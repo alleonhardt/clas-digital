@@ -87,6 +87,7 @@ void session::handle_read(const boost::system::error_code& error,
 		std::cout<<"RECEIVED BY: "<<this<<std::endl;
 		std::cout<<data_<<std::endl;
 		http_request http(data_,bytes_transferred);
+		http.print_request();
 		socket_.async_read_some(boost::asio::buffer(data_,max_length),
 				boost::bind(&session::handle_read,this,boost::asio::placeholders::error,
 					boost::asio::placeholders::bytes_transferred));
