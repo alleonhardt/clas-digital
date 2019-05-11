@@ -1,4 +1,11 @@
 #pragma once
+/**
+ * @file src/server/httpparser.hpp
+ *
+ * Classes for parsing requests and constructing reponses in the http format
+ *
+ * This header defines the interface to the classes http_request and http_reponse
+ */
 #include <string>
 #include <vector>
 #include <string_view>
@@ -45,7 +52,7 @@ class http_request
 		 * @param key The name of the http parameter to search for
 		 * @return The header fitting to the key if there is one
 		 */
-		const std::string_view GetHeaders(std::string key);
+		const std::string_view &GetHeaders(std::string key);
 
 		/**
 		 * Returns the query parameter parsed from the url given the key to search for.
