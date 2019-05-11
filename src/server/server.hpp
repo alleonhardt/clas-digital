@@ -6,10 +6,11 @@
 #include <boost/asio/ssl.hpp>
 #include <boost/thread.hpp>
 #include <mutex>
+#include "httpparser.hpp"
 
 typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket> ssl_socket;
 
-
+class session;
 /**
  * @brief The Basic Multithreaded HTTPS Server handles all requests.
  */
@@ -32,6 +33,7 @@ class server
 		 */
 		void run(unsigned int threads=0);
 
+	private:
 		/**
 		 * The asynchronous handle accept callback, registers if there are new clients available and creates a new session from them
 		 * @param new_session The new session to start.

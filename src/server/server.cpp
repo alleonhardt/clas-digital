@@ -41,7 +41,7 @@ class session
 
 	private:
 		ssl_socket socket_; ///< The socket used to send encrypted data to the client
-		constexpr unsigned long max_length = 1024*64;	///<The length of the buffer
+		constexpr static unsigned long max_length = 1024*64;	///<The length of the buffer
 		char data_[max_length];							///<The buffer to store the received data in
 };
 
@@ -79,13 +79,14 @@ void session::handle_handshake(const boost::system::error_code& error)
 }
 
 void session::handle_read(const boost::system::error_code& error,
-		size_t /*bytes_transferred*/)
+		size_t bytes_transferred)
 {
 	if (!error)
 	{
 		std::cout<<"RECEIVED BY THREAD: "<<boost::this_thread::get_id()<<std::endl;
 		std::cout<<"RECEIVED BY: "<<this<<std::endl;
 		std::cout<<data_<<std::endl;
+		http_request http(data_,bytes_transferred);
 		socket_.async_read_some(boost::asio::buffer(data_,max_length),
 				boost::bind(&session::handle_read,this,boost::asio::placeholders::error,
 					boost::asio::placeholders::bytes_transferred));

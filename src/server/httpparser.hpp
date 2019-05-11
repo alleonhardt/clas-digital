@@ -1,17 +1,35 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <string_view>
+#include <iostream>
+#include <map>
 
-class http_message
+/**
+ * Parses a given string in the xhttp html format and puts the results in the given map.
+ * @param[out] map The map to put the results from the parsing into
+ * @param[in] query The string to parse into the map.
+ */
+void parse_query(std::map<std::string,std::string> &map,std::string_view const &query);
+
+unsigned char tochar(char hi, char lo);
+
+
+
+class http_request
 {
 	public:
-		http_message();
-		http_message(std::string &&msg);
+		http_request();
+		http_request(const char *asyncReadBuf,size_t bytes);
 
-		http_message &header(const char *hdr,const char *val);
-		http_message &body(const char *bdy);
 
-		std::string operator()();
 	private:
-		std::map<std::string,std::string> _headers;
+		std::string_view _method;
+		std::string_view _url;
+		std::string_view _path;
+		std::string_view _query;
+		std::map<std::string_view,std::string_view> _headers;
+		bool _healthy;
+		void *_body;
+		unsigned long _bodySize;
 };
