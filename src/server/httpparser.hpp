@@ -168,8 +168,8 @@ class http_response
 		 */
 		http_response &header(const std::string key, const std::string value);
 		http_response &body(const std::string &bdy);
-		void SendWithEOM();
-		void handle_write_done(const boost::system::error_code &err, std::size_t bytes_transfered);
+		void SendWithEOM(ssl_socket &sock);
+		void handle_write_done(std::string *str,const boost::system::error_code &err, std::size_t bytes_transfered);
 
 	private:
 		std::string _statusLine; ///<The status line returned

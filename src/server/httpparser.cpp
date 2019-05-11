@@ -298,38 +298,41 @@ http_response &http_response::body(const std::string &bdy)
 
 void http_response::SendWithEOM(ssl_socket &sock)
 {
+	std::string *request = new std::string;
+	*request = _statusLine;
 	for(auto it = _headers.begin(); it!=_headers.end(); it++)
 	{
-		_statusLine+=it->first;
-		_statusLine+=": ";
-		_statusLine+=it->second;
+		(*request)+=it->first;
+		(*request)+=": ";
+		(*request)+=it->second;
 	}
 
 
 	time_t t = time( NULL );
   	struct tm today = *localtime( &t );
 
-	_statusLine+="Content-Length: ";
-	_statusLine+=std::to_string(_body.length());
-	_statusLine+="\r\n";
-	_statusLine+="Server: clas-digital v0.1\r\n";
-	_statusLine+="Date: ";
-	_statusLine+=asctime(&today);
-	_statusLine+="\r\n";
-
+	(*request)+="Content-Length: ";
+	(*request)+=std::to_string(_body.length());
+	(*request)+="\r\n";
+	(*request)+="Server: clas-digital v0.1\r\n";
+	(*request)+="Date: ";
+	(*request)+=asctime(&today);
+	(*request)+="\r\n";
+	(*request)+=_body;
+/*
 	std::vector<boost::asio::const_buffer> scatter_gather_io;
 	scatter_gather_io.push_back(boost::asio::buffer(_statusLine.c_str(),_statusLine.length()));
 	scatter_gather_io.push_back(boost::asio::buffer(_body.c_str(),_body.length()));
-
-	boost::asio::async_write(sock,scatter_gather_io,boost::bind(&http_response::handle_write_done,this,boost::asio::placeholders::error,boost::asio::placeholders::bytes_transferred));
+*/
+	boost::asio::async_write(sock,boost::asio::buffer(request->c_str(),request->length()),boost::bind(&http_response::handle_write_done,this,request,boost::asio::placeholders::error,boost::asio::placeholders::bytes_transferred));
 }
 
-void http_response::handle_write_done(const boost::system::error_code &err, std::size_t bytes_transfered)
+void http_response::handle_write_done(std::string *request,const boost::system::error_code &err, std::size_t bytes_transfered)
 {
 	if(err)
 	{
 		std::cout<<"Async write throwed error!"<<std::endl;
 	}
 	std::cout<<bytes_transfered<<" bytes send by async write"<<std::endl;
-	delete this;
+	delete request;
 }
