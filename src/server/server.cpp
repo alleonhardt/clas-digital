@@ -1,5 +1,51 @@
 #include "server.hpp"
 
+/**@brief Handles a TCP Session uses async reads and writes to perform requests
+ * The session uses asynchronous read and write operations to communicate with the client. Only used
+ * for HTTPS clients at the moment may be used for other purposes later on.
+ */
+class session
+{
+	public:
+		/**
+		 * Creates a new TCP session and pushes the work into the io_service.
+		 * @param io_service The io_service to read from and write to
+		 * @param context The ssl context used to encrypt the connection
+		 */
+		session(boost::asio::io_service& io_service, boost::asio::ssl::context& context);
+
+		/**
+		 * Returns the implementation of the socket used for system specific functions and APIs.
+		 * @return socket implementation
+		 */
+		ssl_socket::lowest_layer_type& socket();
+
+		/**
+		 * Asynchronous starting the handshake.
+		 */
+		void start();
+
+		/**
+		 * The asynchronous called function that handles the ssl handshake and startes the first asynchronous read on the connection
+		 * @param error The error returned by the system if the handshake fails.
+		 */
+		void handle_handshake(const boost::system::error_code& error);
+
+		/**
+		 * Asynchronous read operation used to read data from the client.
+		 * @param error The error returned from the read function
+		 * @param bytes_transferred The number of bytes transferred into the buffer
+		 */
+		void handle_read(const boost::system::error_code& error,
+				size_t bytes_transferred);
+
+	private:
+		ssl_socket socket_; ///< The socket used to send encrypted data to the client
+		constexpr unsigned long max_length = 1024*64;	///<The length of the buffer
+		char data_[max_length];							///<The buffer to store the received data in
+};
+
+
 session::session(boost::asio::io_service& io_service, boost::asio::ssl::context& context)
 	: socket_(io_service, context)
 {
