@@ -76,42 +76,59 @@ http_request::http_request(const char *asyncReadBuf,size_t bytes)
 		start=end+2;
 	}
 
+	//Last thing we read was \r\n to skip those two bytes
 	start+=2;
+	//Check if there are bytes left for the body or if it was a header only request
 	if(start<bytes)
 	{
+		//Calculate body start and size
 		_body = &asyncReadBuf[start];
 		_bodySize = bytes-start;
 	}
 	else
 	{
+		//No body
 		_body = nullptr;
 		_bodySize = 0;
 	}
+
+	//Start parsing the url encoded query parameters
 	start = 0;
+	//Search the beginning of the query parameters
 	end = _url.find("?",start);
+
 	if(end!=std::string::npos)
 	{
+		//Path is the part of the path before the question mark eg
+		// /search/html?mark=x&quest=y
+		// /search/html is the path and mark=x&quest=y the query
 		_path = _url.substr(0,end);
 		_query = _url.substr(end+1);
+		//If we got a query parse the query
 		if(_query!="")
 			parse_query(_queryMap,_query);
 	}
 	else
 	{
+		//No question mark means path equals url and there is no query
 		_path = _url;
 		_query = "";
 	}
 
+	//Everything good seems like the message was a good one
 	_healthy = true;
 }
 
 void http_request::print_request()
 {
+	//If the message is not healthy there is no reason to print it.
 	if(!_healthy)
 	{
 		std::cout<<"Some corrupted message received"<<std::endl;
 		return;
 	}
+
+	//Prints everything we got
 	std::cout<<"Method: "<<_method<<std::endl;
 	std::cout<<"URL: "<<_url<<std::endl;
 	std::cout<<"Path: "<<_path<<std::endl;
@@ -126,47 +143,47 @@ void http_request::print_request()
 	std::cout<<"Body size: "<<_bodySize<<std::endl;
 }
 
-const std::string_view &GetHeaders(std::string key)
+const std::string_view &http_request::GetHeaders(std::string key)
 {
 	return _headers[key];
 }
 
-const std::string_view &GetQueryParams(std::string key)
+const std::string_view http_request::GetQueryParams(std::string key)
 {
 	return _queryMap[key];
 }
 
-const std::string_view &GetMethod()
+const std::string_view &http_request::GetMethod()
 {
 	return _method;
 }
 
-const std::string_view &GetURL()
+const std::string_view &http_request::GetURL()
 {
 	return _url;
 }
 
-const std::string_view &GetPath()
+const std::string_view &http_request::GetPath()
 {
 	return _path;
 }
 
-const std::string_view &GetQuery()
+const std::string_view &http_request::GetQuery()
 {
 	return _query;
 }
 
-bool IsHealthy()
+bool http_request::IsHealthy()
 {
 	return _healthy;
 }
 
-const void *GetBody()
+const void *http_request::GetBody()
 {
 	return _body;
 }
 
-unsigned long GetBodySize()
+unsigned long http_request::GetBodySize()
 {
 	return _bodySize;
 }
@@ -174,6 +191,7 @@ unsigned long GetBodySize()
 
 unsigned char tochar(char hi, char lo)
 {
+	//Convert hi to a decimal value F=15,E=14,D=13,...,9,8,7,6,5,4,3,2,1
 	if(hi>='A'&&hi<='F')
 		hi-=55;
 	else if(hi>='a'&&hi<='f')
@@ -181,56 +199,74 @@ unsigned char tochar(char hi, char lo)
 	else if(hi>='0'&&hi<='9')
 		hi-=48;
 
+	//Same for lo F=15,E=14,D=13,...,9,8,7,6,5,4,3,2,1
 	if(lo>='A'&&lo<='F')
 		lo-=55;
 	else if(lo>='a'&&lo<='f')
 		lo-=('a'+10);
 	else if(lo>='0'&&lo<='9')
 		lo-=48;
+	//Calculate decimal value out of it
 	return hi*16+lo;
 }
-
+/**
+ * \todo Fix multiple key collisions and find a way to manage that eg collections=RXBADE&collections=RXFGABAAD
+ */
 void parse_query(std::map<std::string,std::string> &queryMap,std::string_view const &query)
 {
+	//Fill a map with the corresponding key: value pair and parse the url format
 	std::string name = "";
 	std::string value = "";
+	//Set the current write pointer to the name as first comes the key then the value
 	std::string *writer = &name;
+
+	//Parse the whole string
 	for(unsigned long i = 0; i < query.length(); i++)
 	{
+		//If there is a '%' sign it means the next two characters are hexadecimal format.
+		//eg %20 = 32 = ' ' or %30 = 48 = '0' etc.
 		if(query[i] == '%')
 		{
+			//Check if there is enough space left for conversion
 			if(i+2<query.length())
 			{
 				(*writer)+=tochar(query[i+1],query[i+2]);
 				i+=2;
 			}
 			else
-				(*writer)+=query[i];
+				(*writer)+=query[i]; //If not just fill the normal % sign
 		}
-		else if(query[i] == '+')
+		else if(query[i] == '+') //+ means whitespace in url
 		{
 			(*writer)+=' ';
 			continue;
 		}
-		else if(query[i] == '=')
+		else if(query[i] == '=') // '=' means the key is over and the value pair will start now eg. key=value
 		{
+			//If we are currently writing the key pair set the pointer to write the value pair now,
+			//if we are in the value pair just put down the '=' sign in the value part 
 			if(writer==&name)
 			{
 				writer = &value;
 				continue;
 			}
 		}
-		else if(query[i]=='&')
+		else if(query[i]=='&') //& means new key=value pair so write down the last pair and start the new pair
 		{
+			//No checking of existing name etc. if the user send stuff like that only the last key=value pair with the same key
+			//will get saved
 			queryMap[std::move(name)] = std::move(value);
+			//Reset vars to start the next key=value pair
 			name="";
 			value="";
 			writer = &name;
 		}
 		else
 		{
+			//No special character just take what the query got
 			(*writer)+=query[i];
 		}
 	}
+	//Write down the last key and value pair as there is no finishing & at the end of the url
 	queryMap[std::move(name)] = std::move(value);
 }
