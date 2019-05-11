@@ -1,4 +1,4 @@
-#include "CFunctions.h"
+#include "CFunctions.hpp"
 
 /**
 * @param[in] chT1 first string to compare
@@ -77,4 +77,13 @@ void CFunctions::createMapOfWords(std::string sPathToOcr, std::map<std::string, 
 void CFunctions::createMapofWordsFromString(std::string sWords, std::map<std::string, int>& mapWords)
 {
 }
+
+/**
+* @param[in] sPathToWords path to .txt with all words in book
+* @param[out] mapWords map to which new words will be added.
+*/
+void CFunctions::loadMapOfWords(std::string sPathToWords, std::map<std::string, int>& mapWords)
+{
+}
+
 

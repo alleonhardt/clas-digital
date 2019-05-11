@@ -1,5 +1,6 @@
 #include "CMetadata.hpp"
 
+CMetadata::CMetadata () {}
 /**
 *@param[in] sMetadata path to metadata
 */
@@ -170,6 +171,49 @@ int CMetadata::getDate()
 
     //Return -1 if regex nether matched
     return -1;
+}
+
+
+/**
+* @return string with Auhtor + first 6 words 15 words of title + date
+*/
+std::string CMetadata::getShow()
+{
+    //Add author to result
+    std::string sResult = getAuthor();
+
+    //Add first 15 words of title to result
+    std::string sTitle = getMetadata("title", "data");
+    unsigned int counter = 0;
+    bool bFinisched = true;
+    for(unsigned int i=0; i<sTitle.length(); i++)
+    {
+        if(sTitle[i] == ' ')
+            counter++;
+        if(counter == 10)
+        {
+            bFinisched = false;
+            break;
+        }
+
+        sResult += sTitle[i];
+    }
+    if(bFinisched == false)
+        sResult += " ... \"";
+    else
+        sResult += "\"";
+
+    //Add date to result
+    int date = getDate();
+    if(date != -1)
+    {
+        sResult.append(", ");
+        sResult.append(std::to_string(date));
+    }
+
+    sResult += ".";
+    
+    return sResult;
 }
 
 

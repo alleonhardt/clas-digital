@@ -46,6 +46,12 @@ public:
     */
     void createMapofWordsFromString(std::string sWords, std::map<std::string, int>& mapWords);
 
+    /**
+    * @param[in] sPathToWords path to .txt with all words in book
+    * @param[out] mapWords map to which new words will be added.
+    */
+    void loadMapOfWords(std::string sPathToWords, std::map<std::string, int>& mapWords);
+
 };
 
 

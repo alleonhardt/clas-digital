@@ -1,5 +1,7 @@
 #pragma once 
 
+#include <iostream>
+#include <fstream>
 #include <map>
 #include <string>
 #include <regex>
@@ -16,6 +18,8 @@ private:
     CMetadata m_Metadata;                  //Json with all metadata 
 
 public:
+
+    CBook ();
 
     /**
     * @Brief Constructor
@@ -56,7 +60,7 @@ public:
     /**
     * @return info.json of book
     */
-    CMetadata& getJsonMetadata();
+    CMetadata& getMetadata();
 
     /**
     * @return vector with all collections this book is in

@@ -1,5 +1,7 @@
 #include "CBook.hpp"
 
+CBook::CBook () {}
+
 /**
 * @Brief Constructor
 * @param[in] sPath Path to book
@@ -56,7 +58,7 @@ std::map<std::string, int>& CBook::getMapWords() {
 /**
 * @return info.json of book
 */
-CMetadata& CBook::getJsonMetadata() {
+CMetadata& CBook::getMetadata() {
     return m_Metadata;
 }
 
@@ -106,6 +108,20 @@ int CBook::getDate() {
 */
 void CBook::createMapWords()
 {
+    std::ifstream readOcr(getOcrPath());
+
+    //If ocr exists create or load list with words
+    if(!readOcr)
+        return;
+
+    CFunctions function;
+    std::ifstream readWords(getOcrPath()+"/words.txt");
+    if(!readWords)
+        function.createMapOfWords(getOcrPath(), m_Words);
+    else
+        function.loadMapOfWords(getOcrPath()+"/words.txt", m_Words);
+
+    m_bOcr = true;
 }
 
 

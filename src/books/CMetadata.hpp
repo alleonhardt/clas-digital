@@ -12,6 +12,8 @@ private:
 
 public:
     
+    CMetadata();
+
     /**
     *@param[in] sMetadata path to metadata
     */
@@ -73,4 +75,10 @@ public:
     * @return date or -1 if date does not exists or is currupted
     */
     int getDate();
+
+    /**
+    * @return string with Auhtor + first 6 words 15 words of title + date
+    */
+    std::string getShow();
+
 };

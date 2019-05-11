@@ -11,14 +11,22 @@ class CBookManager
 private:
 
     //Map of all books
-    std::map<std::string, CBook*> m_mapBooks;
+    std::map<std::string, CBook> m_mapBooks;
 
 public:
 
+   // **** getter **** //
+
    /**
-   *@brief load all books.
+   * @return map of all book
    */
-   void initialize(); 
+   std::map<std::string, CBook>& getMapOfBooks();
+
+   /**
+   * @brief load all books.
+   * @return boolean for successful of not
+   */
+   bool initialize(); 
 
 }; 
 
