@@ -143,12 +143,12 @@ void http_request::print_request()
 	std::cout<<"Body size: "<<_bodySize<<std::endl;
 }
 
-const std::string_view &http_request::GetHeaders(std::string key)
+const std::string_view &http_request::GetHeaders(const std::string key)
 {
 	return _headers[key];
 }
 
-const std::string_view http_request::GetQueryParams(std::string key)
+const std::string_view http_request::GetQueryParams(const std::string key)
 {
 	return _queryMap[key];
 }
@@ -209,6 +209,7 @@ unsigned char tochar(char hi, char lo)
 	//Calculate decimal value out of it
 	return hi*16+lo;
 }
+
 /**
  * \todo Fix multiple key collisions and find a way to manage that eg collections=RXBADE&collections=RXFGABAAD
  */
@@ -269,4 +270,66 @@ void parse_query(std::map<std::string,std::string> &queryMap,std::string_view co
 	}
 	//Write down the last key and value pair as there is no finishing & at the end of the url
 	queryMap[std::move(name)] = std::move(value);
+}
+
+
+http_response::http_response()
+{
+}
+
+http_response &http_response::status(const std::string hdr)
+{
+	_statusLine = hdr;
+	return *this;
+}
+
+http_response &http_response::header(const std::string key, const std::string value)
+{
+	_headers[key] = value+"\r\n";
+	return *this;
+}
+
+http_response &http_response::body(const std::string &bdy)
+{
+	_body += bdy;
+	return *this;
+}
+
+
+void http_response::SendWithEOM(ssl_socket &sock)
+{
+	for(auto it = _headers.begin(); it!=_headers.end(); it++)
+	{
+		_statusLine+=it->first;
+		_statusLine+=": ";
+		_statusLine+=it->second;
+	}
+
+
+	time_t t = time( NULL );
+  	struct tm today = *localtime( &t );
+
+	_statusLine+="Content-Length: ";
+	_statusLine+=std::to_string(_body.length());
+	_statusLine+="\r\n";
+	_statusLine+="Server: clas-digital v0.1\r\n";
+	_statusLine+="Date: ";
+	_statusLine+=asctime(&today);
+	_statusLine+="\r\n";
+
+	std::vector<boost::asio::const_buffer> scatter_gather_io;
+	scatter_gather_io.push_back(boost::asio::buffer(_statusLine.c_str(),_statusLine.length()));
+	scatter_gather_io.push_back(boost::asio::buffer(_body.c_str(),_body.length()));
+
+	boost::asio::async_write(sock,scatter_gather_io,boost::bind(&http_response::handle_write_done,this,boost::asio::placeholders::error,boost::asio::placeholders::bytes_transferred));
+}
+
+void http_response::handle_write_done(const boost::system::error_code &err, std::size_t bytes_transfered)
+{
+	if(err)
+	{
+		std::cout<<"Async write throwed error!"<<std::endl;
+	}
+	std::cout<<bytes_transfered<<" bytes send by async write"<<std::endl;
+	delete this;
 }

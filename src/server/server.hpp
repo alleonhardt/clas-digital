@@ -1,4 +1,13 @@
 #pragma once
+/**
+ * @file src/server/server.hpp
+ *
+ * Classes for receiving encrypted ssl connections and for sending and receving data
+ * from these connections running.
+ *
+ * This header defines the basic interface for starting a multithreaded ssl encrypted
+ * server which reads https requests
+ */
 #include <cstdlib>
 #include <iostream>
 #include <boost/bind.hpp>
@@ -8,7 +17,6 @@
 #include <mutex>
 #include "httpparser.hpp"
 
-typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket> ssl_socket;
 
 class session;
 /**

@@ -58,6 +58,8 @@ ssl_socket::lowest_layer_type& session::socket()
 
 void session::start()
 {
+	boost::asio::ip::tcp::no_delay option(true);
+	socket_.lowest_layer().set_option(option);
 	socket_.async_handshake(boost::asio::ssl::stream_base::server,
 			boost::bind(&session::handle_handshake, this,
 				boost::asio::placeholders::error));
@@ -84,10 +86,22 @@ void session::handle_read(const boost::system::error_code& error,
 	if (!error)
 	{
 		std::cout<<"RECEIVED BY THREAD: "<<boost::this_thread::get_id()<<std::endl;
-		std::cout<<"RECEIVED BY: "<<this<<std::endl;
-		std::cout<<data_<<std::endl;
+		std::cout<<"RECEIVED BY: "<<this<<" SESSID"<<std::endl;
 		http_request http(data_,bytes_transferred);
-		http.print_request();
+		if(http.IsHealthy())
+		{
+			http_response *resp = new http_response();
+			resp->status(http_response::StatusCodes::Ok)
+				.header("Content-Type","text/html")
+				.body("Does it work?")
+				.SendWithEOM(socket_);
+			return;
+		}
+		else
+		{
+			delete this;
+			return;
+		}
 		socket_.async_read_some(boost::asio::buffer(data_,max_length),
 				boost::bind(&session::handle_read,this,boost::asio::placeholders::error,
 					boost::asio::placeholders::bytes_transferred));

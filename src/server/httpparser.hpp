@@ -11,6 +11,10 @@
 #include <string_view>
 #include <iostream>
 #include <map>
+#include <boost/bind.hpp>
+#include <boost/asio.hpp>
+#include <boost/asio/ssl.hpp>
+
 
 /**
  * Parses a given string in the xhttp html format and puts the results in the given map.
@@ -27,6 +31,7 @@ void parse_query(std::map<std::string,std::string> &map,std::string_view const &
  */
 unsigned char tochar(char hi, char lo);
 
+typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket> ssl_socket;
 
 /**
  * @brief Parses and stores informations about an HTTP request
@@ -52,14 +57,14 @@ class http_request
 		 * @param key The name of the http parameter to search for
 		 * @return The header fitting to the key if there is one
 		 */
-		const std::string_view &GetHeaders(std::string key);
+		const std::string_view &GetHeaders(const std::string key);
 
 		/**
 		 * Returns the query parameter parsed from the url given the key to search for.
 		 * @param key The variable name in the query parameter
 		 * @return The query parameter fitting to a key.
 		 */
-		const std::string_view GetQueryParams(std::string key);
+		const std::string_view GetQueryParams(const std::string key);
 		
 		/**
 		 * Returns the method used in the Request, 'POST' or 'GET' etc.
@@ -114,4 +119,60 @@ class http_request
 		bool _healthy;	///<Checks if the message is well built and the class didnt encounter errors while parsing
 		const void *_body;	///<A pointer to the body part of the HTTP message
 		unsigned long _bodySize;	///<The body size of the http message
+};
+
+
+/**
+ * @brief This class constructs a http reponse and sends it so the client
+ */
+class http_response
+{
+	public:
+		/**
+		 * The Error codes thrown by various http_response functions
+		 */
+		enum class Errors
+		{
+			StatusAlreadyDefined, ///<The status was already defined when the user tried to set it
+			StatusNotSet ///<The status was not set before the user tried to set the headers
+		};
+
+		/**
+		 * The status codes used to answer to the client
+		 */
+		struct StatusCodes
+		{
+			constexpr static char Continue[] = "HTTP/1.1 100 Continue\r\n"; ///<Continue HTTP Header
+			constexpr static char Ok[] = "HTTP/1.1 200 OK\r\n"; ///<Ok HTTP Header
+			constexpr static char NotFound[] = "HTTP/1.1 404 Not found\r\n"; ///<Not found HTTP header
+			constexpr static char Unauthorized[] = "HTTP/1.1 401 Unauthorized\r\n"; ///<Unauthorized http header
+		};
+
+		/**
+		 * Creates the http response.
+		 */
+		http_response();
+		
+		/**
+		 * Sets the status code for the response
+		 * @param statusCode The statusCode for the response
+		 * @return A reference to the class itself, used for function chaining
+		 */
+		http_response &status(const std::string hdr);
+
+		/**
+		 * Sets a new header for the pending response.
+		 * @param[in] key The header field to write
+		 * @param[in] value The value field which will get set after the header field
+		 * @return A reference to the class itself, this enables function chaining eg response.header("Content-Length","10").header("hdr2","someVal");
+		 */
+		http_response &header(const std::string key, const std::string value);
+		http_response &body(const std::string &bdy);
+		void SendWithEOM();
+		void handle_write_done(const boost::system::error_code &err, std::size_t bytes_transfered);
+
+	private:
+		std::string _statusLine; ///<The status line returned
+		std::map<std::string,std::string> _headers;	///<The headers for the response
+		std::string _body; 		///<The response later given to async_write
 };
