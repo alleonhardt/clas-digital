@@ -1,10 +1,76 @@
 cmake_minimum_required(VERSION 2.6)
-project(clas-digital)
+project(Menard2)
 
-set(CMAKE_CXX_FLAGS "-O3 -W -Wall -Werror -std=c++1z")
-set(SRC_FILES src/main.cpp src/server/server.cpp src/server/httpparser.cpp)
+include_directories(
+  "src")
 
-set(EXECUTABLE_OUTPUT_PATH ../bin) 
+set(CMAKE_CXX_FLAGS "-Wall -Werror -Wpedantic -std=c++1z")
+#
+# - Try to find Facebook proxygen library
+# This will define
+# PROXYFGEN_FOUND
+# PROXYGEN_INCLUDE_DIR
+# PROXYGEN_LIBRARIES
+#
+
+find_package(Folly REQUIRED)
+find_package(Wangle REQUIRED)
+find_package(Threads REQUIRED)
+find_package(GTest REQUIRED)
+find_package(Fizz QUIET)
+find_package(CURL REQUIRED)
+find_path(
+  PROXYGEN_INCLUDE_DIR
+  NAMES "proxygen/httpserver/HTTPServer.h"
+  HINTS
+    "/usr/local/facebook/include"
+)
+
+find_library(
+  PROXYGEN_LIBRARY
+  NAMES proxygenlib
+  HINTS
+    "/usr/local/facebook/lib"
+  )
+
+find_library(
+  PROXYGEN_HTTP_SERVER
+  NAMES proxygenhttpserver
+  HINTS
+    "/usr/local/facebook/lib"
+)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(PROXYGEN_LIBRARIES
+  ${PROXYGEN_LIBRARY}
+  ${PROXYGEN_HTTP_SERVER}
+)
+
+set(PROXYGEN_LIBRARIES ${PROXYGEN_LIBRARIES} ${FOLLY_LIBRARIES} ${WANGLE_LIBRARIES})
+
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(
+  PROXYGEN DEFAULT_MSG PROXYGEN_INCLUDE_DIR PROXYGEN_LIBRARIES)
+
+mark_as_advanced(PROXYGEN_INCLUDE_DIR PROXYGEN_LIBRARIES PROXYGEN_FOUND)
+
+if(PROXYGEN_FOUND AND NOT PROXYGEN_FIND_QUIETLY)
+  message(STATUS "PROXYGEN: ${PROXYGEN_INCLUDE_DIR}")
+endif()
+
+
+set(SRC_FILES src/main.cpp src/server/GetHandler.cpp)
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_HOME_DIRECTORY}/bin)
+
+add_executable(unittest.o ${SRC_FILES})
+add_custom_command(
+	TARGET unittest.o
+	POST_BUILD
+	COMMAND ${EXECUTABLE_OUTPUT_PATH}/unittest
+	WORKING_DIRECTORY ${EXECUTABLE_OUTPUT_PATH}
+    COMMENT "Running unit tests..."
+)
+
 add_executable(clas-digital.o ${SRC_FILES})
-target_link_libraries(clas-digital.o boost_system boost_thread ssl crypto)
-
+target_link_libraries(clas-digital.o ${PROXYGEN_LIBRARIES} ${CURL_LIBRARIES})
+target_link_libraries(unittest.o ${PROXYGEN_LIBRARIES} ${GTEST_BOTH_LIBRARIES} ${CURL_LIBRARIES})
+target_compile_definitions(unittest.o PRIVATE COMPILE_UNITTEST=10)

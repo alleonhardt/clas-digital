@@ -1,5 +1,8 @@
-sudo apt-get install libboost-all-dev openssl libssl-dev
 mkdir build
 mkdir doc
-cd build
-cmake ..
+mkdir bin
+sudo iptables -t nat -I OUTPUT -p tcp -o lo --dport 443 -j REDIRECT --to-ports 1409
+sudo iptables -t nat -I PREROUTING -p tcp -o lo --dport 443 -j REDIRECT --to-ports 1409
+sudo iptables -t nat -I OUTPUT -p tcp -o lo --dport 80 -j REDIRECT --to-ports 1408
+sudo iptables -t nat -I PREROUTING -p tcp -o lo --dport 80 -j REDIRECT --to-ports 1408
+sudo apt install iptables-persistent
