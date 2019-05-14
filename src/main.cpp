@@ -1,4 +1,3 @@
-#define __DEFINE_ONE__
 #ifdef COMPILE_UNITTEST 
 #include <gtest/gtest.h>
 #endif
@@ -40,7 +39,7 @@ int main(int argc, char* argv[]) {
 
 	wangle::SSLContextConfig cfg;
 	cfg.setCertificate("bin/cert.pem","bin/key.pem","");
-	cfg.isDefault = true;
+	icfg.isDefault = true;
 	std::vector<HTTPServer::IPConfig> IPs = {
 		{SocketAddress(0, FLAGS_http_red, true), Protocol::HTTP},
 		{SocketAddress(0, FLAGS_http_port, true), Protocol::HTTP},
