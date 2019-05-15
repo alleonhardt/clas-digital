@@ -39,7 +39,7 @@ int main(int argc, char* argv[]) {
 
 	wangle::SSLContextConfig cfg;
 	cfg.setCertificate("bin/cert.pem","bin/key.pem","");
-	icfg.isDefault = true;
+	cfg.isDefault = true;
 	std::vector<HTTPServer::IPConfig> IPs = {
 		{SocketAddress(0, FLAGS_http_red, true), Protocol::HTTP},
 		{SocketAddress(0, FLAGS_http_port, true), Protocol::HTTP},

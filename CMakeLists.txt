@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 2.6)
 project(Menard2)
 
 include_directories(
-  "src")
+  "src"
+  ".")
 
 set(CMAKE_CXX_FLAGS "-Wall -Werror -Wpedantic -std=c++1z")
 #
@@ -58,15 +59,16 @@ if(PROXYGEN_FOUND AND NOT PROXYGEN_FIND_QUIETLY)
 endif()
 
 
-set(SRC_FILES src/main.cpp src/server/GetHandler.cpp)
+set(SRC_FILES src/main.cpp src/server/GetHandler.cpp src/server/PostHandler.cpp src/login/user.cpp)
+
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_HOME_DIRECTORY}/bin)
 
 add_executable(unittest.o ${SRC_FILES})
 add_custom_command(
 	TARGET unittest.o
 	POST_BUILD
-	COMMAND ${EXECUTABLE_OUTPUT_PATH}/unittest
-	WORKING_DIRECTORY ${EXECUTABLE_OUTPUT_PATH}
+	COMMAND ${EXECUTABLE_OUTPUT_PATH}/unittest.o
+	WORKING_DIRECTORY ${CMAKE_HOME_DIRECTORY}
     COMMENT "Running unit tests..."
 )
 

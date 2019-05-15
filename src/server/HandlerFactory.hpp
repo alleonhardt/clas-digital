@@ -1,3 +1,9 @@
+/**
+ * @file src/server/HandlerFactory.hpp
+ * 
+ * This file contains the basic static handler factory used to instantiate the proxygen server
+ * The Handler Factory selects based on the request the appropriate request handler class
+ */
 #pragma once
 #include <folly/Memory.h>
 #include <folly/executors/GlobalExecutor.h>
@@ -12,7 +18,7 @@
 #include <string>
 #include <map>
 
-#include "server/GetHandler.hpp"
+#include "src/server/BasicHandlers.hpp"
 
 using namespace proxygen;
 using folly::EventBase;
@@ -22,6 +28,7 @@ using folly::SocketAddress;
 
 
 /**
+ * @brief The HandlerFactory is used to instantiate the proxygen server and creates all request handler for every request directed to the server
  * This class redirects every request to the right handler, in order to do so it keeps book of every URI object registered
  * and sends the request to the URI object if there is any else the request goes to the default handler.
  */
@@ -32,10 +39,12 @@ class HandlerFactory : public RequestHandlerFactory {
          * Initialises the HandlerFactory and gets called by the proxygen server as the server starts up.
          * Reserve all the post URI Objects as well as all the GET URI Objects.
          */
-        void onServerStart(folly::EventBase* /*evb*/) noexcept override 
-        {
-		}
+        void onServerStart(folly::EventBase* /*evb*/) noexcept override {}
 
+		/**
+		 * @brief Handles the cleanup and behaviour if the server is stopped, in this case it does nothing at all because no cleanup is needed
+		 *
+		 */
         void onServerStop() noexcept override {}
 
         /**
@@ -44,8 +53,13 @@ class HandlerFactory : public RequestHandlerFactory {
          * @param hdr The header of the message received, is used to set identify the user the message was sent from
          * @return Returns the correct request handler for the requested URI
          */
-        RequestHandler* onRequest(RequestHandler*, HTTPMessage* hdr) noexcept override {
-			return new GetHandler;
+        RequestHandler* onRequest(RequestHandler*, HTTPMessage* hdr) noexcept override 
+		{
+			User *from = nullptr;
+			if(hdr->getMethod() == HTTPMethod::GET)
+				return new GetHandler(from);
+			else
+				return new PostHandler(from);
         }
 };
 

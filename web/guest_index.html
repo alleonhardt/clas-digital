@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <title>Zoologie</title>
+<style>
+
+/* search box */
+
+.button_box2 {
+  margin:20% auto;
+  text-align: center;
+}
+/*-------------------------------------*/
+.cf:before, .cf:after{
+  content:"";
+  display:table;
+}
+.cf:after{
+  clear:both;
+}
+.cf{
+  zoom:1;
+}
+/*-------------------------------------*/
+
+.form-wrapper-2 {
+  display: inline-block;
+  width: 70%;
+  padding-bottom: 2px;
+  background: #555;
+}
+.form-wrapper-2 input {
+  width: 80%;
+  height: 40px;
+  padding: 10px 5px;
+  float: left;
+  font: bold 15px 'Raleway', sans-serif;
+  border: 0;
+  background: #fff;
+}
+.form-wrapper-2 button {
+  overflow: visible;
+  position: relative;
+  float: right;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  height: 40px;
+  width: 20%;
+  font: bold 15px/40px 'Raleway', sans-serif;
+  color: #fff;
+  text-transform: uppercase;
+  background: #D88F3C;
+}
+
+.form-wrapper-2 button:hover{
+  background: #FA8807;
+}
+.form-wrapper-2 button:active,
+.form-wrapper-2 button:focus{
+  background: #c42f2f;
+}
+</style>
+    <script>
+function sendToPage(name)
+{
+  let input = document.getElementById(name).value;
+  location.href = "/search?q="+input;
+}
+    </script>
+
+  </head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <!--<a class="navbar-brand" href="/">
+      <img src="home-icon.png" width="32" height="32" alt="">
+  </a>-->
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul id="SpecialBannerList" class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+      </li>
+    </ul>
+    <div id="LogInBanner" class ="form-inline my-2 my-lg-0">
+    
+    </div>
+    <form id ="LoginForm" class="form-inline my-2 my-lg-0" action="/" method="post">
+      <input id="EmailType" class="form-control mr-sm-2" type="email" name="email" placeholder="Email" aria-label="Email" required>
+      <input id="PasswordType" class="from-control mr-sm-2" type="password" name="password" placeholder="Password" aria-label="Password" required>
+      <input class="btn btn-outline-success my-2 my-sm-0" type="submit" value="Log In"/>
+    </form>
+  </div>
+</nav>
+<div class="button_box2">
+  <form class="form-wrapper-2 cf">
+    <input id="kkD" type="text" placeholder="Search here..." required>
+    <button type="button" onclick="sendToPage('kkD')">Search</button>
+  </form>
+ </div>
+  </body>
+</html>
