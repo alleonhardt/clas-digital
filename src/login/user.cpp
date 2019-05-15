@@ -46,6 +46,17 @@ bool User::DoesMatch(std::string email, std::string passwd) const
 		return false;
 }
 
+const std::string &User::GetSessid() const
+{
+	return _sessid;
+}
+
+
+void User::SetSessionId(std::string sessid)
+{
+	_sessid = std::move(sessid);
+}
+
 
 #ifdef COMPILE_UNITTEST
 

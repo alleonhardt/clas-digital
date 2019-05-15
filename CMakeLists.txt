@@ -59,7 +59,7 @@ if(PROXYGEN_FOUND AND NOT PROXYGEN_FIND_QUIETLY)
 endif()
 
 
-set(SRC_FILES src/main.cpp src/server/GetHandler.cpp src/server/PostHandler.cpp src/login/user.cpp)
+set(SRC_FILES src/main.cpp src/server/GetHandler.cpp src/server/PostHandler.cpp src/login/user.cpp src/login/usertable.cpp)
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_HOME_DIRECTORY}/bin)
 

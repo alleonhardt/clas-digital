@@ -12,6 +12,7 @@
 #include <folly/File.h>
 #include <proxygen/httpserver/RequestHandler.h>
 #include "src/login/user_system.hpp"
+#include "src/util/debug.hpp"
 
 namespace proxygen {
 	class ResponseHandler;
