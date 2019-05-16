@@ -22,7 +22,7 @@ public:
     * @param[int mapSR map of search results
     * @return list of books
     */
-    void normalSearch(std::map<std::string, std::list<CBook*>>& mapWords,
-                                                            std::map<std::string, CBook*>& mapSR);
+    void normalSearch(std::map<std::string, std::map<std::string, CBook*>>& mapWords,
+                                                            std::map<std::string, CBook*>* mapSR);
 
 };

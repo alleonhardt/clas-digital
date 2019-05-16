@@ -53,26 +53,20 @@ bool CBookManager::initialize()
 * @param[in] searchOPts 
 * @return list of all found books
 */
-std::list<CBook*>& CBookManager::search(std::string sWord, bool ocr, bool title)
+std::map<std::string, CBook*>* CBookManager::search(std::string sWord, bool ocr, bool title)
 {
     CSearch search(sWord);
 
     //Create empty map of searchResults
-    std::map<std::string, CBook*> mapSearchresults;
+    std::map<std::string, CBook*>* mapSearchresults = new std::map<std::string, CBook*>;
 
     //Search in ocr and/ or in title
     if(title == false)
-        search.normalSearch(m_mapWordsTitle, mapSearchresults);
+        search.normalSearch(m_mapWords, mapSearchresults);
     if(ocr == false)
         search.normalSearch(m_mapWordsTitle, mapSearchresults);
 
-    //Convert map to list of books
-    std::list<CBook*> listSearchResults;
-    for(auto it=mapSearchresults.begin(); it!=mapSearchresults.end(); it++) {
-        listSearchResults.push_back(it->second);
-    }
-    
-    return listSearchResults;
+    return mapSearchresults;
 }
 
 
@@ -89,8 +83,12 @@ void CBookManager::createMapWords()
         if(it->second.getOcr() == false)
             continue;
 
-        //Add new words to map of all words
-        addWords(it->second, it->second.getMapWords());
+        //Get map of words of current book
+        std::map<std::string, int> mapWords = it->second.getMapWords();
+
+        //Iterate over all words in this book. Check whether word already exists in list off all words.
+        for(auto yt=mapWords.begin(); yt!=mapWords.end(); yt++)
+            m_mapWordsTitle[yt->first][it->first] = &it->second;
     }
 
     unsigned int counter = 0;
@@ -110,34 +108,11 @@ void CBookManager::createMapWordsTitle()
         std::map<std::string, int> mapWords; 
         function.createMapofWordsFromString(it->second.getTitle(), mapWords);
 
-        //Add new words to map of all words
-        addWords(it->second, mapWords);
+        //Iterate over all words in this book. Check whether word already exists in list off all words.
+        for(auto yt=mapWords.begin(); yt!=mapWords.end(); yt++)
+            m_mapWordsTitle[yt->first][it->first] = &it->second;
     }
 
     unsigned int counter = 0;
 }
 
-/**
-* @brief Iterate over all words in this book. Check whether word already exists in list off all words.
-* @param[in] mapWords map of all words in current book)
-*/
-void CBookManager::addWords (CBook& book, const std::map<std::string, int>& mapWords)
-{
-    //Iterate over all words in this book. Check whether word already exists in list off all words.
-    //If yes:   add book to list of books matching to current word.
-    //If no:    add word to map of all words and book to list mathcing to this word.
-    for(auto yt=mapWords.begin(); yt!=mapWords.end(); yt++)
-    {
-        //Add book to list of books matching to current word.
-        if(m_mapWordsTitle.count(yt->first) > 0)
-            m_mapWordsTitle.at(yt->first).push_back(&book);
-
-        //add word to map of all words and book to list mathcing to this word.
-        else
-        {
-            std::list<CBook*> listBooks;
-            listBooks.push_back(&book);
-            m_mapWordsTitle[yt->first] = listBooks;
-        }
-    }
-}

@@ -24,12 +24,12 @@ int main()
 
     std::cout << "Searching for " << sInput << "... \n";
 
-    std::list<CBook*> searchResults = manager.search(sInput, true, true);
+    std::map<std::string, CBook*>* searchResults = manager.search(sInput, false, false);
     
     unsigned int counter = 0;
-    for(auto it=searchResults.begin(); it!=searchResults.end(); it++)
+    for(auto it=searchResults->begin(); it!=searchResults->end(); it++)
     {
-        std::cout << (*it)->getKey() << ": " << (*it)->getMetadata().getShow() << "\n";
+        std::cout << it->first << ": " << it->second->getMetadata().getShow() << "\n";
         counter++;
     }
     std::cout << "Results found: " << counter << "\n";
