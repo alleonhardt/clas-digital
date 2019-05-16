@@ -12,6 +12,7 @@
 #ifdef COMPILE_UNITTEST
 #include <gtest/gtest.h>
 #endif
+#include "src/books/json.hpp"
 
 /**
  * @brief Defines the basic a access rights a user can have at the moment
@@ -24,7 +25,7 @@ enum AccessRights
 };
 
 /**
- * @brief The basic user class this represents a basic user and stores email password and access rights for this user
+ * @brief The basic user class this represents a basic user and stores email password and access rights for this user as well as the current session
  *
  */
 class User
@@ -78,8 +79,16 @@ class User
 		 */
 		const std::string &GetPassword() const;
 
+		/**
+		 * @brief Returns the current session id of the user logged in at the moment
+		 * @return The session id for the user
+		 */
 		const std::string &GetSessid() const;
 
+		/**
+		 * @brief Sets the session id to a new session id 
+		 *
+		 */
 		void SetSessionId(std::string sessid);
 
 		/**
@@ -141,6 +150,27 @@ class UserHandler
 		 * user with this password and/or email.
 		 */
 		std::string DoLogin(std::string email, std::string password);
+		
+		/**
+		 * @brief Returns a shared ptr to the User associated with the session id if it exists
+		 * @param x The session id
+		 * @return The user associated with the session id
+		 */
 		std::shared_ptr<User> GetUserBySessid(std::string x);
+
+		/**
+		 * @brief Returns a shared pointer to the user associated with the given email returns a nullptr otherwise
+		 *
+		 * @param email The email of the user which should be found
+		 *
+		 * @return A shared pointer to the user associated with the given email
+		 */
+		std::shared_ptr<User> GetUserByName(std::string email);
+
+		/**
+		 * @brief Removes the session by the given id
+		 * @param x The session id to remove
+		 * @return
+		 */
 		void RemoveSession(std::string x);
 };

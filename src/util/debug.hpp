@@ -26,3 +26,8 @@ namespace debug
   		{}
 	};
 }
+
+#define DBG_MSG debug::empty
+#ifdef _DEBUG_
+#include "src/util/debug_file.hpp"
+#endif

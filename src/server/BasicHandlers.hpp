@@ -18,6 +18,7 @@ namespace proxygen {
 	class ResponseHandler;
 }
 
+
 /**
  * @brief Small class used for setting the default empty method for every request handler
  *
