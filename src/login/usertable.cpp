@@ -45,12 +45,24 @@ void UserHandler::SetAccessRights(std::string email, int newAccess)
 	it->second->SetAccessRights(newAccess);
 }
 
-/**\todo Implement toJSON
- */
 std::string UserHandler::toJSON()
 {
+	std::string json="[";
 	std::shared_lock lck(m);
-	return "";
+	for(auto &it : m_userTable)
+	{
+		//Put the email and the access rights into the specific json
+		json+="{\"email\":\"";
+		json+=it->second->GetEmail();
+		json+="\",\"access\":";
+		json+=std::to_string(it->second->GetAccessRights());
+		json+="},";
+		//The list probably goes on so put a , at the end for the next entry
+	}
+	//Replace the , by the ] to close the list
+	json[json.length()-1] = ']';
+
+	return std::move(json);
 }
 
 void UserHandler::RemoveUser(std::string email)
@@ -175,5 +187,4 @@ TEST(UserTable, load)
 	m_ptr->SetAccessRights(user->GetEmail(),5);
 	EXPECT_EQ(user->GetAccessRights(),5);
 }
-
 #endif
