@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <!--<link rel="stylesheet" href="style.css">-->
+    <title>Home - clas digital</title>
+
+<style>
+
+
+/*SEARCHBAR STYLE BEGIN ________________ */
+
+/*Keeping the search box in the middle in the top of the screen*/
+.button_box_top {
+  text-align: center;
+  width: 80%;
+  margin-top: 3%;
+  padding-top: 20px;
+  margin-left: 10%;
+  padding-bottom: 60%;
+  background: white;
+}
+
+.headerStyle {
+  background: #909090;
+  color: white;
+  margin-top: 3rem;
+  margin-bottom: 1rem;
+}
+/*Styling the search bar*/
+.form-wrapper-2 {
+  display: inline-block;
+  width: 100%;
+  padding-bottom: 2px;
+  background: #555;
+}
+
+.form-wrapper-2 input {
+  width: 70%;
+  height: 40px;
+  outline: none;
+  padding: 10px 5px;
+  float: left;
+  font: bold 15px 'Raleway', sans-serif;
+  border: 0;
+  background: #ffffff;
+}
+.form-wrapper-2 .btclass2 {
+  color: #FFFFFF;
+  position: relative;
+  overflow: visible;
+  background: #777777;
+  padding: 0;
+  position: relative;
+  border: 0;
+  height: 40px;
+  width: 10%;
+}
+
+.form-wrapper-2 .btclass2:hover {
+  background: #333333;
+}
+
+.form-wrapper-2 .srchBtrn {
+  overflow: visible;
+  position: relative;
+  float: left;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  height: 40px;
+  width: 20%;
+  font: bold 15px/40px 'Raleway', sans-serif;
+  color: #fff;
+  text-transform: uppercase;
+  background: #D88F3C;
+}
+
+.form-wrapper-2 .srchBtrn:hover{
+  background: #FA9918;
+}
+.form-wrapper-2 .srchBtrn:active,
+.form-wrapper-2 .srchBtrn:focus{
+  background: #c42f2f;
+}
+/*SEARCHBAR STYLE END ----------------------------------*/
+
+/*MODAL ADVANCED SEARCHBOX BEGIN ------------------------*/
+.slider { 
+	display: inline-block;
+	margin-right: 30px;
+	margin-left: 30px;
+}
+
+.sliderNum {
+	display: inline-block;
+	margin-right: 20px;
+	color: #FF0000;
+}
+
+.inlineButton {
+  display: inline-block !important;
+}
+
+ /* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Could be more or less, depending on screen size */
+}
+
+/* The Close Button */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  } 
+/* MODAL ADVANCED SEARCHBOX END*/
+
+/*SEARCH HIT LIST STYLE BEGIN */
+
+.list-type2{
+width:90%;
+margin-left: 3%;
+margin:0 auto;
+}
+
+.list-type2 ol{
+list-style: none;
+*list-style: decimal;
+font-size: 15px;
+font-family: 'Raleway', sans-serif;
+padding: 0;
+margin-bottom: 4em;
+}
+
+.list-type2 ol ol{
+margin: 0 0 0 2em;
+}
+
+.bg-company-red {
+    background-color: darkred;
+}
+
+.list-type2 a{
+list-style: none;
+*list-style: decimal;
+position: relative;
+display: block;
+padding: .4em .4em .4em 2em;
+*padding: .4em;
+margin: .5em 0;
+background: #eaeaea;
+color: #444;
+text-decoration: none;
+transition: all .2s ease-in-out;
+}
+
+.list-type2 a:hover{
+background: #b0b0b0;
+text-decoration:none;
+transform: scale(1.1);
+}
+
+.list-type2 a:before{
+position: absolute;
+left: -1.3em;
+top: 50%;
+margin-top: -1.3em;
+background:#FC756F;
+height: 2em;
+width: 2em;
+line-height: 2em;
+border: .3em solid #fff;
+text-align: center;
+font-weight: bold;
+color:#FFF;
+}
+/*SEARCH HIT LIST STYLE END*/
+
+/*Hides the content that the user cannot access!*/
+.classifiedContent {
+    display: None;
+}
+
+</style>
+
+<script>
+
+//Handles all the User related stuff
+class User {
+  //Static because it does not matter which user asks to end his session
+  static DoLogout() {
+    //Just tell the server to log the current user out, then reload the page
+    let xhr = new XMLHttpRequest();
+    xhr.open("POST","/logout",true);
+    xhr.onload = function() {
+        window.location.href = "/";
+    }
+    xhr.send(null);
+  }
+
+  static initialise() {
+    let xhr = new XMLHttpRequest();
+    xhr.open("GET","/getProfileInfo",true);
+    xhr.onload = function() {
+        let jsonObj = JSON.parse(xhr.responseText);
+        if(jsonObj.email===undefined)
+            return;
+        if(jsonObj.access===undefined)
+            return;
+
+		window.sessionStorage.email = jsonObj.email;
+		window.sessionStorage.access = jsonObj.access;
+
+        document.getElementById("LoggedInAs").innerHTML = "Logged in as <strong>"+jsonObj.email+"</strong>";
+    
+        let list = document.getElementsByClassName("classifiedContent");
+        //Unlocks all the content that the user can access!
+	for(var i=0; i < list.length; i++)
+        {
+            let y = list[i].dataset.acc;
+            if((jsonObj.access&y)!=0)
+            {
+                list[i].style.display="block";
+            }
+        }
+
+    }
+    xhr.send(null);
+  }
+}
+
+//Create an enum to identify the valid types of State Banner changes
+var StateBannerType = {"success":1,"danger":2,"warning":3,"info":4,"release":5};
+Object.freeze(StateBannerType);
+
+//Shows a banner at the top of the screen, used to inform the user of errors and success
+class StateBanner {
+  static ChangeBanner(msg, type)
+  {
+    //Show the new banner message
+    let alt = document.getElementById("StateBanner");
+    let newHTML = "<strong>";
+    newHTML+= msg;
+    newHTML+="</strong>";
+    alt.innerHTML = newHTML;
+
+    //Decide what kind of layout the banner should show
+    if(type===StateBannerType.success)
+    {
+        alt.setAttribute("class","alert alert-success");
+    }
+    else if(type===StateBannerType.danger)
+    {
+        alt.setAttribute("class","alert alert-danger"); 
+    }
+    else if(type===StateBannerType.warning)
+    {
+        alt.setAttribute("class","alert alert-warning"); 
+    }
+    else if(type===StateBannerType.info)
+    {
+        alt.setAttribute("class","alert alert-info"); 
+    }
+    else if(type==StateBannerType.release)
+    {
+        alt.setAttribute("class","None");
+        alt.innerHTML = "";
+    }
+  }
+}
+
+//Opens the search options
+function openSearchOpts(name)
+{
+    //Get the modal banner which contains all the advanced options
+    let advancedOpts = document.getElementById("ModalBanner");
+    //Tell the modal banner it should display itself right now
+    advancedOpts.style.display = "block";
+
+    //Show the last set amount of fuzzyness in the modal banner
+    let x = document.getElementById("FuzzyID");
+    document.getElementById("SliderNum").innerHTML = x.value;
+
+    
+    //Prepare the close button, on close click it will hide the modal banner
+    let close = document.getElementsByClassName("close")[0];
+    close.onclick = function() {
+      advancedOpts.style.display = "none";
+    }
+
+  //If the user clicked outside of the modal banner close the window as well
+  window.onclick = function(event) {
+    if (event.target == advancedOpts) {
+        advancedOpts.style.display = "none";
+    }
+  } 
+}
+
+
+//Searches in the server with the given search options and displays a list of matches
+function sendToPage(name)
+{
+    document.getElementById("ResultBanner").innerHTML="";
+    //First of all put the search box to the top in order to show the results
+    let searchbox = document.getElementById("searchboxid");
+    searchbox.setAttribute("class","button_box_top");
+
+    //Get the searched word
+    let inputObj = document.getElementById(name);
+    let input = inputObj.value;
+    //Form the request for the server
+    let requ = "/search?q="+input;
+
+    //Create the json file with the advanced search options
+    let jsonFile = '{"fuzzyness":'+document.getElementById("FuzzyID").value;
+    jsonFile += ',"titelonly":'+document.getElementById("SearchInTitle").checked;
+    if(document.getElementById("SearchForAuthor").value == "")
+      jsonFile += ',"author":""';
+    else
+      jsonFile += ',"author":"'+document.getElementById("SearchForAuthor").value+'"';
+    jsonFile += ',"publicatedafter":'+document.getElementById("PublicatedAfter").value;
+    jsonFile +=  ',"publicatedbefore":' + document.getElementById("PublicatedBefore").value;
+    jsonFile += "}";
+
+    
+    //TODO: Delete debug logs
+    console.log(jsonFile);
+
+    
+    let xhr = new XMLHttpRequest();
+    xhr.open("POST",requ,true);
+    
+    //Clear the results of the last search
+    let obj = document.getElementById("SearchHitList");
+    obj.innerHTML = "";  
+
+    xhr.onload = function() {
+	//First of all log the response for debug purposes
+        console.log(xhr.responseText);
+
+	//Parse the received json file
+        let jsonObj = JSON.parse(xhr.responseText);
+  
+	//corrupted json? Show error message
+        if(jsonObj.books==undefined)
+	{
+	    StateBanner.ChangeBanner("Received corrupted JSON File!",StateBannerType.danger);
+            return;
+	}
+
+	if(jsonObj.books.length===0)
+	  StateBanner.ChangeBanner("No results found!",StateBannerType.info);
+	else
+	  StateBanner.ChangeBanner("",StateBannerType.release);
+
+	document.getElementById("ResultBanner").innerHTML = "<h1 class='headerStyle'>Search Results for: \""+document.getElementById("SpecialSID").value+"\"</h1>";
+	//Iterate over every book and create based on the json the links to the books
+        for(var i = 0; i < jsonObj.books.length; i++)
+        {
+            console.log("Found book with description: "+jsonObj.books[i].description);
+            console.log("With scanID: "+jsonObj.books[i].scanId);
+            let newList = document.createElement("li");
+            let inner = "<a href='/getBook?book=dummy";
+            inner+= "&query="+input;
+            inner+="&scanId="+jsonObj.books[i].scanId;
+            inner+="' onclick='window.open(this.href);return false;'>"+jsonObj.books[i].description+"</a>"; 
+            newList.innerHTML = inner;
+	    //Show the new link in the search hit list
+            obj.appendChild(newList);
+        }
+    }
+    
+    StateBanner.ChangeBanner("Started searching...",StateBannerType.success);
+    xhr.send(jsonFile);
+}
+
+window.addEventListener("load",User.initialise,false);
+</script>
+<style>
+
+.topnav {
+    background-color: #333;
+    overflow: hidden;
+}
+
+/* Style the links inside the navigation bar */
+.topnav a,.topnav .topnav-right a{
+  float: left;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 1em 1em;
+  text-decoration: none;
+  font-size: 1em;
+}
+
+/* Change the color of links on hover */
+.topnav a:hover {
+  transition: all 0.4s ease;
+  background-color: #ddd;
+  color: black;
+}
+
+/* Add a color to the active/current link */
+.topnav a.active {
+  background-color: #c66900;
+  color: white;
+}
+
+/* Right-aligned section inside the top navigation */
+.topnav-right {
+  float: right;
+}
+
+.topnav-right button{
+	box-sizing: border-box;
+	padding: 0.4em 0.8em;
+	margin: 0.5em 0.8em;
+}
+
+.topnav-right span {
+	box-sizing: border-box;
+	color: #f2f2f2;
+	font-size: 1.2em;
+	text-align: center;
+	height: 100%;
+}
+
+</style>
+  </head>
+<body>
+<!-- The navigation bar config -->
+ <div class="topnav">
+  <a class="active" href="/">Home</a>
+  <a href="/search">Search</a>
+  <a class="classifiedContent" href="/administration" data-acc=4>Administration</a>
+  <a class="classifiedContent" href="/uploadbook" data-acc=2>Upload Books</a>
+  <a class="classifiedContent" href="/managebooks" data-acc=2>Manage Books</a>
+    <div class="topnav-right">
+	  <span id="LoggedInAs">Logged in</span>
+      <button id="logoutBut" class="btn btn-outline-info" onclick='User.DoLogout()'>Logout</button>
+  </div>
+</div>
+<div id="StateBanner"></div>
+</body>
+</html>
