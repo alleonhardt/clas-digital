@@ -18,7 +18,7 @@ CBook::CBook(std::string sPath) : m_Metadata (sPath + "/info.json")
 /**
 * @return Path to directory of the book
 */
-std::string CBook::getPath() {
+const std::string& CBook::getPath() {
     return m_sPath;
 }
 
@@ -50,7 +50,7 @@ bool CBook::getOcr() {
 /**
 * @return map of all words in book 
 */
-std::map<std::string, int>& CBook::getMapWords() {
+const std::map<std::string, int>& CBook::getMapWords() {
     return m_Words;
 }
 
@@ -65,19 +65,6 @@ CMetadata& CBook::getMetadata() {
 
 // **** Setter **** //
 
-/**
-* @param[in] bool indicating whether book has ocr or not
-*/
-void CBook::setOcr(bool bOcr) {
-    m_bOcr = bOcr;
-}
-
-/**
-* @param[in] sPath Path to direcory
-*/
-void CBook::setPath(std::string sPath) {
-    m_sPath.assign(sPath);
-}
 
 /**
 * @return vector with all collections this book is in
@@ -91,6 +78,13 @@ std::vector<std::string> CBook::getCollections() {
 */
 std::string CBook::getAuthor() {
     return m_Metadata.getAuthor();
+}
+
+/**
+* @return title of book
+*/
+std::string CBook::getTitle() {
+    return m_Metadata.getTitle();
 }
 
 /**
@@ -115,14 +109,31 @@ void CBook::createMapWords()
         return;
 
     CFunctions function;
-    std::ifstream readWords(getOcrPath()+"/words.txt");
-    if(!readWords)
+    std::ifstream readWords(m_sPath + "/words.txt");
+    if(!readWords || readWords.peek() == std::ifstream::traits_type::eof() )
+    {
         function.createMapOfWords(getOcrPath(), m_Words);
+        safeMapOfWords();
+    }
     else
-        function.loadMapOfWords(getOcrPath()+"/words.txt", m_Words);
+        function.loadMapOfWords(m_sPath + "/words.txt", m_Words);
 
     m_bOcr = true;
 }
 
+/**
+* @brief safe created word list to file
+*/
+void CBook::safeMapOfWords()
+{
+    //Open path to words
+    std::string sPathToWords = m_sPath + "/words.txt";
+    std::ofstream write(sPathToWords);
 
+    //Iterate over map of words and write all words to file
+    for(auto it=m_Words.begin(); it != m_Words.end(); it++)
+        write << it->first << "\n";
+
+    write.close();
+}
 
