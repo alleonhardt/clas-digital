@@ -1,10 +1,14 @@
 #include <iostream>
+#include <list>
 #include "CBookManager.hpp"
+#include "CFunctions.hpp"
+
 
 int main()
 {
-    CBookManager manager;
+    CFunctions function;
 
+    CBookManager manager;
     bool check = manager.initialize();
 
     if(check == false)
@@ -13,15 +17,22 @@ int main()
         return 0;
     }
 
-    std::map<std::string, CBook> mapBooks = manager.getMapOfBooks();
+    std::string sInput;
+    std::cout << "> ";
+    getline(std::cin, sInput);
+    function.convertToLower(sInput);
 
+    std::cout << "Searching for " << sInput << "... \n";
+
+    std::map<std::string, CBook*>* searchResults = manager.search(sInput, false, false);
+    
     unsigned int counter = 0;
-    for(auto it=mapBooks.begin(); it!= mapBooks.end(); it++)
+    for(auto it=searchResults->begin(); it!=searchResults->end(); it++)
     {
-        std::cout << it->second.getMetadata().getShow() << "\n";
+        std::cout << it->first << ": " << it->second->getMetadata().getShow() << "\n";
         counter++;
     }
-    std::cout << "Books found: " << counter << "\n";
+    std::cout << "Results found: " << counter << "\n";
 }
      
 

@@ -33,16 +33,13 @@ std::string CFunctions::removeSpace(std::string str)
 }
 
 /**
-* @param[out] modief to ignore case
+* @param[in, out] str string to be modified
 */
-void CFunctions::ignoreCase(std::string &str)
+void CFunctions::convertToLower(std::string &str)
 {
+    std::locale loc1("de_DE.UTF8");
     for(unsigned int i=0; i<str.length(); i++)
-    {
-        int num = static_cast<int>(str[i]); 
-        if(str[i] >= 65 && str[i] <= 90)
-            str[i] = (char)num + 32;
-    }
+        str[i] = tolower(str[i], loc1);
 }
 
 /**
@@ -62,12 +59,104 @@ bool CFunctions::iequals(const char* chA, const char* chB)
     return true;
 }
 
+/** 
+* @brief function checks whether character is a letter with de and fr local
+* @param[in] s char to be checked
+*/
+bool CFunctions::isLetter(const char s)
+{
+    std::locale loc1("de_DE.UTF8");
+    //std::locale loc2("fr_FR");
+    if(std::isalpha(s, loc1) == true) 
+        return true;
+    else
+        return false;
+}
+
+/**
+* @brief checks whether a string is a word
+* @param[in] chWord string to be checked
+* @return boolean for words/ no word
+*/
+bool CFunctions::isWord(const char* chWord) 
+{
+    unsigned int counter = 0;
+    for(unsigned int i=0; i<strlen(chWord); i++)
+    {
+        if(isLetter(chWord[i]) == false)
+            counter++;
+    }
+
+    if(static_cast<double>(counter)/static_cast<double>(strlen(chWord)) <= 0.3)
+        return true;
+
+    return false;
+}
+
+/**
+* @param[in] str string to be splitet
+* @param[in] delimitter 
+*/
+void CFunctions::split(std::string str, std::string delimiter, std::vector<std::string>& vStr)
+{
+    size_t pos=0;
+    while ((pos = str.find(delimiter)) != std::string::npos) {
+        vStr.push_back(str.substr(0, pos));
+        str.erase(0, pos + delimiter.length());
+    }
+
+    vStr.push_back(str);
+} 
+
+/**
+* @brief cuts all non-letter-characters from end and beginning of str
+* @param[in, out] string to modify
+*/
+void CFunctions::transform(std::string& str)
+{
+    if(str.length() == 0)
+        return;
+
+    if(isLetter(str.front()) == false)
+        transform(str.erase(0,1));
+
+    if(str.length() == 0)
+        return;
+
+    if(isLetter(str.back()) == false)
+    {
+        str.pop_back();
+        transform(str);
+    }
+}
+
 /**
 * @param[in] sPathToOcr Path to ocr of a book
 * @param[out] mapWords map to which new words will be added
 */
 void CFunctions::createMapOfWords(std::string sPathToOcr, std::map<std::string, int>& mapWords)
 {
+    //Read ocr
+    std::ifstream read(sPathToOcr, std::ios::in);
+
+    //Check, whether ocr could be loaded
+    if(!read)
+        return;
+
+    //Parse through file line by line
+    while(!read.eof())
+    {
+        //Create string for current line
+        std::string sBuffer;
+        getline(read, sBuffer);
+
+        //Check whether bufffer is empty
+        if(sBuffer.length()<=1)
+            continue;
+        
+        //Create words from current line
+        createMapofWordsFromString(sBuffer, mapWords);
+     }
 }
 
 /**
@@ -76,6 +165,18 @@ void CFunctions::createMapOfWords(std::string sPathToOcr, std::map<std::string, 
 */
 void CFunctions::createMapofWordsFromString(std::string sWords, std::map<std::string, int>& mapWords)
 {
+    std::vector<std::string> vStrs;
+    split(sWords, " ", vStrs);
+
+    for(unsigned int i=0; i<vStrs.size(); i++)
+    {
+        transform(vStrs[i]);
+        if(isWord(vStrs[i].c_str()) == true)
+        {
+            convertToLower(vStrs[i]);
+            mapWords[vStrs[i]] = 0;
+        }
+    }
 }
 
 /**
@@ -84,6 +185,17 @@ void CFunctions::createMapofWordsFromString(std::string sWords, std::map<std::st
 */
 void CFunctions::loadMapOfWords(std::string sPathToWords, std::map<std::string, int>& mapWords)
 {
-}
+    std::ifstream read(sPathToWords);
 
+    std::string sBuffer;
+    while(!read.eof())
+    {
+        //Read new line
+        getline(read, sBuffer);
+
+        //Add word to map of words 
+        mapWords[sBuffer] = 0;
+    }
+ 
+}
 

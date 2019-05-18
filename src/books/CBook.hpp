@@ -1,5 +1,3 @@
-#pragma once 
-
 #include <iostream>
 #include <fstream>
 #include <map>
@@ -7,6 +5,8 @@
 #include <regex>
 #include "CFunctions.hpp"
 #include "CMetadata.hpp"
+
+#pragma once 
 
 class CBook
 {
@@ -35,7 +35,7 @@ public:
     * @brief getter function to return the path to the directory of a book
     * @return string (Path to directory of the book)
     */
-    std::string getPath();
+    const std::string& getPath();
 
     /**
     * @return Path to directory of the book
@@ -55,7 +55,7 @@ public:
     /**
     * @return map of all words in book 
     */
-    std::map<std::string, int>& getMapWords();
+    const std::map<std::string, int>& getMapWords();
 
     /**
     * @return info.json of book
@@ -73,26 +73,23 @@ public:
     std::string getAuthor();
 
     /**
+    * @return title of book
+    */
+    std::string getTitle();
+
+    /**
     * @return date or -1 if date does not exists or is currupted
     */
     int getDate();
 
     
-    // **** Setter **** //
-
-    /**
-    * @param[in] bool indicating whether book has ocr or not
-    */
-    void setOcr(bool bOcr);
-    
-    /**
-    * @param[in] sPath Path to direcory
-    */
-    void setPath(std::string sPath);
-
-
     /**
     * Create a map of all word of this book
     */
     void createMapWords();
+
+    /**
+    * @brief safe created word list to file
+    */
+    void safeMapOfWords();
 };

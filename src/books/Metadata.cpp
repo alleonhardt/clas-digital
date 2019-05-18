@@ -14,7 +14,7 @@ CMetadata::CMetadata(std::string sMetadata)
 /**
 *@return metadata
 */
-nlohmann::json CMetadata::getJson() {
+const nlohmann::json& CMetadata::getJson() {
     return m_metadata;
 }
 
@@ -147,6 +147,13 @@ std::string CMetadata::getAuthor()
 
     //Return result: either Name of author or empty string
     return sAuthor;
+}
+
+/**
+* @return title of book
+*/
+std::string CMetadata::getTitle() {
+    return getMetadata("title", "data");
 }
 
 /**

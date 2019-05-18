@@ -22,7 +22,7 @@ public:
     /**
     *@return metadata
     */
-    nlohmann::json getJson();
+    const nlohmann::json& getJson();
 
 
     //************ get metadata *******************//
@@ -72,6 +72,11 @@ public:
     std::string getAuthor();
 
     /**
+    * @return title of book
+    */
+    std::string getTitle();
+
+    /**
     * @return date or -1 if date does not exists or is currupted
     */
     int getDate();
@@ -80,5 +85,4 @@ public:
     * @return string with Auhtor + first 6 words 15 words of title + date
     */
     std::string getShow();
-
 };
