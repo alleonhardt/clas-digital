@@ -495,13 +495,20 @@ function sendToPage(name)
 	requ += "&publicatedafter="+document.getElementById("PublicatedAfter").value;
 	requ +=  "&publicatedbefore="+ document.getElementById("PublicatedBefore").value;
 	let myList = document.getElementsByClassName("saeule");
+	
+	requ+="&pillars=";
+	let val = "";
 	for(i = 0; i < myList.length; i++)
 	{
 		if(myList[i].checked)
 		{
-			requ+="&pillars="+myList[i].dataset.key;
+	 		if(val != "")
+	 			val+=","
+	 
+			val+=myList[i].dataset.key;
 		}
 	}
+	requ+=val;
 
 
 	//TODO: Delete debug logs

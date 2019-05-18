@@ -40,8 +40,8 @@ EmptyHandler *CreateHandler()
  */
 class HandlerFactory : public RequestHandlerFactory {
     private:
-		std::map<std::string,EmptyHandler*(*)()> _getMap;
-		std::map<std::string,EmptyHandler*(*)()> _postMap;
+		std::map<std::string,EmptyHandler*(*)()> _getMap; ///< The map of all get handlers used to map every get handler to a specific URI
+		std::map<std::string,EmptyHandler*(*)()> _postMap;	///< The map of all post handlers used to map every post handler to a specific URI
     public:
         /**
          * Initialises the HandlerFactory and gets called by the proxygen server as the server starts up.
@@ -51,8 +51,11 @@ class HandlerFactory : public RequestHandlerFactory {
 		{
 			_getMap["/getProfileInfo"] = &CreateHandler<UserSystemHandler>;
 			_getMap["/userList"] = &CreateHandler<UserSystemHandler>;
+			_getMap["/getBookRessources"] = &CreateHandler<GetBookRessource>;
+			_getMap["/searchword"] = &CreateHandler<GetSearchHandler>;
 
 			_postMap["/changeUserTable"] = &CreateHandler<UpdateUserSystemHandler>;
+			_postMap["/logout"] = &CreateHandler<PostHandler>;
 		}
 
 		/**
@@ -74,22 +77,36 @@ class HandlerFactory : public RequestHandlerFactory {
 			return onRequest<PostHandler>(_postMap,hdr);
         }
 
+		/**
+		 * @brief This function handles all requests to either getMap or postMap depending on the first parameter
+		 * It creates the right RequestHandler and sets the user parameter in the handler class to the user that does the request
+		 *
+		 * @param mp The map to use for looking up the URI function mapping
+		 * @param hdr The http message received by the user
+		 *
+		 * @return The request handler which is about to handle the received request
+		 */
 		template<typename T>
 		RequestHandler *onRequest(std::map<std::string,EmptyHandler*(*)()> &mp, HTTPMessage *hdr)
 		{
+			//Start with an empty empty handler
 			EmptyHandler *ret = nullptr;
 			try
 			{
+				//Try to get the right request handler if the path is unknown the function will throw an error
 				ret = (*mp.at(hdr->getPath()))();
 			}
 			catch(...)
 			{
+				//If an error was thrown check if we have to deallocate a dangling pointer if yes delete it
 				if(ret)
 					delete ret;
+				//Create a new default handler which is going to handle the request no one could satify
 				ret = new T();
 			}
-
+			//Set the user in the empty handler to the user we deduced from the cookie he gave us is going to be nullptr if he does not have a valid session key
 			ret->_user = std::move(UserHandler::GetUserTable().GetUserBySessid(hdr->getCookie("SESSID").toString()));
+			//Return the request handler
 			return ret;
 		}
 };

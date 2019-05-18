@@ -39,7 +39,7 @@ namespace proxygen {
  */
 class EmptyHandler : public proxygen::RequestHandler {
 	public:
-		std::shared_ptr<User> _user;
+		std::shared_ptr<User> _user; ///< The user this specific request is from
 	public:
 		/**
 		 * @brief Dummy function for the proxygen virtual function onRequest
@@ -230,12 +230,22 @@ class URIFile
  *
  */
 class PostHandler : public EmptyHandler {
+	private:
+		bool _logout;
 	public:
-
 		/**
 		 * @brief Proxygen callback for body data tries to parse user name and password from the data
 		 *
 		 * @param body The data send with the post request
 		 */
 		void onBody(std::unique_ptr<folly::IOBuf> body) noexcept override;
+
+
+		/**
+		 * @brief The Function determines if the user wants to login or logout and handles the request accordingly
+		 *
+		 * @param headers The http message passed by proxygen to our handler
+		 */
+		void onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
+			noexcept override;
 };

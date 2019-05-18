@@ -142,9 +142,14 @@ void UserHandler::RemoveSession(std::string x)
 {
 	//No lock before this functioN!!!!!! This will result in a deadlock
 	std::shared_ptr<User> ptr = std::move(GetUserBySessid(x));
-	//Lock the function now as we are changing something important
-	std::unique_lock lck(m);
-	ptr->SetSessionId("");
+	if(ptr)
+	{
+		//Lock the function now as we are changing something important
+		std::unique_lock lck(m);
+		
+		//Reset the session id so the user cant use the session id anymore
+		ptr->SetSessionId("");
+	}
 }
 
 std::shared_ptr<User> UserHandler::GetUserByName(std::string email)
