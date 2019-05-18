@@ -19,6 +19,7 @@
 #include <map>
 
 #include "src/server/BasicHandlers.hpp"
+#include "src/server/URIObjects.hpp"
 
 using namespace proxygen;
 using folly::EventBase;
@@ -26,6 +27,11 @@ using folly::EventBaseManager;
 using folly::SocketAddress;
 
 
+template<typename T>
+EmptyHandler *CreateHandler()
+{
+	return new T();
+}
 
 /**
  * @brief The HandlerFactory is used to instantiate the proxygen server and creates all request handler for every request directed to the server
@@ -33,13 +39,21 @@ using folly::SocketAddress;
  * and sends the request to the URI object if there is any else the request goes to the default handler.
  */
 class HandlerFactory : public RequestHandlerFactory {
-    private: 
+    private:
+		std::map<std::string,EmptyHandler*(*)()> _getMap;
+		std::map<std::string,EmptyHandler*(*)()> _postMap;
     public:
         /**
          * Initialises the HandlerFactory and gets called by the proxygen server as the server starts up.
          * Reserve all the post URI Objects as well as all the GET URI Objects.
          */
-        void onServerStart(folly::EventBase* /*evb*/) noexcept override {}
+        void onServerStart(folly::EventBase* /*evb*/) noexcept override 
+		{
+			_getMap["/getProfileInfo"] = &CreateHandler<UserSystemHandler>;
+			_getMap["/userList"] = &CreateHandler<UserSystemHandler>;
+
+			_postMap["/changeUserTable"] = &CreateHandler<UpdateUserSystemHandler>;
+		}
 
 		/**
 		 * @brief Handles the cleanup and behaviour if the server is stopped, in this case it does nothing at all because no cleanup is needed
@@ -55,11 +69,28 @@ class HandlerFactory : public RequestHandlerFactory {
          */
         RequestHandler* onRequest(RequestHandler*, HTTPMessage* hdr) noexcept override 
 		{
-			User *from = nullptr;
 			if(hdr->getMethod() == HTTPMethod::GET)
-				return new GetHandler(from);
-			else
-				return new PostHandler(from);
+				return onRequest<GetHandler>(_getMap,hdr);
+			return onRequest<PostHandler>(_postMap,hdr);
         }
+
+		template<typename T>
+		RequestHandler *onRequest(std::map<std::string,EmptyHandler*(*)()> &mp, HTTPMessage *hdr)
+		{
+			EmptyHandler *ret = nullptr;
+			try
+			{
+				ret = (*mp.at(hdr->getPath()))();
+			}
+			catch(...)
+			{
+				if(ret)
+					delete ret;
+				ret = new T();
+			}
+
+			ret->_user = std::move(UserHandler::GetUserTable().GetUserBySessid(hdr->getCookie("SESSID").toString()));
+			return ret;
+		}
 };
 

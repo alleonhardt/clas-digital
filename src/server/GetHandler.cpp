@@ -105,7 +105,11 @@ const std::string &URIFile::getMimeType() const
 std::unordered_map<std::string,URIFile> fileAccess {
 	{"/",URIFile("web/guest_index.html",0)},
 	{"/favicon.ico",URIFile("web/favicon.png",0)},
-	{"/home",URIFile("web/index.html",1)}
+	{"/home",URIFile("web/index.html",1)},
+	{"/search",URIFile("web/Search.html",1)},
+	{"/administration",URIFile("web/Administration.html",4)},
+	{"/uploadbook",URIFile("web/UploadBook.html",2)},
+	{"/managebooks",URIFile("web/ManageBooks.html",2)}
 };
 
 
@@ -228,39 +232,42 @@ TEST(URIFile,access_check)
 
 
 
-GetHandler::GetHandler(User *from) : EmptyHandler(from)
-{}
 
 void GetHandler::onRequest(std::unique_ptr<HTTPMessage> headers) noexcept {
-	std::cout<<"Servicing request to url : "<< headers->getURL() <<std::endl;
+	int access = 0;
+	if(_user)
+		access = _user->GetAccessRights();
 	//As long as we dont have users yet just set the access here
-	int access = 0xFF;
 	try
 	{
-		//Have a look if the file requested does exist at all
-		URIFile &file = fileAccess.at(headers->getPath());
+		URIFile *file;
+		if(headers->getPath()=="/" && _user)
+		{
+			file = &fileAccess.at("/home");
+		}
+		else
+		{
+			//Have a look if the file requested does exist at all
+			file = &fileAccess.at(headers->getPath());
+		}
 
 		//Ok the file does exist so do the access check based on the user rights
-		if(!file.doAccessCheck(access))
-		{
-			//If the access check fails send the appropriate response and quit the handler
-			SendAccessDenied(downstream_);
-			return;
-		}
+		if(!file->doAccessCheck(access)) //If the access check fails send the appropriate response and quit the handler
+			return SendAccessDenied(downstream_);
 		
 		//Build the response from the found file
 		ResponseBuilder(downstream_)
 			.status(200, "OK")
-			.header("Content-Type",file.getMimeType())
-			.body(file.getBuffer())
+			.header("Content-Type",file->getMimeType())
+			.body(file->getBuffer())
 			.sendWithEOM();
 
 	}
 	catch(...)
 	{
+		std::cout<<"Could not satisfy request to: "<< headers->getURL() <<std::endl;
 		//Some error occured just state that the file was not found
-		SendErrorNotFound(downstream_);
-		return;
+		return SendErrorNotFound(downstream_);
 	}
 }
 

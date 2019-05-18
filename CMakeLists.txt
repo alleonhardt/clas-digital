@@ -59,7 +59,7 @@ if(PROXYGEN_FOUND AND NOT PROXYGEN_FIND_QUIETLY)
 endif()
 
 
-set(SRC_FILES src/main.cpp src/server/GetHandler.cpp src/server/PostHandler.cpp src/login/user.cpp src/login/usertable.cpp)
+set(SRC_FILES src/main.cpp src/server/GetHandler.cpp src/server/PostHandler.cpp src/login/user.cpp src/login/usertable.cpp src/server/URIObjects.cpp)
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_HOME_DIRECTORY}/bin)
 
@@ -73,6 +73,6 @@ add_custom_command(
 )
 
 add_executable(clas-digital.o ${SRC_FILES})
-target_link_libraries(clas-digital.o ${PROXYGEN_LIBRARIES} ${CURL_LIBRARIES})
-target_link_libraries(unittest.o ${PROXYGEN_LIBRARIES} ${GTEST_BOTH_LIBRARIES} ${CURL_LIBRARIES})
+target_link_libraries(clas-digital.o ${PROXYGEN_LIBRARIES} ${CURL_LIBRARIES} stdc++fs)
+target_link_libraries(unittest.o ${PROXYGEN_LIBRARIES} ${GTEST_BOTH_LIBRARIES} ${CURL_LIBRARIES} stdc++fs)
 target_compile_definitions(unittest.o PRIVATE COMPILE_UNITTEST=10)

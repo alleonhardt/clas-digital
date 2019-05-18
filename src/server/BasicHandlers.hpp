@@ -8,9 +8,11 @@
 #ifdef COMPILE_UNITTEST 
 #include <gtest/gtest.h>
 #endif
+#include <memory>
 #include <folly/Memory.h>
 #include <folly/File.h>
 #include <proxygen/httpserver/RequestHandler.h>
+#include "src/books/json.hpp"
 #include "src/login/user_system.hpp"
 #include "src/util/debug.hpp"
 
@@ -36,11 +38,9 @@ namespace proxygen {
  * @endcode
  */
 class EmptyHandler : public proxygen::RequestHandler {
-	protected:
-		User *_user;
 	public:
-		EmptyHandler(User *fromUser) : _user(fromUser) {}
-
+		std::shared_ptr<User> _user;
+	public:
 		/**
 		 * @brief Dummy function for the proxygen virtual function onRequest
 		 * @param headers The HTTP Message provided by proxygen
@@ -132,7 +132,6 @@ class GetHandler : public EmptyHandler {
 		 */
 		void onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 			noexcept override;
-		GetHandler(User *from);
 };
 
 /**
@@ -232,15 +231,6 @@ class URIFile
  */
 class PostHandler : public EmptyHandler {
 	public:
-		/**
-		 * @brief Handles all post requests which are not handled by other handlers
-		 *
-		 * @param headers The headers provided by proxygen
-		 */
-		void onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
-			noexcept override;
-
-		PostHandler(User *from);
 
 		/**
 		 * @brief Proxygen callback for body data tries to parse user name and password from the data

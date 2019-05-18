@@ -79,6 +79,7 @@ class User
 		 */
 		const std::string &GetPassword() const;
 
+
 		/**
 		 * @brief Returns the current session id of the user logged in at the moment
 		 * @return The session id for the user
@@ -173,4 +174,10 @@ class UserHandler
 		 * @return
 		 */
 		void RemoveSession(std::string x);
+
+		static inline UserHandler &GetUserTable()
+		{
+			static UserHandler usrHandler("bin/usertable.json");
+			return usrHandler;
+		}
 };

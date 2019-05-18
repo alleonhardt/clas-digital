@@ -1,0 +1,650 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+		<!-- Bootstrap CSS -->
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+		<!--<link rel="stylesheet" href="style.css">-->
+		<title>Upload book - clas digital</title>
+
+		<style>
+
+.biggerPageClass {
+	padding-left: 10%;
+	padding-right: 10%;
+	padding-top: 0.5rem;
+	padding-bottom: 2rem;
+	overflow: scroll !important;
+}
+
+.filesList {
+	list-style-type: none;
+	width: 100%;
+	background-color: #4682b4;
+	color: white;
+	padding: 0;
+}
+
+.filesList>li {
+	display: block;
+	padding: 2rem;
+	border-bottom: 1px solid white;
+}
+
+.filesList p {
+	display: block;
+	padding: 2rem;
+	font-size: large;
+	color: black;
+}
+
+.filesList>li:not(:last-child) {
+	background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-2 -2 104 168'><polygon stroke='white' stroke-width='2' fill='none' points='0,0 0,162 100,162 100,40 60,0' /><path stroke='white' stroke-width='2' fill='none' d='M60,0 L60,40 L100,40' /></svg>");
+	background-repeat: no-repeat;
+	background-size: 2.2rem;
+	background-position: 1rem center;
+	padding-left:4rem;
+
+}
+.filesList>li:not(:last-child).donotuse:hover {
+	background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-2 -2 104 168'><polygon stroke='white' stroke-width='2' fill='none' points='0,0 0,162 100,162 100,40 60,0' /><path stroke='white' stroke-width='2' fill='none' d='M60,0 L60,40 L100,40' /></svg>"),
+		url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-2 -2 104 168'><path stroke='white' stroke-width='2' fill='none' d='M0,20 L100,20'/><polygon stroke='white' stroke-width='2' fill='none' points='10,20 20,162 80,162 90,20'/><path stroke='white' stroke-width='2' fill='none' d='M25,30 L33,155'/><path stroke='white' stroke-width='2' fill='none' d='M42.5,30 L45,155'/><path stroke='white' stroke-width='2' fill='none' d='M58.5,30 L55,155'/><path stroke='white' stroke-width='2' fill='none' d='M75,30 L67,155'/><path stroke='white' stroke-width='2' fill='none' d='M30,20 L35,0 L65,0 70,20'/></svg>");
+	background-position: 1rem center, right 1rem center;
+}
+
+.filesList>li:not(:last-child) progress {
+	float: right;	
+}
+
+.filesList>li:not(:last-child) button {
+	float: right;
+	height: 1em;
+	width: 1em;
+	display: none;
+}
+
+.filesList>li:last-child {
+	background-color: #ccd7ff;
+	height: 8rem;
+	line-height: 4rem;
+	vertical-align: middle;
+	text-align: center;
+	color: grey;
+	border-bottom: none;
+	transition: font 0.2s ease;
+}
+
+.filesList>li:last-child:hover {
+	font-size: 1.8rem;
+}
+
+.saveButton {
+	display: block;
+	margin: 0 auto;
+	height: 4.8rem;
+	width: 25rem;
+	line-height: 2rem;
+
+}
+
+.pagesRange {
+	color: white;
+	padding: 1.5rem;
+	padding-left: 5rem;
+	background-color: #4682b4;
+	margin-bottom: 2rem;
+	background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-2 -2 154 186'><polygon stroke='white' stroke-width='2' fill='none' points='50,0  50,50 60,50 100,90 100,132 150,132 150,40 110,0' /><path stroke='white' stroke-width='2' fill='none' d='M110,0 L110,40 L150,40' /><polygon stroke='white' stroke-width='2' stroke-linejoin='bevel' fill='none' points='0,50 0,182 100,182 100,90 60,50' /><path stroke='white' stroke-width='2' fill='none' d='M60,50 L60,90 L100,90' /></svg>");
+	background-repeat: no-repeat;
+	background-size: 3rem;
+	background-position: 1rem center;
+}
+
+.hasText {
+	color: white;
+	padding: 1.5rem;
+	padding-left: 5rem;
+	background-color: #4682b4;
+	margin-bottom: 2rem;
+	background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-2 -2 154 156'><circle cx='50' cy='50' r='50' stroke='white' stroke-width='2' fill='none' /><path stroke='white' stroke-width='2' fill='none' d='M20,30 L80,30'/><path stroke='white' stroke-width='2' fill='none' d='M20,50 L80,50'/><path stroke='white' stroke-width='2' fill='none' d='M20,70 L80,70'/><path stroke='white' stroke-width='2' fill='none' d='M85.0903524534,85.0903524534 L150,150'/></svg>");
+	background-repeat: no-repeat;
+	background-size: 3rem;
+	background-position: 1rem center;
+}
+
+.inputStyle {
+	width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+}
+
+.filelist {
+	background-color: white;
+	color: black;
+	border: 2px solid black;
+	font-size: small;
+	margin-top: 0.1rem;
+	margin-bottom: 0.1rem;
+}
+
+.filelistcont {
+	background-color: grey;
+}
+
+.saver {
+	width: 100%;
+	height: 20%;
+	overflow: auto;
+	z-index: -1;
+	display: block;
+	border-radius: 2rem;
+	margin-top: 3rem;
+}
+
+.progresStyle {
+	display: block;
+	width: 100%;
+	height: 5rem;
+	background-color: grey;
+}
+
+.internStyle {
+	width: 100%;
+	height: 100%;
+	background-color: green;
+	vertical-align: middle;
+	line-height: 1rem;
+	text-align: center;
+	overflow: visible;
+}
+
+.progresStyle p {
+	display: inline-block;
+	color: white;
+	font-size: x-large;
+	position: relative;
+	text-align: center;
+	top: 50%;
+	transform: translateY(-50%);
+}
+
+
+
+
+/*Hides the content that the user cannot access!*/
+.classifiedContent {
+	display: None;
+}
+
+.hideContent {
+	display: None;
+}
+
+
+/* The Modal (background) */
+.modal {
+	display: none; /* Hidden by default */
+	position: fixed; /* Stay in place */
+	z-index: 1; /* Sit on top */
+	left: 0;
+	top: 0;
+	width: 100%; /* Full width */
+	height: 100%; /* Full height */
+	overflow: auto; /* Enable scroll if needed */
+	background-color: rgb(0,0,0); /* Fallback color */
+	background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+.modal-content {
+	background-color: #fefefe;
+	margin: 5% auto; /* 15% from the top and centered */
+	padding: 20px;
+	border: 1px solid #888;
+	width: 80%; /* Could be more or less, depending on screen size */
+}
+
+/* The Close Button */
+i.close {
+	color: #aaa;
+	float: right;
+	font-size: 28px;
+	font-weight: bold;
+}
+
+.successwrite {
+	color: green;
+	float: right;
+	margin: 0;
+}
+
+.failwrite {
+	color: red;
+	float: right;
+	margin: 0;
+}
+
+.close:hover,
+.close:focus {
+	color: black;
+	text-decoration: none;
+	cursor: pointer;
+} 
+
+		</style>
+
+		<script>
+			let jsonZoteroAccess = 0;
+
+//Handles all the User related stuff
+class User {
+	//Static because it does not matter which user asks to end his session
+	static DoLogout() {
+		//Just tell the server to log the current user out, then reload the page
+		let xhr = new XMLHttpRequest();
+		xhr.open("POST","/logout",true);
+		xhr.onload = function() {
+			window.location.href = "/";
+		}
+		xhr.send(null);
+	}
+
+	static initialise() {
+		if(window.sessionStorage.email == undefined || window.sessionStorage.access == undefined)
+		{
+			window.location.href = "/";
+		}
+		else
+		{
+			document.getElementById("LoggedInAs").innerHTML = "Logged in as <strong>"+window.sessionStorage.email+"</strong>";
+
+			let list = document.getElementsByClassName("classifiedContent");
+			//Unlocks all the content that the user can access!
+			for(var i=0; i < list.length; i++)
+			{
+				let y = list[i].dataset.acc;
+				if((window.sessionStorage.access&y)!=0)
+				{
+					list[i].style.display="block";
+				}
+			}
+
+		}
+		let input = document.getElementById("fileUpID");
+		input.addEventListener('change',function(e) {
+			console.log(e.target.files.length);
+			document.getElementById("FileDropList").innerHTML = "<p>File selected: "+e.target.files[0].name+"<br>size: "+ Math.round((e.target.files[0].size/1024)/1024)+"MB</p>";
+		});
+	}
+}
+
+//Create an enum to identify the valid types of State Banner changes
+var StateBannerType = {"success":1,"danger":2,"warning":3,"info":4,"release":5};
+Object.freeze(StateBannerType);
+
+//Shows a banner at the top of the screen, used to inform the user of errors and success
+class StateBanner {
+	static ChangeBanner(msg, type)
+	{
+		//Show the new banner message
+		let alt = document.getElementById("StateBanner");
+		let newHTML = "<strong>";
+		newHTML+= msg;
+		newHTML+="</strong>";
+		alt.innerHTML = newHTML;
+
+		//Decide what kind of layout the banner should show
+		if(type===StateBannerType.success)
+		{
+			alt.setAttribute("class","alert alert-success");
+		}
+		else if(type===StateBannerType.danger)
+		{
+			alt.setAttribute("class","alert alert-danger"); 
+		}
+		else if(type===StateBannerType.warning)
+		{
+			alt.setAttribute("class","alert alert-warning"); 
+		}
+		else if(type===StateBannerType.info)
+		{
+			alt.setAttribute("class","alert alert-info"); 
+		}
+		else if(success==StateBannerType.release)
+		{
+			alt.setAttribute("class","None");
+			alt.innerHTML = "";
+		}
+	}
+}
+
+var startUpload = function(){};
+
+function showError(fg,bg,text)
+{
+	document.getElementById("progressB").style.width = "100%";
+	document.getElementById("okka").innerHTML = text;
+	document.getElementById("okka").style.color = fg;
+	document.getElementById("progressB").style.background = bg;
+}
+
+function UploadAll()
+{
+	let input = document.getElementById("fileUpID");
+	let permalink = document.getElementById("Permalink").value;
+
+	if(permalink=="")
+	{
+		StateBanner.ChangeBanner("No permalink given!",StateBannerType.danger);
+		window.scrollTo(0,0);
+		return;
+	}
+	if(input.files.length!=1)
+	{
+		StateBanner.ChangeBanner("No files selected!",StateBannerType.danger);
+		window.scrollTo(0,0);
+		return;
+	}
+	console.log("Upload: "+input.files.length+" files");
+
+	console.log("With name: "+input.files[0].name);
+	console.log("And size: "+input.files[0].size+" Bytes");
+
+	let xhr = new XMLHttpRequest();
+	let requ = "/uploadBook";
+	let arr = permalink.split("/");
+	for(var i = 0; i < arr.length; i++)
+	{
+		if(arr[i]=="itemKey")
+		{
+			permalink = arr[i+1];
+			break;
+		}
+	}
+	console.log("Extracted item key: "+permalink);
+	xhr.open("POST",requ,true);
+	xhr.setRequestHeader("ZoteroItemKey",permalink);
+	xhr.onload = function() {
+		if(xhr.status != 200)
+		{
+			showError("black","red",xhr.responseText);
+			return;
+		}
+
+		console.log(xhr.responseText);
+		let js = JSON.parse(xhr.responseText);
+		document.getElementById("BookMeta").innerHTML = js.metadata.bib;
+		let advancedOpts = document.getElementById("ModalBanner");
+		//Tell the modal banner it should display itself right now
+		advancedOpts.style.display = "block";
+
+		//Prepare the close button, on close click it will hide the modal banner
+		let close = document.getElementsByClassName("close")[0];
+		close.onclick = function() {
+			advancedOpts.style.display = "none";
+			showError("black","red","Upload rejected");
+			setTimeout(function(){location.reload();},1000);
+		}
+
+		//If the user clicked outside of the modal banner close the window as well
+		window.onclick = function(event) {
+			if (event.target == advancedOpts) {
+				advancedOpts.style.display = "none";
+				showError("black","red","Upload rejected");
+				setTimeout(function(){location.reload();},1000);
+			}
+		}
+		if(js.dirstruct.files.length < 3)
+		{
+			startUpload = function(){
+				document.getElementById("okka").innerHTML = "Uploading 0%";
+				document.getElementById('ModalBanner').style.display='none';
+				recUpload(0,permalink,input.files[0],0,1024*1024*2);
+			}
+		}
+		else
+		{
+			startUpload = function() {
+				document.body.style.overflow = "hidden";
+				document.getElementById("BookMetaHeader").innerHTML = "WARNING: There are already these files on the server!\nAre you sure this is the right book?";
+				let x = document.getElementById("BookMeta");
+				let y = "<ol>";
+				for(var i = 0; i < js.dirstruct.files.length; i++)
+				{
+					y += "<li class='filelist'>"+js.dirstruct.files[i].name+"</li>";
+				}
+				y+="</ol>"
+				x.innerHTML = y;
+				x.focus();
+				startUpload = function(){
+					document.getElementById("okka").innerHTML = "Uploading 0%";
+					document.getElementById('ModalBanner').style.display='none';
+					recUpload(0,permalink,input.files[0],0,1024*1024*2);
+				}
+			}
+		}
+		return;
+	}
+	xhr.send(null);
+	console.log(document.getElementById("saver").innerHTML);
+	document.getElementById("saver").innerHTML = "<div class='progresStyle'><div id='progressB' class='internStyle'><p id='okka'>Synchronizing with the server...</p></div></div>";
+}
+
+function showWriteError(respText)
+{
+	let js = JSON.parse(respText);
+	document.body.style.overflow = "hidden";
+		let advancedOpts = document.getElementById("ModalBanner");
+		//Tell the modal banner it should display itself right now
+		advancedOpts.style.display = "block";
+
+		//Prepare the close button, on close click it will hide the modal banner
+		let close = document.getElementsByClassName("close")[0];
+		close.onclick = function() {
+			advancedOpts.style.display = "none";
+			document.body.style.overflow = "auto";
+		}
+
+		//If the user clicked outside of the modal banner close the window as well
+		window.onclick = function(event) {
+			if (event.target == advancedOpts) {
+				advancedOpts.style.display = "none";
+				document.body.style.overflow = "auto";
+			}
+		}
+
+				document.getElementById("ButtonTypes").innerHTML = "";
+				document.getElementById("BookMetaHeader").innerHTML = "This is the changelog of the server!<br>It shows all changed files";
+				let x = document.getElementById("BookMeta");
+				let y = "<ol>";
+				for(var i = 0; i < js.length; i++)
+				{
+					y += "<li class='filelist'>"+js[i].name;
+					if(js[i].written)
+						y+="<p class='successwrite'>Written</p></li>";
+					else
+						y+="<p class='failwrite'>Not written, already an file with this name on the server!</p></li>";
+				}
+				y+="</ol>"
+				x.innerHTML = y;
+				x.focus();
+}
+
+function recUpload(upid,key,file,start,slice)
+{
+	let reader = new FileReader();
+	let blob = file.slice(start,start+slice);
+	reader.onload = function(ev) {
+
+		let xhr = new XMLHttpRequest();
+		let requ = "/uploadBook";
+		xhr.open("POST",requ,true);
+		xhr.setRequestHeader("ZoteroItemKey",key);
+		xhr.setRequestHeader("UniqueUploadID",upid);
+		xhr.setRequestHeader("hasData","true");
+		xhr.onload = function() {
+			if(xhr.status!=200)
+			{
+				showError("black","red",xhr.responseText);
+				return;
+			}
+			start+=slice;
+			document.getElementById("okka").innerHTML = "Uploading "+Math.round(((start/file.size)*100))+"%";
+			document.getElementById("progressB").style.width = Math.round(((start/file.size)*100))+"%";
+			if(start<file.size)
+			{
+				if((start+slice)>file.size)
+				{
+					slice = file.size-start;
+				}
+
+				recUpload(xhr.getResponseHeader("UniqueUploadID"),key,file,start,slice);
+			}
+			else
+			{
+
+				document.getElementById("okka").innerHTML = xhr.responseText;
+				let yhr = new XMLHttpRequest();
+				yhr.open("POST","/uploadBook",true);
+				yhr.setRequestHeader("ZoteroItemKey",key);
+				yhr.setRequestHeader("UploadDone","true");
+				yhr.setRequestHeader("UniqueUploadID",upid);
+				yhr.setRequestHeader("hasData","true");
+				yhr.onload = function() {
+					if(yhr.status!=200)
+					{
+						showError("black","red","Could not write all files to the server");
+						showWriteError(yhr.responseText);
+						return;
+					}
+					document.getElementById("okka").innerHTML = "Upload done!!";
+				}
+				yhr.send(null);
+			}
+		}
+		xhr.send(blob);
+	}
+	reader.readAsBinaryString(blob);
+}
+
+
+window.addEventListener("load",User.initialise,false);
+		</script>
+		<style>
+.MetaLayout {
+	margin: 3rem;
+	margin-bottom: 5rem;
+}
+.topnav {
+	background-color: #333;
+	overflow: hidden;
+	width: 100%;
+	position: fixed;
+}
+
+/* Style the links inside the navigation bar */
+.topnav a,.topnav .topnav-right a{
+	float: left;
+	color: #f2f2f2;
+	text-align: center;
+	padding: 1em 1em;
+	text-decoration: none;
+	font-size: 1em;
+}
+
+/* Change the color of links on hover */
+.topnav a:hover {
+	transition: all 0.4s ease;
+	background-color: #ddd;
+	color: black;
+}
+
+/* Add a color to the active/current link */
+.topnav a.active {
+	background-color: #c66900;
+	color: white;
+}
+
+/* Right-aligned section inside the top navigation */
+.topnav-right {
+	float: right;
+}
+
+.topnav-right button{
+	box-sizing: border-box;
+	padding: 0.4em 0.8em;
+	margin: 0.5em 0.8em;
+}
+
+.topnav-right span {
+	box-sizing: border-box;
+	color: #f2f2f2;
+	font-size: 1.2em;
+	text-align: center;
+	height: 100%;
+}
+
+		</style>
+	</head>
+	<body>
+		<!-- The navigation bar config -->
+		<div class="topnav">
+			<a href="/">Home</a>
+			<a href="/search.html">Search</a>
+			<a class="classifiedContent" href="/administration" data-acc=4>Administration</a>
+			<a class="classifiedContent active" href="/uploadbook" data-acc=2>Upload Books</a>
+			<a class="classifiedContent" href="/managebooks" data-acc=2>Manage Books</a>
+			<div class="topnav-right">
+				<span id="LoggedInAs">Logged in</span>
+				<button id="logoutBut" class="btn btn-outline-info" onclick='User.DoLogout()'>Logout</button>
+			</div>
+		</div>
+		<div id="StateBanner"></div>
+		<div class="biggerPageClass">
+			<h1>Volltexte hochladen</h1>
+			<input class="inputStyle" type="file" id="fileUpID"/>
+
+			<h2><span>1.</span>Wo sind die Dateien?</h2>
+			<p>Die Zip-Dateien (nur eine aufeinmal) der Staatsbibliothek müssen zuerst einmal auf den Projekt-Server gelangen. Lade sie von der Bibliothek auf deinen PC und nutze das Feld unten, um sie wieder auszuwählen. Sie werden dann auf den Projekt-Server übertragen.</p>
+			<p><strong>Wichtig:</strong> Schließe diesen Tab nicht, während der Upload läuft!</p>
+			<ul class="list-group" id="CurrentUploads">
+			</ul>
+			<ul id="FileDropList" class="filesList" onclick="document.getElementById('fileUpID').click()">
+				<li>Hier klicken um eine Datei auszuwaehlen</li>
+			</ul>
+			<br>
+			<h2><span>2.</span>Ist alles korrekt?</h2>
+			<div aria-label="Vorhandene Scans" class="pagesRange">Noch keine Scans hochgeladen</div>
+			<div aria-label="Durchsuchbarer Text?" class="hasText">Nein, es wurde kein durchsuchbarer Text hochgeladen</div>
+
+			<br>
+			<h2><span>3.</span>Welches Werk ist das?</h2>
+			<p>Fuege noch den Link zu Zotero ein um das Item spaeter immer korrekt zuordnen zu koennen:</p>
+			<input id="Permalink" class="description" type="text" placeholder="Permalink hier einfügen"/>
+			<br>
+			<h2><span>4.</span>Speichern!</h2>
+			<div class="saver" id="saver">
+				<p>Speichere diesen Volltext auf dem Projektserver!</p>
+				<button class="saveButton" onclick="UploadAll()">Speichern!</button>
+			</div>
+		</div>
+		<div id="ModalBanner" class="modal">
+			<div class="modal-content">
+				<span class="close">&times;</span>
+				<h4 id="BookMetaHeader">Are you sure that you are uploading the book</h4>
+				<br>
+				<div id="BookMeta" class="MetaLayout"></div>
+				<br>
+				<br>
+				<div id="ButtonTypes">
+					<button class='btn btn-outline-success my2 my-sm-0 inlineButton' onclick="startUpload();return true">Grant upload</button>
+					<button class='btn btn-outline-info my2 my-sm-0 inlineButton' onclick="document.getElementsByClassName('close')[0].click();">Reject upload</button>
+				</div>
+			</div>
+		</div>
+
+	</body>
+</html>

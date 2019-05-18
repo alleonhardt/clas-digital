@@ -1,0 +1,839 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+		<!-- Bootstrap CSS -->
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+		<!--<link rel="stylesheet" href="style.css">-->
+		<title>Search - clas digital</title>
+
+		<style>
+
+
+/*SEARCHBAR STYLE BEGIN ________________ */
+
+/*Keeping the search box in the middle in the top of the screen*/
+.button_box_top {
+	text-align: center;
+	width: 80%;
+	margin-top: 3%;
+	padding-top: 20px;
+	margin-left: 10%;
+	padding-bottom: 4rem;
+	background: white;
+	overflow: visible;
+}
+
+.headerStyle {
+	height: 3rem;
+	background: #909090;
+	color: white;
+	margin-top: 3rem;
+	margin-bottom: 1rem;
+}
+/*Styling the search bar*/
+.form-wrapper-2 {
+	display: inline-block;
+	width: 100%;
+	padding-bottom: 2px;
+	background: #555;
+}
+
+.form-wrapper-2 input {
+	width: 70%;
+	height: 40px;
+	outline: none;
+	padding: 10px 5px;
+	float: left;
+	font: bold 15px 'Raleway', sans-serif;
+	border: 0;
+	background: #ffffff;
+}
+.form-wrapper-2 .btclass2 {
+	color: #FFFFFF;
+	position: relative;
+	overflow: visible;
+	background: #777777;
+	padding: 0;
+	position: relative;
+	border: 0;
+	height: 40px;
+	width: 10%;
+}
+
+.form-wrapper-2 .btclass2:hover {
+	background: #333333;
+}
+
+.form-wrapper-2 .srchBtrn {
+	overflow: visible;
+	position: relative;
+	float: left;
+	border: 0;
+	padding: 0;
+	cursor: pointer;
+	height: 40px;
+	width: 20%;
+	font: bold 15px/40px 'Raleway', sans-serif;
+	color: #fff;
+	text-transform: uppercase;
+	background: #D88F3C;
+}
+
+.form-wrapper-2 .srchBtrn:hover{
+	background: #FA9918;
+}
+.form-wrapper-2 .srchBtrn:active,
+.form-wrapper-2 .srchBtrn:focus{
+	background: #c42f2f;
+}
+/*SEARCHBAR STYLE END ----------------------------------*/
+
+/*MODAL ADVANCED SEARCHBOX BEGIN ------------------------*/
+.slider { 
+	display: inline-block;
+	margin-right: 30px;
+	margin-left: 30px;
+}
+
+.sliderNum {
+	display: inline-block;
+	margin-right: 20px;
+	color: #FF0000;
+}
+
+.inlineButton {
+	display: inline-block !important;
+}
+
+/* The Modal (background) */
+.modal {
+	display: none; /* Hidden by default */
+	position: fixed; /* Stay in place */
+	z-index: 1; /* Sit on top */
+	left: 0;
+	top: 0;
+	width: 100%; /* Full width */
+	height: 100%; /* Full height */
+	overflow: auto; /* Enable scroll if needed */
+	background-color: rgb(0,0,0); /* Fallback color */
+	background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+.modal-content {
+	background-color: #fefefe;
+	margin: 15% auto; /* 15% from the top and centered */
+	padding: 20px;
+	border: 1px solid #888;
+	width: 80%; /* Could be more or less, depending on screen size */
+}
+
+/* The Close Button */
+.close {
+	color: #aaa;
+	float: right;
+	font-size: 28px;
+	font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+	color: black;
+	text-decoration: none;
+	cursor: pointer;
+} 
+/* MODAL ADVANCED SEARCHBOX END*/
+
+/*SEARCH HIT LIST STYLE BEGIN */
+
+.list-type2{
+	width:90%;
+	margin-left: 3%;
+	margin:0 auto;
+}
+
+.divlisttype {
+	width: 90%;
+	margin-left: 3%;
+	display: block;
+	margin:0 auto;
+	overflow-wrap: anywhere;
+}
+
+.list-type2 ol{
+	list-style: none;
+	*list-style: decimal;
+font-size: 15px;
+font-family: 'Raleway', sans-serif;
+padding: 0;
+margin-bottom: 4em;
+}
+
+.list-type2 ol ol{
+	margin: 0 0 0 2em;
+}
+
+.list-type2 a{
+	list-style: none;
+	*list-style: decimal;
+position: relative;
+display: block;
+padding: .4em .4em .4em 2em;
+		 *padding: .4em;
+	 margin: .7em 0;
+	 background: #eaeaea;
+	 color: #444;
+	 text-decoration: none;
+		 padding-left: 2rem;
+		text-align: justify;
+		text-indent: 2.5rem;
+	 transition: all .2s ease-in-out;
+}
+
+.list-type2 a div{
+	float: left;
+	width: 1.4rem;
+	height: 1.4rem;
+}
+
+.list-type2 a img{
+	float: left;
+	width: 1.4rem;
+	height: 1.4rem;
+}
+
+.list-type2 a:hover{
+	background: #b0b0b0;
+	text-decoration:none;
+		//transform: scale(1.05);
+}
+
+.list-type2 a:before{
+	position: absolute;
+	left: -1.3em;
+	top: 50%;
+	margin-top: -1.3em;
+	background:#FC756F;
+	height: 2em;
+	width: 2em;
+	line-height: 2em;
+	border: .3em solid #fff;
+	text-align: center;
+	font-weight: bold;
+	color:#FFF;
+}
+
+.list-type2 input{
+	display: inline-block;
+	float: right;
+}
+i
+.list-type2 p {
+	display: inline-block;
+	float: left;
+	margin-right: 1rem;
+	color: red;
+	border: solid #FF0000 .1em;
+	padding: .1em;
+}
+
+.linkedClass {
+	margin-right: .5em;
+}
+
+/*SEARCH HIT LIST STYLE END*/
+
+/*Hides the content that the user cannot access!*/
+.classifiedContent {
+	display: None;
+}
+
+
+.citationButton {
+	float: right;
+	margin-right: 0;
+	height: 100%;
+	color: white;
+	background-color: #D88F3C;
+	padding: 0.5rem;
+	padding-left: 0.7rem;
+	text-align: center;
+	font: bold 15px/40px 'Raleway', sans-serif;
+	cursor: pointer;
+}
+
+.citationButton:hover {
+	transition: all 0.4s ease;
+	background-color: black;
+	color: #D88F3C;
+}
+
+		</style>
+
+		<script>
+
+			let search_parameters = {};
+let default_search_parameters = {};
+//Handles all the User related stuff
+class User {
+	//Static because it does not matter which user asks to end his session
+	static DoLogout() {
+		//Just tell the server to log the current user out, then reload the page
+		let xhr = new XMLHttpRequest();
+		xhr.open("POST","/logout",true);
+		xhr.onload = function() {
+			window.location.href = "/";
+		}
+		xhr.send(null);
+	}
+
+	static initialise() {
+		StateBanner.ChangeBanner("Fuzzy search ist momentan nicht benutzbar, also bitte nicht testen!",StateBannerType.warning);
+		let inp = document.getElementById("SpecialSID");
+		inp.addEventListener("keypress",function(event){
+			if(event.key === "Enter")
+			{
+				document.getElementById("srchButton").click();
+			}
+		});
+
+		if(window.sessionStorage.email == undefined || window.sessionStorage.access == undefined)
+		{
+			window.location.href = "/";
+		}
+		else
+		{
+			document.getElementById("LoggedInAs").innerHTML = "Logged in as <strong>"+window.sessionStorage.email+"</strong>";
+
+			let list = document.getElementsByClassName("classifiedContent");
+			//Unlocks all the content that the user can access!
+			for(var i=0; i < list.length; i++)
+			{
+				let y = list[i].dataset.acc;
+				if((window.sessionStorage.access&y)!=0)
+				{
+					list[i].style.display="block";
+				}
+			}
+
+		}
+		ApplySearchData();
+		default_search_parameters = JSON.parse(JSON.stringify(search_parameters));
+	}
+}
+
+//Create an enum to identify the valid types of State Banner changes
+var StateBannerType = {"success":1,"danger":2,"warning":3,"info":4,"release":5};
+Object.freeze(StateBannerType);
+
+//Shows a banner at the top of the screen, used to inform the user of errors and success
+class StateBanner {
+	static ChangeBanner(msg, type)
+	{
+		//Show the new banner message
+		let alt = document.getElementById("StateBanner");
+		let newHTML = "<strong>";
+		newHTML+= msg;
+		newHTML+="</strong>";
+		alt.innerHTML = newHTML;
+
+		//Decide what kind of layout the banner should show
+		if(type===StateBannerType.success)
+		{
+			alt.setAttribute("class","alert alert-success");
+		}
+		else if(type===StateBannerType.danger)
+		{
+			alt.setAttribute("class","alert alert-danger"); 
+		}
+		else if(type===StateBannerType.warning)
+		{
+			alt.setAttribute("class","alert alert-warning"); 
+		}
+		else if(type===StateBannerType.info)
+		{
+			alt.setAttribute("class","alert alert-info"); 
+		}
+		else if(type==StateBannerType.release)
+		{
+			alt.setAttribute("class","None");
+			alt.innerHTML = "";
+		}
+	}
+}
+
+//Opens the search options
+function openSearchOpts(name)
+{
+
+	//Create the json file with the advanced search options
+	document.getElementById("FuzzyID").value = search_parameters.fuzzyness;
+	document.getElementById("SearchInTitle").checked = search_parameters.title_only;
+	document.getElementById("SearchForAuthor").value = search_parameters.author_name;
+	document.getElementById("PublicatedAfter").value = search_parameters.pub_after;
+	document.getElementById("PublicatedBefore").value = search_parameters.pub_before;
+	document.getElementById("SearchInOCR").value = search_parameters.ocr_only;
+
+	//Get the modal banner which contains all the advanced options
+	let advancedOpts = document.getElementById("ModalBanner");
+	//Tell the modal banner it should display itself right now
+	advancedOpts.style.display = "block";
+
+	//Show the last set amount of fuzzyness in the modal banner
+	let x = document.getElementById("FuzzyID");
+	document.getElementById("SliderNum").innerHTML = x.value;
+
+
+	//Prepare the close button, on close click it will hide the modal banner
+	let close = document.getElementById("CloseSModal");
+	close.onclick = function() {
+		advancedOpts.style.display = "none";
+	}
+
+	//If the user clicked outside of the modal banner close the window as well
+	window.onclick = function(event) {
+		if (event.target == advancedOpts) {
+			advancedOpts.style.display = "none";
+		}
+	} 
+}
+
+
+let jsonObj = {}
+let lastInput ="";
+let filterOpts = {};
+function ApplyFilterOptions()
+{
+	console.log(jsonObj);
+	let obj = document.getElementById("SearchHitList");
+	obj.innerHTML = "";  
+	filterOpts["ShowOnlyTextsWithOCR"] = document.getElementById("ShowOnlyTextsWithOCR").checked;
+	let x = filterOpts["ShowOnlyTextsWithOCR"];
+
+	for(var i = 0; i < jsonObj.books.length; i++)
+	{
+		if(x && (!jsonObj.books[i].hasocr||(jsonObj.books[i].hasocr == undefined)))
+		{	continue;}
+
+			let newList = document.createElement("li");
+			let inner = "";
+			if(!jsonObj.books[i].hasocr || (jsonObj.books[i].hasocr == undefined))
+			{
+
+				inner = "<a data-specialhref='/1/ShowMetadata.html";
+			}
+			else
+			{
+				inner = "<a data-specialhref='/1/GetBooks.html";
+			}
+			inner+= "?query="+lastInput;
+			inner+="&scanId="+jsonObj.books[i].scanId;
+			inner+="' onclick='return changeColor(this);'>";
+			if(!jsonObj.books[i].hasocr || (jsonObj.books[i].hasocr == undefined))
+			{
+				inner+="<div></div><div></div>";
+			}
+			else
+			{
+				inner+="<img src='/0/volltext.png' alt='volltext' title='Buch besitzt Volltext'><img src='/0/scan.png' alt='scan' title='Buch besitzt einen Scan'>";
+			}
+			inner+=jsonObj.books[i].description+"   "+"<input onclick='this.was_clicked=1;return true;' type='checkbox' unchecked></a>"; 
+			newList.innerHTML = inner;
+			//Show the new link in the search hit list
+			obj.appendChild(newList);
+	}
+}
+
+function OpenFilter()
+{
+	console.log("Called open filter!");
+	document.getElementById("ShowOnlyTextsWithOCR").checked = filterOpts["ShowOnlyTextsWithOCR"];
+	//Get the modal banner which contains all the advanced options
+	let advancedOpts = document.getElementById("FilterModal");
+	//Tell the modal banner it should display itself right now
+	advancedOpts.style.display = "block";
+
+	//Prepare the close button, on close click it will hide the modal banner
+	let close = document.getElementById("CloseFModal");
+	close.onclick = function() {
+		advancedOpts.style.display = "none";
+	}
+
+	//If the user clicked outside of the modal banner close the window as well
+	window.onclick = function(event) {
+		if (event.target == advancedOpts) {
+			advancedOpts.style.display = "none";
+		}
+	}
+}
+//Searches in the server with the given search options and displays a list of matches
+function sendToPage(name)
+{
+	filterOpts["ShowOnlyTextsWithOCR"] = false;
+	document.getElementById("ResultBanner").innerHTML="";
+	//First of all put the search box to the top in order to show the results
+	let searchbox = document.getElementById("searchboxid");
+	searchbox.setAttribute("class","button_box_top");
+
+	//Get the searched word
+	let inputObj = document.getElementById(name);
+	let input = inputObj.value;
+	//Form the request for the server
+	let requ = "/searchword?search="+input;
+
+	//Create the json file with the advanced search options
+	requ += "&fuzzyness="+document.getElementById("FuzzyID").value;
+	requ += "&title_only="+document.getElementById("SearchInTitle").checked;
+	requ += "&ocr_only="+document.getElementById("SearchInOCR").checked;
+	if(document.getElementById("SearchForAuthor").value == "")
+		requ += "&author=";
+	else
+		requ += "&author="+document.getElementById("SearchForAuthor").value;
+	requ += "&publicatedafter="+document.getElementById("PublicatedAfter").value;
+	requ +=  "&publicatedbefore="+ document.getElementById("PublicatedBefore").value;
+	let myList = document.getElementsByClassName("saeule");
+	for(i = 0; i < myList.length; i++)
+	{
+		if(myList[i].checked)
+		{
+			requ+="&pillars="+myList[i].dataset.key;
+		}
+	}
+
+
+	//TODO: Delete debug logs
+	console.log(requ);
+	let xhr = new XMLHttpRequest();
+	xhr.open("GET",requ,true);
+
+	//Clear the results of the last search
+	let obj = document.getElementById("SearchHitList");
+	obj.innerHTML = "";  
+
+	xhr.onload = function() {
+		//First of all log the response for debug purposes
+		console.log(xhr.responseText);
+
+		//Parse the received json file
+		jsonObj = JSON.parse(xhr.responseText);
+		lastInput = input;
+		//corrupted json? Show error message
+		if(jsonObj.books==undefined)
+		{
+			StateBanner.ChangeBanner("Received corrupted JSON File!",StateBannerType.danger);
+			return;
+		}
+
+		if(jsonObj.books.length===0)
+			StateBanner.ChangeBanner("No results found!",StateBannerType.info);
+		else
+			StateBanner.ChangeBanner("",StateBannerType.release);
+
+		let maxSearchResults = 25;
+		if(jsonObj.books.length < 25)
+		{
+			maxSearchResults = jsonObj.books.length;
+		}
+
+		document.getElementById("ResultBanner").innerHTML = "<h1 class='headerStyle'>Search Results for: \""+document.getElementById("SpecialSID").value+"\"<a class='citationButton' onclick='OpenFilter();return true;'>Filter results</a></h1>";
+		//Iterate over every book and create based on the json the links to the books
+
+		for(var i = 0; i < jsonObj.books.length; i++)
+		{
+			let newList = document.createElement("li");
+			let inner = "";
+			if(!jsonObj.books[i].hasocr || (jsonObj.books[i].hasocr == undefined))
+			{
+
+				inner = "<a data-specialhref='/1/ShowMetadata.html";
+			}
+			else
+			{
+				inner = "<a data-specialhref='/1/GetBooks.html";
+			}
+			inner+= "?query="+input;
+			inner+="&scanId="+jsonObj.books[i].scanId;
+			inner+="' onclick='return changeColor(this);'>";
+			if(!jsonObj.books[i].hasocr || (jsonObj.books[i].hasocr == undefined))
+			{}
+			else
+			{
+				inner+="<img src='/0/volltext.png' alt='volltext' title='Buch besitzt Volltext'><img src='/0/scan.png' alt='scan' title='Buch besitzt einen Scan'>";
+			}
+			inner+="   "+jsonObj.books[i].description+"   "+"<input onclick='this.was_clicked=1;return true;' type='checkbox' unchecked></a>"; 
+			newList.innerHTML = inner;
+			//Show the new link in the search hit list
+			obj.appendChild(newList);
+		}
+		/*
+		let lList = document.getElementById("LinkList");
+		for(var i = 0; i < (jsonObj.books.length/25); i++)
+		{
+			lList.innerHTML += "<a href='www.google.de' class='linkedClass'>"+i+"</a>";
+		}*/
+	}
+
+	StateBanner.ChangeBanner("Started searching...",StateBannerType.success);
+	xhr.send();
+}
+
+function changeColor(obj)
+{
+	for(var i = 0; i < obj.childNodes.length; i++)
+	{
+		if(obj.childNodes[i].was_clicked === 1)
+		{
+			obj.childNodes[1].was_clicked = 0;
+			return true;
+		}
+	}
+	obj.style.background = "#b1c4e2";
+	window.open(obj.dataset.specialhref);
+	return true;
+}
+
+function LoadSearchData(sp)
+{
+
+	document.getElementById("SearchInOCR").checked = sp.ocr_only;
+	document.getElementById("FuzzyID").value = sp.fuzzyness;
+	document.getElementById("SearchInTitle").checked = sp.title_only;
+	document.getElementById("SearchForAuthor").value = sp.author_name;
+	document.getElementById("PublicatedAfter").value = sp.pub_after;
+	document.getElementById("PublicatedBefore").value = sp.pub_before;
+	document.getElementById('SliderNum').innerHTML = sp.fuzzyness;
+	document.getElementById("SaeuleGeschiZoo").checked = sp.saeule_gesch_zoo;
+	document.getElementById("SaeuleGeschiLi").checked = sp.saeule_gesch_li;
+	document.getElementById("SaeuleForsch").checked = sp.saeule_forsch;
+	document.getElementById("SaeuleBuechnerLi").checked = sp.saeule_buechner_li;
+	document.getElementById("SaeuleForschBuechner").checked = sp.saeule_forsch_buechner;
+}
+
+
+function ApplySearchData()
+{
+	//Create the json file with the advanced search options
+	search_parameters.fuzzyness = document.getElementById("FuzzyID").value;
+	search_parameters.title_only = document.getElementById("SearchInTitle").checked;
+	search_parameters.ocr_only = document.getElementById("SearchInOCR").checked;
+	search_parameters.author_name = document.getElementById("SearchForAuthor").value;
+	search_parameters.pub_after = document.getElementById("PublicatedAfter").value;
+	search_parameters.pub_before = document.getElementById("PublicatedBefore").value;
+	search_parameters.saeule_gesch_zoo = document.getElementById("SaeuleGeschiZoo").checked;
+	search_parameters.saeule_gesch_li = document.getElementById("SaeuleGeschiLi").checked;
+	search_parameters.saeule_forsch = document.getElementById("SaeuleForsch").checked;
+	search_parameters.saeule_buechner_li = document.getElementById("SaeuleBuechnerLi").checked;
+	search_parameters.saeule_forsch_buechner = document.getElementById("SaeuleForschBuechner").checked;
+
+	document.getElementById("ModalBanner").style.display = "none";
+}
+
+function ResetToDefault()
+{
+	LoadSearchData(default_search_parameters);
+}
+
+window.addEventListener("load",User.initialise,false);
+		</script>
+		<style>
+
+.topnav {
+	background-color: #333;
+	overflow: hidden;
+}
+
+/* Style the links inside the navigation bar */
+.topnav a,.topnav .topnav-right a{
+	float: left;
+	color: #f2f2f2;
+	text-align: center;
+	padding: 1em 1em;
+	text-decoration: none;
+	font-size: 1em;
+}
+
+/* Change the color of links on hover */
+.topnav a:hover {
+	transition: all 0.4s ease;
+	background-color: #ddd;
+	color: black;
+}
+
+/* Add a color to the active/current link */
+.topnav a.active {
+	background-color: #c66900;
+	color: white;
+}
+
+/* Right-aligned section inside the top navigation */
+.topnav-right {
+	float: right;
+}
+
+.topnav-right button{
+	box-sizing: border-box;
+	padding: 0.4em 0.8em;
+	margin: 0.5em 0.8em;
+}
+
+.topnav-right span {
+	box-sizing: border-box;
+	color: #f2f2f2;
+	font-size: 1.2em;
+	text-align: center;
+	height: 100%;
+}
+
+
+ /* Customize the label (the container) */
+.container {
+  display: block;
+  position: relative;
+  padding-left: 35px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  font-size: 22px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Hide the browser's default checkbox */
+.container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* Create a custom checkbox */
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 1.5rem;
+  width: 1.5rem;
+  background-color: grey;
+}
+
+/* On mouse-over, add a grey background color */
+.container:hover input ~ .checkmark {
+  background-color: #ccc;
+}
+
+/* When the checkbox is checked, add a blue background */
+.container input:checked ~ .checkmark {
+  background-color: #2196F3;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+/* Show the checkmark when checked */
+.container input:checked ~ .checkmark:after {
+  display: block;
+}
+
+/* Style the checkmark/indicator */
+.container .checkmark:after {
+  left: 0.5rem;
+  top: 0.15rem;
+  width: 0.5rem;
+  height: 1rem;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+} 
+		</style>
+	</head>
+	<body>
+		<!-- The navigation bar config -->
+		<div class="topnav">
+			<a href="/">Home</a>
+			<a class="active" href="/search">Search</a>
+			<a class="classifiedContent" href="/administration" data-acc=4>Administration</a>
+			<a class="classifiedContent" href="/uploadbook" data-acc=2>Upload Books</a>
+			<a class="classifiedContent" href="/managebooks" data-acc=2>Manage Books</a>
+			<div class="topnav-right">
+				<span id="LoggedInAs">Logged in</span>
+				<button id="logoutBut" class="btn btn-outline-info" onclick='User.DoLogout()'>Logout</button>
+			</div>
+		</div>
+		<div id="StateBanner"></div><div id="ModalBanner" class="modal">
+			<div class="modal-content">
+				<span id="CloseSModal" class="close">&times;</span>
+				<div class="slider">
+					<p>Select the collections...</p>
+					<label class="checkbox-inline slider"><input id="SaeuleGeschiZoo" class="saeule" type="checkbox" value="" data-key="RFWJC42V" checked>Geschichte des Tierwissens</label>
+					<label class="checkbox-inline slider"><input id="SaeuleGeschiLi" class="saeule" type="checkbox" value="" data-key="2SWXSFCX" checked>Literarische Texte</label>
+					<label class="checkbox-inline slider"><input id="SaeuleForsch" class="saeule" type="checkbox" value="" data-key="XCFFDRQC" checked>Forschungsliteratur CLAS</label>
+					<label class="checkbox-inline slider"><input id="SaeuleBuechnerLi" class="saeule" type="checkbox" value="" data-key="WIXP3DS3" checked>Tierwissen (deprecated)</label>
+					<label class="checkbox-inline slider"><input id="SaeuleForschBuechner" class="saeule" type="checkbox" value="" data-key="RBB8DW5B" checked>Forschung Büchner</label>
+				</div>
+				<div class="slidecontainer">
+					<p class="slider">Fuzzyness (Smaller is more accurate, zero means no fuzzy search): </p>
+					<p id="SliderNum" class="sliderNum"></p>
+					<input oninput="document.getElementById('SliderNum').innerHTML=this.value;" id="FuzzyID" type="range" min="0" max="5" value="0" class="slider" id="myRange"></div>
+				<div class="checker">
+					<p class="slider">Search only in Titel</p>
+					<label class="checkbox-inline"><input id="SearchInTitle" type="checkbox" value=""></label>
+				</div>
+				<div class="checker">
+					<p class="slider">Search only in OCR</p>
+					<label class="checkbox-inline"><input id="SearchInOCR" type="checkbox" value=""></label>
+				</div>
+				<div class="checker">
+					<p class="slider">Search only for this author</p>
+					<input id="SearchForAuthor" type="text" value="">
+				</div>
+				<div class="checker">
+					<p class="slider">Search only in books publicated from</p>
+					<input id="PublicatedAfter" type="number" step="1" min="0" value="0">
+					<p class="slider"> until </p>
+					<input id="PublicatedBefore" type="number" step="1" min="1" value="2018">
+				</div>
+				<div>
+					<button class='btn btn-outline-success my2 my-sm-0 inlineButton' onclick="ApplySearchData();">Apply</button>
+					<button class='btn btn-outline-info my2 my-sm-0 inlineButton' onclick="ResetToDefault();">Reset to default</button>
+				</div>
+			</div>
+		</div>
+
+		<div id="FilterModal" class="modal">
+			<div class="modal-content">
+				<span id="CloseFModal" class="close">&times;</span>
+				<p>This is the new filter option</p>
+	<label class="container">
+		Show only books with OCR
+		<input id="ShowOnlyTextsWithOCR" type="checkbox">
+  <span class="checkmark"></span>
+</label>	
+<button class='btn btn-outline-success my2 my-sm-0' style='width: 10%' onclick="document.getElementById('FilterModal').style.display='none';ApplyFilterOptions();return true;">Apply</button>
+			
+			</div>
+		</div>
+
+
+		<div id="searchboxid" class="button_box_top">
+			<div class="form-wrapper-2 cf">
+				<input id="SpecialSID" type="text" placeholder="Search here..." required>
+				<button id="srchButton" class="srchBtrn" type="button" onclick="sendToPage('SpecialSID')">Search</button>
+				<button class="btclass2" type="button" onclick="openSearchOpts('AdvancedSearchOptions')">Advanced</button>
+			</div>
+			<div id="ResultBanner"></div>
+			<ol id="SearchHitList" class="list-type2"></ol>
+			<div id="LinkList" class="divlisttype"></div>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <title>clas digital</title>
+<style>
+.damn {
+	background-color: grey;
+}
+
+.InfoPage{
+	background-color: white;
+	padding: 2rem;
+	margin-left: 15%;
+	margin-right: 15%;
+	margin-top: 5%;
+}
+</style>
+	<script>
+class Server {
+	static Get(filename, okCallback, errorCallback) {
+		let sendRequest = new XMLHttpRequest();
+		sendRequest.open("GET", filename, true);
+		sendRequest.onreadystatechange = () => {
+			if(sendRequest.readyState == 4) {
+				if(sendRequest.status == 200) {
+					okCallback(sendRequest.responseText);
+				} else {
+					errorCallback(sendRequest.responseText);
+				}
+			}
+		}
+		sendRequest.send(null);
+
+	}
+}
+function LoadMetadata()
+{
+		let Index = window.location.href.indexOf("scanId=");
+		let value = window.location.href.substr(Index+7);
+		Server.Get("/books/"+value+"/info.json",function(content) {
+		document.getElementById("details").innerHTML += JSON.parse(content).bib;
+		},function(){});
+}
+	</script>
+  </head>
+<body class ="damn" onload="LoadMetadata();">
+	<div class="InfoPage">
+		<h1>Book details</h1>
+		<p id="details">Bibliographie: </p>
+	</div>
+</body>
+</html>
