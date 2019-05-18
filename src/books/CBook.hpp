@@ -12,24 +12,30 @@ class CBook
 {
 private:
 
-    std::string m_sPath;                    //Key of the book
+    std::string m_sKey;                     //Key of the book
+    std::string m_sPath;                    //Path to book (if exists)
     std::map<std::string, int> m_Words;     //Map of all words in book.
     bool m_bOcr;                            //Book has ocr path
-    CMetadata m_Metadata;                  //Json with all metadata 
+    CMetadata m_Metadata;                   //Json with all metadata 
 
 public:
 
-    CBook ();
+    CBook();
 
     /**
     * @Brief Constructor
     * @param[in] sPath Path to book
     * @param[in] map map of words in book
     */
-    CBook(std::string sPath);
+    CBook(nlohmann::json jMetadata);
 
 
     // **** Getter **** //
+
+    /**
+    * @return Key of the book, after extracting it from the path
+    */
+    const std::string& getKey();
 
     /**
     * @brief getter function to return the path to the directory of a book
@@ -42,11 +48,6 @@ public:
     */
     std::string getOcrPath();
 
-    /**
-    * @return Key of the book, after extracting it from the path
-    */
-    std::string getKey();
-    
     /**
     * @return Boolean, whether book contains ocr or not 
     */
@@ -82,6 +83,12 @@ public:
     */
     int getDate();
 
+    // **** SETTER **** //
+    
+    /**
+    * @param[in] path set Path to book)
+    */
+    void setPath(std::string sPath);
     
     /**
     * Create a map of all word of this book

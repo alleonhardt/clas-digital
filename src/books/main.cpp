@@ -1,5 +1,6 @@
 #include <iostream>
 #include <list>
+#include "json.hpp"
 #include "CBookManager.hpp"
 #include "CFunctions.hpp"
 
@@ -9,6 +10,13 @@ int main()
     CFunctions function;
 
     CBookManager manager;
+
+    std::ifstream read("Items.json");
+    nlohmann::json jItems;
+    read >> jItems;
+    read.close();
+    std::cout << "updating zotero.\n";
+    manager.updateZotero(jItems);
     bool check = manager.initialize();
 
     if(check == false)

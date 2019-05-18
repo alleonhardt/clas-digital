@@ -28,17 +28,10 @@ bool CBookManager::initialize()
     //Go though all books and create book
     while((e_allItems = readdir(dir_allItems)) != NULL)
     {
-        //Ignore files that aren't books
-        if(e_allItems->d_name[0] == '.')
-            continue;
-
-        //Create book
-        std::string sPath = "web/books/";
-        sPath.append(e_allItems->d_name); 
-        CBook book (sPath);
-
-        //Add book to map of all books
-        m_mapBooks[book.getKey()] = book;
+        if(m_mapBooks.count(e_allItems->d_name) > 0)
+            addBook(e_allItems->d_name);
+        else
+            std::cout << "Book found that isn't in map!\n";
     }
 
     createMapWords();
@@ -47,6 +40,29 @@ bool CBookManager::initialize()
     return true;
 }
 
+
+void CBookManager::updateZotero(nlohmann::json j_items)
+{
+    for(auto &it:j_items)
+    {
+        if(m_mapBooks.count(it["key"]) > 0)
+            m_mapBooks[it["key"]].getMetadata().setMetadata(it);
+        else
+        {
+            CBook book(it);
+            m_mapBooks[it["key"]] = book;
+        }
+    }
+}
+
+/**
+* @brief add a book
+*/
+void CBookManager::addBook(std::string sKey) {
+    m_mapBooks[sKey].setPath("/web/books/" + sKey);
+    m_mapBooks[sKey].createMapWords();
+}
+    
 
 /**
 * @brief search function calling fitting function from search class
