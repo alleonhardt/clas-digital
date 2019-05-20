@@ -6,6 +6,7 @@
 #include <dirent.h>
 #include "CBook.hpp"
 #include "CSearch.hpp"
+#include "func.hpp"
 
 #pragma once 
 
@@ -32,6 +33,17 @@ public:
     * @return boolean for successful of not
     */
     bool initialize(); 
+
+    /**
+    * @brief update zotero and get json with all books. Replace all metadata. If a new book
+    *        was found, call "addBook"
+    */
+    void updateZotero(nlohmann::json j_Items);
+
+    /**
+    * @brief add a book
+    */
+    void addBook(std::string sKey);
 
     /**
     * @brief search function calling fitting function from search class

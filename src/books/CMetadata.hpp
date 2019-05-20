@@ -2,6 +2,7 @@
 #include <string>
 #include <fstream>
 #include <regex>
+#include <mutex>
 #include <map>
 #include "json.hpp"
 
@@ -15,17 +16,19 @@ public:
     CMetadata();
 
     /**
-    *@param[in] sMetadata path to metadata
+    * @param[in] jMetadata json with metadata
     */
-    CMetadata(std::string sMetadata);
-
-    /**
-    *@return metadata
+    CMetadata(nlohmann::json jMetadata);
+ 
+    /*
+    * @param[in] jMetadata new metadata
     */
-    const nlohmann::json& getJson();
+    void setMetadata(nlohmann::json jMetadata);
 
 
     //************ get metadata *******************//
+
+    nlohmann::json getMetadata();
 
     /**
     * getter function to return selected metadata

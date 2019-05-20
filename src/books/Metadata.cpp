@@ -1,25 +1,30 @@
 #include "CMetadata.hpp"
 
 CMetadata::CMetadata () {}
-/**
-*@param[in] sMetadata path to metadata
-*/
-CMetadata::CMetadata(std::string sMetadata)
-{
-    std::ifstream read(sMetadata);
-    if(read.is_open())
-        read >> m_metadata;
-}
+
 
 /**
-*@return metadata
+* @param[in] jMetadata json with metadata
 */
-const nlohmann::json& CMetadata::getJson() {
-    return m_metadata;
+CMetadata::CMetadata(nlohmann::json jMetadata) {
+    m_metadata = jMetadata;
 }
+
+
+/*
+* @param[in] jMetadata new metadata
+*/
+void CMetadata::setMetadata(nlohmann::json jMetadata) {
+    m_metadata = jMetadata;
+}
+    
 
 
 //************ get metadata *******************//
+
+nlohmann::json CMetadata::getMetadata() {
+    return m_metadata;
+}
 
 /**
 * getter function to return selected metadata
@@ -188,6 +193,7 @@ std::string CMetadata::getShow()
 {
     //Add author to result
     std::string sResult = getAuthor();
+        sResult + ", ";
 
     //Add first 15 words of title to result
     std::string sTitle = getMetadata("title", "data");

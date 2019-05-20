@@ -3,6 +3,7 @@
 #include <list>
 #include <map>
 #include "CBook.hpp"
+#include "func.hpp"
 
 #pragma once 
 

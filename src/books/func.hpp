@@ -3,12 +3,14 @@
 #include <fstream>
 #include <string.h>
 #include <string>
+#include <map>
+#include <list>
 #include <locale>
+#include <regex>
 #include "json.hpp"
 
-class CFunctions
+namespace func 
 {
-public:
 
     /**
     * @param[in] chT1 first string to compare
@@ -62,22 +64,60 @@ public:
     void transform(std::string& str);
 
     /**
-    * @param[in] sPathToOcr Path to ocr of a book
+    * @param[in] sWords string of which map shall be created 
     * @param[out] mapWords map to which new words will be added
     */
-    void createMapOfWords(std::string sPathToOcr, std::map<std::string, int>& mapWords);
+    void extractWordsFromString(std::string sWords, std::map<std::string, int>& mapWords);
 
     /**
     * @param[in] sWords string of which map shall be created 
     * @param[out] mapWords map to which new words will be added
     */
-    void createMapofWordsFromString(std::string sWords, std::map<std::string, int>& mapWords);
+    void extractWordsFromString(std::string sWords, std::list<std::string>& mapWords);
+
+
+    /**
+    * @param[in] sPathToOcr Path to ocr of a book
+    * @param[out] mapWords map to which new words will be added
+    */
+    template<typename T>
+    void extractWords(std::string sPathToOcr, T& words)
+    {
+        //Read ocr
+        std::ifstream read(sPathToOcr, std::ios::in);
+
+        //Check, whether ocr could be loaded
+        if(!read)
+            return;
+
+        //Parse through file line by line
+        while(!read.eof())
+        {
+            //Create string for current line
+            std::string sBuffer;
+            getline(read, sBuffer);
+
+            //Check whether bufffer is empty
+            if(sBuffer.length()<=1)
+                continue;
+            
+            //Create words from current line
+            extractWordsFromString(sBuffer, words);
+         }
+    }
 
     /**
     * @param[in] sPathToWords path to .txt with all words in book
     * @param[out] mapWords map to which new words will be added.
     */
     void loadMapOfWords(std::string sPathToWords, std::map<std::string, int>& mapWords);
+
+    /**
+    * @brief check whether string indicates, that next page is reached
+    * @param[in] buffer 
+    * @return 
+    */
+    static inline bool checkPage(std::string &buffer);
 
 };
 

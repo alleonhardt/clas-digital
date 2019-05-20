@@ -7,12 +7,21 @@ CBook::CBook () {}
 * @param[in] sPath Path to book
 * @param[in] map map of words in book
 */
-CBook::CBook(std::string sPath) : m_Metadata (sPath + "/info.json")
+CBook::CBook(nlohmann::json jMetadata) : m_Metadata(jMetadata)
 {
-    m_sPath = sPath;
+    m_sKey = jMetadata["key"];
+    m_sKey = "";
     m_bOcr = false;
+}
 
-    createMapWords();    
+
+// **** GETTER **** //
+
+/**
+* @return Key of the book, after extracting it from the path
+*/
+const std::string& CBook::getKey() { 
+    return m_sKey;
 }
 
 /**
@@ -31,14 +40,6 @@ std::string CBook::getOcrPath() {
     return sPath;
 }
 
-/**
-* @return Key of the book, after extracting it from the path
-*/
-std::string CBook::getKey() { 
-    std::string sKey = m_sPath;
-    sKey.erase(sKey.begin(), sKey.end()-8);
-    return sKey;
-}
 
 /**
 * @return Boolean, whether book contains ocr or not 
@@ -95,6 +96,15 @@ int CBook::getDate() {
 }
 
 
+// **** SETTER **** //
+    
+/**
+* @param[in] path set Path to book)
+*/
+void CBook::setPath(std::string sPath) {
+    m_sPath = sPath;
+}
+
 // **** Other Functions **** //
 
 /**
@@ -108,15 +118,15 @@ void CBook::createMapWords()
     if(!readOcr)
         return;
 
-    CFunctions function;
     std::ifstream readWords(m_sPath + "/words.txt");
     if(!readWords || readWords.peek() == std::ifstream::traits_type::eof() )
     {
-        function.createMapOfWords(getOcrPath(), m_Words);
+        std::cout << "Creating map of words... \n";
+        func::extractWords(getOcrPath(), m_Words);
         safeMapOfWords();
     }
     else
-        function.loadMapOfWords(m_sPath + "/words.txt", m_Words);
+        func::loadMapOfWords(m_sPath + "/words.txt", m_Words);
 
     m_bOcr = true;
 }
@@ -135,5 +145,37 @@ void CBook::safeMapOfWords()
         write << it->first << "\n";
 
     write.close();
+}
+
+/*
+* @param[in] sWord searched word
+* @return list of pages on which searched word accures
+*/
+std::list<int>* CBook::getPages(std::string sWord)
+{
+    //Convert search word to lower case
+    func::convertToLower(sWord);
+
+    //Create list of all words in book
+    std::list<std::string> listWords;
+    func::extractWords(getOcrPath(), listWords);
+
+    //Create empty list of pages 
+    std::list<int>* listPages = new std::list<int>;
+
+    unsigned int pageNum = 0;
+    unsigned int lastPage = 0;
+    for(auto it:listWords)
+    {
+        if(func::compare(it.c_str(), "###page###") == true)
+            pageNum++;
+        if(func::compare(it.c_str(), sWord.c_str()) == true && lastPage != pageNum)
+        {
+            listPages->push_back(pageNum);
+            lastPage = pageNum;
+        }
+    }
+
+    return listPages;
 }
 
