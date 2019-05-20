@@ -4,6 +4,7 @@
 * @brief constructor
 */
 CSearch::CSearch(std::string sWord) {
+    func::convertToLower(sWord);
     m_sWord = sWord;
 }
 
@@ -15,7 +16,9 @@ CSearch::CSearch(std::string sWord) {
 void CSearch::normalSearch(std::map<std::string, std::map<std::string, CBook*>>& mapWords, 
                                                     std::map<std::string, CBook*>* mapSR) {
 
-    std::map<std::string, CBook*> searchResults = mapWords[m_sWord];
-    mapSR->insert(searchResults.begin(), searchResults.end());
+    if(mapWords.count(m_sWord) > 0) {
+        std::map<std::string, CBook*> searchResults = mapWords.at(m_sWord);
+        mapSR->insert(searchResults.begin(), searchResults.end());
+    }
 }
 

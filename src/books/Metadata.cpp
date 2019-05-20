@@ -193,6 +193,7 @@ std::string CMetadata::getShow()
 {
     //Add author to result
     std::string sResult = getAuthor();
+        sResult + ", ";
 
     //Add first 15 words of title to result
     std::string sTitle = getMetadata("title", "data");

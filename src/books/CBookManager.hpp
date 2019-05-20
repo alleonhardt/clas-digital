@@ -6,6 +6,7 @@
 #include <dirent.h>
 #include "CBook.hpp"
 #include "CSearch.hpp"
+#include "func.hpp"
 
 #pragma once 
 

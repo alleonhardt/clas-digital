@@ -1,11 +1,14 @@
-#include "CFunctions.hpp"
+#include "func.hpp"
+
+namespace func 
+{
 
 /**
 * @param[in] chT1 first string to compare
 * @param[in] chT2 second string to compare
 * @return Boolean indicating, whether strings compare or not
 */
-bool CFunctions::compare(const char* chT1, const char* chT2)
+bool compare(const char* chT1, const char* chT2)
 {
     if(strlen(chT1) != strlen(chT2))
         return false;
@@ -22,7 +25,7 @@ bool CFunctions::compare(const char* chT1, const char* chT2)
 * @param[out] str remove of spaces from str
 * @return modified string
 */
-std::string CFunctions::removeSpace(std::string str)
+std::string removeSpace(std::string str)
 {
     for(unsigned int i=0; i<str.length(); i++)
     {
@@ -35,7 +38,7 @@ std::string CFunctions::removeSpace(std::string str)
 /**
 * @param[in, out] str string to be modified
 */
-void CFunctions::convertToLower(std::string &str)
+void convertToLower(std::string &str)
 {
     std::locale loc1("de_DE.UTF8");
     for(unsigned int i=0; i<str.length(); i++)
@@ -48,7 +51,7 @@ void CFunctions::convertToLower(std::string &str)
 * @param[in] string b
 * @return true if strings are equal, false if not
 */
-bool CFunctions::iequals(const char* chA, const char* chB) 
+bool iequals(const char* chA, const char* chB) 
 {
     unsigned int len = strlen(chB);
     if (strlen(chA) != len)
@@ -63,7 +66,7 @@ bool CFunctions::iequals(const char* chA, const char* chB)
 * @brief function checks whether character is a letter with de and fr local
 * @param[in] s char to be checked
 */
-bool CFunctions::isLetter(const char s)
+bool isLetter(const char s)
 {
     std::locale loc1("de_DE.UTF8");
     //std::locale loc2("fr_FR");
@@ -78,7 +81,7 @@ bool CFunctions::isLetter(const char s)
 * @param[in] chWord string to be checked
 * @return boolean for words/ no word
 */
-bool CFunctions::isWord(const char* chWord) 
+bool isWord(const char* chWord) 
 {
     unsigned int counter = 0;
     for(unsigned int i=0; i<strlen(chWord); i++)
@@ -97,7 +100,7 @@ bool CFunctions::isWord(const char* chWord)
 * @param[in] str string to be splitet
 * @param[in] delimitter 
 */
-void CFunctions::split(std::string str, std::string delimiter, std::vector<std::string>& vStr)
+void split(std::string str, std::string delimiter, std::vector<std::string>& vStr)
 {
     size_t pos=0;
     while ((pos = str.find(delimiter)) != std::string::npos) {
@@ -112,7 +115,7 @@ void CFunctions::split(std::string str, std::string delimiter, std::vector<std::
 * @brief cuts all non-letter-characters from end and beginning of str
 * @param[in, out] string to modify
 */
-void CFunctions::transform(std::string& str)
+void transform(std::string& str)
 {
     if(str.length() == 0)
         return;
@@ -131,39 +134,10 @@ void CFunctions::transform(std::string& str)
 }
 
 /**
-* @param[in] sPathToOcr Path to ocr of a book
-* @param[out] mapWords map to which new words will be added
-*/
-void CFunctions::createMapOfWords(std::string sPathToOcr, std::map<std::string, int>& mapWords)
-{
-    //Read ocr
-    std::ifstream read(sPathToOcr, std::ios::in);
-
-    //Check, whether ocr could be loaded
-    if(!read)
-        return;
-
-    //Parse through file line by line
-    while(!read.eof())
-    {
-        //Create string for current line
-        std::string sBuffer;
-        getline(read, sBuffer);
-
-        //Check whether bufffer is empty
-        if(sBuffer.length()<=1)
-            continue;
-        
-        //Create words from current line
-        createMapofWordsFromString(sBuffer, mapWords);
-     }
-}
-
-/**
 * @param[in] sWords string of which map shall be created 
 * @param[out] mapWords map to which new words will be added
 */
-void CFunctions::createMapofWordsFromString(std::string sWords, std::map<std::string, int>& mapWords)
+void extractWordsFromString(std::string sWords, std::map<std::string, int>& mapWords)
 {
     std::vector<std::string> vStrs;
     split(sWords, " ", vStrs);
@@ -180,10 +154,36 @@ void CFunctions::createMapofWordsFromString(std::string sWords, std::map<std::st
 }
 
 /**
+* @param[in] sWords string of which map shall be created 
+* @param[out] mapWords map to which new words will be added
+*/
+void extractWordsFromString(std::string sWords, std::list<std::string>& listWords)
+{
+    if (checkPage(sWords) == true)
+    {
+        listWords.push_back("###page###");
+        return;
+    }
+
+    std::vector<std::string> vStrs;
+    split(sWords, " ", vStrs);
+
+    for(unsigned int i=0; i<vStrs.size(); i++)
+    {
+        transform(vStrs[i]);
+        if(isWord(vStrs[i].c_str()) == true)
+        {
+            convertToLower(vStrs[i]);
+            listWords.push_back(vStrs[i]);
+        }
+    }
+}
+
+/**
 * @param[in] sPathToWords path to .txt with all words in book
 * @param[out] mapWords map to which new words will be added.
 */
-void CFunctions::loadMapOfWords(std::string sPathToWords, std::map<std::string, int>& mapWords)
+void loadMapOfWords(std::string sPathToWords, std::map<std::string, int>& mapWords)
 {
     std::ifstream read(sPathToWords);
 
@@ -199,3 +199,32 @@ void CFunctions::loadMapOfWords(std::string sPathToWords, std::map<std::string, 
  
 }
 
+/**
+* @brief check whether string indicates, that next page is reached
+* @param[in] buffer 
+* @return 
+*/
+static inline bool checkPage(std::string &buffer)
+{
+    const char arr[] = "----- ";
+    if(buffer.length()<6)
+        return false;
+
+    for(unsigned int i=0; i < 6;i++)
+    {
+        if(arr[i]!=buffer[i])
+        return false;
+    }
+
+    for(unsigned int i = 6; i < buffer.length(); i++)
+    {
+        if(buffer[i]==' ')
+            return true;
+        else if(buffer[i]<48||buffer[i]>57)
+            return false;
+   }
+   return false;
+}
+
+
+} //Close namespace 

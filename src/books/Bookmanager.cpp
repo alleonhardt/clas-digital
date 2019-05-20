@@ -1,6 +1,5 @@
 #include "CBookManager.hpp"
 
-
 /**
 * @return map of all book
 */
@@ -59,7 +58,7 @@ void CBookManager::updateZotero(nlohmann::json j_items)
 * @brief add a book
 */
 void CBookManager::addBook(std::string sKey) {
-    m_mapBooks[sKey].setPath("/web/books/" + sKey);
+    m_mapBooks[sKey].setPath("web/books/" + sKey);
     m_mapBooks[sKey].createMapWords();
 }
     
@@ -72,7 +71,6 @@ void CBookManager::addBook(std::string sKey) {
 std::map<std::string, CBook*>* CBookManager::search(std::string sWord, bool ocr, bool title)
 {
     CSearch search(sWord);
-
     //Create empty map of searchResults
     std::map<std::string, CBook*>* mapSearchresults = new std::map<std::string, CBook*>;
 
@@ -102,9 +100,13 @@ void CBookManager::createMapWords()
         //Get map of words of current book
         std::map<std::string, int> mapWords = it->second.getMapWords();
 
+        unsigned int counter = 0;
         //Iterate over all words in this book. Check whether word already exists in list off all words.
         for(auto yt=mapWords.begin(); yt!=mapWords.end(); yt++)
-            m_mapWordsTitle[yt->first][it->first] = &it->second;
+        {
+            counter++;
+            m_mapWords[yt->first][it->first] = &it->second;
+        }
     }
 
     unsigned int counter = 0;
@@ -120,9 +122,8 @@ void CBookManager::createMapWordsTitle()
     for(auto it=m_mapBooks.begin(); it!=m_mapBooks.end(); it++)
     {
         //Get map of words of current book)
-        CFunctions function;
         std::map<std::string, int> mapWords; 
-        function.createMapofWordsFromString(it->second.getTitle(), mapWords);
+        func::extractWordsFromString(it->second.getTitle(), mapWords);
 
         //Iterate over all words in this book. Check whether word already exists in list off all words.
         for(auto yt=mapWords.begin(); yt!=mapWords.end(); yt++)

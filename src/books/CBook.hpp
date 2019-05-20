@@ -1,9 +1,10 @@
 #include <iostream>
 #include <fstream>
 #include <map>
+#include <list>
 #include <string>
 #include <regex>
-#include "CFunctions.hpp"
+#include "func.hpp"
 #include "CMetadata.hpp"
 
 #pragma once 
@@ -12,11 +13,11 @@ class CBook
 {
 private:
 
-    std::string m_sKey;                     //Key of the book
-    std::string m_sPath;                    //Path to book (if exists)
-    std::map<std::string, int> m_Words;     //Map of all words in book.
-    bool m_bOcr;                            //Book has ocr path
-    CMetadata m_Metadata;                   //Json with all metadata 
+    std::string m_sKey;                                 //Key of the book
+    std::string m_sPath;                                //Path to book (if exists)
+    std::map<std::string, int> m_Words;                 //Map of all words in book.
+    bool m_bOcr;                                        //Book has ocr path
+    CMetadata m_Metadata;                               //Json with all metadata 
 
 public:
 
@@ -99,4 +100,10 @@ public:
     * @brief safe created word list to file
     */
     void safeMapOfWords();
+
+    /*
+    * @param[in] sWord searched word
+    * @return list of pages on which searched word accures
+    */
+    std::list<int>* getPages(std::string sWord);
 };

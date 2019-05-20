@@ -118,15 +118,15 @@ void CBook::createMapWords()
     if(!readOcr)
         return;
 
-    CFunctions function;
     std::ifstream readWords(m_sPath + "/words.txt");
     if(!readWords || readWords.peek() == std::ifstream::traits_type::eof() )
     {
-        function.createMapOfWords(getOcrPath(), m_Words);
+        std::cout << "Creating map of words... \n";
+        func::extractWords(getOcrPath(), m_Words);
         safeMapOfWords();
     }
     else
-        function.loadMapOfWords(m_sPath + "/words.txt", m_Words);
+        func::loadMapOfWords(m_sPath + "/words.txt", m_Words);
 
     m_bOcr = true;
 }
@@ -145,5 +145,37 @@ void CBook::safeMapOfWords()
         write << it->first << "\n";
 
     write.close();
+}
+
+/*
+* @param[in] sWord searched word
+* @return list of pages on which searched word accures
+*/
+std::list<int>* CBook::getPages(std::string sWord)
+{
+    //Convert search word to lower case
+    func::convertToLower(sWord);
+
+    //Create list of all words in book
+    std::list<std::string> listWords;
+    func::extractWords(getOcrPath(), listWords);
+
+    //Create empty list of pages 
+    std::list<int>* listPages = new std::list<int>;
+
+    unsigned int pageNum = 0;
+    unsigned int lastPage = 0;
+    for(auto it:listWords)
+    {
+        if(func::compare(it.c_str(), "###page###") == true)
+            pageNum++;
+        if(func::compare(it.c_str(), sWord.c_str()) == true && lastPage != pageNum)
+        {
+            listPages->push_back(pageNum);
+            lastPage = pageNum;
+        }
+    }
+
+    return listPages;
 }
 
