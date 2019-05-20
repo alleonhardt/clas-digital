@@ -13,7 +13,8 @@
 #include <proxygen/httpserver/RequestHandlerFactory.h>
 #include <list>
 #include <string>
-#include "server/HandlerFactory.hpp"
+#include "src/server/HandlerFactory.hpp"
+#include "src/zotero/zotero.hpp"
 
 using namespace proxygen;
 

@@ -1,12 +1,22 @@
+/**
+ * @file src/zotero/zotero.hpp
+ * Contains the zotero interface, with which the server communicates with the zotero server
+ *
+ */
 #pragma once
 #include <curl/curl.h>
 #include <fstream>
 #include <streambuf>
-#include "include/util/debug.hpp"
-#include "json.hpp"
+#include "src/util/debug.hpp"
+#include "src/books/json.hpp"
 
 #define ZOTERO_API_ADDR "https://api.zotero.org"
+constexpr const char ZOTERO_API_KEY_FILE_PATH[] = "bin/zoteroKey.json";
 
+/**
+ * @brief The zotero class connects the server to the zotero api and requests metadata from the server to keep the metadata up to date
+ *
+ */
 class Zotero
 {
 	private:
@@ -23,6 +33,7 @@ class Zotero
 		 */
 		
 		void ReceiveBytes(char *pBytes, size_t pNumBytes);
+		
 		/**
 		 * Sets the class variable _nextLink to the next url which is needed to download
 		 * all json chunks from zotero
@@ -31,6 +42,23 @@ class Zotero
 		void SetNextLink(std::string str);
 
 	public:
+		/**
+		 * @brief Defines the most Basic requests to the zotero API
+		 * @code
+		 * Zotero zot;
+		 * zot.SendRequest(Zotero::Request::GetAllItems);
+		 * //Or this
+		 * Zotero zot;
+		 * zot.SendRequest(Zotero::Request::GetSpecificItem("X2DEFG"));
+		 * @endcode
+		 */
+		struct Request
+		{
+			static constexpr const char GetAllItems[] = "/items?format=json&include=data,bib,citation"; ///< The zotero request to get all items in the zotero library from zotero
+			static constexpr const char GetAllPillars[] = "/collections/top?format=json"; ///< The zotero request to get all collections from the zotero api
+			static std::string GetSpecificItem(std::string key); ///< The zotero request to get a specific item from the zotero api
+			static std::string GetItemsInSpecificPillar(std::string key); ///< The zotero request to get all items from a specific collection out of zotero
+		};
 		/**
 		 * Creates a new ssl connection to the zotero server
 		 */
@@ -53,6 +81,6 @@ class Zotero
 		 */
 		~Zotero();
 
-		friend size_t zoteroHeaderReader(char *, size_t, size_t, void *);
-		friend size_t zoteroReadBuffer(void *, size_t, size_t, void *);
+		friend size_t zoteroHeaderReader(char *, size_t, size_t, void *); ///< Needed as curl callback on header receiving
+		friend size_t zoteroReadBuffer(void *, size_t, size_t, void *);  ///< Needed as curl callback on data receiving
 };

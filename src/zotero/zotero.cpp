@@ -70,11 +70,12 @@ Zotero::Zotero()
 
 	//Try to load the file with the API Key from zotero and the group number
 	//to perform requests to the zotero api interface
-	std::ifstream ifs("private_data/privateKey.txt",std::ios::in);
+	std::ifstream ifs(ZOTERO_API_KEY_FILE_PATH,std::ios::in);
 	nlohmann::json zotAccess;
 	if(!ifs.is_open())
 	{
-		DBG_INF_MSG_EXIT("Could not open private_data/privateKey.txt for reading keys for zotero",EXIT_FAILURE);
+		debug::print("Could not open: ",ZOTERO_API_KEY_FILE_PATH," for reading API Keys for zotero");
+		throw 0;
 	}
 
 	//As the data is crucial for the programm exit the programm when there is an
@@ -85,7 +86,8 @@ Zotero::Zotero()
 	}
 	catch(...)
 	{
-		DBG_INF_MSG_EXIT("Faulty json at private_data/privateKey.txt!",EXIT_FAILURE);
+		debug::print("Faulty json read as Zotero API Key from: ",ZOTERO_API_KEY_FILE_PATH);
+		throw 0;
 	}
 	ifs.close();
 
@@ -132,7 +134,7 @@ std::string Zotero::SendRequest(std::string requestURI)
 	nlohmann::json js;
 	while(true)
 	{
-		std::cout<<"END REQUEST: "<<st.c_str()<<std::endl;
+		DBG_MSG("Zotero send request to url: ",st.c_str());	
 		//Set the request url
 		curl_easy_setopt(_curl, CURLOPT_URL, st.c_str());
 
@@ -173,10 +175,9 @@ std::string Zotero::SendRequest(std::string requestURI)
 			if(_requestJSON.find("An error occurred")!=std::string::npos)
 			{
 				_requestJSON="";
-				std::cout<<"Request again!!!!!!!"<<std::endl;
 				continue;
 			}
-			//TODO: Some error handling at the moment the propgramm just exits with an
+			//TODO: Some error handling at the moment the programm just exits with an
 			//error code
 			DBG_INF_MSG_EXIT("Received corrupted json file!",EXIT_FAILURE);
 		}
@@ -218,31 +219,51 @@ void Zotero::ReceiveBytes(char *pBytes, size_t pNumBytes)
 		_requestJSON += pBytes[i];
 }
 
+std::string Zotero::Request::GetSpecificItem(std::string key)
+{
+	std::string ret = "/items/";
+	ret+=key;
+	ret+="?format=json&include=data,bib,citation";
+	return std::move(ret);
+}
+
+std::string Zotero::Request::GetItemsInSpecificPillar(std::string key)
+{
+	std::string ret = "/collections/";
+	ret+=key;
+	ret+="/items?format=json&include=bib,citation,data";
+	return std::move(ret);
+}
+
 #ifdef COMPILE_UNITTEST
+
+TEST(Zotero,init)
+{
+	EXPECT_NO_THROW(Zotero zot);
+}
 
 /**
  * This test should check if the zotero connection works by doing a simple
  * request and searching for some key which is always present in this request.
  */
-/*
 TEST(Zotero,zotero_test)
 {
 	//Create the connection to the server
 	Zotero zot;
 
 	//Do the most basic request in zotero
-	std::string request = std::move(zot.SendRequest("/collections/top?format=json"));
+	std::string request = std::move(zot.SendRequest(Zotero::Request::GetAllPillars));
 	//Parse the string to a json and search for the unique key always
 	//present in this request
 	auto js = nlohmann::json::parse(request);
 	bool exist = false;
 	for(auto &el : js.items())
 	{
-		if(el.value()["key"].get<std::string>()=="WIXP3DS3")
+		if(el.value()["key"].get<std::string>()=="2SWXSFCX")
 			exist = true;
 	}
 	//The key should be present
 	ASSERT_EQ(exist,true);
 }
-*/
+
 #endif
