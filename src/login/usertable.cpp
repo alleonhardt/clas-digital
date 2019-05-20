@@ -53,9 +53,9 @@ std::string UserHandler::toJSON()
 	{
 		//Put the email and the access rights into the specific json
 		json+="{\"email\":\"";
-		json+=it->second->GetEmail();
+		json+=it.second->GetEmail();
 		json+="\",\"access\":";
-		json+=std::to_string(it->second->GetAccessRights());
+		json+=std::to_string(it.second->GetAccessRights());
 		json+="},";
 		//The list probably goes on so put a , at the end for the next entry
 	}
@@ -69,8 +69,13 @@ void UserHandler::RemoveUser(std::string email)
 {
 	//Change the table so lock the map entirely to prevent segmentation faults
 	std::unique_lock lck(m);
+
+	auto it = m_userTable.find(email);
+	if(it==m_userTable.end())
+		return;
+	it->second->SetAccessRights(0);
 	//erase the user doesnt do anything if the user does not exist
-	m_userTable.erase(email);
+	m_userTable.erase(it);
 }
 
 std::string UserHandler::DoLogin(std::string email, std::string password)
@@ -137,9 +142,14 @@ void UserHandler::RemoveSession(std::string x)
 {
 	//No lock before this functioN!!!!!! This will result in a deadlock
 	std::shared_ptr<User> ptr = std::move(GetUserBySessid(x));
-	//Lock the function now as we are changing something important
-	std::unique_lock lck(m);
-	ptr->SetSessionId("");
+	if(ptr)
+	{
+		//Lock the function now as we are changing something important
+		std::unique_lock lck(m);
+		
+		//Reset the session id so the user cant use the session id anymore
+		ptr->SetSessionId("");
+	}
 }
 
 std::shared_ptr<User> UserHandler::GetUserByName(std::string email)

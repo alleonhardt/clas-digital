@@ -79,6 +79,7 @@ class User
 		 */
 		const std::string &GetPassword() const;
 
+
 		/**
 		 * @brief Returns the current session id of the user logged in at the moment
 		 * @return The session id for the user
@@ -98,6 +99,16 @@ class User
 		 * @return Returns true if the given credentials matches the user credentials
 		 */
 		bool DoesMatch(std::string email, std::string passwd) const;
+		
+		/**
+		 * @brief Check if the user has the necessary access rights to access this ressource
+		 *
+		 * @param usr The user the message is one can be a nullptr as well!
+		 * @param accRequired The access rights required to access this ressource
+		 *
+		 * @return true if the user has enough access rights false otherwise
+		 */
+		static bool AccessCheck(const std::shared_ptr<User> &usr, int accRequired);
 };
 
 /**
@@ -117,14 +128,17 @@ class UserHandler
 		UserHandler(std::string filePath);
 
 		/**
-		 * Adds a user to the map of current users
+		 * @brief Adds a user to the map of current users
+		 * @param email The email with which the user gets created
+		 * @param password The password the user accounts has got
+		 * @param access The access rights the user has
 		 */
 		bool AddUser(std::string email, std::string password, int access);
 
 		/**
 		 * Set the access rights for a specific user and save the changes instantly to disk.
 		 * @param email The email of the user who gets the access rights changed
-		 * @param acc The new access rights the user gets granted
+		 * @param newAccess The new access rights the user gets granted
 		 */
 		void SetAccessRights(std::string email, int newAccess);
 
@@ -137,7 +151,7 @@ class UserHandler
 
 		/**
 		 * Removes a user from the user table and deletes all files and all folder associated with him.
-		 * @param usr The user which should be removed from the user table
+		 * @param email The email from the user who is about to be removed from the map of users
 		 */
 		void RemoveUser(std::string email);
 
@@ -173,4 +187,15 @@ class UserHandler
 		 * @return
 		 */
 		void RemoveSession(std::string x);
+
+		/**
+		 * @brief Returns the global user table used to manage all users in the server
+		 * @return A reference to the global user table
+		 */
+		static inline UserHandler &GetUserTable()
+		{
+			//Create a new static user table and load it from bin/usertable.json
+			static UserHandler usrHandler("bin/usertable.json");
+			return usrHandler;
+		}
 };

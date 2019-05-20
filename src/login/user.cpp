@@ -57,6 +57,15 @@ void User::SetSessionId(std::string sessid)
 	_sessid = std::move(sessid);
 }
 
+bool User::AccessCheck(const std::shared_ptr<User> &usr, int accRequired)
+{
+	if(accRequired==0)
+		return true;
+	else if(!usr||((usr->GetAccessRights()&accRequired)!=accRequired))
+		return false;
+	return true;
+}
+
 
 #ifdef COMPILE_UNITTEST
 

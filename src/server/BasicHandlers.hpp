@@ -8,9 +8,11 @@
 #ifdef COMPILE_UNITTEST 
 #include <gtest/gtest.h>
 #endif
+#include <memory>
 #include <folly/Memory.h>
 #include <folly/File.h>
 #include <proxygen/httpserver/RequestHandler.h>
+#include "src/books/json.hpp"
 #include "src/login/user_system.hpp"
 #include "src/util/debug.hpp"
 
@@ -36,11 +38,9 @@ namespace proxygen {
  * @endcode
  */
 class EmptyHandler : public proxygen::RequestHandler {
-	protected:
-		User *_user;
 	public:
-		EmptyHandler(User *fromUser) : _user(fromUser) {}
-
+		std::shared_ptr<User> _user; ///< The user this specific request is from
+	public:
 		/**
 		 * @brief Dummy function for the proxygen virtual function onRequest
 		 * @param headers The HTTP Message provided by proxygen
@@ -132,7 +132,6 @@ class GetHandler : public EmptyHandler {
 		 */
 		void onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 			noexcept override;
-		GetHandler(User *from);
 };
 
 /**
@@ -231,21 +230,22 @@ class URIFile
  *
  */
 class PostHandler : public EmptyHandler {
+	private:
+		bool _logout;
 	public:
-		/**
-		 * @brief Handles all post requests which are not handled by other handlers
-		 *
-		 * @param headers The headers provided by proxygen
-		 */
-		void onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
-			noexcept override;
-
-		PostHandler(User *from);
-
 		/**
 		 * @brief Proxygen callback for body data tries to parse user name and password from the data
 		 *
 		 * @param body The data send with the post request
 		 */
 		void onBody(std::unique_ptr<folly::IOBuf> body) noexcept override;
+
+
+		/**
+		 * @brief The Function determines if the user wants to login or logout and handles the request accordingly
+		 *
+		 * @param headers The http message passed by proxygen to our handler
+		 */
+		void onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
+			noexcept override;
 };

@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>clas digital</title>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<!-- <link rel="stylesheet" href="container.css"/>-->
+<style>
+
+.mybtn {
+    background-color: #FFD700;
+    width: 8rem;
+    height: 2rem;
+    font-size: large;
+	margin-bottom: 8rem;
+}
+
+.mybtn:hover{
+    background-color: #FF3700;
+}
+
+@import url('https://fonts.googleapis.com/css?family=Raleway:200,300');
+
+html {
+	padding-top: 1rem;
+	padding-bottom: 1rem;
+	background-color: lightgrey;
+}
+
+
+html * {
+	font-family: "Raleway", serif;
+	font-weight: 200;
+	box-sizing: border-box;
+	-webkit-font-smoothing: antialiased;
+}
+
+body {
+	font-size: 1.4em;
+}
+
+body>.container {
+width: 60rem;
+       min-height: 75vh;
+margin: 0 auto;
+padding: 1rem;
+	 padding-left: 4rem;
+	 padding-right: 4rem;
+	padding-bottom: 4rem;
+	 background-color: white;
+display: none;
+}
+
+body>.container.active {
+display: block;
+}
+
+p {
+	font-size: 1.4rem;
+	line-height: 1.9em;
+}
+
+p strong {
+	font-weight: 300;
+}
+
+h1 {
+	font-size: 2rem;
+	margin-bottom: 4rem;
+	text-align: center;
+}
+
+h2 {
+	margin-top: 4rem;
+	font-size: 1.9rem;
+}
+
+h2>span {
+display: inline-block;
+width: 1.7em;
+height: 1.7em;
+	background-color: #FF6666;
+color: white;
+       border-radius: 50%;
+       text-align: center;
+       line-height: 1.55em;
+       vertical-align: middle;
+       padding-left: 0.15em;
+margin: 0;
+} 
+
+input[type="text"] {
+	font-size: inherit;
+border: none;
+	border-bottom: 1px solid #DC143C;
+}
+
+input[type="text"]:hover,input[type="text"]:focus  {
+outline: none;
+}
+
+
+em {
+	color: steelblue;
+	font-style: normal;
+
+}
+
+html {
+	padding: 0;
+	margin: 0;
+}
+
+body {
+/*	display: grid;
+	igrid-template-columns: 25rem 1fr;*/
+	padding: 0;
+	margin: 0;
+	background: grey;
+}
+
+.info {
+	grid-column: 2 / span 1;
+	grid-row: 2 / span 1;
+	background-color: white;
+	margin: 1rem;
+	margin-top: 0rem;
+	margin-bottom: 0;
+	padding: 1rem;
+	padding-top:0;
+	overflow: scroll;
+}
+
+.matchedWord {
+  color: black;
+  background: yellow;
+}
+
+.ocrbutton {
+  position: fixed;
+  display: block;
+  top: 0;
+  margin-left: 58%;
+  width: 21%;
+  padding: 0;
+  height: 6%;
+  overflow: auto;
+}
+
+.blackLine {
+	width: 120%;
+	height: 1rem;
+	margin-left: -1rem !important;
+	background: grey;
+	color: grey;
+	border: 0;
+}
+
+.nextbutton {
+  position: fixed;
+  display: block;
+  top: 0;
+  width: 21%;
+  padding: 0;
+  margin-left: 79%;
+  height: 6%;
+  overflow: auto;
+}
+
+.nextbutton2 {
+  position: fixed;
+  display: block;
+  top: 0;
+  width: 21%;
+  padding: 0;
+  margin-left: 79%;
+  height: 6%;
+  overflow: auto;
+}
+
+.butactive,.nextbutton:hover,.nextbutton2:hover,.ocrbutton:hover,.metabutton:hover {
+  color: white;
+  background: black;
+}
+
+
+
+.metabutton {
+  position:	fixed;
+  display: block;
+  top: 3rem;
+  height: 3rem;
+  width: 40rem;
+  overflow: auto;
+}
+
+.ocrstyle {
+	overflow: auto;
+	width: 100%;
+	margin-left: -1rem;
+  white-space: pre-wrap;
+  background: white;
+  padding: 1rem;
+}
+
+.ocrstyle p {
+	font-size: small;
+}
+
+.reader {
+	grid-column: 1 / span 1;
+	grid-row: 1 / span 2;
+	width: 100%;
+	height: 100%;
+	background-color: grey;
+	overflow: scroll;
+	margin: 0;
+	margin-top: 0.5rem;
+	padding: 0;
+}
+
+.hidden {
+  display: none;
+}
+
+.page {
+margin: 0;
+padding: 1rem;
+padding-top: 0.2rem;
+padding-bottom: 0.8rem;
+padding-right: 0;
+}
+
+.page:first-child {
+	padding-top: 1rem;
+}
+
+.page img, .page svg {
+	width: 100%;
+}
+
+.page svg {
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-color: lightgrey;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'  viewBox='0 0 100 150'%3E%3Ccircle cx='50' cy='50' fill='none' stroke='darkgrey' stroke-width='6' r='25'/%3E%3Ccircle cx='50' cy='50' fill='none' stroke='steelblue' stroke-width='6' r='25' stroke-dasharray='40px 200px'%3E%3CanimateTransform attributeName='transform' type='rotate' calcMode='linear' values='0 50 50;360 50 50' keyTimes='0;1' dur='3s' begin='0s' repeatCount='indefinite'%3E%3C/animateTransform%3E%3C/circle%3E%3C/svg%3E");
+	     background-size: 200px 200px;
+}
+
+.page .placeholder {
+	background-color: white;
+}
+
+.LinkListClass a:visited{
+	color: red;
+}
+
+
+#scanBibInfo {
+	color: steelblue;
+}
+
+.hideContent {
+	display: none !important;
+}
+
+</style>
+<script>
+class Server {
+	static Get(filename, okCallback, errorCallback) {
+		let sendRequest = new XMLHttpRequest();
+		sendRequest.open("GET", filename, true);
+		sendRequest.onreadystatechange = () => {
+			if(sendRequest.readyState == 4) {
+				if(sendRequest.status == 200) {
+					okCallback(sendRequest.responseText);
+				} else {
+					errorCallback(sendRequest.responseText);
+				}
+			}
+		}
+		sendRequest.send(null);
+
+	}
+}
+
+
+class PageLoader {
+	constructor() {
+		this.queue = new Array();
+	}
+
+
+	queuePage(pageNode) {
+		console.log("queuePage called for: " + pageNode.info);
+		if(this.queue.length > 0) {
+			this.queue.unshift(pageNode);
+		} else {
+			this.loadPage(pageNode);
+		}
+	}
+
+	checkQueue() {
+		if(this.queue.length > 0) {
+			this.loadPage(queue.shift());
+		}
+
+		if(this.queue.length > 5)
+			this.queue.splice(5);
+	}
+
+	deferedCheckQueue() {
+		if(this.queue.length > 0)
+			window.setTimeout(this.checkQueue.bind(this), 50);
+	}
+
+	loadPage(pageNode) {
+		console.log("loadPage called for: " + pageNode.info);
+
+		pageNode.classList.remove("placeholder");
+		let img = document.createElement("img");
+		img.src = pageNode.scanFilePath;
+		img.classList = "findImg";
+		img.page = pageNode.info;
+		img.onload = function() {
+			pageNode.replaceChild(img, pageNode.querySelector("svg"));
+			this.deferedCheckQueue();
+		}.bind(this);
+	}
+}
+
+let pageLoader = new PageLoader(); 
+
+function getVisiblePages()
+{
+	let allPages = document.querySelectorAll("div.page");
+
+	let visiblePages = new Array();
+	for(let i = 0; i < allPages.length; i++) {
+		if(isElementInViewport(allPages[i])) {
+			visiblePages.push(allPages[i]);
+		}
+	}
+
+	return(visiblePages);
+}
+
+function getVisiblePagesOCR()
+{
+	let allPages = document.getElementsByClassName("ocrpage");
+
+	let visiblePages = new Array();
+	for(let i = 0; i < allPages.length; i++) {
+		if(isElementInViewport(allPages[i])) {
+			visiblePages.push(allPages[i]);
+		}
+	}
+
+	return(visiblePages);
+}
+
+
+function updateAfterScroll() {
+	let visiblePages = getVisiblePages();
+
+	for(let i = 0; i < visiblePages.length; i++) {
+		if(visiblePages[i].classList.contains("placeholder"))
+			pageLoader.queuePage(visiblePages[i]);
+	}
+
+	if(visiblePages.length > 0 && 
+			visiblePages[visiblePages.length - 1].nextElementSibling != null &&
+			visiblePages[visiblePages.length - 1].nextElementSibling.classList.contains("placeholder"))
+	{
+		pageLoader.queuePage(visiblePages[visiblePages.length - 1].nextElementSibling);
+	}
+}
+
+function isElementInViewport (el) {
+	var rect = el.getBoundingClientRect();
+
+	// it's definitely outside if bottom < 0
+	if(rect.bottom <= 0)
+		return(false);
+	if(rect.top > window.innerHeight)
+		return(false);
+
+	return(true);
+}
+
+function padNumber(num, padCount) {
+	let outStr = num + "";
+	while(outStr.length < padCount)
+		outStr = "0" + outStr;
+
+	return(outStr);
+}
+
+function parseURLParams(url) {
+	let parser = document.createElement('a');
+	parser.href = url;
+
+	let searchObject = {};
+	let queries = parser.search.replace(/^\?/, '').split('&');
+	for(let i = 0; i < queries.length; i++ ) {
+		let split = queries[i].split('=');
+		searchObject[split[0]] = split[1];
+	}
+	
+	return(searchObject);
+}
+function doAdditionalSearch() {
+	let parsedUrlParams = parseURLParams(window.location.href);
+	window.open("/1/GetBooks.html?query="+document.getElementById("adSrch").value+"&scanId="+parsedUrlParams['scanId']);
+
+}
+
+let HighlightList = [];
+
+function GetOCRTxt() {
+			    let parsedUrlParams = parseURLParams(window.location.href);
+			    Server.Get("/books/"+parsedUrlParams['scanId']+"/ocr.txt",function(content) {
+			    
+			      //let doc2 = document.createElement("div");
+			      //let doc = document.createElement("p");
+
+			      content = content.replace(new RegExp("<",'g'),"&lt;");
+			      content = content.replace(new RegExp(">",'g'),"&gt;");
+			      //content = content.replace(new RegExp(parsedUrlParams['query'],'g'), '<mark>'+parsedUrlParams['query']+'</mark>');
+
+			      UpdateOCRTxt(content);
+			      //doc.classList.add("ocrstyle");
+
+			      //doc2.appendChild(doc);
+			      //CurrentInfoHtml = doc2.innerHTML;
+							},function(content){
+								let Index = window.location.href.indexOf("scanId=");
+								let value = window.location.href.substr(Index+7);
+								window.location.href = "/1/ShowMetadata.html?scanId="+value;
+							});
+}
+
+let pageVal = [];
+
+function updateAfterScrollOCR() {
+	let visibleText = getVisiblePagesOCR();
+
+	console.log("Update after scroll");
+	for(let i = 0; i < visibleText.length; i++)
+	{
+		visibleText[i].innerHTML = pageVal[visibleText[i].dataset.page-1];
+	}
+}
+
+function UpdateOCRTxt(x)
+{
+  console.log(HighlightList);
+  for(let i = 0; i < HighlightList.length; i++)
+      x = x.replace(new RegExp('('+HighlightList[i]+')','gi'),'<mark>$1</mark>');
+
+  let RegSrch = /\n-----\s(\d+)\s/g;
+	x = '<p data-page="1" class="ocrpage">' + x;
+	x = x.replace(RegSrch,'</p><p data-page="$1" class="ocrpage" ondblclick="SwitchToPage(this);">\n----- $1 ');
+  	x+="</p>";
+	document.getElementById("OCRBuffer").innerHTML = x;
+	
+	let lst = document.getElementsByClassName("ocrpage");
+	for(var i = 0; i < lst.length; i++)
+	{
+		pageVal[i] = lst[i].innerHTML;
+		let pgSize = lst[i].style.height;
+		lst[i].innerHTML = "";
+		lst[i].style.height = pgSize;
+	
+	}
+	document.getElementById("olol").addEventListener("scroll", updateAfterScrollOCR, false);
+}
+
+function SwitchToPage(x)
+{
+	window.location = "#page"+x.dataset.page;
+}
+
+let onChangeFunc = function() {};
+
+function ShowInfoText()
+{
+  	document.getElementsByClassName("pageContainer")[0].style["grid-template-columns"] = "60% 40% 0%";
+	document.getElementById("InfoScreen").style.display = "inline-grid";
+	HighlightButton(document.getElementById("ShowInfoButton"));
+}
+
+function HighlightButton(x)
+{
+  document.getElementsByClassName("butact")[0].classList.remove("butact");
+  x.classList.add("butact");
+}
+
+function ShowOCR(a) {
+	document.getElementsByClassName("pageContainer")[0].style["grid-template-columns"] = "60% 0% 40%";
+		document.getElementById("InfoScreen").style.display = "none";
+    HighlightButton(document.getElementById("ShowOCRButton"));
+	console.log("Try to scroll!");
+	if(a===undefined)
+	{
+		a = {};
+		a.innerHTML = window.location.hash.substr(window.location.hash.search("page")+4);
+		console.log("PARSED A:"+a.innerHTML);
+	}
+	if(parseInt(a.innerHTML)==1)
+	{
+	document.getElementById("olol").scrollTop = 0;
+	}
+	else
+	{
+	document.getElementById("olol").scrollTop += document.getElementsByClassName("ocrpage")[parseInt(a.innerHTML)-2].getBoundingClientRect().bottom-16;
+	return 0;
+	}
+}
+
+let metadata = {};
+
+function init() {
+	let inp = document.getElementById("adSrch");
+	inp.addEventListener("keypress",function(event){
+	    if(event.key === "Enter")
+	    {
+	      document.getElementById("MySearchButton").click();
+	    }
+	});
+
+	let parsedUrlParams = parseURLParams(window.location.href);
+	let scanId = parsedUrlParams['scanId'];
+	
+		Server.Get("/books/" + scanId + "/readerInfo.json", function(content) {
+		let scanInfo = JSON.parse(content);
+		
+		scanInfo.pages.sort(function(a, b) {
+			return(a.pageNumber - b.pageNumber);
+		});
+		for(let i = 0; i < scanInfo.pages.length; i++) {
+			let svgCode = "<svg viewBox='0 0 " + 
+				scanInfo.pages[i].width + " " + 
+				scanInfo.pages[i].height + "'/>";
+
+			let pageNode = document.createElement("div");
+			pageNode.innerHTML = svgCode;
+			pageNode.pageNumber = scanInfo.pages[i].pageNumber;
+			pageNode.ondblclick = function(){document.getElementsByClassName("ocrpage")[this.pageNumber-1].scrollIntoView();};
+			pageNode.classList.add("page");
+			pageNode.classList.add("placeholder");
+			let anchorNode = document.createElement("a");
+			anchorNode.name = "page" + scanInfo.pages[i].pageNumber;
+			document.querySelector(".reader").appendChild(anchorNode);			
+			document.querySelector(".reader").appendChild(pageNode);
+			pageNode.scanFilePath = "/books/"+scanId+ "/" + scanInfo.pages[i].file.substr(scanInfo.pages[i].file.search("page"));
+			//	scanInfo.pages[i].file.replace("/books/","/getBookRessource?book=").replace("/page","&res=page");
+			pageNode.info = i;
+		}
+
+		// if an anchor was specified go there (as it is now defined)
+		if(location.hash)
+			location.hash = location.hash;
+		updateAfterScroll();
+	}, function() {
+		// print some error message here
+	});
+
+	document.getElementsByClassName("reader")[0].addEventListener("scroll", updateAfterScroll, false);
+	Server.Get("/books/" + scanId + "/info.json", function(content) {
+		metadata = JSON.parse(content);
+	  	document.getElementById("scanBibInfo").innerHTML = metadata.bib;
+		if(metadata.data.creators[0].lastName === undefined)
+			document.title = metadata.data.creators[0].name+" - clas digital";
+		else
+			document.title = metadata.data.creators[0].lastName+" - clas digital";
+	}, function() {
+		// print some error message here
+	});
+
+	
+	if(!parsedUrlParams.hasOwnProperty("query"))
+		return;
+
+	parsedUrlParams["query"] = decodeURIComponent(parsedUrlParams["query"]);
+		
+	Server.Get("/books/actions/searchInScan?scanId=" + scanId + "&query=" + encodeURIComponent(parsedUrlParams["query"]), function(content) {
+		let searchResults = JSON.parse(content);
+		// temporary needed
+		searchResults.pages = searchResults.books;
+
+		document.getElementById("searchQuery").innerHTML = parsedUrlParams["query"];
+		
+		if(searchResults.is_fuzzy === undefined)
+		{	
+		  let pagesList = [];
+		  HighlightList = [parsedUrlParams["query"]];
+		  for(let i = 0; i < searchResults.pages.length; i++)
+		  	pagesList.push(searchResults.pages[i]);
+		  pagesList = pagesList.filter((v, i, a) => a.indexOf(v) === i); 
+
+		  let resultLinks = "";
+		  for(let i = 0; i < pagesList.length; i++) {
+		  resultLinks = resultLinks + " " + "<a href='#page"+pagesList[i]+"' onclick='ShowOCR(this);return true;'>" + pagesList[i] + "</a>";			
+		  }
+
+		
+		  document.getElementById("linkList").innerHTML = resultLinks;
+		}
+		else
+		{
+		  let resultLinks = "";
+		  for( let i = 0; i < searchResults.pages.length; i++)
+		  {
+			  resultLinks = resultLinks + " " + "<a href='#page"+searchResults.pages[i].page+"' onclick='ShowOCR(this);return true;'>" + searchResults.pages[i].page + "( "
+									 + searchResults.pages[i].word + " )</a>";
+		    if(HighlightList.indexOf(searchResults.pages[i].word)<0)
+		      HighlightList.push(searchResults.pages[i].word.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&'));
+		  }
+		  document.getElementById("linkList").innerHTML = resultLinks;
+		}
+		GetOCRTxt();
+	}, function() {
+		// print some error message here
+	});
+}
+
+
+window.addEventListener("load", init, false);
+</script>
+<style>
+.pageContainer {
+	display: grid;
+	position; fixed;
+	top: 0;
+	left: 0;
+	height: 100vh;
+	grid-template-columns: 60% 40% 0%;
+	grid-template-rows: 7% 93%;
+	background-color: grey;
+	overflow:hidden;
+}
+
+.SpecialOCR {
+	grid-column: 3 / span 1;
+	grid-row: 2 / span 1;
+	margin: 1rem;
+	margin-bottom: 0rem;
+	margin-top: 0;
+	padding-right: 0;
+	overflow: auto;
+	background-color: grey;
+
+}
+
+.ocrdispstyle {
+	margin-top: 0.4rem;
+	padding: 0;
+}
+
+.ocrdispstyle p {
+	font-size: small;
+	background-color: white;
+	margin-bottom: 1rem;
+	padding: 2rem;
+}
+
+.buttoncontainer {
+	display: grid;
+	grid-template-column: 50% 50%;
+	grid-column: 2 / span 2;
+	grid-row: 1 /span 1;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+	background-color: grey;
+}
+
+.butact {
+	background-color: orange;
+	color: white;
+}
+
+.but1, .but2 {
+	margin-top: 0.7rem;
+	padding: 0;
+	cursor: pointer;
+	font: bold;
+	font-size: large;
+	text-transform: uppercase;
+	overflow: hidden;
+}
+
+.but1 {
+	grid-column: 1 /span 1;
+	margin-left: 1rem;
+}
+
+.but2 {
+	grid-column: 2 /span 1;
+	margin-right: 1rem;
+}
+
+.but1:hover,.but2:hover {
+	background-color: black;
+	color: orange;
+}
+
+</style>
+</head>
+<body>
+
+	<div class="pageContainer">
+		<div class="buttoncontainer">
+			<button id="ShowInfoButton" class="but1 butact" onclick="ShowInfoText();">Search</button>
+	    <button id="ShowOCRButton" class="but2" onclick="ShowOCR(undefined);">OCR</button>
+		</div>
+		<div id="InfoScreen" class="info">
+			<p id="scanBibInfo"></p>
+			<p>Ihr Suchbegriff '<span class="matchedWord" id="searchQuery"></span>' wurde auf folgenden Seiten gefunden:</p>
+			<p id="linkList" class="LinkListClass"></p>
+			<input id="adSrch" type="text" placeholder="New search within this book"></input>
+		        <button id="MySearchButton" class="mybtn" onclick="doAdditionalSearch();"><strong>Go</strong></button>
+		</div>
+
+	<div id="olol" class="SpecialOCR">
+		<div id="OCRBuffer" class="ocrdispstyle"></div>
+	</div>
+	<div class="reader" tabindex="0">
+	</div>
+	</div>
+	<div id="SizeOfRem" style="width:2rem;display:none"></div>
+</body>
+</html>
+
