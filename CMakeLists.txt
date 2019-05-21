@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.6)
-project(Menard2)
+project(clas-digital)
 
 include_directories(
   "src"
