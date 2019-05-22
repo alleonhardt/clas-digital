@@ -134,7 +134,7 @@ std::string Zotero::SendRequest(std::string requestURI)
 	nlohmann::json js;
 	while(true)
 	{
-		DBG_MSG("Zotero send request to url: ",st.c_str());	
+		debug::print("Zotero send request to url: ",st.c_str());	
 		//Set the request url
 		curl_easy_setopt(_curl, CURLOPT_URL, st.c_str());
 
@@ -240,6 +240,7 @@ std::string Zotero::Request::GetItemsInSpecificPillar(std::string key)
 TEST(Zotero,init)
 {
 	EXPECT_NO_THROW(Zotero zot);
+	alx::cout<<"Hello mate what up!"<<std::endl;
 }
 
 /**

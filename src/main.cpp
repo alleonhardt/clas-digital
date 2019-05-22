@@ -13,8 +13,11 @@
 #include <proxygen/httpserver/RequestHandlerFactory.h>
 #include <list>
 #include <string>
+#include "src/books/CBookManager.hpp"
+#include "src/books/func.hpp"
 #include "src/server/HandlerFactory.hpp"
 #include "src/zotero/zotero.hpp"
+#include "src/console/console.hpp"
 
 using namespace proxygen;
 
@@ -33,7 +36,17 @@ DEFINE_int32(threads, 2, "Number of threads to listen on. Numbers <= 0 "
 #ifndef COMPILE_UNITTEST
 
 int main(int argc, char* argv[]) {
+	return 0;
+	std::cout<<"Initialising book manager"<<std::endl;
+	CBookManager manager;
+	Zotero zot;
 
+	manager.updateZotero(nlohmann::json::parse(zot.SendRequest(Zotero::Request::GetAllItems)));
+	manager.initialize();
+	for(auto &it : manager.getMapOfBooks())
+	{
+		std::cout<< const_cast<CBook*>(&it.second)->getKey() <<std::endl;
+	}
 	std::cout<<"Starting server..."<<std::endl;
 	folly::init(&argc, &argv, true);
 
