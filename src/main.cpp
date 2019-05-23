@@ -1,7 +1,3 @@
-#ifdef COMPILE_UNITTEST 
-#include <gtest/gtest.h>
-#endif
-
 #include <folly/Memory.h>
 #include <folly/executors/GlobalExecutor.h>
 #include <folly/executors/CPUThreadPoolExecutor.h>
@@ -35,7 +31,6 @@ DEFINE_int32(h2_port, 11002, "Port to listen on with HTTP/2 protocol");
 DEFINE_string(ip, "localhost", "IP/Hostname to bind to");
 DEFINE_int32(threads, 2, "Number of threads to listen on. Numbers <= 0 "
 		"will use the number of cores on this machine.");
-#ifndef COMPILE_UNITTEST
 
 int main(int argc, char* argv[]) {
 
@@ -83,7 +78,7 @@ int main(int argc, char* argv[]) {
 			for(;;)
 			{
 				std::string x = std::move(alx::cout.getCommand());
-				if(x=="quit")
+				if(x=="shutdown")
 				{
 					std::raise(SIGINT);
 					debug::gGlobalShutdown = true;
@@ -119,11 +114,3 @@ int main(int argc, char* argv[]) {
 	t2.join();
 	return 0;
 }
-#else
-
-int main(int argc, char* argv[]) {
-	testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
-}
-
-#endif

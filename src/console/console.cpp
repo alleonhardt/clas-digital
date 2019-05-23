@@ -3,7 +3,12 @@
 
 namespace alx
 {
-#ifndef COMPILE_UNITTEST
+	console::color console::red_black;
+	console::color console::white_black;
+	console::color console::green_black;
+	console::color console::yellow_black;
+
+
 	console::console()
 	{
 		initscr();
@@ -17,6 +22,11 @@ namespace alx
 		init_pair(3,COLOR_RED,COLOR_BLACK);
 		init_pair(4,COLOR_GREEN,COLOR_BLACK);
 
+		console::red_black.x = COLOR_PAIR(3)|A_BOLD;
+		console::green_black.x = COLOR_PAIR(4)|A_BOLD;
+		console::yellow_black.x = COLOR_PAIR(1)|A_BOLD;
+		console::white_black.x = COLOR_PAIR(2)|A_BOLD;
+
 		int x, y;
 		getmaxyx(stdscr,y,x);
 		_stdout = newwin(y-2,x,0,0);
@@ -25,11 +35,16 @@ namespace alx
 		wattrset(_stdout,COLOR_PAIR(2)|A_BOLD);
 		whline(_cmd,0,x);
 		scrollok(_stdout,TRUE);
-		//curs_set(0);
 		wattrset(_cmd,COLOR_PAIR(4)|A_BOLD);
 		mvwaddstr(_cmd,1,0,"$> ");
 		wattrset(_cmd,COLOR_PAIR(1)|A_BOLD);
 		wrefresh(_cmd);
+	}
+
+	void console::SetColor(color x)
+	{
+		std::lock_guard lck(_outputLock);
+		wattrset(_stdout,x.x);
 	}
 
 	std::string console::getCommand()
@@ -44,9 +59,10 @@ namespace alx
 				break;
 			else if(ch==KEY_BACKSPACE||ch == KEY_DC || ch == 127)
 			{
-				if(command!="")
-					command.pop_back();
+				if(command=="")
+					continue;
 
+				command.pop_back();
 				int x,y;
 				getyx(_cmd,y,x);
 				wmove(_cmd,y,x-1);
@@ -69,6 +85,26 @@ namespace alx
 		return std::move(command);
 	}
 
+	void console::_write(std::string s)
+	{
+		waddstr(_stdout,s.c_str());
+	}
+
+	void console::flush()
+	{
+		wrefresh(_stdout);
+	}
+
+	void console::_write(int x)
+	{
+		waddstr(_stdout,std::to_string(x).c_str());
+	}
+
+	void console::_write(color x)
+	{
+		wattrset(_stdout,x.x);
+	}
+
 	console::~console()
 	{
 		endwin();
@@ -88,9 +124,8 @@ namespace alx
 	console &console::operator<<(std::string strs)
 	{
 		std::lock_guard lck(_outputLock);
-		waddstr(_stdout,strs.c_str());
+		_write(std::move(strs));
 		wrefresh(_stdout);
 		return *this;
 	}
-#endif
 }

@@ -9,9 +9,6 @@
 #include <shared_mutex>
 #include <memory>
 #include "src/util/debug.hpp"
-#ifdef COMPILE_UNITTEST
-#include <gtest/gtest.h>
-#endif
 #include "src/books/json.hpp"
 
 /**

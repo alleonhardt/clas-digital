@@ -60,11 +60,11 @@ if(PROXYGEN_FOUND AND NOT PROXYGEN_FIND_QUIETLY)
 endif()
 
 
-set(SRC_FILES src/main.cpp src/server/GetHandler.cpp src/server/PostHandler.cpp src/login/user.cpp src/login/usertable.cpp src/server/URIObjects.cpp src/zotero/zotero.cpp src/books/Book.cpp src/books/Bookmanager.cpp src/books/Metadata.cpp src/books/SearchOptions.cpp src/books/func.cpp src/books/Search.cpp src/console/console.cpp src/server/HandlerFactory.cpp)
+set(SRC_FILES src/server/GetHandler.cpp src/server/PostHandler.cpp src/login/user.cpp src/login/usertable.cpp src/server/URIObjects.cpp src/zotero/zotero.cpp src/books/Book.cpp src/books/Bookmanager.cpp src/books/Metadata.cpp src/books/SearchOptions.cpp src/books/func.cpp src/books/Search.cpp src/server/HandlerFactory.cpp)
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_HOME_DIRECTORY}/bin)
 
-add_executable(unittest.o ${SRC_FILES})
+add_executable(unittest.o ${SRC_FILES} src/console/unittestconsole.cpp src/test.cpp src/login/tests/TestUser.cpp src/login/tests/TestUsertable.cpp src/zotero/tests/TestZotero.cpp src/server/tests/TestURIFile.cpp)
 add_custom_command(
 	TARGET unittest.o
 	POST_BUILD
@@ -73,7 +73,6 @@ add_custom_command(
     COMMENT "Running unit tests..."
 )
 
-add_executable(clas-digital.o ${SRC_FILES})
+add_executable(clas-digital.o ${SRC_FILES} src/console/console.cpp src/main.cpp)
 target_link_libraries(clas-digital.o ${PROXYGEN_LIBRARIES} ${CURL_LIBRARIES} stdc++fs ${CURSES_LIBRARY})
 target_link_libraries(unittest.o ${PROXYGEN_LIBRARIES} ${GTEST_BOTH_LIBRARIES} ${CURL_LIBRARIES} stdc++fs ${CURSES_LIBRARY})
-target_compile_definitions(unittest.o PRIVATE COMPILE_UNITTEST=10)

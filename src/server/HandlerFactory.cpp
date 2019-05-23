@@ -4,20 +4,24 @@ void HandlerFactory::parseCommands(std::string cmd)
 {
 	if(cmd=="?")
 	{
-		alx::cout<<"Command ?: Supported commands -> 'quit'(Exits the programm),'show users'(Shows the current user table)"<<alx::endl;
+		alx::cout.write(alx::console::yellow_black,std::string("Command ?: Supported commands -> 'shutdown'(Exits the programm),'show users'(Shows the current user table)\n"));
 	}
 	else if(cmd=="show users")
 	{
 		nlohmann::json js= nlohmann::json::parse(UserHandler::GetUserTable().toJSON());
-		alx::cout<<"\nShow users v0.0: "<<alx::endl;
+		std::string xs = "\nShow users v0.1: \n";
 		for(auto &entry : js)
 		{
-			alx::cout<<entry["email"].get<std::string>()<<" with access: "<<entry["access"].get<int>()<<alx::endl;
+			xs+=entry["email"].get<std::string>();
+			xs+=" with access: ";
+			xs+=std::to_string(entry["access"].get<int>());
+			xs+="\n";
 		}
-		alx::cout<<alx::endl;
+		xs+="\n";
+		alx::cout.write(alx::console::yellow_black,std::move(xs));
 	}
 	else
 	{
-		alx::cout<<"Unknown command(show list of commands with '?'): "<<cmd<<alx::endl;
+		alx::cout.write(alx::console::yellow_black,std::string("Unknown command(show list of commands with '?'): "),cmd,std::string("\n"));
 	}
 }
