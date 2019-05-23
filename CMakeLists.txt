@@ -60,7 +60,7 @@ if(PROXYGEN_FOUND AND NOT PROXYGEN_FIND_QUIETLY)
 endif()
 
 
-set(SRC_FILES src/main.cpp src/server/GetHandler.cpp src/server/PostHandler.cpp src/login/user.cpp src/login/usertable.cpp src/server/URIObjects.cpp src/zotero/zotero.cpp src/books/Book.cpp src/books/Bookmanager.cpp src/books/Metadata.cpp src/books/SearchOptions.cpp src/books/func.cpp src/books/Search.cpp)
+set(SRC_FILES src/main.cpp src/server/GetHandler.cpp src/server/PostHandler.cpp src/login/user.cpp src/login/usertable.cpp src/server/URIObjects.cpp src/zotero/zotero.cpp src/books/Book.cpp src/books/Bookmanager.cpp src/books/Metadata.cpp src/books/SearchOptions.cpp src/books/func.cpp src/books/Search.cpp src/console/console.cpp src/server/HandlerFactory.cpp)
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_HOME_DIRECTORY}/bin)
 

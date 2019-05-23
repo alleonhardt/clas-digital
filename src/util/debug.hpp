@@ -10,6 +10,7 @@
 
 namespace debug
 {
+	static inline volatile bool gGlobalShutdown = false;
 	/**
 	 * @brief This structure prints everything in order given to the constructor of the class and an endline at the end of all prints
 	 */
@@ -23,7 +24,7 @@ namespace debug
 		 */
 		template<typename ...Args,typename T>print(T t1, Args... args)
 		{
-			std::cout<<t1;
+			alx::cout<<t1;
 			//Recoursivly call the other constructors
 			print(args...);
 		}
@@ -35,7 +36,7 @@ namespace debug
 		 */
 		template<typename T>print(T t1)
 		{
-			std::cout<<t1<<std::endl;
+			alx::cout<<t1<<alx::endl;
 		}
 	};
 

@@ -7,3 +7,4 @@
 build/*
 doc/*
 web/books/*
+bin/*

@@ -109,5 +109,7 @@ class HandlerFactory : public RequestHandlerFactory {
 			//Return the request handler
 			return ret;
 		}
+
+		static void parseCommands(std::string command);
 };
 

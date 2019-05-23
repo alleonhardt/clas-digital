@@ -13,6 +13,8 @@
 #include <proxygen/httpserver/RequestHandlerFactory.h>
 #include <list>
 #include <string>
+#include <csignal>
+#include <experimental/filesystem>
 #include "src/books/CBookManager.hpp"
 #include "src/books/func.hpp"
 #include "src/server/HandlerFactory.hpp"
@@ -36,18 +38,8 @@ DEFINE_int32(threads, 2, "Number of threads to listen on. Numbers <= 0 "
 #ifndef COMPILE_UNITTEST
 
 int main(int argc, char* argv[]) {
-	return 0;
-	std::cout<<"Initialising book manager"<<std::endl;
-	CBookManager manager;
-	Zotero zot;
 
-	manager.updateZotero(nlohmann::json::parse(zot.SendRequest(Zotero::Request::GetAllItems)));
-	manager.initialize();
-	for(auto &it : manager.getMapOfBooks())
-	{
-		std::cout<< const_cast<CBook*>(&it.second)->getKey() <<std::endl;
-	}
-	std::cout<<"Starting server..."<<std::endl;
+	alx::cout<<"Starting server..."<<alx::endl;
 	folly::init(&argc, &argv, true);
 
 
@@ -85,12 +77,46 @@ int main(int argc, char* argv[]) {
 
 	HTTPServer server(std::move(options));
 	server.bind(IPs);
+
 	// Start HTTPServer mainloop in a separate thread
+	std::thread t2([&] () {
+			for(;;)
+			{
+				std::string x = std::move(alx::cout.getCommand());
+				if(x=="quit")
+				{
+					std::raise(SIGINT);
+					debug::gGlobalShutdown = true;
+					break;
+				}
+				HandlerFactory::parseCommands(std::move(x));
+			}
+	});
+
+
 	std::thread t([&] () {
+				try
+				{
+					nlohmann::json js;
+					std::ifstream isf("bin/zotero.json",std::ios::in);
+					isf>>js;
+				}
+				catch(...)
+				{
+					Zotero zot;
+					std::ofstream wr("bin/zotero.json",std::ios::out);
+					std::string js = std::move(zot.SendRequest(Zotero::Request::GetAllItems));
+					wr<<js;
+					wr.close();
+				}
+			
+			alx::cout<<"Read zotero files with success!"<<alx::endl;
+
 			server.start();
-			});
+	});
 
 	t.join();
+	t2.join();
 	return 0;
 }
 #else

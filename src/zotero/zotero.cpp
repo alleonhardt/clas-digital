@@ -58,6 +58,7 @@ void Zotero::SetNextLink(std::string str)
 
 Zotero::Zotero()
 {
+	_nextLink="";
 	//Init the interface to libcurl
 	_curl = curl_easy_init();
 
@@ -134,6 +135,11 @@ std::string Zotero::SendRequest(std::string requestURI)
 	nlohmann::json js;
 	while(true)
 	{
+		if(debug::gGlobalShutdown)
+		{
+			alx::cout<<"Zotero SendRequest() read global shutdown flag, shuttding down..."<<alx::endl;
+			return "{}";
+		}
 		debug::print("Zotero send request to url: ",st.c_str());	
 		//Set the request url
 		curl_easy_setopt(_curl, CURLOPT_URL, st.c_str());
@@ -240,7 +246,6 @@ std::string Zotero::Request::GetItemsInSpecificPillar(std::string key)
 TEST(Zotero,init)
 {
 	EXPECT_NO_THROW(Zotero zot);
-	alx::cout<<"Hello mate what up!"<<std::endl;
 }
 
 /**
