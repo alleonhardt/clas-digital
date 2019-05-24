@@ -3,7 +3,7 @@
 /**
 * @return map of all book
 */
-const std::map<std::string, CBook>& CBookManager::getMapOfBooks() {
+std::map<std::string, CBook>& CBookManager::getMapOfBooks() {
     return m_mapBooks;
 }
 
@@ -30,22 +30,32 @@ bool CBookManager::initialize()
         if(m_mapBooks.count(e_allItems->d_name) > 0)
             addBook(e_allItems->d_name);
         else
-            std::cout << "Book found that isn't in map!\n";
+            std::cout << e_allItems->d_name << " found which isn't in map!\n";
     }
 
+    //Create map of all words + and of all words in all titles
     createMapWords();
+    std::cout << "Map Words: " << m_mapWords.size() << "\n";
     createMapWordsTitle();
+    std::cout << "Map Titles: " << m_mapWordsTitle.size() << "\n";
 
     return true;
 }
 
-
+/**
+* @brief parse json of all items. If item exists, change metadata of item, create new book.
+* @param[in] j_items json with all items
+*/
 void CBookManager::updateZotero(nlohmann::json j_items)
 {
+    //Iterate over all items in json
     for(auto &it:j_items)
     {
+        //If book already exists, simply change metadata of book
         if(m_mapBooks.count(it["key"]) > 0)
             m_mapBooks[it["key"]].getMetadata().setMetadata(it);
+
+        //If it does not exits, create new book and add to map of all books
         else
         {
             CBook book(it);
@@ -55,7 +65,8 @@ void CBookManager::updateZotero(nlohmann::json j_items)
 }
 
 /**
-* @brief add a book
+* @brief add a book, or rather: add ocr to book
+* @param[in] sKey key to book
 */
 void CBookManager::addBook(std::string sKey) {
     m_mapBooks[sKey].setPath("web/books/" + sKey);
@@ -68,21 +79,48 @@ void CBookManager::addBook(std::string sKey) {
 * @param[in] searchOPts 
 * @return list of all found books
 */
-std::map<std::string, CBook*>* CBookManager::search(std::string sWord, bool ocr, bool title)
+std::map<std::string, CBook*>* CBookManager::search(CSearchOptions* searchOpts)
 {
-    CSearch search(sWord);
+    CSearch search(searchOpts);
+
     //Create empty map of searchResults
     std::map<std::string, CBook*>* mapSearchresults = new std::map<std::string, CBook*>;
 
-    //Search in ocr and/ or in title
-    if(title == false)
-        search.normalSearch(m_mapWords, mapSearchresults);
-    if(ocr == false)
-        search.normalSearch(m_mapWordsTitle, mapSearchresults);
+    //Normal search (full-match)
+    if (searchOpts->getFuzzyness() == 0)
+    {
+        //Search in ocr and/ or in title
+        if(searchOpts->getOnlyTitle() == false)
+            search.normalSearch(m_mapWords, mapSearchresults);
+        if(searchOpts->getOnlyOcr() == false)
+            search.normalSearch(m_mapWordsTitle, mapSearchresults);
+    }
+
+    //Contains-Search 
+    else if (searchOpts->getFuzzyness() == 1)
+    {
+        //Search in ocr and/ or in title
+        if(searchOpts->getOnlyTitle() == false)
+            search.containsSearch(m_mapWords, mapSearchresults);
+        if(searchOpts->getOnlyOcr() == false)
+            search.containsSearch(m_mapWordsTitle, mapSearchresults);
+    }
+
+    //Fuzzy Search
+    else
+    {
+        //Search in ocr and/ or in title
+        if(searchOpts->getOnlyTitle() == false)
+            search.fuzzySearch(m_mapWords, mapSearchresults);
+        if(searchOpts->getOnlyOcr() == false)
+            search.fuzzySearch(m_mapWordsTitle, mapSearchresults);
+    }
+
+    //Check search-options and remove books from search results, that don't match
+    search.removeBooks(mapSearchresults);
 
     return mapSearchresults;
 }
-
 
 /**
 * @brief create map of all words (key) and books in which the word occurs (value)

@@ -5,6 +5,7 @@
 #include <mutex>
 #include <map>
 #include "json.hpp"
+#include "func.hpp"
 
 class CMetadata
 {

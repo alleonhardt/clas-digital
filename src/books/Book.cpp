@@ -149,27 +149,36 @@ void CBook::safeMapOfWords()
 
 /*
 * @param[in] sWord searched word
+* @param[in] fuzzyness 
 * @return list of pages on which searched word accures
 */
-std::list<int>* CBook::getPages(std::string sWord)
+std::list<int>* CBook::getPages(std::string sWord, int fuzzyness)
 {
     //Convert search word to lower case
     func::convertToLower(sWord);
 
-    //Create list of all words in book
+    //Create list of all words in book, with a marking "###page### for new page
     std::list<std::string> listWords;
     func::extractWords(getOcrPath(), listWords);
 
     //Create empty list of pages 
     std::list<int>* listPages = new std::list<int>;
 
-    unsigned int pageNum = 0;
-    unsigned int lastPage = 0;
+    //Iterate over all words
+    unsigned int pageNum = 0;   //current page
+    unsigned int lastPage = 0;  //last page added to list of pages
     for(auto it:listWords)
     {
+        //check whether new page is reached.
         if(func::compare(it.c_str(), "###page###") == true)
             pageNum++;
-        if(func::compare(it.c_str(), sWord.c_str()) == true && lastPage != pageNum)
+
+        //If we're still on the last added page, skipp checking, until next page is reached
+        if(lastPage == pageNum)
+            continue;
+
+        //check whether search word was found on this page. Then add to list of pages.
+        if(compare(it, sWord, fuzzyness) == true)
         {
             listPages->push_back(pageNum);
             lastPage = pageNum;
@@ -177,5 +186,27 @@ std::list<int>* CBook::getPages(std::string sWord)
     }
 
     return listPages;
+}
+
+/**
+* @brief calls spezifik compare-function depending on fuzzyness
+* @param[in] curWord current word in list of words
+* @param[in] sWord searched word
+* @param[in] fuzzyness 
+* @return bool
+*/
+bool CBook::compare(std::string curWord, std::string sWord, int fuzzyness)
+{
+    //Use normal search (full-match)
+    if(fuzzyness == 0)
+        return func::compare(curWord, sWord);
+
+    //Use contains-search (current word contains searched word)
+    else if(fuzzyness == 1)
+        return func::contains(curWord, sWord);
+
+    //Use fuzzy search
+    else
+        return fuzzy::fuzzy_cmp(curWord, sWord);
 }
 

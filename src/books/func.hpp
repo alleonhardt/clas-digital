@@ -12,7 +12,16 @@
 namespace func 
 {
 
+    /*
+    * @brief: checks whether a string is in a vector of strings
+    * @parameter string
+    * @parameter vector<string> 
+    * @return bool
+    */
+    bool in(std::string str, std::vector<std::string> vec);
+    
     /**
+    * @brief expects words to be non-capital letters
     * @param[in] chT1 first string to compare
     * @param[in] chT2 second string to compare
     * @return Boolean indicating, whether strings compare or not
@@ -20,23 +29,32 @@ namespace func
     bool compare(const char* chT1, const char* chT2);
 
     /**
-    * @param[out] str remove of spaces from str
-    * @return modified string
+    * @param[in] str1 first string to compare
+    * @param[in] str2 string to compare first string with
+    * @return Boolean indicating, whether strings compare or not
     */
-    std::string removeSpace(std::string str);
+    bool compare(std::string str1, std::string str2);
 
-     /**
+    /**
+    * @brief expects words to be non-capital letters
+    * @param[in] chT1 first string
+    * @param[in] chT2 second string, check whether it is in the first
+    * @return Boolean indicating, whether string1 contains string2 or not
+    */
+    bool contains(const char* chT1, const char* chT2);
+
+    /**
+    * @brief takes to strings, converts to lower and calls contains (const char*, const char*)
+    * @param[in] s1 first string
+    * @param[in] s2 second string, check whether it is in the first
+    * @return Boolean indicating, whether string1 contains string2 or not
+    */
+    bool contains(std::string s1, std::string s2);
+
+    /**
     * @param[in, out] str string to be modified
     */
     void convertToLower(std::string &str);
-
-    /**
-    * iequals: compare two string and ignore case.
-    * @param[in] string a
-    * @param[in] string b
-    * @return true if strings are equal, false if not
-    */
-    bool iequals(const char* a, const char* b);
 
     /** 
     * @brief function checks whether character is a letter with de and fr local
@@ -74,7 +92,6 @@ namespace func
     * @param[out] mapWords map to which new words will be added
     */
     void extractWordsFromString(std::string sWords, std::list<std::string>& mapWords);
-
 
     /**
     * @param[in] sPathToOcr Path to ocr of a book

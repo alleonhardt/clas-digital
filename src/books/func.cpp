@@ -3,15 +3,36 @@
 namespace func 
 {
 
+/*
+* in: checks whether a string is in a vector of strings
+* @parameter string
+* @parameter vector<string> 
+* @return bool
+*/
+bool in(std::string str, std::vector<std::string> vec)
+{
+    for(unsigned int i=0; i<vec.size(); i++)
+    {
+        if(compare(str, vec[i])== true)
+            return true;
+    }
+
+    return false;
+}
+
 /**
+* @brief expects words to be non-capital letters
 * @param[in] chT1 first string to compare
 * @param[in] chT2 second string to compare
 * @return Boolean indicating, whether strings compare or not
 */
 bool compare(const char* chT1, const char* chT2)
 {
+    //Return false, if length of words differs
     if(strlen(chT1) != strlen(chT2))
         return false;
+
+    //Iterate over characters. Return false if characters don't match
     for(unsigned int i=0; i<strlen(chT1); i++)
     {
         if(chT1[i] != chT2[i])
@@ -22,18 +43,65 @@ bool compare(const char* chT1, const char* chT2)
 }
 
 /**
-* @param[out] str remove of spaces from str
-* @return modified string
+* @brief takes to strings, converts to lower and calls compare (const char*, const char*)
+* @param[in] str1 first string to compare
+* @param[in] str2 string to compare first string with
+* @return Boolean indicating, whether strings compare or not
 */
-std::string removeSpace(std::string str)
+bool compare(std::string str1, std::string str2)
 {
-    for(unsigned int i=0; i<str.length(); i++)
-    {
-        if(str[i] == ' ')
-            str.erase(i, 1);
-    }
-    return str;
+    //Convert both strings to lower
+    convertToLower(str1);
+    convertToLower(str2);
+
+    //Call normal compare funktion
+    return compare(str1.c_str(), str2.c_str());
 }
+
+/**
+* @brief expects words to be non-capital letters
+* @param[in] chT1 first string
+* @param[in] chT2 second string, check whether it is in the first
+* @return Boolean indicating, whether string1 contains string2 or not
+*/
+bool contains(const char* chT1, const char* chT2)
+{
+    bool r = true;
+    for(unsigned int i=0; i<strlen(chT1); i++)
+    {
+        r = true;
+        for(unsigned int j=0; j<strlen(chT2); j++)
+        {
+            if(chT1[i+j] != chT2[j]) {
+                r = false;
+                break;
+            }
+        }
+
+        if (r==true)
+            return true;
+    }
+
+    return false;
+}
+
+/**
+* @brief takes to strings, converts to lower and calls contains (const char*, const char*)
+* @brief expects words to be non-capital letters
+* @param[in] s1 first string
+* @param[in] s2 second string, check whether it is in the first
+* @return Boolean indicating, whether string1 contains string2 or not
+*/
+bool contains(std::string s1, std::string s2)
+{
+    //Convert both strings to lower
+    convertToLower(s1);
+    convertToLower(s2);
+
+    //Call normal contains function
+    return contains(s1.c_str(), s2.c_str());
+}
+
 
 /**
 * @param[in, out] str string to be modified
@@ -43,23 +111,6 @@ void convertToLower(std::string &str)
     std::locale loc1("de_DE.UTF8");
     for(unsigned int i=0; i<str.length(); i++)
         str[i] = tolower(str[i], loc1);
-}
-
-/**
-* iequals: compare two string and ignore case.
-* @param[in] string a
-* @param[in] string b
-* @return true if strings are equal, false if not
-*/
-bool iequals(const char* chA, const char* chB) 
-{
-    unsigned int len = strlen(chB);
-    if (strlen(chA) != len)
-        return false;
-    for (unsigned int i = 0; i < len; ++i)
-        if (tolower(chA[i]) != tolower(chB[i]))
-            return false;
-    return true;
 }
 
 /** 
@@ -83,6 +134,7 @@ bool isLetter(const char s)
 */
 bool isWord(const char* chWord) 
 {
+    //Count number of non-letters in string
     unsigned int counter = 0;
     for(unsigned int i=0; i<strlen(chWord); i++)
     {
@@ -90,6 +142,7 @@ bool isWord(const char* chWord)
             counter++;
     }
 
+    //Calculate whether more the 30% of characters are non-letters (return false)
     if(static_cast<double>(counter)/static_cast<double>(strlen(chWord)) <= 0.3)
         return true;
 
@@ -99,6 +152,7 @@ bool isWord(const char* chWord)
 /**
 * @param[in] str string to be splitet
 * @param[in] delimitter 
+* @param[in, out] vStr vector of slpitted strings
 */
 void split(std::string str, std::string delimiter, std::vector<std::string>& vStr)
 {
