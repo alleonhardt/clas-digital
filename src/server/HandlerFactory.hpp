@@ -72,6 +72,7 @@ class HandlerFactory : public RequestHandlerFactory {
          */
         RequestHandler* onRequest(RequestHandler*, HTTPMessage* hdr) noexcept override 
 		{
+			alx::cout.write("Request to: ",hdr->getURL(),"\n");
 			if(hdr->getMethod() == HTTPMethod::GET)
 				return onRequest<GetHandler>(_getMap,hdr);
 			return onRequest<PostHandler>(_postMap,hdr);

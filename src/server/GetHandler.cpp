@@ -170,7 +170,7 @@ void GetHandler::onRequest(std::unique_ptr<HTTPMessage> headers) noexcept {
 	}
 	catch(...)
 	{
-		std::cout<<"Could not satisfy request to: "<< headers->getURL() <<std::endl;
+		alx::cout.write(alx::console::red_black,"Could not satisfy request to: ",headers->getURL(),"\n");
 		//Some error occured just state that the file was not found
 		return SendErrorNotFound(downstream_);
 	}

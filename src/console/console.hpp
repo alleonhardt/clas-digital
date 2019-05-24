@@ -2,6 +2,7 @@
 #include <ncurses.h>
 #include <iostream>
 #include <mutex>
+#include <list>
 
 namespace alx
 {
@@ -17,6 +18,7 @@ namespace alx
 			WINDOW *_stdout;
 			WINDOW *_cmd;
 			std::mutex _outputLock;
+			std::list<std::string> _cmdBuffer;
 		
 			template<typename ...Args,typename T>
 			void _write(T s,Args... args)
@@ -28,12 +30,14 @@ namespace alx
 			void _write(std::string s);
 			void _write(color x);
 			void _write(int x);
+			void _write(const char *x);
 
 		public:
 			static color red_black;
 			static color white_black;
 			static color green_black;
 			static color yellow_black;
+			static color blue_black;
 
 
 			~console();

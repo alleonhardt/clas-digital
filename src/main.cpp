@@ -49,6 +49,7 @@ int main(int argc, char* argv[]) {
 	IPs[1].sslConfigs = std::vector<wangle::SSLContextConfig>{cfg};
 	IPs[2].sslConfigs = std::vector<wangle::SSLContextConfig>{cfg};
 
+	alx::cout.write("Loading ssl context... ",alx::console::green_black,"done.\n");
 
 
 	if (FLAGS_threads <= 0) {
@@ -72,6 +73,7 @@ int main(int argc, char* argv[]) {
 
 	HTTPServer server(std::move(options));
 	server.bind(IPs);
+	alx::cout.write("Binding server ports... ",alx::console::green_black,"done.\n");
 
 	// Start HTTPServer mainloop in a separate thread
 	std::thread t2([&] () {
@@ -90,22 +92,32 @@ int main(int argc, char* argv[]) {
 
 
 	std::thread t([&] () {
+			CBookManager manager;
 				try
 				{
+					alx::cout.write("Loading zotero json from disk... ");
 					nlohmann::json js;
 					std::ifstream isf("bin/zotero.json",std::ios::in);
 					isf>>js;
+					alx::cout.write(alx::console::green_black,"done.\n");
+					manager.updateZotero(js);
 				}
 				catch(...)
 				{
+					alx::cout.write("Fetching zotero metadata from the server...\n");
 					Zotero zot;
 					std::ofstream wr("bin/zotero.json",std::ios::out);
 					std::string js = std::move(zot.SendRequest(Zotero::Request::GetAllItems));
 					wr<<js;
 					wr.close();
+					manager.updateZotero(nlohmann::json::parse(js));
 				}
-			
-			alx::cout<<"Read zotero files with success!"<<alx::endl;
+
+			alx::cout.write("Zotero metadata fetched\n");
+			if(manager.initialize())
+				alx::cout.write("CBookManager initialisation: ",alx::console::green_black,"SUCCESS\n");
+			else
+				alx::cout.write("CBookManager initialisation: ",alx::console::red_black,"FAILURE\n");
 
 			server.start();
 	});

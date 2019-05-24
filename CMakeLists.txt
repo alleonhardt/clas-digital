@@ -60,7 +60,7 @@ if(PROXYGEN_FOUND AND NOT PROXYGEN_FIND_QUIETLY)
 endif()
 
 
-set(SRC_FILES src/server/GetHandler.cpp src/server/PostHandler.cpp src/login/user.cpp src/login/usertable.cpp src/server/URIObjects.cpp src/zotero/zotero.cpp src/books/Book.cpp src/books/Bookmanager.cpp src/books/Metadata.cpp src/books/SearchOptions.cpp src/books/func.cpp src/books/Search.cpp src/server/HandlerFactory.cpp)
+set(SRC_FILES src/server/GetHandler.cpp src/server/PostHandler.cpp src/login/user.cpp src/login/usertable.cpp src/server/URIObjects.cpp src/zotero/zotero.cpp src/books/Book.cpp src/books/Bookmanager.cpp src/books/Metadata.cpp src/books/SearchOptions.cpp src/books/func.cpp src/books/Search.cpp src/server/HandlerFactory.cpp src/books/fuzzy.cpp)
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_HOME_DIRECTORY}/bin)
 
@@ -74,5 +74,7 @@ add_custom_command(
 )
 
 add_executable(clas-digital.o ${SRC_FILES} src/console/console.cpp src/main.cpp)
+add_executable(books.o src/books/Book.cpp src/books/Bookmanager.cpp src/books/Metadata.cpp src/books/Search.cpp src/books/SearchOptions.cpp src/books/func.cpp src/zotero/zotero.cpp src/console/console.cpp src/books/main.cpp src/books/fuzzy.cpp)
 target_link_libraries(clas-digital.o ${PROXYGEN_LIBRARIES} ${CURL_LIBRARIES} stdc++fs ${CURSES_LIBRARY})
+target_link_libraries(books.o ${CURL_LIBRARY} stdc++fs ${CURSES_LIBRARY})
 target_link_libraries(unittest.o ${PROXYGEN_LIBRARIES} ${GTEST_BOTH_LIBRARIES} ${CURL_LIBRARIES} stdc++fs ${CURSES_LIBRARY})

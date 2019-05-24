@@ -7,7 +7,7 @@ namespace alx
 	console::color console::white_black;
 	console::color console::green_black;
 	console::color console::yellow_black;
-
+	console::color console::blue_black;
 
 	console::console()
 	{
@@ -15,6 +15,11 @@ namespace alx
 
 	void console::SetColor(color x)
 	{
+	}
+
+	void console::_write(const char *x)
+	{
+		std::cout<<x;
 	}
 
 	std::string console::getCommand()

@@ -4,7 +4,7 @@ void HandlerFactory::parseCommands(std::string cmd)
 {
 	if(cmd=="?")
 	{
-		alx::cout.write(alx::console::yellow_black,std::string("Command ?: Supported commands -> 'shutdown'(Exits the programm),'show users'(Shows the current user table)\n"));
+		alx::cout.write(alx::console::blue_black,std::string("Command ?: Supported commands -> 'shutdown'(Exits the programm),'show users'(Shows the current user table)\n"));
 	}
 	else if(cmd=="show users")
 	{
@@ -18,10 +18,23 @@ void HandlerFactory::parseCommands(std::string cmd)
 			xs+="\n";
 		}
 		xs+="\n";
-		alx::cout.write(alx::console::yellow_black,std::move(xs));
+		alx::cout.write(alx::console::blue_black,std::move(xs));
+	}
+	else if(cmd.find("user ")==0)
+	{
+		std::string username = cmd.substr(5);
+		auto ptr = UserHandler::GetUserTable().GetUserByName(username);
+		if(!ptr)
+		{
+			alx::cout.write(alx::console::red_black,"Could not find user: ",username,"\n");
+		}
+		else
+		{
+			alx::cout.write(alx::console::blue_black,"User: ",username,", access: ",ptr->GetAccessRights(),", sessid: ",ptr->GetSessid(),"\n");
+		}
 	}
 	else
 	{
-		alx::cout.write(alx::console::yellow_black,std::string("Unknown command(show list of commands with '?'): "),cmd,std::string("\n"));
+		alx::cout.write(alx::console::blue_black,std::string("Unknown command(show list of commands with '?'): "),cmd,std::string("\n"));
 	}
 }
