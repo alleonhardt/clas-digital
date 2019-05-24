@@ -4,6 +4,7 @@
 *.jpg
 *.json
 *.o
+zotero.json
 build/*
 doc/*
 web/books/*

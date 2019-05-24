@@ -6,6 +6,7 @@
 #include <dirent.h>
 #include "CBook.hpp"
 #include "CSearch.hpp"
+#include "CSearchOptions.hpp"
 #include "func.hpp"
 
 #pragma once 
@@ -26,7 +27,7 @@ public:
     /**
     * @return map of all book
     */
-    const std::map<std::string, CBook>& getMapOfBooks();
+    std::map<std::string, CBook>& getMapOfBooks();
 
     /**
     * @brief load all books.
@@ -35,13 +36,14 @@ public:
     bool initialize(); 
 
     /**
-    * @brief update zotero and get json with all books. Replace all metadata. If a new book
-    *        was found, call "addBook"
+    * @brief parse json of all items. If item exists, change metadata of item, create new book.
+    * @param[in] j_items json with all items
     */
     void updateZotero(nlohmann::json j_Items);
 
     /**
-    * @brief add a book
+    * @brief add a book, or rather: add ocr to book
+    * @param[in] sKey key to book
     */
     void addBook(std::string sKey);
 
@@ -49,7 +51,7 @@ public:
     * @brief search function calling fitting function from search class
     * @return list of all found books
     */
-    std::map<std::string, CBook*>* search(std::string sWord, bool ocr, bool title);
+    std::map<std::string, CBook*>* search(CSearchOptions* searchOpts);
 
     /**
     * @brief create map of all words (key) and books in which the word occurs (value)

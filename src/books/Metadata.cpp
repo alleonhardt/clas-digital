@@ -95,12 +95,12 @@ std::string CMetadata::getMetadata(std::string sSearch, std::string sFrom1, std:
     //Create first level
     nlohmann::json jFrom1;           
     jFrom1 = m_metadata[sFrom1];
-    
+
     if(jFrom1.size() == 0)
         return "";
 
     //Create vector of jsons
-    std::vector<nlohmann::json> listJsons = jFrom1[sFrom2];
+    nlohmann::json listJsons = jFrom1[sFrom2];
 
     //Check whether element could be accessed
     if(listJsons.size() == 0)
@@ -145,6 +145,9 @@ std::string CMetadata::getAuthor()
 {
     //Get author. Try to find "lastName"
     std::string sAuthor = getMetadata("lastName", "data", "creators", 0);
+
+    //std::string sAuthor = m_metadata["data"]["creators"][0]["lastName"];
+
 
     //If string is empty, try to find "name"
     if(sAuthor.size() == 0)
@@ -191,32 +194,21 @@ int CMetadata::getDate()
 */
 std::string CMetadata::getShow()
 {
-    //Add author to result
-    std::string sResult = getAuthor();
-        sResult + ", ";
+    // *** Add Author *** //
+    std::string sResult = getAuthor() + ", \"";
 
-    //Add first 15 words of title to result
-    std::string sTitle = getMetadata("title", "data");
-    unsigned int counter = 0;
-    bool bFinisched = true;
-    for(unsigned int i=0; i<sTitle.length(); i++)
-    {
-        if(sTitle[i] == ' ')
-            counter++;
-        if(counter == 10)
-        {
-            bFinisched = false;
-            break;
-        }
+    // *** Add first [num] words of title *** //
+    std::vector<std::string> vStrs;
+    func::split(getMetadata("title", "data"), " ", vStrs);
+    for(unsigned int i=0; i<10 && i<vStrs.size(); i++)
+        sResult += vStrs[i] + " ";
 
-        sResult += sTitle[i];
-    }
-    if(bFinisched == false)
-        sResult += " ... \"";
+    if(vStrs.size() > 10)
+        sResult += "...\"";
     else
         sResult += "\"";
 
-    //Add date to result
+    // *** Add date *** //
     int date = getDate();
     if(date != -1)
     {
@@ -225,7 +217,7 @@ std::string CMetadata::getShow()
     }
 
     sResult += ".";
-    
+
     return sResult;
 }
 

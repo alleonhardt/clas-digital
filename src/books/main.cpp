@@ -9,7 +9,25 @@ int main()
 {
     CBookManager manager;
 
-    std::ifstream read("Items.json");
+    /*
+    std::string str1;
+    std::string str2;
+
+    for(;;)
+    {
+        std::cout << "> ";
+        getline(std::cin, str1);
+        std::cout << "> ";
+        getline(std::cin, str2);
+        int ld = fuzzy::levenshteinDistance(str1.c_str(), str2.c_str()); 
+        double score = static_cast<double>(ld)/std::max(str1.length(), str2.length());
+        std::cout << "LD: " << score << "\n";
+        if(str1 == "q")
+            break;
+    }
+    */ 
+
+    std::ifstream read("zotero.json");
     nlohmann::json jItems;
     read >> jItems;
     read.close();
@@ -23,27 +41,62 @@ int main()
         return 0;
     }
 
-    std::string sInput;
-    std::cout << "> ";
-    getline(std::cin, sInput);
-    func::convertToLower(sInput);
-
-    std::cout << "Searching for " << sInput << "... \n";
-
-    std::map<std::string, CBook*>* searchResults = manager.search(sInput, true, false);
-    
-    unsigned int counter = 0;
-    for(auto it=searchResults->begin(); it!=searchResults->end(); it++)
+    for(;;)
     {
-        std::cout << it->first << ": " << it->second->getMetadata().getShow() << "\n";
-        std::cout << "Pages: ";
-        std::list<int>* listPages = it->second->getPages(sInput);
-        for(auto jt=listPages->begin(); jt!=listPages->end(); jt++)
-            std::cout << (*jt) << ", ";
-        std::cout << "\n";
-        counter++;
-    }
-    std::cout << "Results found: " << counter << "\n";
+        std::string sInput;
+        std::string sFuzzy;
+
+        std::cout << "> ";
+        getline(std::cin, sInput);
+        func::convertToLower(sInput);
+
+        if(sInput == "q")
+            return 0;
+
+        if(sInput == "show")
+        {
+            std::map<std::string, CBook> mapBooks = manager.getMapOfBooks();
+            for(auto it=mapBooks.begin(); it!=mapBooks.end(); it++)
+                std::cout << it->first << ": " << it->second.getMetadata().getShow() << "\n";
+             std::cout << "\n";
+             continue;
+        }
+
+        else if (sInput == "get")
+        {
+            std::string sKey;
+            std::cout << "> ";
+            getline(std::cin, sKey);
+            std::ofstream write(sKey + ".json");
+            write << manager.getMapOfBooks().at(sKey).getMetadata().getMetadata();
+            write.close();
+            continue;
+        }
+
+        std::cout << "Fuzzyness: ";
+        getline(std::cin, sFuzzy);
+        int fuzzy = std::stoi(sFuzzy);
+
+        
+        CSearchOptions* searchOpts = new CSearchOptions(sInput, fuzzy, {}, false, true, "", 0 , 2019);
+
+        std::cout << "Searching for " << sInput << "... \n";
+
+        std::map<std::string, CBook*>* searchResults = manager.search(searchOpts);
+        unsigned int counter = 0;
+        for(auto it=searchResults->begin(); it!=searchResults->end(); it++)
+        {
+            std::cout << it->first << ": " << it->second->getMetadata().getShow() << "\n";
+            std::cout << "-- Pages: ";
+            std::list<int>* listPages = it->second->getPages(sInput, fuzzy);
+            for(auto jt=listPages->begin(); jt!=listPages->end(); jt++)
+                std::cout << (*jt) << ", ";
+            std::cout << "\n";
+            counter++;
+        }
+        std::cout << "Results found: " << counter << "\n";
+
+   }
 }
      
 

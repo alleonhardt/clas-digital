@@ -5,6 +5,7 @@
 #include <string>
 #include <regex>
 #include "func.hpp"
+#include "fuzzy.hpp"
 #include "CMetadata.hpp"
 
 #pragma once 
@@ -103,7 +104,17 @@ public:
 
     /*
     * @param[in] sWord searched word
+    * @param[in] fuzzyness
     * @return list of pages on which searched word accures
     */
-    std::list<int>* getPages(std::string sWord);
+    std::list<int>* getPages(std::string sWord, int fuzzyness);
+
+    /**
+    * @brief calls spezifik compare-function depending on fuzzyness
+    * @param[in] curWord current word in list of words
+    * @param[in] sWord searched word
+    * @param[in] fuzzyness 
+    * @return bool
+    */
+    bool compare(std::string curWord, std::string sWord, int fuzzyness);
 };

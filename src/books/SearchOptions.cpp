@@ -27,8 +27,9 @@ CSearchOptions::CSearchOptions()
 CSearchOptions::CSearchOptions(std::string chSearchedWord, int fuzzyness, std::vector<std::string> 
                     sCollections, bool onlyTitle, bool onlyOCR, std::string slastName, int from, int to) 
 {
+    func::convertToLower(chSearchedWord);
     m_chSearchedWord.assign(chSearchedWord);
-    m_fuzzyness = static_cast<double>(fuzzyness)/10;
+    m_fuzzyness = fuzzyness;
     m_sCollections = sCollections;
     m_onlyTitle = onlyTitle;
     m_slastName.assign(slastName); 
@@ -76,7 +77,7 @@ std::string CSearchOptions::getSearchedWord() const {
 /**
 * @return selected fuzzyness
 **/
-double CSearchOptions::getFuzzyness() const {
+int CSearchOptions::getFuzzyness() const {
     return m_fuzzyness;
 }
 

@@ -3,13 +3,14 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "func.hpp"
 
 
 class CSearchOptions
 {
 private:
     std::string  m_chSearchedWord;              //Searched word
-    double m_fuzzyness;                         //0-> no fuzzy search; 
+    int m_fuzzyness;                         //0-> no fuzzy search; 
     std::vector<std::string> m_sCollections;    //Vector with all selected pillas
     std::string m_slastName;                    //Search only books from one author
     int m_From;                                 //Search books from year...
@@ -62,7 +63,7 @@ public:
     /**
     * @return selected fuzzyness
     **/
-    double getFuzzyness() const;
+    int getFuzzyness() const;
 
     /**
     * @return selected pillars
