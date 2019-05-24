@@ -258,7 +258,7 @@ void loadMapOfWords(std::string sPathToWords, std::map<std::string, int>& mapWor
 * @param[in] buffer 
 * @return 
 */
-static inline bool checkPage(std::string &buffer)
+bool checkPage(std::string &buffer)
 {
     const char arr[] = "----- ";
     if(buffer.length()<6)

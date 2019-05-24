@@ -5,9 +5,6 @@
  *
  */
 #pragma once
-#ifdef COMPILE_UNITTEST 
-#include <gtest/gtest.h>
-#endif
 #include <memory>
 #include <folly/Memory.h>
 #include <folly/File.h>

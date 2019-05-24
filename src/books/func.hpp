@@ -134,8 +134,8 @@ namespace func
     * @param[in] buffer 
     * @return 
     */
-    static inline bool checkPage(std::string &buffer);
+    bool checkPage(std::string &buffer);
 
-};
+}
 
 

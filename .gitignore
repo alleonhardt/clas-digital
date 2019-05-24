@@ -8,3 +8,4 @@ zotero.json
 build/*
 doc/*
 web/books/*
+bin/*

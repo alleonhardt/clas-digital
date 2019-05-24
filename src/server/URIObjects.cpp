@@ -211,7 +211,7 @@ void GetSearchHandler::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 		{
 			std::cout<<it<<",";
 		}
-		std::cout<<endl;
+		std::cout<<std::endl;
 		return SendErrorNotFound(downstream_);
 	}
 	catch(...)

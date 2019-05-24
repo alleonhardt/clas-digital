@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 2.6)
-project(Menard2)
+project(clas-digital)
 
 include_directories(
   "src"
-  ".")
-
+  "."
+  ${CURSES_INCLUDE_DIR})
 set(CMAKE_CXX_FLAGS "-Wall -Werror -Wpedantic -std=c++1z")
 #
 # - Try to find Facebook proxygen library
@@ -20,6 +20,7 @@ find_package(Threads REQUIRED)
 find_package(GTest REQUIRED)
 find_package(Fizz QUIET)
 find_package(CURL REQUIRED)
+find_package(Curses REQUIRED)
 find_path(
   PROXYGEN_INCLUDE_DIR
   NAMES "proxygen/httpserver/HTTPServer.h"
@@ -59,7 +60,7 @@ if(PROXYGEN_FOUND AND NOT PROXYGEN_FIND_QUIETLY)
 endif()
 
 
-set(SRC_FILES src/main.cpp src/server/GetHandler.cpp src/server/PostHandler.cpp src/login/user.cpp src/login/usertable.cpp src/server/URIObjects.cpp)
+set(SRC_FILES src/main.cpp src/server/GetHandler.cpp src/server/PostHandler.cpp src/login/user.cpp src/login/usertable.cpp src/server/URIObjects.cpp src/zotero/zotero.cpp src/books/Book.cpp src/books/Bookmanager.cpp src/books/Metadata.cpp src/books/SearchOptions.cpp src/books/func.cpp src/books/Search.cpp src/console/console.cpp src/server/HandlerFactory.cpp)
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_HOME_DIRECTORY}/bin)
 
@@ -73,6 +74,6 @@ add_custom_command(
 )
 
 add_executable(clas-digital.o ${SRC_FILES})
-target_link_libraries(clas-digital.o ${PROXYGEN_LIBRARIES} ${CURL_LIBRARIES} stdc++fs)
-target_link_libraries(unittest.o ${PROXYGEN_LIBRARIES} ${GTEST_BOTH_LIBRARIES} ${CURL_LIBRARIES} stdc++fs)
+target_link_libraries(clas-digital.o ${PROXYGEN_LIBRARIES} ${CURL_LIBRARIES} stdc++fs ${CURSES_LIBRARY})
+target_link_libraries(unittest.o ${PROXYGEN_LIBRARIES} ${GTEST_BOTH_LIBRARIES} ${CURL_LIBRARIES} stdc++fs ${CURSES_LIBRARY})
 target_compile_definitions(unittest.o PRIVATE COMPILE_UNITTEST=10)

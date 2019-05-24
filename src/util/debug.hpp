@@ -1,12 +1,16 @@
 #pragma once
 #include <iostream>
-
+#ifdef COMPILE_UNITTEST 
+#include <gtest/gtest.h>
+#endif
 #define DBG_INF_MSG_EXIT(x,y) std::cerr<<x<<std::endl;std::cerr<<"Error in FILE: "<<__FILE__<<"\nIn Line: "<<__LINE__<<"\nIn Function: "<<__PRETTY_FUNCTION__<<std::endl;exit(EXIT_FAILURE);
 #define DBG_INF_MSG(x) std::cerr<<x<<std::endl;std::cerr<<"Error in FILE: "<<__FILE__<<"\nIn Line: "<<__LINE__<<"\nIn Function: "<<__PRETTY_FUNCTION__<<std::endl;
 #define DBG_INF() std::cerr<<"Error in FILE: "<<__FILE__<<"\nIn Line: "<<__LINE__<<"\nIn Function: "<<__PRETTY_FUNCTION__<<std::endl;
+#include "src/console/console.hpp"
 
 namespace debug
 {
+	static inline volatile bool gGlobalShutdown = false;
 	/**
 	 * @brief This structure prints everything in order given to the constructor of the class and an endline at the end of all prints
 	 */
@@ -20,7 +24,7 @@ namespace debug
 		 */
 		template<typename ...Args,typename T>print(T t1, Args... args)
 		{
-			std::cout<<t1;
+			alx::cout<<t1;
 			//Recoursivly call the other constructors
 			print(args...);
 		}
@@ -32,7 +36,7 @@ namespace debug
 		 */
 		template<typename T>print(T t1)
 		{
-			std::cout<<t1<<std::endl;
+			alx::cout<<t1<<alx::endl;
 		}
 	};
 

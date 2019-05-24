@@ -179,43 +179,14 @@ TEST(URIFile, load_file)
 
 TEST(URIFile, load_bad_file)
 {
-	try
-	{
-		//bin is a directory not a file!
-		URIFile fl("bin");
-		ASSERT_EQ(true, false);
-	}
-	catch(...)
-	{
-	
-		//Function throws 0 if the file is not good check if this is our exception or something else{
-		EXPECT_EQ(0,0);
-	}
+	//Tries to open a folder
+	EXPECT_ANY_THROW(URIFile fl("bin"));
 
-	try
-	{
-		//bin does exist as folder but the file does not exist within
-		URIFile fl("bin/whatever.bin");
-		ASSERT_EQ(true,false);
-	}
-	catch(...)
-	{
-	
-		//Function throws 0 if the file is not good check if this is our exception or something else{
-		EXPECT_EQ(0,0);
-	}
+	//bin does exist as folder but the file does not exist within
+	EXPECT_ANY_THROW(URIFile fl("bin/whatever.bin"));
 
-	try
-	{
-		//The file and the folder does not exist
-		URIFile fl("bin/what/store/bin.bin");
-		ASSERT_EQ(true,false);
-	}
-	catch(...)
-	{
-		//Function throws 0 if the file is not good check if this is our exception or something else
-		EXPECT_EQ(0,0);
-	}
+	//The file and the folder does not exist
+	EXPECT_ANY_THROW(URIFile fl("bin/what/store/bin.bin"));
 }
 
 TEST(URIFile,access_check)

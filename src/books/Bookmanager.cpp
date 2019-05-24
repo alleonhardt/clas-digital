@@ -147,7 +147,7 @@ void CBookManager::createMapWords()
         }
     }
 
-    unsigned int counter = 0;
+    //unsigned int counter = 0;
 } 
 
 /**
@@ -168,6 +168,6 @@ void CBookManager::createMapWordsTitle()
             m_mapWordsTitle[yt->first][it->first] = &it->second;
     }
 
-    unsigned int counter = 0;
+    //unsigned int counter = 0;
 }
 
