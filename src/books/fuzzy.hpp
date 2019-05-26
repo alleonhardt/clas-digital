@@ -16,7 +16,7 @@ namespace fuzzy
     * @parameter const char* (target word)
     * @return int (levenshtein distance)
     **/
-    int levenshteinDistance(const char* chS,const char* chT);
+    size_t levenshteinDistance(const char* chS,const char* chT);
             
     //Levenshtein Distance algorithm as a recursive function
     int recursiveLD(const char* chS, int len_s, const char* chT, int len_t);
