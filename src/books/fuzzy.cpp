@@ -9,23 +9,20 @@ namespace fuzzy
 * @parameter const char* (target string)
 * @return int (levenshteindistance)
 **/
-int levenshteinDistance(const char* chS, const char* chT)
+size_t levenshteinDistance(const char* chS, const char* chT)
 {
-    unsigned int len_S = strlen(chS);
-    unsigned int len_T = strlen(chT);
-    int* d = new int[len_S*len_T];
+    size_t len_S = strlen(chS)+1;
+    size_t len_T = strlen(chT)+1;
+    size_t* d = new size_t[len_S*len_T];
     int substitutionCost = 0;
 
-    for(unsigned int i=1; i<len_S; i++)
-        d[i*len_T+0] = i;
-    for(unsigned int j=1; j<len_T; j++)
-        d[0*len_T+j] = j;
+    std::memset(d, 0, sizeof(size_t) * len_S * len_T);
 
-    for(unsigned int j=1; j<len_T; j++)
+    for(size_t j=1, jm=0; j<len_T; j++, jm++)
     {
-        for(unsigned int i=1; i<len_S; i++)
+        for(size_t i=1, im=0; i<len_S; i++, im++)
         {
-            if(chS[i] == chT[j])
+            if(chS[im] == chT[jm])
                 substitutionCost = 0;
             else
                 substitutionCost = 1;
@@ -36,7 +33,7 @@ int levenshteinDistance(const char* chS, const char* chT)
         }
     }
      
-    int score = d[(len_S-1)*len_T+(len_T-1)];
+    size_t score = d[len_S*len_T-1];
     delete []d;
     return score; 
 }
@@ -100,7 +97,7 @@ bool fuzzy_cmp(std::string sWord1, std::string sWord2)
         return false;
 
     //Calculate levenshtein distance
-    int ldIterative = levenshteinDistance(sWord1.c_str(), sWord2.c_str());
+    size_t ldIterative = levenshteinDistance(sWord1.c_str(), sWord2.c_str());
 
     //Calculate score
     double score = static_cast<double>(ldIterative)/ std::max(sWord1.length(), sWord2.length());
