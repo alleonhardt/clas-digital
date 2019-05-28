@@ -53,7 +53,7 @@ namespace alx
 	std::string console::getCommand()
 	{
 		std::string command="";
-		char ch;
+		int ch;
 		auto it = _cmdBuffer.end();
 		std::string spcChar="";
 		for(;;)
@@ -63,47 +63,29 @@ namespace alx
 
 			if(ch==13||ch==10)
 				break;
-			else if(ch=='^'||ch=='[')
+			else if(ch==KEY_UP)
 			{
-				spcChar+=ch;
-				continue;
-			}
-			else if((spcChar+ch)=="^C")
-			{
-				if(_cmdBuffer.size() == 0)
-					continue;
-				else if(it==_cmdBuffer.begin())
+				if(it==_cmdBuffer.begin()||_cmdBuffer.size()==0)
 					continue;
 				it--;
-				wmove(_cmd,1,0);
+				wmove(_cmd,1,3);
 				wclrtoeol(_cmd);
-				wattrset(_cmd,console::green_black.x);
-				mvwaddstr(_cmd,1,0,"$> ");
-				wattrset(_cmd,console::yellow_black.x);
-				waddstr(_cmd,it->c_str());
 				command = it->c_str();
-				continue;
+				mvwaddstr(_cmd,1,3,command.c_str());
 			}
-			else if((spcChar+ch)=="^B")
+			else if(ch==KEY_DOWN)
 			{
-				if(_cmdBuffer.size() == 0)
-					continue;
-				else if(it==_cmdBuffer.end())
+				wmove(_cmd,1,3);
+				wclrtoeol(_cmd);
+				wmove(_cmd,1,3);
+				command="";
+				if(it==_cmdBuffer.end()||_cmdBuffer.size()==0)
 					continue;
 				it++;
 				if(it==_cmdBuffer.end())
-				{
-					it--;
 					continue;
-				}
-				wmove(_cmd,1,0);
-				wclrtoeol(_cmd);
-				wattrset(_cmd,console::green_black.x);
-				mvwaddstr(_cmd,1,0,"$> ");
-				wattrset(_cmd,console::yellow_black.x);
-				waddstr(_cmd,it->c_str());
 				command = it->c_str();
-				continue;
+				waddstr(_cmd,command.c_str());
 			}
 			else if(ch==KEY_BACKSPACE||ch == KEY_DC || ch == 127)
 			{
@@ -119,11 +101,13 @@ namespace alx
 			else 
 			{
 				waddch(_cmd,ch);
-				command+=ch;
+				char singlec = (char)ch;
+				command+=singlec;
 			}
 			wrefresh(_cmd);
 		}
-		_cmdBuffer.push_back(command);
+		if(_cmdBuffer.size() == 0 || _cmdBuffer.back() != command)
+			_cmdBuffer.push_back(command);
 		std::lock_guard lck(_outputLock);
 		wmove(_cmd, 1, 0);
 		wclrtoeol(_cmd);
