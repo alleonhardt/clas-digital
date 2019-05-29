@@ -251,6 +251,10 @@ i
 	display: None;
 }
 
+.hiddenContent {
+	visibility: hidden;
+}
+
 
 .citationButton {
 	float: right;
@@ -427,18 +431,18 @@ function ApplyFilterOptions()
 			}
 			else
 			{
-				inner = "<a data-specialhref='/1/GetBooks.html";
+				inner = "<a data-specialhref='/GetBooks";
 			}
 			inner+= "?query="+lastInput;
 			inner+="&scanId="+jsonObj.books[i].scanId;
 			inner+="' onclick='return changeColor(this);'>";
 			if(!jsonObj.books[i].hasocr || (jsonObj.books[i].hasocr == undefined))
 			{
-				inner+="<div></div><div></div>";
+				inner+="<img src='/volltext.png' class='hiddenContent' alt='volltext' title='Buch besitzt Volltext'><img src='/scan.png' class='hiddenContent' alt='scan' title='Buch besitzt einen Scan'>";
 			}
 			else
 			{
-				inner+="<img src='/0/volltext.png' alt='volltext' title='Buch besitzt Volltext'><img src='/0/scan.png' alt='scan' title='Buch besitzt einen Scan'>";
+				inner+="<img src='/volltext.png' alt='volltext' title='Buch besitzt Volltext'><img src='/scan.png' alt='scan' title='Buch besitzt einen Scan'>";
 			}
 			inner+=jsonObj.books[i].description+"   "+"<input onclick='this.was_clicked=1;return true;' type='checkbox' unchecked></a>"; 
 			newList.innerHTML = inner;
@@ -559,16 +563,18 @@ function sendToPage(name)
 			}
 			else
 			{
-				inner = "<a data-specialhref='/1/GetBooks.html";
+				inner = "<a data-specialhref='/GetBooks";
 			}
 			inner+= "?query="+input;
 			inner+="&scanId="+jsonObj.books[i].scanId;
 			inner+="' onclick='return changeColor(this);'>";
 			if(!jsonObj.books[i].hasocr || (jsonObj.books[i].hasocr == undefined))
-			{}
+			{
+				inner+="<img src='/volltext.png' class='hiddenContent' alt='volltext' title='Buch besitzt Volltext'><img src='/scan.png' class='hiddenContent' alt='scan' title='Buch besitzt einen Scan'>";
+			}
 			else
 			{
-				inner+="<img src='/0/volltext.png' alt='volltext' title='Buch besitzt Volltext'><img src='/0/scan.png' alt='scan' title='Buch besitzt einen Scan'>";
+				inner+="<img src='/volltext.png' alt='volltext' title='Buch besitzt Volltext'><img src='/scan.png' alt='scan' title='Buch besitzt einen Scan'>";
 			}
 			inner+="   "+jsonObj.books[i].description+"   "+"<input onclick='this.was_clicked=1;return true;' type='checkbox' unchecked></a>"; 
 			newList.innerHTML = inner;

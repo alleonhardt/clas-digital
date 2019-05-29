@@ -5,7 +5,7 @@ include_directories(
   "src"
   "."
   ${CURSES_INCLUDE_DIR})
-set(CMAKE_CXX_FLAGS "-Wall -Werror -Wpedantic -std=c++1z")
+set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -Wpedantic -std=c++1z")
 #
 # - Try to find Facebook proxygen library
 # This will define

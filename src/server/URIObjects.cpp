@@ -123,14 +123,35 @@ void GetBookRessource::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 
 	try
 	{
+		if(!User::AccessCheck(_user,AccessRights::USR_WRITE|AccessRights::USR_READ))
+			return SendAccessDenied(downstream_);
+
 		//Get the book part of the request as well as the ressource part of the request
 		std::string book = headers->getDecodedQueryParam("book");
 		std::string res = headers->getDecodedQueryParam("ressource");
+
+		if(book.find("..")!=std::string::npos||book.find("~")!=std::string::npos
+				||res.find("..")!=std::string::npos||res.find("~")!=std::string::npos)
+			return SendAccessDenied(downstream_);
+
 		//If book and res is zero the client wants to get a list of all books on the server
 		if(book==""&&res=="")
 		{
+			auto &mapBooks = GetSearchHandler::GetBookManager().getMapOfBooks();
+			nlohmann::json ret;
+			for(auto &it : mapBooks)
+			{
+				nlohmann::json x;
+				x["bib"] = it.second.getMetadata().getShow();
+				ret.push_back(x);
+			}
 			//Return a list of all books with bibliography and ocr yes false
-			return SendErrorNotFound(downstream_);
+			return ResponseBuilder(downstream_)
+				.status(200,"Ok")
+				.header("Content-Type","application/json")
+				.body(ret.dump())
+				.sendWithEOM();
+			return;
 		}
 		else if(book!=""&&res=="") //Returns a list of all files in a specific book
 		{
@@ -185,8 +206,8 @@ void GetSearchHandler::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 		if(!User::AccessCheck(_user,AccessRights::USR_READ))
 			throw 0;
 
-		std::cout<< headers->getURL() <<std::endl;
-		std::cout<< headers->getDecodedQueryParam("pillars") <<std::endl;
+		alx::cout<< headers->getURL() <<alx::endl;
+		alx::cout<< headers->getDecodedQueryParam("pillars") <<alx::endl;
 		std::string word = headers->getDecodedQueryParam("search");
 		std::string author = headers->getDecodedQueryParam("author");
 		int Fuzzyness = headers->getIntQueryParam("fuzzyness",0);
@@ -205,17 +226,83 @@ void GetSearchHandler::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 			onlyTitle = true;
 		if(headers->getDecodedQueryParam("ocr_only")=="true")
 			ocrOnly = true;
-		std::cout<<"Search for: "<<word<<" author: "<<author<<" Fuzzyness: "<<Fuzzyness<<" released before: "<<from<<" and after: "<<to<<"\nSearch only title "<<onlyTitle<<std::endl<<"Search only ocr: "<<ocrOnly<<std::endl;
-		std::cout<<"Pillars: ";
+		alx::cout<<"Search for: "<<word<<" author: "<<author<<" Fuzzyness: "<<Fuzzyness<<" released before: "<<from<<" and after: "<<to<<"\nSearch only title "<<onlyTitle<<alx::endl<<"Search only ocr: "<<ocrOnly<<alx::endl;
+		alx::cout<<"Pillars: ";
 		for(auto &it : pillars)
 		{
-			std::cout<<it<<",";
+			alx::cout<<it<<",";
 		}
-		std::cout<<std::endl;
-		return SendErrorNotFound(downstream_);
+		alx::cout<<alx::endl;
+		std::unique_ptr<CSearchOptions> nso(new CSearchOptions(std::move(word),Fuzzyness,std::move(pillars),onlyTitle,ocrOnly,std::move(author),from,to));
+		auto results = GetBookManager().search(nso.get());
+		nlohmann::json js;
+
+		for(auto &it : *results)
+		{
+			nlohmann::json entry;
+			entry["scanId"] = it.first;
+			entry["hasocr"] = it.second->getOcr();
+			entry["description"] = it.second->getMetadata().getShow();
+			js["books"].push_back(std::move(entry));
+		}
+
+		ResponseBuilder(downstream_)
+			.status(200,"Ok")
+			.header("Content-Type","application/json")
+			.body(std::move(js.dump()))
+			.sendWithEOM();
+		return;
 	}
 	catch(...)
 	{
 		return SendAccessDenied(downstream_);
+	}
+}
+
+CBookManager &GetSearchHandler::GetBookManager()
+{
+	static CBookManager gManager;
+	return gManager;
+}
+
+
+void GetSearchInBookHandler::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers) noexcept
+{
+	try
+	{
+		if(!User::AccessCheck(_user,AccessRights::USR_READ))
+			throw 0;
+
+		std::string searchFor = headers->getDecodedQueryParam("query");
+		std::string inBook = headers->getDecodedQueryParam("scanId");
+		if(searchFor==""||inBook=="")
+			throw 0;
+		auto &mapofbooks = GetSearchHandler::GetBookManager().getMapOfBooks();
+		auto &book = mapofbooks.at(inBook);
+		alx::cout.write(alx::console::green_black,"Still alive got the book and the map of books!\n");
+	
+		std::unique_ptr<std::list<int>> listPtr(book.getPages(std::move(searchFor),0));
+		
+		if(listPtr)
+			alx::cout.write(alx::console::green_black,"Still alive and the list pointer is valid!\n");
+		else
+			alx::cout.write(alx::console::red_black,"Received invalid ptr from book.getPages()\n");
+		alx::cout.write(alx::console::yellow_black,"Received ",(int)listPtr->size()," search results!\n");
+		nlohmann::json js;
+		js["is_fuzzy"] = false;
+		for(auto it : *listPtr)
+		{
+			int k = it;
+			js["books"].push_back(k);
+		}
+		return ResponseBuilder(downstream_)
+			.status(200,"Ok")
+			.header("Content-Type","application/json")
+			.body(std::move(js.dump()))
+			.sendWithEOM();
+	}
+	catch(...)
+	{
+		return SendErrorNotFound(downstream_);
 	}
 }

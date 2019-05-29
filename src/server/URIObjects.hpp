@@ -6,6 +6,7 @@
  */
 #pragma once
 #include "src/server/BasicHandlers.hpp"
+#include "src/books/CBookManager.hpp"
 
 /**
  * @brief Handles all read accesses to the user system
@@ -51,13 +52,18 @@ class GetBookRessource : public EmptyHandler
 			noexcept override;
 };
 
-
 /**
  * @brief Handles the general search in all books
  */
 class GetSearchHandler : public EmptyHandler
 {
 	public:
+		/**
+		 * @brief Returns an instance of the global book manager used to manage all books
+		 *
+		 * @return Returns the global book manager which manages all books
+		 */
+		static CBookManager &GetBookManager();
 		/**
 		 * @brief Tries to satify the search request and send back an json with all found books to the server
 		 *
@@ -66,3 +72,18 @@ class GetSearchHandler : public EmptyHandler
 		void onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 			noexcept override;
 };
+
+/**
+ * @brief Searches a specific book for a specific word with the given fuzzyness 
+ */
+class GetSearchInBookHandler : public EmptyHandler
+{
+	public:
+		/**
+		 * @brief Searches in a specific book for a specififc word with the given fuzzynes and returns a json file with the results from the search
+		 * @param[in] headers The headers for the http request received from the user
+		 */
+		void onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
+			noexcept override;
+};
+

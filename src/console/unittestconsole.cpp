@@ -13,7 +13,7 @@ namespace alx
 	{
 	}
 
-	void console::SetColor(color x)
+	void console::SetColor(color)
 	{
 	}
 
@@ -37,7 +37,7 @@ namespace alx
 		std::cout<<x;
 	}
 
-	void console::_write(color x)
+	void console::_write(color)
 	{
 	}
 

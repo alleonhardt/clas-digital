@@ -60,8 +60,10 @@ namespace alx
 		{
 			ch = wgetch(_cmd);
 			std::lock_guard lck(_outputLock);
-
-			if(ch==13||ch==10)
+			
+			if(ch==KEY_F(12))
+				continue;
+			else if(ch==13||ch==10)
 				break;
 			else if(ch==KEY_UP)
 			{
@@ -98,6 +100,8 @@ namespace alx
 				wmove(_cmd,y,x-1);
 				wdelch(_cmd);
 			}
+			else if(ch>255)
+				continue;
 			else 
 			{
 				waddch(_cmd,ch);

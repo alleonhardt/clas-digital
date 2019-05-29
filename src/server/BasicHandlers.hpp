@@ -42,7 +42,7 @@ class EmptyHandler : public proxygen::RequestHandler {
 		 * @brief Dummy function for the proxygen virtual function onRequest
 		 * @param headers The HTTP Message provided by proxygen
 		 */
-		virtual void onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
+		virtual void onRequest(std::unique_ptr<proxygen::HTTPMessage>)
 			noexcept override{}
 
 		/**
@@ -52,7 +52,7 @@ class EmptyHandler : public proxygen::RequestHandler {
 		 * is a lot of data
 		 *
 		 */
-		virtual void onBody(std::unique_ptr<folly::IOBuf> body) noexcept override{}
+		virtual void onBody(std::unique_ptr<folly::IOBuf>) noexcept override{}
 
 
 		/**
@@ -61,7 +61,7 @@ class EmptyHandler : public proxygen::RequestHandler {
 		 * @param proto The new protocol to follow from there on
 		 *
 		 */
-		virtual void onUpgrade(proxygen::UpgradeProtocol proto) noexcept override{}
+		virtual void onUpgrade(proxygen::UpgradeProtocol) noexcept override{}
 
 		/**
 		 * @brief The empty handler for the proxygen function requestComplete
@@ -73,7 +73,7 @@ class EmptyHandler : public proxygen::RequestHandler {
 		 *
 		 * @param err The error that occured
 		 */
-		virtual void onError(proxygen::ProxygenError err) noexcept override{}
+		virtual void onError(proxygen::ProxygenError) noexcept override{}
 
 		/**
 		 * @brief The dummy function for the proxygen function inEgressPaused

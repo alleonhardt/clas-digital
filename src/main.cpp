@@ -29,7 +29,7 @@ DEFINE_int32(http_red,1408,"Port to redirect HTTP to HTTPSS");
 DEFINE_int32(http_port, 1409, "Port to listen on with HTTP protocol");
 DEFINE_int32(h2_port, 11002, "Port to listen on with HTTP/2 protocol");
 DEFINE_string(ip, "localhost", "IP/Hostname to bind to");
-DEFINE_int32(threads, 2, "Number of threads to listen on. Numbers <= 0 "
+DEFINE_int32(threads, 0, "Number of threads to listen on. Numbers <= 0 "
 		"will use the number of cores on this machine.");
 
 int main(int argc, char* argv[]) {
@@ -92,33 +92,43 @@ int main(int argc, char* argv[]) {
 
 
 	std::thread t([&] () {
-			CBookManager manager;
+			CBookManager &manager = GetSearchHandler::GetBookManager();
+				
+				nlohmann::json js;
 				try
 				{
 					alx::cout.write("Loading zotero json from disk... ");
-					nlohmann::json js;
 					std::ifstream isf("bin/zotero.json",std::ios::in);
 					isf>>js;
 					alx::cout.write(alx::console::green_black,"done.\n");
-					manager.updateZotero(js);
 				}
 				catch(...)
 				{
 					alx::cout.write("Fetching zotero metadata from the server...\n");
 					Zotero zot;
 					std::ofstream wr("bin/zotero.json",std::ios::out);
-					std::string js = std::move(zot.SendRequest(Zotero::Request::GetAllItems));
-					wr<<js;
+					std::string jstr = std::move(zot.SendRequest(Zotero::Request::GetAllItems));
+					wr<<jstr;
 					wr.close();
-					manager.updateZotero(nlohmann::json::parse(js));
+					js = std::move(nlohmann::json::parse(jstr));
 				}
+				try
+				{
+					alx::cout.write("Fetching zotero metadata in book manager... ");
+					manager.updateZotero(js);
+				}
+				catch(...)
+				{
+					alx::cout.write(alx::console::red_black,"failed.\n");
+					sleep(3);
+					return;
+				}
+				alx::cout.write(alx::console::green_black,"done.\n");
 
-			alx::cout.write("Zotero metadata fetched\n");
 			if(manager.initialize())
 				alx::cout.write("CBookManager initialisation: ",alx::console::green_black,"SUCCESS\n");
 			else
 				alx::cout.write("CBookManager initialisation: ",alx::console::red_black,"FAILURE\n");
-
 			server.start();
 	});
 

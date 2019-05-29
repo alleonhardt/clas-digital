@@ -109,7 +109,11 @@ std::unordered_map<std::string,URIFile> fileAccess {
 	{"/search",URIFile("web/Search.html",1)},
 	{"/administration",URIFile("web/Administration.html",4)},
 	{"/uploadbook",URIFile("web/UploadBook.html",2)},
-	{"/managebooks",URIFile("web/ManageBooks.html",2)}
+	{"/managebooks",URIFile("web/ManageBooks.html",2)},
+	{"/GetBooks",URIFile("web/GetBooks.html",1)},
+	{"/scan.png",URIFile("web/scan.png",1)},
+	{"/404.jpeg",URIFile("web/404.jpeg",0)},
+	{"/volltext.png",URIFile("web/volltext.png",1)}
 };
 
 

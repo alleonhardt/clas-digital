@@ -109,6 +109,8 @@ std::string UserHandler::DoLogin(std::string email, std::string password)
 	auto it = m_userTable.find(email);
 	if(it==m_userTable.end())
 		return "";
+	if(!it->second->DoesMatch(email,password))
+		return "";
 
 	//Set the session id to the new value, will kick any user that is singed in twice
 	it->second->SetSessionId(sessid);
