@@ -147,66 +147,170 @@ void CBook::safeMapOfWords()
     write.close();
 }
 
+
 /*
 * @param[in] sWord searched word
-* @param[in] fuzzyness 
 * @return list of pages on which searched word accures
 */
-std::list<int>* CBook::getPages(std::string sWord, int fuzzyness)
+std::list<int>* CBook::getPagesFull(std::string sWord)
 {
-    //Convert search word to lower case
-    func::convertToLower(sWord);
-
-    //Create list of all words in book, with a marking "###page### for new page
-    std::list<std::string> listWords;
-    func::extractWords(getOcrPath(), listWords);
-
-    //Create empty list of pages 
+    //Create empty list of pages
     std::list<int>* listPages = new std::list<int>;
 
-    //Iterate over all words
-    unsigned int pageNum = 0;   //current page
-    unsigned int lastPage = 0;  //last page added to list of pages
-    for(auto it:listWords)
-    {
-        //check whether new page is reached.
-        if(func::compare(it.c_str(), "###page###") == true)
-            pageNum++;
+    //Load ocr
+    std::ifstream read(getOcrPath(), std::ios::in);
 
-        //If we're still on the last added page, skipp checking, until next page is reached
-        if(lastPage == pageNum)
+    //Check whether ocr could be loaded
+    if(!read)
+        return listPages;
+
+    //Find pages on which searched word occures
+    func::convertToLower(sWord);
+    unsigned int pageNum = 0;
+    unsigned int lastPage = 0;
+    while(!read.eof())
+    {
+        //read buffer
+        std::string sBuffer;
+        getline(read, sBuffer);
+
+        //Check new page
+        if(func::checkPage(sBuffer) == true) {
+            pageNum++;
+            continue;
+        }
+
+        //Check wether we're still on a page where a word has already been found
+        if(pageNum == lastPage)
             continue;
 
-        //check whether search word was found on this page. Then add to list of pages.
-        if(compare(it, sWord, fuzzyness) == true)
-        {
-            listPages->push_back(pageNum);
-            lastPage = pageNum;
-        }
+        //Search for word in buffer
+        func::convertToLower(sBuffer);
+        size_t found = sBuffer.find(sWord);
+
+
+        if(found == std::string::npos)
+            continue;
+
+        size_t found2 = sBuffer.find(" ", found);
+
+        size_t len = 0;
+        if(found2 == std::string::npos)
+            len = sWord.length();
+        else
+            len = found2-found;
+
+        std::string foundWord = sBuffer.substr(found, len);
+        func::transform(foundWord);
+
+        //Check whether search result is a full match
+        if(func::compare(foundWord, sWord) == false)
+            continue;
+
+        //Add page to list of pages and increase page number
+        listPages->push_back(pageNum);
+        lastPage = pageNum;
     }
 
     return listPages;
 }
 
-/**
-* @brief calls spezifik compare-function depending on fuzzyness
-* @param[in] curWord current word in list of words
+/*
 * @param[in] sWord searched word
-* @param[in] fuzzyness 
-* @return bool
+* @return map of pages with vector of words found on this page
 */
-bool CBook::compare(std::string curWord, std::string sWord, int fuzzyness)
+std::map<int, std::vector<std::string>>* CBook::getPagesContains(std::string sWord)
 {
-    //Use normal search (full-match)
-    if(fuzzyness == 0)
-        return func::compare(curWord, sWord);
+    //Create empty map
+    std::map<int, std::vector<std::string>>* mapPages = new std::map<int, std::vector<std::string>>;
 
-    //Use contains-search (current word contains searched word)
-    else if(fuzzyness == 1)
-        return func::contains(curWord, sWord);
+    //Load ocr
+    std::ifstream read(getOcrPath(), std::ios::in);
 
-    //Use fuzzy search
-    else
-        return fuzzy::fuzzy_cmp(curWord, sWord);
+    //Check whether ocr has been loaded
+    if(!read)
+        return mapPages;
+
+    func::convertToLower(sWord);
+    unsigned int pageNum = 0;
+    while(!read.eof())
+    {
+        std::string sBuffer;
+        getline(read, sBuffer);
+
+        //Check new page
+        if(func::checkPage(sBuffer) == true) {
+            pageNum++;
+            continue;
+        }
+
+        func::convertToLower(sBuffer);
+        size_t found = sBuffer.find(sWord);
+
+        if(found == std::string::npos)
+            continue;
+
+        size_t found2 = sBuffer.find(" ", found);
+        size_t len = 0;
+        if(found2 == std::string::npos)
+            len = sWord.length();
+        else
+            len = found2-found;
+
+        std::string foundWord = sBuffer.substr(found, len);
+        func::transform(foundWord);
+
+        if(mapPages->count(pageNum) > 0)
+            mapPages->at(pageNum).push_back(foundWord);
+        else
+            mapPages->insert(std::pair<int, std::vector<std::string>> (pageNum, {foundWord}));
+    }
+
+    return mapPages;
 }
 
+/*
+* @param[in] sWord searched word
+* @return map of pages with vector of words found on this page
+*/
+std::map<int, std::vector<std::string>>* CBook::getPagesFuzzy(std::string sWord)
+{
+    //Create empty map
+    std::map<int, std::vector<std::string>>* mapPages = new std::map<int, std::vector<std::string>>;
+
+    std::ifstream read(getOcrPath(), std::ios::in);
+
+    if(!read)
+        return mapPages;
+
+    func::convertToLower(sWord);
+    unsigned int pageNum = 0;
+    while(!read.eof())
+    {
+        std::string sBuffer;
+        getline(read, sBuffer);
+
+        //Check new page
+        if(func::checkPage(sBuffer) == true) {
+            pageNum++;
+            continue;
+        }
+
+        std::map<std::string, int> mapWords;
+        func::extractWordsFromString(sBuffer, mapWords);
+
+        for(auto it=mapWords.begin(); it!=mapWords.end(); it++)
+        {
+            if(fuzzy::fuzzy_cmp(it->first, sWord) == true)
+            {
+                if(mapPages->count(pageNum) > 0)
+                    mapPages->at(pageNum).push_back(it->first);
+                else
+                    mapPages->insert(std::pair<int, std::vector<std::string>> (pageNum, {it->first}));
+            }
+        }
+    }
+
+    return mapPages;
+}
+         

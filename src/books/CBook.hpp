@@ -104,17 +104,19 @@ public:
 
     /*
     * @param[in] sWord searched word
-    * @param[in] fuzzyness
     * @return list of pages on which searched word accures
     */
-    std::list<int>* getPages(std::string sWord, int fuzzyness);
+    std::list<int>* getPagesFull(std::string sWord);
 
-    /**
-    * @brief calls spezifik compare-function depending on fuzzyness
-    * @param[in] curWord current word in list of words
+    /*
     * @param[in] sWord searched word
-    * @param[in] fuzzyness 
-    * @return bool
+    * @return map of pages with vector of words found on this page
     */
-    bool compare(std::string curWord, std::string sWord, int fuzzyness);
+    std::map<int, std::vector<std::string>>* getPagesContains(std::string sWord);
+
+    /*
+    * @param[in] sWord searched word
+    * @return map of pages with vector of words found on this page
+    */
+    std::map<int, std::vector<std::string>>* getPagesFuzzy(std::string sWord);
 };

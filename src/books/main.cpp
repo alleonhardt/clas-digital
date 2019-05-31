@@ -12,25 +12,6 @@ int main()
     std::string str1;
     std::string str2;
 
-    /*
-    for(;;)
-    {
-        std::cout << "> ";
-        getline(std::cin, str1);
-        std::cout << "> ";
-        getline(std::cin, str2);
-        size_t ld = fuzzy::levenshteinDistance(str1.c_str(), str2.c_str()); 
-        int rd = fuzzy::recursiveLD(str1.c_str(), str1.length(), str2.c_str(), str2.length());
-        std::cout << "LD: " << ld << "\n";
-        double score = static_cast<double>(ld)/std::max(str1.length(), str2.length());
-        double score2 = static_cast<double>(rd)/std::max(str1.length(), str2.length());
-        std::cout << "Score: " << score << "\n";
-        std::cout << "Score: " << score2 << "\n";
-        if(str1 == "q")
-            break;
-    }
-    */
-
     std::ifstream read("zotero.json");
     nlohmann::json jItems;
     read >> jItems;
@@ -91,13 +72,47 @@ int main()
         for(auto it=searchResults->begin(); it!=searchResults->end(); it++)
         {
             std::cout << it->first << ": " << it->second->getMetadata().getShow() << "\n";
-            /*
             std::cout << "-- Pages: ";
-            std::list<int>* listPages = it->second->getPages(sInput, fuzzy);
-            for(auto jt=listPages->begin(); jt!=listPages->end(); jt++)
-                std::cout << (*jt) << ", ";
-            std::cout << "\n";
-            */
+
+            //Pages for full search
+            if(fuzzy == 0)
+            {
+                std::list<int>* listPages = it->second->getPagesFull(sInput);
+                for(auto jt=listPages->begin(); jt!=listPages->end(); jt++)
+                    std::cout << (*jt) << ", ";
+                delete listPages;
+                std::cout << "\n";
+            }
+
+            //Pages for contains search
+            else if(fuzzy == 1)
+            {
+                std::map<int, std::vector<std::string>>* mapPages = it->second->getPagesContains(sInput);
+                for(auto jt=mapPages->begin(); jt!=mapPages->end(); jt++)
+                {
+                    std::cout << jt->first << " (";
+                    for(size_t i=0; i<jt->second.size(); i++)
+                        std::cout << jt->second[i] << ", ";
+                    std::cout << "), ";
+                }
+                delete mapPages;
+                std::cout << std::endl;
+            }
+
+            //Pages for fuzzy search
+            else if(fuzzy == 2)
+            {
+                std::map<int, std::vector<std::string>>* mapPages = it->second->getPagesFuzzy(sInput);
+                for(auto jt=mapPages->begin(); jt!=mapPages->end(); jt++)
+                {
+                    std::cout << jt->first << " (";
+                    for(size_t i=0; i<jt->second.size(); i++)
+                        std::cout << jt->second[i] << ", ";
+                    std::cout << "), ";
+                }
+                delete mapPages;
+                std::cout << std::endl;
+            }
             counter++;
         }
         std::cout << "Results found: " << counter << "\n";
