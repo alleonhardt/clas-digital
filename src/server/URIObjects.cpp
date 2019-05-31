@@ -142,7 +142,7 @@ void GetBookRessource::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 			for(auto &it : mapBooks)
 			{
 				nlohmann::json x;
-				x["bib"] = it.second.getMetadata().getShow();
+				x["bib"] = it.second.getMetadata().getMetadata()["bib"];
 				ret.push_back(x);
 			}
 			//Return a list of all books with bibliography and ocr yes false

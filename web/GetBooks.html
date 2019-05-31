@@ -355,7 +355,6 @@ function getVisiblePages()
 function getVisiblePagesOCR()
 {
 	let allPages = document.getElementsByClassName("ocrpage");
-
 	let visiblePages = new Array();
 	for(let i = 0; i < allPages.length; i++) {
 		if(isElementInViewport(allPages[i])) {
@@ -447,16 +446,17 @@ function GetOCRTxt() {
 							});
 }
 
-let pageVal = [];
-
 function updateAfterScrollOCR() {
 	let visibleText = getVisiblePagesOCR();
+    let visibleTextRest = document.getElementsByClassName("ocrpage");
 
 	console.log("Update after scroll");
 	for(let i = 0; i < visibleText.length; i++)
 	{
-		visibleText[i].innerHTML = pageVal[visibleText[i].dataset.page-1];
+		visibleText[i].display = "block";
 	}
+	for(let i = 0; i < visibleTextRest.length; i++)
+		visibleTextRest[i].display = "block";
 }
 
 function UpdateOCRTxt(x)
@@ -474,11 +474,7 @@ function UpdateOCRTxt(x)
 	let lst = document.getElementsByClassName("ocrpage");
 	for(var i = 0; i < lst.length; i++)
 	{
-		pageVal[i] = lst[i].innerHTML;
-		let pgSize = lst[i].style.height;
-		lst[i].innerHTML = "";
-		lst[i].style.height = pgSize;
-	
+		lst[i].style.display = "none";
 	}
 	document.getElementById("olol").addEventListener("scroll", updateAfterScrollOCR, false);
 }
@@ -521,8 +517,8 @@ function ShowOCR(a) {
 	else
 	{
 	document.getElementById("olol").scrollTop += document.getElementsByClassName("ocrpage")[parseInt(a.innerHTML)-2].getBoundingClientRect().bottom-16;
-	return 0;
 	}
+	updateAfterScrollOCR();
 }
 
 let metadata = {};
