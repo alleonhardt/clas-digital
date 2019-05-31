@@ -91,9 +91,9 @@ bool fuzzy_cmp(std::string sWord1, std::string sWord2)
     double len2 = sWord2.length();
 
     //Check whether length of words are to far appart.
-    if(len1>len2 && len2/len1 < 0.6)
+    if(len1>len2 && len2/len1 <= 0.75)
         return false;
-    else if(len1<len2 && len1/len2 < 0.6)
+    else if(len1<len2 && len1/len2 <= 0.75)
         return false;
 
     //Calculate levenshtein distance
@@ -101,7 +101,7 @@ bool fuzzy_cmp(std::string sWord1, std::string sWord2)
 
     //Calculate score
     double score = static_cast<double>(ldIterative)/ std::max(sWord1.length(), sWord2.length());
-    double fuzzyness = 0.25;
+    double fuzzyness = 0.2;
 
     //Check whether score is lower than given fuzzyness)
     if(score < fuzzyness && score >= 0)

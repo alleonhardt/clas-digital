@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <fstream>
 #include <string.h>
 #include <string>
@@ -121,6 +122,8 @@ namespace func
             //Create words from current line
             extractWordsFromString(sBuffer, words);
          }
+
+         std::cout << "succsess.\n";
     }
 
     /**
