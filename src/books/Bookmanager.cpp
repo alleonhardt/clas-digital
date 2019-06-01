@@ -20,7 +20,7 @@ bool CBookManager::initialize()
     //Check whether files where found
     if(!dir_allItems)
     {
-        std::cerr<< "No books found.\n";
+        alx::cout.write(alx::console::red_black, "No books found.\n");
         return false;
     }
 
@@ -30,7 +30,7 @@ bool CBookManager::initialize()
         if(m_mapBooks.count(e_allItems->d_name) > 0)
             addBook(e_allItems->d_name);
         else
-            alx::cout.write((const char*)e_allItems->d_name, " found which isn't in map!\n");
+            alx::cout.write(alx::console::red_black, (const char*)e_allItems->d_name, " found which isn't in map!\n");
     }
 
     //Create map of all words + and of all words in all titles
@@ -81,45 +81,38 @@ void CBookManager::addBook(std::string sKey) {
 */
 std::map<std::string, CBook*>* CBookManager::search(CSearchOptions* searchOpts)
 {
+    //Create new instance of "CSearch"
     CSearch search(searchOpts);
 
-    //Create empty map of searchResults
-    std::map<std::string, CBook*>* mapSearchresults = new std::map<std::string, CBook*>;
+    //Search main word
+    std::map<std::string, CBook*>* results1 = search.search(m_mapWords, m_mapWordsTitle);
 
-    //Normal search (full-match)
-    if (searchOpts->getFuzzyness() == 0)
+    //If second word exists, search for second word
+    if(searchOpts->getSecondWord().length() > 0)
     {
-        //Search in ocr and/ or in title
-        if(searchOpts->getOnlyTitle() == false)
-            search.normalSearch(m_mapWords, mapSearchresults);
-        if(searchOpts->getOnlyOcr() == false)
-            search.normalSearch(m_mapWordsTitle, mapSearchresults);
+        //Safe acctual searched word
+        std::string sSearchedWord = searchOpts->getSearchedWord();
+
+        //Change searched word to second word
+        searchOpts->setSearchedWord(searchOpts->getSecondWord()); 
+
+        //Get results for second word
+        std::map<std::string, CBook*>* results2 = search.search(m_mapWords, m_mapWordsTitle);
+
+        //remove all books, that don't contain both words
+        for(auto it=results1->begin(); it!=results1->end(); it++)
+        {
+            if(results2->count(it->first) == 0)
+                results1->erase(it);
+        }
+
+        //Reset searched word & delete additional search results
+        searchOpts->setSearchedWord(sSearchedWord);
+        delete results2;
     }
 
-    //Contains-Search 
-    else if (searchOpts->getFuzzyness() == 1)
-    {
-        //Search in ocr and/ or in title
-        if(searchOpts->getOnlyTitle() == false)
-            search.containsSearch(m_mapWords, mapSearchresults);
-        if(searchOpts->getOnlyOcr() == false)
-            search.containsSearch(m_mapWordsTitle, mapSearchresults);
-    }
-
-    //Fuzzy Search
-    else
-    {
-        //Search in ocr and/ or in title
-        if(searchOpts->getOnlyTitle() == false)
-            search.fuzzySearch(m_mapWords, mapSearchresults);
-        if(searchOpts->getOnlyOcr() == false)
-            search.fuzzySearch(m_mapWordsTitle, mapSearchresults);
-    }
-
-    //Check search-options and remove books from search results, that don't match
-    search.removeBooks(mapSearchresults);
-
-    return mapSearchresults;
+    //Return search results
+    return results1;
 }
 
 /**

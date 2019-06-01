@@ -7,6 +7,7 @@
 #include "func.hpp"
 #include "fuzzy.hpp"
 #include "CMetadata.hpp"
+#include "src/console/console.hpp"
 
 #pragma once 
 

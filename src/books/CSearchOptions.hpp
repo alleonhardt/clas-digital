@@ -9,7 +9,8 @@
 class CSearchOptions
 {
 private:
-    std::string  m_chSearchedWord;              //Searched word
+    std::string m_chSearchedWord;              //Searched word
+    std::string m_secondWord;
     int m_fuzzyness;                         //0-> no fuzzy search; 
     std::vector<std::string> m_sCollections;    //Vector with all selected pillas
     std::string m_slastName;                    //Search only books from one author
@@ -61,6 +62,11 @@ public:
     std::string getSearchedWord() const;
 
     /**
+    * @return second searched word
+    **/
+    std::string getSecondWord() const;
+
+    /**
     * @return selected fuzzyness
     **/
     int getFuzzyness() const;
@@ -94,6 +100,16 @@ public:
     * @return year to which books shall be searched
     **/
     int getTo() const;
+
+    /**
+    * @param[in] searchedWord new searched word
+    */
+    void setSearchedWord (std::string searchedWord);
+
+    /**
+    * @param[in] secondWord
+    */
+    void setSecondWord(std::string secondWord);
 };
 
     

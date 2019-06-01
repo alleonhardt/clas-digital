@@ -60,6 +60,10 @@ int main()
 
         
         CSearchOptions* searchOpts = new CSearchOptions(sInput, fuzzy, {}, false, true, "", 0 , 2019);
+        alx::cout.write("Second word: ");
+        std::string sSecondWord = alx::cout.getCommand();
+        if(sSecondWord.length() > 0)
+            searchOpts->setSecondWord(sSecondWord);
 
         alx::cout.write ("Searching for ", sInput, "... \n");
 
@@ -78,6 +82,17 @@ int main()
                     alx::cout.write ((*jt), ", ");
                 delete listPages;
                 alx::cout.write ("\n");
+
+                //If second word exists, print pages, where second word has been found
+                if(searchOpts->getSecondWord().length() > 0)
+                {
+                    alx::cout.write("-- Pages: ");
+                    std::list<int>* listPages = it->second->getPagesFull(searchOpts->getSecondWord());
+                    for(auto jt=listPages->begin(); jt!=listPages->end(); jt++)
+                        alx::cout.write ((*jt), ", ");
+                    delete listPages;
+                    alx::cout.write ("\n");
+                }
             }
 
             //Pages for contains search
@@ -93,6 +108,22 @@ int main()
                 }
                 delete mapPages;
                 alx::cout.write ("\n");
+
+                //If second word exists, print pages, where second word has been found
+                if(searchOpts->getSecondWord().length() > 0)
+                {
+
+                    std::map<int, std::vector<std::string>>* mapPages = it->second->getPagesContains(searchOpts->getSecondWord());
+                    for(auto jt=mapPages->begin(); jt!=mapPages->end(); jt++)
+                    {
+                        alx::cout.write (jt->first, " (");
+                        for(size_t i=0; i<jt->second.size(); i++)
+                            alx::cout.write (jt->second[i], ", ");
+                        alx::cout.write ("), ");
+                    }
+                    delete mapPages;
+                    alx::cout.write ("\n");
+                }
             }
 
             //Pages for fuzzy search
@@ -108,6 +139,22 @@ int main()
                 }
                 delete mapPages;
                 alx::cout.write ("\n");
+
+                //If second word exists, print pages, where second word has been found
+                if(searchOpts->getSecondWord().length() > 0)
+                {
+                    alx::cout.write("-- Pages: ");
+                    std::map<int, std::vector<std::string>>* mapPages = it->second->getPagesFuzzy(searchOpts->getSecondWord());
+                    for(auto jt=mapPages->begin(); jt!=mapPages->end(); jt++)
+                    {
+                        alx::cout.write (jt->first, " (");
+                        for(size_t i=0; i<jt->second.size(); i++)
+                            alx::cout.write (jt->second[i], ", ");
+                        alx::cout.write ("), ");
+                    }
+                    delete mapPages;
+                    alx::cout.write ("\n");
+                }
             }
             counter++;
         }

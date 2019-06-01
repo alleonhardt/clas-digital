@@ -6,6 +6,7 @@
 CSearchOptions::CSearchOptions()
 {
     m_chSearchedWord="";
+    m_secondWord = "";
     m_fuzzyness = 0;
     m_onlyTitle = false;
     m_From = 0;
@@ -29,6 +30,7 @@ CSearchOptions::CSearchOptions(std::string chSearchedWord, int fuzzyness, std::v
 {
     func::convertToLower(chSearchedWord);
     m_chSearchedWord.assign(chSearchedWord);
+    m_secondWord = "";
     m_fuzzyness = fuzzyness;
     m_sCollections = sCollections;
     m_onlyTitle = onlyTitle;
@@ -75,6 +77,12 @@ std::string CSearchOptions::getSearchedWord() const {
 }
 
 /**
+* @return second searched word
+**/
+std::string CSearchOptions::getSecondWord() const {
+    return m_secondWord;
+}
+/**
 * @return selected fuzzyness
 **/
 int CSearchOptions::getFuzzyness() const {
@@ -120,4 +128,18 @@ int CSearchOptions::getFrom() const {
 **/
 int CSearchOptions::getTo() const {
     return m_To;
+}
+
+/**
+* @param[in] searchedWord new searched word 
+*/
+void CSearchOptions::setSearchedWord(std::string searchedWord) {
+    m_chSearchedWord = searchedWord;
+}
+
+/**
+* @param[in] secondWord
+*/
+void CSearchOptions::setSecondWord(std::string secondWord) {
+    m_secondWord = secondWord;
 }

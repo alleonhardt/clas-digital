@@ -48,9 +48,7 @@ bool CBook::getOcr() {
     return m_bOcr;
 }
 
-/**
-* @return map of all words in book 
-*/
+/** * @return map of all words in book */
 const std::map<std::string, int>& CBook::getMapWords() {
     return m_Words;
 }
@@ -121,7 +119,7 @@ void CBook::createMapWords()
     std::ifstream readWords(m_sPath + "/words.txt");
     if(!readWords || readWords.peek() == std::ifstream::traits_type::eof() )
     {
-        std::cout << "Creating map of words... \n";
+        alx::cout.write(alx::console::yellow_black, "Creating map of words... \n");
         func::extractWords(getOcrPath(), m_Words);
         safeMapOfWords();
     }
@@ -275,6 +273,7 @@ std::map<int, std::vector<std::string>>* CBook::getPagesContains(std::string sWo
 */
 std::map<int, std::vector<std::string>>* CBook::getPagesFuzzy(std::string sWord)
 {
+    auto start = std::chrono::system_clock::now(); 
     //Create empty map
     std::map<int, std::vector<std::string>>* mapPages = new std::map<int, std::vector<std::string>>;
 
@@ -305,6 +304,7 @@ std::map<int, std::vector<std::string>>* CBook::getPagesFuzzy(std::string sWord)
             {
                 if(fuzzy::fuzzy_cmp(cur, sWord) == true)
                 {
+                    func::transform(cur);
                     if(mapPages->count(pageNum) > 0)
                         mapPages->at(pageNum).push_back(cur);
                     else
@@ -316,23 +316,11 @@ std::map<int, std::vector<std::string>>* CBook::getPagesFuzzy(std::string sWord)
             else
                 cur += sBuffer[i];
         }
-
-        /*
-        std::map<std::string, int> mapWords;
-        func::extractWordsFromString(sBuffer, mapWords);
-
-        for(auto it=mapWords.begin(); it!=mapWords.end(); it++)
-        {
-            if(fuzzy::fuzzy_cmp(it->first, sWord) == true)
-            {
-                if(mapPages->count(pageNum) > 0)
-                    mapPages->at(pageNum).push_back(it->first);
-                else
-                    mapPages->insert(std::pair<int, std::vector<std::string>> (pageNum, {it->first}));
-            }
-        }
-        */
     }
+
+    auto end = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_seconds = end-start;
+    alx::cout.write(alx::console::yellow_black, "getPagesFuzzy took ", elapsed_seconds.count(), "s\n");
 
     return mapPages;
 }
