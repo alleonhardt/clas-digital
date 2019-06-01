@@ -10,7 +10,6 @@ CBook::CBook () {}
 CBook::CBook(nlohmann::json jMetadata) : m_Metadata(jMetadata)
 {
     m_sKey = jMetadata["key"];
-    m_sKey = "";
     m_bOcr = false;
 }
 

@@ -1,4 +1,5 @@
 <!doctype html>
+<!---Some comment!-->
 <html lang="en">
   <head>
     <meta charset="utf-8">
@@ -22,6 +23,14 @@
 	background-color: yellow;
 }
 
+.ocrpage {
+	margin-top: 0.5rem;
+	margin-left: 0.5rem;
+	margin-right: 0.5rem;
+	padding: 2rem;
+	background-color: white;
+}
+
 .activeFile {
 	background-color: red !important;
 	font: large !important;
@@ -31,15 +40,28 @@
 .nextTo {
 	display: none;
 	width: 100%;
+	background-color: grey;
 	grid-column: 2 / span 1;
 	overflow-wrap: anywhere;
-	overflow: scroll;
-	height: 100%;
+	overflow: auto;
+	height: 100vh;
+	margin-bottom: 0;
 }
 
 .fitIt {
 	background: grey;
-	padding: 3rem;
+	height: 100vh;
+	margin: 0;
+}
+
+.fititImg {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 0.5rem;
+	margin-top: 0.5rem;
+	max-height: calc(100% - 1rem);
+	max-width: 100%;
 }
 </style>
 
@@ -222,7 +244,7 @@ function ShowPage(whichPage)
 		{
 				let x = "<li onclick='slideOut(";
 				x+=pages[whichPage][i];
-				x+=");'>";
+				x+=",this);'>";
 				console.log(allBooksJS[pages[whichPage][i]].bib);
 				if(document.getElementById("fuzzysearchlist").value=="")
 				{
@@ -248,6 +270,17 @@ function ShowCurrentPage(new_page)
 	
 	x[new_page].style.display = "block";
 	PAGEShow = new_page;
+	 if(PAGEShow===0)
+	 {
+		 let bookList = document.getElementById("BookFiles");
+		 bookList.scrollTop = 0;
+		let lst = document.getElementsByClassName("activeFile");
+		for(var i = 0; i < lst.length; i++)
+		{
+			lst[i].classList.remove("activeFile");
+		}	
+	 	document.getElementById("HoldAll").style["grid-template-columns"] = "100% 0%";
+	 }
 	return;
 }
 
@@ -264,38 +297,61 @@ function ShowFile(x)
 	if(x.innerHTML.search(".jpg") === -1)
 	{
 	let xhr = new XMLHttpRequest();
-	xhr.open("GET","/books/"+x.dataset.key+"/"+x.innerHTML,true);
+	xhr.open("GET","/getBookRessources?book="+x.dataset.key+"&ressource="+x.innerHTML,true);
 	xhr.onload = function() {
 		if(xhr.status!=200)
 			return;
-		document.getElementById("frameNextTo").innerHTML=xhr.responseText;
+	 	if(x.innerHTML==="ocr.txt")
+	 	{
+		  let RegSrch = /\n-----\s(\d+)\s/g;
+			let xy = xhr.responseText;
+	 		xy = '<p data-page="1" class="ocrpage">' + xy;
+			xy = xy.replace(RegSrch,'</p><p data-page="$1" class="ocrpage">\n----- $1 ');
+  			xy+="</p>";
+			document.getElementById("frameNextTo").innerHTML = xy;
+			document.getElementById("frameNextTo").style["background-color"] = "grey";
+	 	}
+		else
+		{
+			document.getElementById("frameNextTo").innerHTML=xhr.responseText;
+			document.getElementById("frameNextTo").style["background-color"] = "white";
+		}
 	}
 	xhr.send(null);
 	}
 	else
 	{
-		document.getElementById("frameNextTo").innerHTML = "<div class='fitIt'><img src='/books/"+x.dataset.key+"/"+x.innerHTML+"' alt='description' style='width: 100%;height: 800px;'></img></div>";
+	 document.getElementById("frameNextTo").innerHTML = "<div class='fitIt'><img src='/getBookRessources?book="+x.dataset.key+"&ressource="+x.innerHTML+"' alt='description' class='fititImg'></img></div>";
 	}
 	document.getElementById("frameNextTo").style.display = "inline-grid";
 }
 
-function slideOut(i)
+function slideOut(i,lstEnt)
 {
-	ShowCurrentPage(1);
 	let xhr = new XMLHttpRequest();
 	console.log(i);
 	console.log(allBooksJS[i]);
-	xhr.open("GET","/getBookDirLayout?scanId="+allBooksJS[i].key,true);
+	xhr.open("GET","/getBookRessources?book="+allBooksJS[i].key,true);
 	xhr.onload = function() {
 		if(xhr.status!=200)
+	 	{
+	 		let kColor = lstEnt.style["background-color"];
+	 		lstEnt.style["background-color"] = "#FF0000";
+	 		let kCont = lstEnt.innerHTML;
+	 		lstEnt.innerHTML = "<strong>No files from this book are on the server</strong>";
+	 		window.setTimeout(function(){ 
+	 			lstEnt.style["background-color"] = kColor;
+	 			lstEnt.innerHTML = kCont;
+	 		},2000);
 			return;
+		}
 		let xs = JSON.parse(xhr.responseText);
 		let bkList = document.getElementById("BookFiles");
 		bkList.innerHTML="";
 		let newArr = [];
-		for(var x = 0; x < xs.files.length; x++)
+		for(var x = 0; x < xs.length; x++)
 	 	{
-	 		newArr.push(xs.files[x].name);
+	 		newArr.push(xs[x].name);
 	 	}
 	 	newArr.sort();
 
@@ -306,6 +362,7 @@ function slideOut(i)
 			f+="</li>";
 			bkList.innerHTML+=f;
 		}
+		ShowCurrentPage(1);
 	}
 	xhr.send(null);
 	return true;
@@ -372,7 +429,7 @@ class User {
 			{
 			let x = "<li onclick='slideOut(";
 			x+=i;
-			x+=");'>";
+			x+=",this);'>";
 			x+=allBooksJS[i].bib;
 			x+="</li>";
 			xl+=x;
@@ -484,12 +541,12 @@ window.addEventListener("load",User.initialise,false);
 }
 
 .GeneralPageLayout {
-	padding: 3rem;
+	padding: 1.5rem;
 	position: absolute;
 	background-color: white;
 	width: 100%;
 	height: calc(100% - 3.5rem);
-	overflow: auto;
+	overflow: hidden;
 }
 
 .fade-out {
@@ -500,6 +557,7 @@ window.addEventListener("load",User.initialise,false);
 	background-color: #ddd;
 	margin-top: 1rem;
 	padding: 1rem;
+	height: 10vh;
 }
 
 .bklst li:hover{
@@ -514,8 +572,9 @@ window.addEventListener("load",User.initialise,false);
 	width: 90%;
 	margin-left: 5%;
 	margin-bottom: 3rem;
-	height: 90%;
-	overflow: scroll;
+	height: 100%;
+	overflow-y: scroll;
+	overflow-x: hidden;
 }
 .filelst li{
 	background-color: #ddd;
@@ -531,11 +590,15 @@ window.addEventListener("load",User.initialise,false);
 }
 
 .grid-container {
+	position: fixed;
+	top: 0;
+	left: 0;
+	background-color: white;
 	width: 100%;
-	height: calc(100% - 4.5rem);
-	margin-top: 1rem;
+	height: 100%;
 	display: grid;
 	grid-template-columns: 100%;
+	overflow: hidden;
 }
 
 .makesmall {
@@ -611,7 +674,6 @@ h1 {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg);}
 }
-
 </style>
   </head>
 <body>
@@ -642,8 +704,7 @@ h1 {
 
 
 <div id="ShowBookInfo" class="GeneralPageLayout fade-out">
-	<h1><a class='citationButton' onclick='SlideBack();return true;'>&lt&lt</a>Book Info</h1>
-<div style="width: 100%;height: 0.2rem;background-color: black;"></div>
+<a class='citationButton' onclick='SlideBack();return true;'>&lt&lt</a>
 <div id="HoldAll" class="grid-container">
 <ol id="BookFiles" class="filelst">
 <div class='loadingSpinner'></div>

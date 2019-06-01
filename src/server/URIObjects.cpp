@@ -144,7 +144,8 @@ void GetBookRessource::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 			{
 				nlohmann::json x;
 				x["bib"] = it.second.getMetadata().getMetadata()["bib"];
-				ret.push_back(x);
+				x["key"] = it.second.getKey();
+				ret.push_back(std::move(x));
 			}
 			//Return a list of all books with bibliography and ocr yes false
 			return ResponseBuilder(downstream_)

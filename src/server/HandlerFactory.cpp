@@ -33,6 +33,11 @@ void HandlerFactory::parseCommands(std::string cmd)
 			alx::cout.write(alx::console::blue_black,"User: ",username,", access: ",ptr->GetAccessRights(),", sessid: ",ptr->GetSessid(),"\n");
 		}
 	}
+	else if(cmd=="reload files")
+	{
+		ReloadAllFiles();
+		alx::cout.writeln(alx::console::blue_black,"Reloaded all cached files from the GetHandler!");
+	}
 	else
 	{
 		alx::cout.write(alx::console::blue_black,std::string("Unknown command(show list of commands with '?'): "),cmd,std::string("\n"));
