@@ -1,5 +1,5 @@
 /**
- * @file src/server/GetHandler.hpp
+ * @file src/server/BasicHandlers.hpp
  *
  * Defines the interface to the Basic Get Handler which does a lot of the servers disk IO
  *
@@ -42,8 +42,8 @@ class EmptyHandler : public proxygen::RequestHandler {
 		 * @brief Dummy function for the proxygen virtual function onRequest
 		 * @param headers The HTTP Message provided by proxygen
 		 */
-		virtual void onRequest(std::unique_ptr<proxygen::HTTPMessage>)
-			noexcept override{}
+		virtual void onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
+			noexcept override{(void)headers;}
 
 		/**
 		 * @brief Dummy empty handler for the on body proxygen virtual function
@@ -52,7 +52,7 @@ class EmptyHandler : public proxygen::RequestHandler {
 		 * is a lot of data
 		 *
 		 */
-		virtual void onBody(std::unique_ptr<folly::IOBuf>) noexcept override{}
+		virtual void onBody(std::unique_ptr<folly::IOBuf> body) noexcept override{(void)body;}
 
 
 		/**
@@ -61,7 +61,7 @@ class EmptyHandler : public proxygen::RequestHandler {
 		 * @param proto The new protocol to follow from there on
 		 *
 		 */
-		virtual void onUpgrade(proxygen::UpgradeProtocol) noexcept override{}
+		virtual void onUpgrade(proxygen::UpgradeProtocol proto) noexcept override{(void)proto;}
 
 		/**
 		 * @brief The empty handler for the proxygen function requestComplete
@@ -73,7 +73,7 @@ class EmptyHandler : public proxygen::RequestHandler {
 		 *
 		 * @param err The error that occured
 		 */
-		virtual void onError(proxygen::ProxygenError) noexcept override{}
+		virtual void onError(proxygen::ProxygenError err) noexcept override{(void)err;}
 
 		/**
 		 * @brief The dummy function for the proxygen function inEgressPaused
