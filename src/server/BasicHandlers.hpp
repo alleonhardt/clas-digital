@@ -246,3 +246,9 @@ class PostHandler : public EmptyHandler {
 		void onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 			noexcept override;
 };
+
+
+/**
+ * @brief Reloads all cached files in the gethandler do not use this on active server!
+ */
+void ReloadAllFiles();

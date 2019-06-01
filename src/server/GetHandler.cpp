@@ -116,6 +116,13 @@ std::unordered_map<std::string,URIFile> fileAccess {
 	{"/volltext.png",URIFile("web/volltext.png",1)}
 }; ///< The map which caches all file the get handler will return and also saves the access rights to acces these files
 
+void ReloadAllFiles()
+{
+	for(auto &it : fileAccess)
+	{
+		std::unique_ptr<folly::IOBuf> ptr(std::move(it.second.getBufferReference()));
+	}
+}
 
 
 void SendErrorNotFound(proxygen::ResponseHandler *rsp, std::string message)
