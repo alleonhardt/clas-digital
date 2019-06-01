@@ -30,14 +30,14 @@ bool CBookManager::initialize()
         if(m_mapBooks.count(e_allItems->d_name) > 0)
             addBook(e_allItems->d_name);
         else
-            std::cout << e_allItems->d_name << " found which isn't in map!\n";
+            alx::cout.write((const char*)e_allItems->d_name, " found which isn't in map!\n");
     }
 
     //Create map of all words + and of all words in all titles
     createMapWords();
-    std::cout << "Map Words: " << m_mapWords.size() << "\n";
+    alx::cout.write("Map Words: ", (int)m_mapWords.size(), "\n");
     createMapWordsTitle();
-    std::cout << "Map Titles: " << m_mapWordsTitle.size() << "\n";
+    alx::cout.write("Map Titles: ", (int)m_mapWordsTitle.size(), "\n");
 
     return true;
 }
