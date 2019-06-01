@@ -12,7 +12,7 @@
 #include <folly/io/async/EventBaseManager.h>
 #include <folly/portability/GFlags.h>
 #include <folly/portability/Unistd.h>
-#include <proxygen/httpserver/HTTPServer.h>
+//#include <proxygen/httpserver/HTTPServer.h>
 #include <proxygen/httpserver/RequestHandlerFactory.h>
 #include <list>
 #include <string>
@@ -27,6 +27,9 @@ using folly::EventBaseManager;
 using folly::SocketAddress;
 
 
+/**
+ * @brief Defines a template function which creates a new instance of the given type is used to easily create multiple functions which create the new Request handlers
+ */
 template<typename T>
 EmptyHandler *CreateHandler()
 {
@@ -112,6 +115,10 @@ class HandlerFactory : public RequestHandlerFactory {
 			return ret;
 		}
 
+		/**
+		 * @brief Used to parse and execute commands from the user
+		 * @param command The command to execute
+		 */
 		static void parseCommands(std::string command);
 };
 

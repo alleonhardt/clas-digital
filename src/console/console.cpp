@@ -8,6 +8,7 @@ namespace alx
 	console::color console::green_black;
 	console::color console::yellow_black;
 	console::color console::blue_black;
+	console::color console::black_red;
 
 
 	console::console()
@@ -22,12 +23,14 @@ namespace alx
 		init_pair(3,COLOR_RED,COLOR_BLACK);
 		init_pair(4,COLOR_GREEN,COLOR_BLACK);
 		init_pair(5,COLOR_BLUE,COLOR_BLACK);
+		init_pair(6,COLOR_BLACK,COLOR_RED);
 
 		console::red_black.x = COLOR_PAIR(3)|A_BOLD;
 		console::green_black.x = COLOR_PAIR(4)|A_BOLD;
 		console::yellow_black.x = COLOR_PAIR(1)|A_BOLD;
 		console::white_black.x = COLOR_PAIR(2)|A_BOLD;
 		console::blue_black.x = COLOR_PAIR(5)|A_BOLD;
+		console::black_red.x = COLOR_PAIR(6);
 
 		int x, y;
 		getmaxyx(stdscr,y,x);

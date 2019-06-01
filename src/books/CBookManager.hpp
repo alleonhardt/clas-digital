@@ -8,6 +8,7 @@
 #include "CSearch.hpp"
 #include "CSearchOptions.hpp"
 #include "func.hpp"
+#include "src/console/console.hpp"
 
 #pragma once 
 

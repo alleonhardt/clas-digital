@@ -8,6 +8,7 @@ namespace alx
 	console::color console::green_black;
 	console::color console::yellow_black;
 	console::color console::blue_black;
+	console::color console::black_red;
 
 	console::console()
 	{

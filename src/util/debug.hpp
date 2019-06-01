@@ -4,6 +4,7 @@
 #define DBG_INF_MSG(x) std::cerr<<x<<std::endl;std::cerr<<"Error in FILE: "<<__FILE__<<"\nIn Line: "<<__LINE__<<"\nIn Function: "<<__PRETTY_FUNCTION__<<std::endl;
 #define DBG_INF() std::cerr<<"Error in FILE: "<<__FILE__<<"\nIn Line: "<<__LINE__<<"\nIn Function: "<<__PRETTY_FUNCTION__<<std::endl;
 #include "src/console/console.hpp"
+#define DBG_HEADER alx::console::red_black,"Error in file: ",__FILE__,",\nin Line: ",__LINE__,",\nin Function: ",__PRETTY_FUNCTION__,",\nError string: ",alx::console::black_red
 
 namespace debug
 {
@@ -21,19 +22,7 @@ namespace debug
 		 */
 		template<typename ...Args,typename T>print(T t1, Args... args)
 		{
-			alx::cout<<t1;
-			//Recoursivly call the other constructors
-			print(args...);
-		}
-
-		/**
-		 * @brief Prints the last argument of the constructor together with a newline
-		 *
-		 * @param t1 The last parameter to print
-		 */
-		template<typename T>print(T t1)
-		{
-			alx::cout<<t1<<alx::endl;
+			alx::cout.writeln(t1,args...);
 		}
 	};
 

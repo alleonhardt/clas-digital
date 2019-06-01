@@ -1,6 +1,6 @@
 /**
  * @file src/zotero/zotero.hpp
- * Contains the zotero interface, with which the server communicates with the zotero server
+ * @brief Contains the zotero interface, with which the server communicates with the zotero server
  *
  */
 #pragma once
@@ -10,8 +10,8 @@
 #include "src/util/debug.hpp"
 #include "src/books/json.hpp"
 
-#define ZOTERO_API_ADDR "https://api.zotero.org"
-constexpr const char ZOTERO_API_KEY_FILE_PATH[] = "bin/zoteroKey.json";
+constexpr const char ZOTERO_API_ADDR[] = "https://api.zotero.org"; ///<The zotero api server address where to send all requests to
+constexpr const char ZOTERO_API_KEY_FILE_PATH[] = "bin/zoteroKey.json";	///<The file path at which the access key and the group number can be found
 
 /**
  * @brief The zotero class connects the server to the zotero api and requests metadata from the server to keep the metadata up to date
@@ -41,15 +41,29 @@ class Zotero
 		 */
 		void SetNextLink(std::string str);
 
+		/**
+		 * Creates a new ssl connection to the zotero server
+		 */
+		Zotero();
+
+		/**
+		 * Receives the json for a specific request.
+		 * Example: _sendRequest("/collections/top?format=json") returns all the
+		 * top level collection form zotero in the json format in a string
+		 * @param requestURI Returns the zotero json for the specific request URI.
+		 * @return Returns the json for the request, returns an empty string for an
+		 * invalid request.
+		 *
+		 */
+		std::string _sendRequest(std::string requestURI);
+	
 	public:
 		/**
 		 * @brief Defines the most Basic requests to the zotero API
 		 * @code
-		 * Zotero zot;
-		 * zot.SendRequest(Zotero::Request::GetAllItems);
+		 * Zotero::SendRequest(Zotero::Request::GetAllItems);
 		 * //Or this
-		 * Zotero zot;
-		 * zot.SendRequest(Zotero::Request::GetSpecificItem("X2DEFG"));
+		 * Zotero::SendRequest(Zotero::Request::GetSpecificItem("X2DEFG"));
 		 * @endcode
 		 */
 		struct Request
@@ -59,22 +73,13 @@ class Zotero
 			static std::string GetSpecificItem(std::string key); ///< The zotero request to get a specific item from the zotero api
 			static std::string GetItemsInSpecificPillar(std::string key); ///< The zotero request to get all items from a specific collection out of zotero
 		};
-		/**
-		 * Creates a new ssl connection to the zotero server
-		 */
-		Zotero();
-
 
 		/**
-		 * Receives the json for a specific request.
-		 * Example: SendRequest("/collections/top?format=json") returns all the
-		 * top level collection form zotero in the json format in a string
-		 * @param requestURI Returns the zotero json for the specific request URI.
-		 * @return Returns the json for the request, returns an empty string for an
-		 * invalid request.
-		 *
+		 * @brief This is just a wrapper for the _sendRequest function 
+		 * @param requestURI The zotero items uri which is about to be received
+		 * @return The json for the request or an empty string on error
 		 */
-		std::string SendRequest(std::string requestURI);
+		static std::string SendRequest(std::string requestURI);
 
 		/**
 		 * Closes all open connection and cleans everything up

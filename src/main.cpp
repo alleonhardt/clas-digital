@@ -35,6 +35,8 @@ DEFINE_int32(threads, 0, "Number of threads to listen on. Numbers <= 0 "
 int main(int argc, char* argv[]) {
 
 	alx::cout<<"Starting server..."<<alx::endl;
+	
+	auto start = std::chrono::system_clock::now();
 	folly::init(&argc, &argv, true);
 
 
@@ -49,12 +51,14 @@ int main(int argc, char* argv[]) {
 	IPs[1].sslConfigs = std::vector<wangle::SSLContextConfig>{cfg};
 	IPs[2].sslConfigs = std::vector<wangle::SSLContextConfig>{cfg};
 
-	alx::cout.write("Loading ssl context... ",alx::console::green_black,"done.\n");
+	alx::cout.write("Loading ssl context... ",alx::console::green_black,"done.");
 
 
 	if (FLAGS_threads <= 0) {
 		FLAGS_threads = sysconf(_SC_NPROCESSORS_ONLN);
 		CHECK_GT(FLAGS_threads, 0);
+		alx::cout.write("\nDetecting processor cores... ", alx::console::green_black,"done.");
+		alx::cout.write("\nDetected ",alx::console::yellow_black,(int)FLAGS_threads,alx::console::white_black," processor cores!\n");
 	}
 	HTTPServerOptions options;
 	options.threads = static_cast<size_t>(FLAGS_threads);
@@ -105,9 +109,8 @@ int main(int argc, char* argv[]) {
 				catch(...)
 				{
 					alx::cout.write("Fetching zotero metadata from the server...\n");
-					Zotero zot;
 					std::ofstream wr("bin/zotero.json",std::ios::out);
-					std::string jstr = std::move(zot.SendRequest(Zotero::Request::GetAllItems));
+					std::string jstr = std::move(Zotero::SendRequest(Zotero::Request::GetAllItems));
 					wr<<jstr;
 					wr.close();
 					js = std::move(nlohmann::json::parse(jstr));
@@ -120,6 +123,7 @@ int main(int argc, char* argv[]) {
 				catch(...)
 				{
 					alx::cout.write(alx::console::red_black,"failed.\n");
+					alx::cout.writeln(DBG_HEADER,"[Could not initialise book manager!]");
 					sleep(3);
 					return;
 				}
@@ -129,6 +133,11 @@ int main(int argc, char* argv[]) {
 				alx::cout.write("CBookManager initialisation: ",alx::console::green_black,"SUCCESS\n");
 			else
 				alx::cout.write("CBookManager initialisation: ",alx::console::red_black,"FAILURE\n");
+
+			auto end = std::chrono::system_clock::now();
+			std::chrono::duration<double> elapsed_seconds = end-start;
+			alx::cout.writeln(DBG_HEADER,"[Minor error please ignore!]");
+			alx::cout.write(alx::console::yellow_black,"Server startup took ",elapsed_seconds.count(),"s\n");
 			server.start();
 	});
 

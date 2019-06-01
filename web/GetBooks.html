@@ -446,17 +446,28 @@ function GetOCRTxt() {
 							});
 }
 
-function updateAfterScrollOCR() {
-	let visibleText = getVisiblePagesOCR();
-    let visibleTextRest = document.getElementsByClassName("ocrpage");
 
-	console.log("Update after scroll");
-	for(let i = 0; i < visibleText.length; i++)
+let pageVal = [];
+
+async function loadExcept(x)
+{
+	let lst = document.getElementsByClassName("ocrpage");
+	for(var i = 0; i < lst.length; i++)
 	{
-		visibleText[i].display = "block";
+		if(i!=x)
+		{
+			lst[i].innerHTML = pageVal[i];
+		}
 	}
-	for(let i = 0; i < visibleTextRest.length; i++)
-		visibleTextRest[i].display = "block";
+}
+
+async function deleteAll()
+{
+let lst = document.getElementsByClassName("ocrpage");
+	for(var i = 0; i < lst.length; i++)
+	{
+			lst[i].innerHTML = "";
+	}
 }
 
 function UpdateOCRTxt(x)
@@ -474,9 +485,9 @@ function UpdateOCRTxt(x)
 	let lst = document.getElementsByClassName("ocrpage");
 	for(var i = 0; i < lst.length; i++)
 	{
-		lst[i].style.display = "none";
+		pageVal[i] = lst[i].innerHTML;
+		lst[i].innerHTML = "";
 	}
-	document.getElementById("olol").addEventListener("scroll", updateAfterScrollOCR, false);
 }
 
 function SwitchToPage(x)
@@ -488,6 +499,7 @@ let onChangeFunc = function() {};
 
 function ShowInfoText()
 {
+	deleteAll();
   	document.getElementsByClassName("pageContainer")[0].style["grid-template-columns"] = "60% 40% 0%";
 	document.getElementById("InfoScreen").style.display = "inline-grid";
 	HighlightButton(document.getElementById("ShowInfoButton"));
@@ -518,7 +530,8 @@ function ShowOCR(a) {
 	{
 	document.getElementById("olol").scrollTop += document.getElementsByClassName("ocrpage")[parseInt(a.innerHTML)-2].getBoundingClientRect().bottom-16;
 	}
-	updateAfterScrollOCR();
+	document.getElementsByClassName("ocrpage")[parseInt(a.innerHTML)-1].innerHTML = pageVal[parseInt(a.innerHTML)-1];
+	loadExcept(parseInt(a.innerHTML)-1);
 }
 
 let metadata = {};
@@ -589,7 +602,7 @@ function init() {
 
 	parsedUrlParams["query"] = decodeURIComponent(parsedUrlParams["query"]);
 		
-	Server.Get("/searchInBook?scanId=" + scanId + "&query=" + encodeURIComponent(parsedUrlParams["query"]), function(content) {
+	Server.Get("/searchInBook?scanId=" + scanId + "&query=" + encodeURIComponent(parsedUrlParams["query"])+"&fuzzyness="+encodeURIComponent(parsedUrlParams["fuzzyness"]), function(content) {
 		let searchResults = JSON.parse(content);
 		// temporary needed
 		searchResults.pages = searchResults.books;

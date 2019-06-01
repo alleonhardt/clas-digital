@@ -75,7 +75,7 @@ Zotero::Zotero()
 	nlohmann::json zotAccess;
 	if(!ifs.is_open())
 	{
-		debug::print("Could not open: ",ZOTERO_API_KEY_FILE_PATH," for reading API Keys for zotero");
+		alx::cout.writeln(DBG_HEADER,"[Could not open: ",ZOTERO_API_KEY_FILE_PATH," for reading the zotero apikey]");
 		throw 0;
 	}
 
@@ -87,7 +87,7 @@ Zotero::Zotero()
 	}
 	catch(...)
 	{
-		debug::print("Faulty json read as Zotero API Key from: ",ZOTERO_API_KEY_FILE_PATH);
+		alx::cout.writeln(DBG_HEADER,"[Faulty json read as Zotero API Key from: ",ZOTERO_API_KEY_FILE_PATH,"]");
 		throw 0;
 	}
 	ifs.close();
@@ -124,7 +124,20 @@ Zotero::Zotero()
 }
 
 
+
 std::string Zotero::SendRequest(std::string requestURI)
+{
+	try
+	{
+		Zotero zot;
+		return std::move(zot._sendRequest(std::move(requestURI)));
+	}
+	catch(...)
+	{
+		return "";
+	}
+}
+std::string Zotero::_sendRequest(std::string requestURI)
 {
 	//Try to build the request to zotero
 	//_baseRequest = https://api.zotero.org/groups/$(our_group_number)
@@ -137,7 +150,7 @@ std::string Zotero::SendRequest(std::string requestURI)
 	{
 		if(debug::gGlobalShutdown)
 		{
-			alx::cout<<"Zotero SendRequest() read global shutdown flag, shuttding down..."<<alx::endl;
+			alx::cout<<"Zotero _sendRequest() read global shutdown flag, shuttding down..."<<alx::endl;
 			return "{}";
 		}
 		debug::print("Zotero send request to url: ",st.c_str());	
@@ -152,7 +165,7 @@ std::string Zotero::SendRequest(std::string requestURI)
 		//If there is a fault show it in the standard error output and return an empty string
 		if(result != CURLE_OK)
 		{
-			DBG_INF_MSG("Could not perform request to zotero api");
+			alx::cout.writeln(DBG_HEADER,"[Could not perform request to zotero api!]");
 			_requestJSON = "";
 			return std::move(_requestJSON);
 		}
@@ -177,7 +190,6 @@ std::string Zotero::SendRequest(std::string requestURI)
 		catch(...)
 		{
 
-			std::cout<<"REQUEST JSON: "<<_requestJSON<<std::endl;
 			if(_requestJSON.find("An error occurred")!=std::string::npos)
 			{
 				_requestJSON="";
@@ -185,7 +197,7 @@ std::string Zotero::SendRequest(std::string requestURI)
 			}
 			//TODO: Some error handling at the moment the programm just exits with an
 			//error code
-			DBG_INF_MSG_EXIT("Received corrupted json file!",EXIT_FAILURE);
+			return "";
 		}
 
 		//If the custom header function set the link to the next chunk of the json

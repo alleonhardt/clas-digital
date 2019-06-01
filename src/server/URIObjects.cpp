@@ -1,6 +1,7 @@
 #include <proxygen/httpserver/RequestHandler.h>
 #include <proxygen/httpserver/ResponseBuilder.h>
 #include <experimental/filesystem>
+#include <chrono>
 #include "src/server/URIObjects.hpp"
 using namespace proxygen;
 namespace fs = std::experimental::filesystem;
@@ -233,8 +234,13 @@ void GetSearchHandler::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 			alx::cout<<it<<",";
 		}
 		alx::cout<<alx::endl;
+
+		auto start = std::chrono::system_clock::now();
 		std::unique_ptr<CSearchOptions> nso(new CSearchOptions(std::move(word),Fuzzyness,std::move(pillars),onlyTitle,ocrOnly,std::move(author),from,to));
 		auto results = GetBookManager().search(nso.get());
+		auto end = std::chrono::system_clock::now();
+		std::chrono::duration<double> elapsed_seconds = end-start;
+		alx::cout.write(alx::console::yellow_black,"Search all books time: ",elapsed_seconds.count(),"s \n");
 		nlohmann::json js;
 
 		for(auto &it : *results)
@@ -275,26 +281,63 @@ void GetSearchInBookHandler::onRequest(std::unique_ptr<proxygen::HTTPMessage> he
 
 		std::string searchFor = headers->getDecodedQueryParam("query");
 		std::string inBook = headers->getDecodedQueryParam("scanId");
+		int Fuzzyness = headers->getIntQueryParam("fuzzyness",0);
 		if(searchFor==""||inBook=="")
 			throw 0;
 		auto &mapofbooks = GetSearchHandler::GetBookManager().getMapOfBooks();
 		auto &book = mapofbooks.at(inBook);
-		alx::cout.write(alx::console::green_black,"Still alive got the book and the map of books!\n");
-	
-		std::unique_ptr<std::list<int>> listPtr(book.getPages(std::move(searchFor),0));
-		
-		if(listPtr)
-			alx::cout.write(alx::console::green_black,"Still alive and the list pointer is valid!\n");
-		else
-			alx::cout.write(alx::console::red_black,"Received invalid ptr from book.getPages()\n");
-		alx::cout.write(alx::console::yellow_black,"Received ",(int)listPtr->size()," search results!\n");
+		alx::cout.write(alx::console::green_black,"New search request! Searching for: ",searchFor,"\n");
+
+
 		nlohmann::json js;
+
+		auto start = std::chrono::system_clock::now();
+		if(Fuzzyness==0)
+		{
+			alx::cout.write(alx::console::yellow_black,"Using normal search!\n");
+			std::unique_ptr<std::list<int>> listPtr(book.getPagesFull(std::move(searchFor)));
+		
 		js["is_fuzzy"] = false;
 		for(auto it : *listPtr)
 		{
 			int k = it;
 			js["books"].push_back(k);
 		}
+		}
+		else
+		{
+			std::unique_ptr<std::map<int,std::vector<std::string>>> mapPtr;
+
+			if(Fuzzyness==1)
+			{
+
+				alx::cout.write(alx::console::yellow_black,"Using contains search!\n");
+				mapPtr = std::unique_ptr<std::map<int,std::vector<std::string>>>(book.getPagesContains(std::move(searchFor)));
+			}
+			else
+			{
+
+				alx::cout.write(alx::console::yellow_black,"Using fuzzy search!\n");
+				mapPtr = std::unique_ptr<std::map<int,std::vector<std::string>>>(book.getPagesFuzzy(std::move(searchFor)));
+			}
+
+			js["is_fuzzy"] = true;
+	  		auto glambda = [](std::string const &str, std::string const &from,std::string const &to) -> std::string {return std::regex_replace(str,std::regex(from),to);};
+			for(auto const &it : *mapPtr)
+			{
+				for(auto const &inner : it.second)
+				{
+					nlohmann::json entry;
+
+					entry["page"] = it.first;
+					entry["word"] = glambda(inner,"\"","\\\"");
+					js["books"].push_back(std::move(entry));
+				}
+			}
+		}
+		auto end=std::chrono::system_clock::now();
+		std::chrono::duration<double> elapsed_seconds = end-start;
+		alx::cout.write(alx::console::yellow_black,"Search in book time: ",elapsed_seconds.count(),"s \n");
 		return ResponseBuilder(downstream_)
 			.status(200,"Ok")
 			.header("Content-Type","application/json")
