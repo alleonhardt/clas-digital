@@ -282,7 +282,6 @@ std::map<int, std::vector<std::string>>* CBook::getPagesFuzzy(std::string sWord)
     if(!read)
         return mapPages;
 
-    func::convertToLower(sWord);
     unsigned int pageNum = 0;
     while(!read.eof())
     {
@@ -295,6 +294,29 @@ std::map<int, std::vector<std::string>>* CBook::getPagesFuzzy(std::string sWord)
             continue;
         }
 
+        std::string cur;
+        for(unsigned int i=0; i<sBuffer.length(); i++)
+        {
+            if(func::isLetter(sBuffer[i]) == false && cur.length() == 0)
+                continue;
+
+            if((sBuffer[i] == ' ' || sBuffer[i] == '.') && cur.length() > 0)
+            {
+                if(fuzzy::fuzzy_cmp(cur, sWord) == true)
+                {
+                    if(mapPages->count(pageNum) > 0)
+                        mapPages->at(pageNum).push_back(cur);
+                    else
+                        mapPages->insert(std::pair<int, std::vector<std::string>> (pageNum, {cur}));
+                }
+                cur = "";
+            }
+
+            else
+                cur += sBuffer[i];
+        }
+
+        /*
         std::map<std::string, int> mapWords;
         func::extractWordsFromString(sBuffer, mapWords);
 
@@ -308,6 +330,7 @@ std::map<int, std::vector<std::string>>* CBook::getPagesFuzzy(std::string sWord)
                     mapPages->insert(std::pair<int, std::vector<std::string>> (pageNum, {it->first}));
             }
         }
+        */
     }
 
     return mapPages;

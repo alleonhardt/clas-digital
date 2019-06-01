@@ -3,7 +3,7 @@
 #include "json.hpp"
 #include "CBookManager.hpp"
 #include "func.hpp"
-
+#include "src/console/console.hpp"
 
 int main()
 {
@@ -12,27 +12,24 @@ int main()
     std::string str1;
     std::string str2;
 
-    std::ifstream read("zotero.json");
+    std::ifstream read("bin/zotero.json");
     nlohmann::json jItems;
     read >> jItems;
     read.close();
-    std::cout << "updating zotero.\n";
+    alx::cout.write ("updating zotero.\n");
     manager.updateZotero(jItems);
     bool check = manager.initialize();
 
     if(check == false)
     {
-        std::cout << "Failed to initialize.\n";
+        alx::cout.write ("Failed to initialize.\n");
         return 0;
     }
 
     for(;;)
     {
-        std::string sInput;
-        std::string sFuzzy;
-
-        std::cout << "> ";
-        getline(std::cin, sInput);
+        alx::cout.write ("> ");
+        std::string sInput = alx::cout.getCommand();
         func::convertToLower(sInput);
 
         if(sInput == "q")
@@ -42,46 +39,45 @@ int main()
         {
             std::map<std::string, CBook> mapBooks = manager.getMapOfBooks();
             for(auto it=mapBooks.begin(); it!=mapBooks.end(); it++)
-                std::cout << it->first << ": " << it->second.getMetadata().getShow() << "\n";
-             std::cout << "\n";
+                alx::cout.write (it->first, ": ", it->second.getMetadata().getShow(), "\n");
+             alx::cout.write("\n");
              continue;
         }
 
         else if (sInput == "get")
         {
-            std::string sKey;
-            std::cout << "> ";
-            getline(std::cin, sKey);
+            alx::cout.write ("> ");
+            std::string sKey = alx::cout.getCommand();
             std::ofstream write(sKey + ".json");
             write << manager.getMapOfBooks().at(sKey).getMetadata().getMetadata();
             write.close();
             continue;
         }
 
-        std::cout << "Fuzzyness: ";
-        getline(std::cin, sFuzzy);
+        alx::cout.write ("Fuzzyness: ");
+        std::string sFuzzy = alx::cout.getCommand();
         int fuzzy = std::stoi(sFuzzy);
 
         
         CSearchOptions* searchOpts = new CSearchOptions(sInput, fuzzy, {}, false, true, "", 0 , 2019);
 
-        std::cout << "Searching for " << sInput << "... \n";
+        alx::cout.write ("Searching for ", sInput, "... \n");
 
         std::map<std::string, CBook*>* searchResults = manager.search(searchOpts);
         unsigned int counter = 0;
         for(auto it=searchResults->begin(); it!=searchResults->end(); it++)
         {
-            std::cout << it->first << ": " << it->second->getMetadata().getShow() << "\n";
-            std::cout << "-- Pages: ";
+            alx::cout.write (it->first, ": ", it->second->getMetadata().getShow(), "\n");
+            alx::cout.write ("-- Pages: ");
 
             //Pages for full search
             if(fuzzy == 0)
             {
                 std::list<int>* listPages = it->second->getPagesFull(sInput);
                 for(auto jt=listPages->begin(); jt!=listPages->end(); jt++)
-                    std::cout << (*jt) << ", ";
+                    alx::cout.write ((*jt), ", ");
                 delete listPages;
-                std::cout << "\n";
+                alx::cout.write ("\n");
             }
 
             //Pages for contains search
@@ -90,13 +86,13 @@ int main()
                 std::map<int, std::vector<std::string>>* mapPages = it->second->getPagesContains(sInput);
                 for(auto jt=mapPages->begin(); jt!=mapPages->end(); jt++)
                 {
-                    std::cout << jt->first << " (";
+                    alx::cout.write (jt->first, " (");
                     for(size_t i=0; i<jt->second.size(); i++)
-                        std::cout << jt->second[i] << ", ";
-                    std::cout << "), ";
+                        alx::cout.write (jt->second[i], ", ");
+                    alx::cout.write ("), ");
                 }
                 delete mapPages;
-                std::cout << std::endl;
+                alx::cout.write ("\n");
             }
 
             //Pages for fuzzy search
@@ -105,17 +101,17 @@ int main()
                 std::map<int, std::vector<std::string>>* mapPages = it->second->getPagesFuzzy(sInput);
                 for(auto jt=mapPages->begin(); jt!=mapPages->end(); jt++)
                 {
-                    std::cout << jt->first << " (";
+                    alx::cout.write (jt->first, " (");
                     for(size_t i=0; i<jt->second.size(); i++)
-                        std::cout << jt->second[i] << ", ";
-                    std::cout << "), ";
+                        alx::cout.write (jt->second[i], ", ");
+                    alx::cout.write ("), ");
                 }
                 delete mapPages;
-                std::cout << std::endl;
+                alx::cout.write ("\n");
             }
             counter++;
         }
-        std::cout << "Results found: " << counter << "\n";
+        alx::cout.write("Results found: ", (int)counter, "\n");
 
    }
 }
