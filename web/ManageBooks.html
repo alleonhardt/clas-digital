@@ -44,13 +44,13 @@
 	grid-column: 2 / span 1;
 	overflow-wrap: anywhere;
 	overflow: auto;
-	height: 100vh;
+	height: 95vh;
 	margin-bottom: 0;
 }
 
 .fitIt {
 	background: grey;
-	height: 100vh;
+	height: 95vh;
 	margin: 0;
 }
 
@@ -569,14 +569,14 @@ window.addEventListener("load",User.initialise,false);
 
 .filelst {
 	grid-column: 1 / span 1;
-	width: 90%;
+	width: 95%;
 	margin-left: 5%;
 	margin-bottom: 3rem;
 	height: 100%;
-	overflow-y: scroll;
-	overflow-x: hidden;
+	overflow: auto;
 }
 .filelst li{
+	width: 90%;
 	background-color: #ddd;
 	margin-top: 0.3rem;
 	padding: 0.2rem;
@@ -589,16 +589,42 @@ window.addEventListener("load",User.initialise,false);
 	cursor: pointer;
 }
 
-.grid-container {
+.abovegridcont {
 	position: fixed;
 	top: 0;
 	left: 0;
+	width: 100%;
+	height: 5vh;
+    background-color: #333;
+}
+
+.abovegridcont a {
+	display: inline-block;
+  	color: #f2f2f2;
+	background-color: orange;
+	cursor: pointer;
+	height: 100%;
+	padding: 0.5rem;
+}
+
+.abovegridcont a:hover {
+  transition: all 0.4s ease;
+  background-color: #ddd;
+  color: black;
+}
+
+
+
+.grid-container {
+	position: fixed;
+	top: 5vh;
+	left: 0;
 	background-color: white;
 	width: 100%;
-	height: 100%;
+	height: 95%;
 	display: grid;
 	grid-template-columns: 100%;
-	overflow: hidden;
+	overflow-x: hidden;
 }
 
 .makesmall {
@@ -705,6 +731,7 @@ h1 {
 
 <div id="ShowBookInfo" class="GeneralPageLayout fade-out">
 <a class='citationButton' onclick='SlideBack();return true;'>&lt&lt</a>
+<div id="gridder" class="abovegridcont"><a onclick="ShowCurrentPage(0)">Go back</a></div>
 <div id="HoldAll" class="grid-container">
 <ol id="BookFiles" class="filelst">
 <div class='loadingSpinner'></div>
