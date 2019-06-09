@@ -7,6 +7,7 @@
 #include "func.hpp"
 #include "fuzzy.hpp"
 #include "CMetadata.hpp"
+#include "src/console/console.hpp"
 
 #pragma once 
 
@@ -97,16 +98,14 @@ public:
     */
     void createMapWords();
 
-    /**
-    * @brief safe created word list to file
-    */
-    void safeMapOfWords();
+    void safePages();
+    void loadPages(std::map<std::string, std::vector<size_t>>& mapWordsPages);
 
     /*
     * @param[in] sWord searched word
     * @return list of pages on which searched word accures
     */
-    std::list<int>* getPagesFull(std::string sWord);
+    std::list<size_t>* getPagesFull(std::string sWord);
 
     /*
     * @param[in] sWord searched word
@@ -119,4 +118,5 @@ public:
     * @return map of pages with vector of words found on this page
     */
     std::map<int, std::vector<std::string>>* getPagesFuzzy(std::string sWord);
+
 };

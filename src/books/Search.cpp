@@ -8,6 +8,51 @@ CSearch::CSearch(CSearchOptions* searchOpts) {
 }
 
 
+std::map<std::string, CBook*>* CSearch::search(std::map<std::string, std::map<std::string, CBook*>>& mWs,
+                                        std::map<std::string, std::map<std::string, CBook*>>& mWsTitle)
+{
+    alx::cout.write("Searching for ", m_sOpts->getSearchedWord(), "\n");
+
+    //Create empty map of searchResults
+    std::map<std::string, CBook*>* mapSearchresults = new std::map<std::string, CBook*>;
+
+    //Normal search (full-match)
+    if (m_sOpts->getFuzzyness() == 0)
+    {
+        //Search in ocr and/ or in title
+        if(m_sOpts->getOnlyTitle() == false)
+            normalSearch(mWs, mapSearchresults);
+        if(m_sOpts->getOnlyOcr() == false)
+            normalSearch(mWsTitle, mapSearchresults);
+    }
+
+    //Contains-Search 
+    else if (m_sOpts->getFuzzyness() == 1)
+    {
+        //Search in ocr and/ or in title
+        if(m_sOpts->getOnlyTitle() == false)
+            containsSearch(mWs, mapSearchresults);
+        if(m_sOpts->getOnlyOcr() == false)
+            containsSearch(mWsTitle, mapSearchresults);
+    }
+
+    //Fuzzy Search
+    else
+    {
+        //Search in ocr and/ or in title
+        if(m_sOpts->getOnlyTitle() == false)
+            fuzzySearch(mWs, mapSearchresults);
+        if(m_sOpts->getOnlyOcr() == false)
+            fuzzySearch(mWsTitle, mapSearchresults);
+    }
+
+    //Check search-options and remove books from search results, that don't match
+    removeBooks(mapSearchresults);
+
+    return mapSearchresults;
+}
+
+
 /**
 * @brief search full-match
 * @param[in] mapWords map of all words with a list of books in which this word accures
@@ -52,6 +97,7 @@ void CSearch::fuzzySearch(std::map<std::string, std::map<std::string, CBook*>>& 
     }
 }
 
+
 /**
 * @param[in, out] mapSR map of search results
 */
@@ -64,6 +110,7 @@ void CSearch::removeBooks(std::map<std::string, CBook*>* mapSR)
     }
 
 }
+
 
 /**
 * @param[in] book to be checked

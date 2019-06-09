@@ -6,6 +6,7 @@
 #include "CSearchOptions.hpp"
 #include "func.hpp"
 #include "fuzzy.hpp"
+#include "src/console/console.hpp"
 
 #pragma once 
 
@@ -21,6 +22,8 @@ public:
     */
     CSearch(CSearchOptions* searchOpts);
 
+    std::map<std::string, CBook*>* search(std::map<std::string, std::map<std::string, CBook*>>& mWs,
+                                        std::map<std::string, std::map<std::string, CBook*>>& mWsTitle);
     /**
     * @brief search full-match
     * @param[in] mapWords map of all words with a list of books in which this where accures

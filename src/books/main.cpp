@@ -9,9 +9,6 @@ int main()
 {
     CBookManager manager;
 
-    std::string str1;
-    std::string str2;
-
     std::ifstream read("bin/zotero.json");
     nlohmann::json jItems;
     read >> jItems;
@@ -73,7 +70,7 @@ int main()
             //Pages for full search
             if(fuzzy == 0)
             {
-                std::list<int>* listPages = it->second->getPagesFull(sInput);
+                std::list<size_t>* listPages = it->second->getPagesFull(sInput);
                 for(auto jt=listPages->begin(); jt!=listPages->end(); jt++)
                     alx::cout.write ((*jt), ", ");
                 delete listPages;

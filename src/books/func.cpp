@@ -166,6 +166,25 @@ void split(std::string str, std::string delimiter, std::vector<std::string>& vSt
 } 
 
 /**
+* @param[in] str string to be splitet
+* @param[in] delimitter 
+* @return vector
+*/
+std::vector<std::string> split2(std::string str, std::string delimiter)
+{
+    std::vector<std::string> vStr;
+
+    size_t pos=0;
+    while ((pos = str.find(delimiter)) != std::string::npos) {
+        vStr.push_back(str.substr(0, pos));
+        str.erase(0, pos + delimiter.length());
+    }
+    vStr.push_back(str);
+
+    return vStr;
+}
+
+/**
 * @brief cuts all non-letter-characters from end and beginning of str
 * @param[in, out] string to modify
 */
@@ -211,14 +230,9 @@ void extractWordsFromString(std::string sWords, std::map<std::string, int>& mapW
 * @param[in] sWords string of which map shall be created 
 * @param[out] mapWords map to which new words will be added
 */
-void extractWordsFromString(std::string sWords, std::list<std::string>& listWords)
+void extractWordsFromString(std::string sWords, std::map<std::string, std::vector<size_t>>& mapWords, 
+                                                                                        size_t pageNum)
 {
-    if (checkPage(sWords) == true)
-    {
-        listWords.push_back("###page###");
-        return;
-    }
-
     std::vector<std::string> vStrs;
     split(sWords, " ", vStrs);
 
@@ -228,29 +242,19 @@ void extractWordsFromString(std::string sWords, std::list<std::string>& listWord
         if(isWord(vStrs[i].c_str()) == true)
         {
             convertToLower(vStrs[i]);
-            listWords.push_back(vStrs[i]);
+            if(mapWords.count(vStrs[i]) > 0)
+            {
+                auto it=std::find(mapWords[vStrs[i]].begin(), mapWords[vStrs[i]].end(), pageNum);
+                if (it != mapWords[vStrs[i]].end())
+                    continue;
+
+                mapWords[vStrs[i]].push_back(pageNum);
+            }
+
+            else
+                mapWords[vStrs[i]] = {pageNum};
         }
     }
-}
-
-/**
-* @param[in] sPathToWords path to .txt with all words in book
-* @param[out] mapWords map to which new words will be added.
-*/
-void loadMapOfWords(std::string sPathToWords, std::map<std::string, int>& mapWords)
-{
-    std::ifstream read(sPathToWords);
-
-    std::string sBuffer;
-    while(!read.eof())
-    {
-        //Read new line
-        getline(read, sBuffer);
-
-        //Add word to map of words 
-        mapWords[sBuffer] = 0;
-    }
- 
 }
 
 /**
@@ -278,6 +282,41 @@ bool checkPage(std::string &buffer)
             return false;
    }
    return false;
+}
+
+/**
+* @param[in] sPathToOcr Path to ocr of a book
+* @param[out] mapWords map to which new words will be added
+*/
+void extractPages(std::string sPathToOcr, std::map<std::string, std::vector<size_t>>& mapWords)
+{
+    //Read ocr
+    std::ifstream read(sPathToOcr, std::ios::in);
+
+    //Check, whether ocr could be loaded
+    if(!read)
+        return;
+
+    size_t pageNum = 0;
+    //Parse through file line by line
+    while(!read.eof())
+    {
+        //Create string for current line
+        std::string sBuffer;
+        getline(read, sBuffer);
+
+        //Check whether bufffer is empty
+        if(sBuffer.length()<=1)
+            continue;
+
+        if(checkPage(sBuffer) == true)
+            pageNum++;
+        
+        //Create words from current line
+        extractWordsFromString(sBuffer, mapWords, pageNum);
+     }
+
+     alx::cout.write("succsess.\n");
 }
 
 

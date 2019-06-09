@@ -121,3 +121,12 @@ int CSearchOptions::getFrom() const {
 int CSearchOptions::getTo() const {
     return m_To;
 }
+
+/**
+* @param[in] searchedWord new searched word 
+*/
+void CSearchOptions::setSearchedWord(std::string searchedWord) {
+    m_chSearchedWord = searchedWord;
+}
+
+
