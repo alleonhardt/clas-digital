@@ -128,6 +128,7 @@ int main(int argc, char* argv[]) {
 					return;
 				}
 				alx::cout.write(alx::console::green_black,"done.\n");
+				Zotero::GetPillars();
 
 			if(manager.initialize())
 				alx::cout.write("CBookManager initialisation: ",alx::console::green_black,"SUCCESS\n");

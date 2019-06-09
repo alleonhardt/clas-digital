@@ -1,5 +1,4 @@
 <!doctype html>
-<html lang="en">
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -253,26 +252,20 @@ class User {
 	}
 
 	static initialise() {
-		if(window.sessionStorage.email == undefined || window.sessionStorage.access == undefined)
-		{
-			window.location.href = "/";
-		}
-		else
-		{
-			document.getElementById("LoggedInAs").innerHTML = "Logged in as <strong>"+window.sessionStorage.email+"</strong>";
+		
+		document.getElementById("LoggedInAs").innerHTML = "Logged in as <strong>"+ServerDataObj.user.email+"</strong>";
 
 			let list = document.getElementsByClassName("classifiedContent");
 			//Unlocks all the content that the user can access!
 			for(var i=0; i < list.length; i++)
 			{
 				let y = list[i].dataset.acc;
-				if((window.sessionStorage.access&y)!=0)
+				if((ServerDataObj.user.access&y)!=0)
 				{
 					list[i].style.display="block";
 				}
 			}
 
-		}
 		let input = document.getElementById("fileUpID");
 		input.addEventListener('change',function(e) {
 			console.log(e.target.files.length);
@@ -647,4 +640,3 @@ window.addEventListener("load",User.initialise,false);
 		</div>
 
 	</body>
-</html>

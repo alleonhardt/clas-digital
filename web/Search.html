@@ -1,5 +1,4 @@
 <!doctype html>
-<html lang="en">
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -295,7 +294,6 @@ class User {
 	}
 
 	static initialise() {
-		StateBanner.ChangeBanner("Fuzzy search ist momentan nicht benutzbar, also bitte nicht testen!",StateBannerType.warning);
 		let inp = document.getElementById("SpecialSID");
 		inp.addEventListener("keypress",function(event){
 			if(event.key === "Enter")
@@ -304,26 +302,18 @@ class User {
 			}
 		});
 
-		if(window.sessionStorage.email == undefined || window.sessionStorage.access == undefined)
-		{
-			window.location.href = "/";
-		}
-		else
-		{
-			document.getElementById("LoggedInAs").innerHTML = "Logged in as <strong>"+window.sessionStorage.email+"</strong>";
+		document.getElementById("LoggedInAs").innerHTML = "Logged in as <strong>"+ServerDataObj.user.email+"</strong>";
 
 			let list = document.getElementsByClassName("classifiedContent");
 			//Unlocks all the content that the user can access!
 			for(var i=0; i < list.length; i++)
 			{
 				let y = list[i].dataset.acc;
-				if((window.sessionStorage.access&y)!=0)
+				if((ServerDataObj.user.access&y)!=0)
 				{
 					list[i].style.display="block";
 				}
 			}
-
-		}
 		ApplySearchData();
 		default_search_parameters = JSON.parse(JSON.stringify(search_parameters));
 	}
@@ -771,8 +761,27 @@ window.addEventListener("load",User.initialise,false);
   transform: rotate(45deg);
 } 
 		</style>
+	<script>
+		function ExecuteInitialise()
+		{
+			if(ServerDataObj===undefined)
+				console.log("Cant find server data!");
+			else
+			{
+				if(ServerDataObj.pillars != undefined)
+				{
+					let x = document.getElementById("ordered_pillars");
+					for(let i = 0; i < ServerDataObj.pillars.length; i++)
+					{
+						x.innerHTML += "<li data-key='"+ServerDataObj.pillars[i].key+"'>"+ServerDataObj.pillars[i].name+"</li>";
+					}
+				console.log("Server data found!");
+				}
+			}
+		}
+	</script>
 	</head>
-	<body>
+	<body onload="ExecuteInitialise()">
 		<!-- The navigation bar config -->
 		<div class="topnav">
 			<a href="/">Home</a>
@@ -790,6 +799,7 @@ window.addEventListener("load",User.initialise,false);
 				<span id="CloseSModal" class="close">&times;</span>
 				<div class="slider">
 					<p>Select the collections...</p>
+					<ol id="ordered_pillars"></ol>
 					<label class="checkbox-inline slider"><input id="SaeuleGeschiZoo" class="saeule" type="checkbox" value="" data-key="RFWJC42V" checked>Geschichte des Tierwissens</label>
 					<label class="checkbox-inline slider"><input id="SaeuleGeschiLi" class="saeule" type="checkbox" value="" data-key="2SWXSFCX" checked>Literarische Texte</label>
 					<label class="checkbox-inline slider"><input id="SaeuleForsch" class="saeule" type="checkbox" value="" data-key="XCFFDRQC" checked>Forschungsliteratur CLAS</label>
@@ -851,4 +861,3 @@ window.addEventListener("load",User.initialise,false);
 			<div id="LinkList" class="divlisttype"></div>
 		</div>
 	</body>
-</html>

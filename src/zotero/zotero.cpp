@@ -153,7 +153,6 @@ std::string Zotero::_sendRequest(std::string requestURI)
 			alx::cout<<"Zotero _sendRequest() read global shutdown flag, shuttding down..."<<alx::endl;
 			return "{}";
 		}
-		debug::print("Zotero send request to url: ",st.c_str());	
 		//Set the request url
 		curl_easy_setopt(_curl, CURLOPT_URL, st.c_str());
 
@@ -253,3 +252,25 @@ std::string Zotero::Request::GetItemsInSpecificPillar(std::string key)
 	return std::move(ret);
 }
 
+const nlohmann::json &Zotero::GetPillars()
+{
+	static bool pill=true;
+	static nlohmann::json ret;
+	if(pill)
+	{
+		ret.clear();
+		alx::cout.write("Trying to detect zotero pillars... ");
+		nlohmann::json js = nlohmann::json::parse(Zotero::SendRequest(Zotero::Request::GetAllPillars));
+		for(const auto &it : js)
+		{
+			nlohmann::json entry;
+			entry["key"] = it["data"]["key"].get<std::string>();
+			entry["name"] = it["data"]["name"].get<std::string>();
+			ret.push_back(std::move(entry));
+		}
+		pill = false;
+		alx::cout.write(alx::console::green_black,"done.\n");
+		alx::cout.writeln("Detected following pillars: ",alx::console::yellow_black,ret.dump());
+	}
+	return ret;
+}

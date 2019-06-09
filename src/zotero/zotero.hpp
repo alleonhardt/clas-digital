@@ -86,6 +86,7 @@ class Zotero
 		 */
 		~Zotero();
 
+		static const nlohmann::json &GetPillars();
 		friend size_t zoteroHeaderReader(char *, size_t, size_t, void *); ///< Needed as curl callback on header receiving
 		friend size_t zoteroReadBuffer(void *, size_t, size_t, void *);  ///< Needed as curl callback on data receiving
 };

@@ -4,7 +4,7 @@
 #define DBG_INF_MSG(x) std::cerr<<x<<std::endl;std::cerr<<"Error in FILE: "<<__FILE__<<"\nIn Line: "<<__LINE__<<"\nIn Function: "<<__PRETTY_FUNCTION__<<std::endl;
 #define DBG_INF() std::cerr<<"Error in FILE: "<<__FILE__<<"\nIn Line: "<<__LINE__<<"\nIn Function: "<<__PRETTY_FUNCTION__<<std::endl;
 #include "src/console/console.hpp"
-#define DBG_HEADER alx::console::red_black,"Error in file: ",__FILE__,",\nin Line: ",__LINE__,",\nin Function: ",__PRETTY_FUNCTION__,",\nError string: ",alx::console::black_red
+#define DBG_HEADER alx::console::red_black,"\nError in file: ",__FILE__,",\nin Line: ",__LINE__,",\nin Function: ",__PRETTY_FUNCTION__,",\nError string: ",alx::console::black_red
 
 namespace debug
 {

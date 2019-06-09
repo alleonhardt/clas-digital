@@ -16,6 +16,7 @@
 #include <fstream>
 #include <string_view>
 #include <unordered_map>
+#include "src/zotero/zotero.hpp"
 
 using namespace proxygen;
 
@@ -78,6 +79,15 @@ std::unique_ptr<folly::IOBuf> URIFile::getBuffer()
 		loadBuffer();
 	//Clones the buffer, makes it shared by facebook definition
 	return _fileBuf->clone();
+}
+
+std::string URIFile::PrepareDataForSending(nlohmann::json &&js)
+{
+	std::string xy;
+	xy = "<script>let ServerDataObj = ";
+	xy+=js.dump();
+	xy+="</script>";
+	return std::move(xy);
 }
 
 bool URIFile::doAccessCheck(int acc) const
@@ -171,13 +181,28 @@ void GetHandler::onRequest(std::unique_ptr<HTTPMessage> headers) noexcept {
 		if(!file->doAccessCheck(access)) //If the access check fails send the appropriate response and quit the handler
 			return SendAccessDenied(downstream_);
 		
-		//Build the response from the found file
-		ResponseBuilder(downstream_)
-			.status(200, "OK")
-			.header("Content-Type",file->getMimeType())
-			.body(file->getBuffer())
-			.sendWithEOM();
+		nlohmann::json js;
+		if(_user)
+		{
+			nlohmann::json usr;
+			usr["email"] = _user->GetEmail();
+			usr["access"] = _user->GetAccessRights();
+			js["user"] = std::move(usr);
+			if(file->getPath() == "web/Search.html")
+			{
+				js["pillars"] = Zotero::GetPillars();
+			}
+		}
 
+		//Build the response from the found file
+		ResponseBuilder resp(downstream_);
+			resp.status(200, "OK")
+			.header("Content-Type",file->getMimeType())
+			.body(file->getBuffer());
+		if(file->getMimeType()=="text/html")
+			resp.body(URIFile::PrepareDataForSending(std::move(js)));
+
+		resp.sendWithEOM();
 	}
 	catch(...)
 	{

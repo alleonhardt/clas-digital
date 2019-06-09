@@ -350,3 +350,12 @@ void GetSearchInBookHandler::onRequest(std::unique_ptr<proxygen::HTTPMessage> he
 		return SendErrorNotFound(downstream_);
 	}
 }
+
+void RedirectToHTTPSHandler::onRequest(std::unique_ptr<proxygen::HTTPMessage> /*headers*/) noexcept
+{
+	ResponseBuilder(downstream_)
+		.status(301,"Moved Permanently")
+		.header("Location","https://www.clas-digital.uni-frankfurt.de")
+		.sendWithEOM();
+
+}

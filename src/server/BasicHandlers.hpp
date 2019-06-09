@@ -219,6 +219,8 @@ class URIFile
 		 * @return The reference to a buffer
 		 */
 		std::unique_ptr<folly::IOBuf> &getBufferReference();
+
+		static std::string PrepareDataForSending(nlohmann::json &&js);
 };
 
 

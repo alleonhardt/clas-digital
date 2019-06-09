@@ -1,6 +1,4 @@
 <!doctype html>
-<!---Some comment!-->
-<html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -388,25 +386,18 @@ class User {
   }
 
   static initialise() {
-    if(window.sessionStorage.email == undefined || window.sessionStorage.access == undefined)
-	{
-		window.location.href = "/";
-	}
-	else
-	{
-        document.getElementById("LoggedInAs").innerHTML = "Logged in as <strong>"+window.sessionStorage.email+"</strong>";
-        let list = document.getElementsByClassName("classifiedContent");
-        //Unlocks all the content that the user can access!
-	for(var i=0; i < list.length; i++)
-        {
-            let y = list[i].dataset.acc;
-            if((window.sessionStorage.access&y)!=0)
-            {
-                list[i].style.display="block";
-            }
-        }
+    		document.getElementById("LoggedInAs").innerHTML = "Logged in as <strong>"+ServerDataObj.user.email+"</strong>";
 
-    }
+			let list = document.getElementsByClassName("classifiedContent");
+			//Unlocks all the content that the user can access!
+			for(var i=0; i < list.length; i++)
+			{
+				let y = list[i].dataset.acc;
+				if((ServerDataObj.user.access&y)!=0)
+				{
+					list[i].style.display="block";
+				}
+			}
 	let xhr = new XMLHttpRequest();
 	  xhr.open("GET","/getBookRessources",true);
 	xhr.onload = function() {
@@ -739,4 +730,3 @@ h1 {
 <div id="frameNextTo" class="nextTo"></div>
 </div>
 </body>
-</html>

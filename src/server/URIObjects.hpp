@@ -87,3 +87,24 @@ class GetSearchInBookHandler : public EmptyHandler
 			noexcept override;
 };
 
+/**
+ * @brief Redirects all request made to http port to the https website
+ */
+class RedirectToHTTPSHandler : public EmptyHandler
+{
+	public:
+		/**
+		 * @brief Sends back an redirect response no matter what the request is!
+		 * @param[in] headers The http headers send from the user
+		 */
+		void onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
+			noexcept override;
+};
+/*
+class UploadBookHandler : public EmptyHandler
+{
+	public:
+		void onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
+			noexcept override;
+		void onBody(std::unique_ptr<folly::IOBuf> body) noexcept override;
+};*/
