@@ -296,14 +296,14 @@ void GetSearchInBookHandler::onRequest(std::unique_ptr<proxygen::HTTPMessage> he
 		if(Fuzzyness==0)
 		{
 			alx::cout.write(alx::console::yellow_black,"Using normal search!\n");
-			std::unique_ptr<std::list<int>> listPtr(book.getPagesFull(std::move(searchFor)));
-		
-		js["is_fuzzy"] = false;
-		for(auto it : *listPtr)
-		{
-			int k = it;
-			js["books"].push_back(k);
-		}
+			std::unique_ptr<std::list<size_t>> listPtr(book.getPagesFull(std::move(searchFor)));
+
+			js["is_fuzzy"] = false;
+			for(auto it : *listPtr)
+			{
+				int k = it;
+				js["books"].push_back(k);
+			}
 		}
 		else
 		{
@@ -323,7 +323,7 @@ void GetSearchInBookHandler::onRequest(std::unique_ptr<proxygen::HTTPMessage> he
 			}
 
 			js["is_fuzzy"] = true;
-	  		auto glambda = [](std::string const &str, std::string const &from,std::string const &to) -> std::string {return std::regex_replace(str,std::regex(from),to);};
+			auto glambda = [](std::string const &str, std::string const &from,std::string const &to) -> std::string {return std::regex_replace(str,std::regex(from),to);};
 			for(auto const &it : *mapPtr)
 			{
 				for(auto const &inner : it.second)
