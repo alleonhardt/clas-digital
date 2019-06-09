@@ -81,20 +81,22 @@ void CBookManager::addBook(std::string sKey) {
 */
 std::map<std::string, CBook*>* CBookManager::search(CSearchOptions* searchOpts)
 {
+    //Create vector of seperated words
+    std::vector<std::string> vWords; 
+    func::split(searchOpts->getSearchedWord(), "+", vWords);
+
     //Create new instance of "CSearch"
+    searchOpts->setSearchedWord(vWords[0]);
     CSearch search(searchOpts);
 
     //Search main word
     std::map<std::string, CBook*>* results1 = search.search(m_mapWords, m_mapWordsTitle);
 
-    //If second word exists, search for second word
-    if(searchOpts->getSecondWord().length() > 0)
+    for(unsigned int i=1; i<vWords.size(); i++)
     {
-        //Safe acctual searched word
-        std::string sSearchedWord = searchOpts->getSearchedWord();
-
-        //Change searched word to second word
-        searchOpts->setSearchedWord(searchOpts->getSecondWord()); 
+        //Create new instance of "CSearch"
+        searchOpts->setSearchedWord(vWords[i]);
+        CSearch search2(searchOpts);
 
         //Get results for second word
         std::map<std::string, CBook*>* results2 = search.search(m_mapWords, m_mapWordsTitle);
@@ -106,8 +108,7 @@ std::map<std::string, CBook*>* CBookManager::search(CSearchOptions* searchOpts)
                 results1->erase(it);
         }
 
-        //Reset searched word & delete additional search results
-        searchOpts->setSearchedWord(sSearchedWord);
+        //Delete additional search results
         delete results2;
     }
 
@@ -129,7 +130,8 @@ void CBookManager::createMapWords()
             continue;
 
         //Get map of words of current book
-        std::map<std::string, int> mapWords = it->second.getMapWords();
+        std::map<std::string, std::vector<size_t>> mapWords;
+        it->second.loadPages(mapWords);
 
         unsigned int counter = 0;
         //Iterate over all words in this book. Check whether word already exists in list off all words.

@@ -9,6 +9,7 @@
 #include <locale>
 #include <regex>
 #include "json.hpp"
+#include "src/console/console.hpp"
 
 namespace func 
 {
@@ -77,6 +78,13 @@ namespace func
     void split(std::string str, std::string sDelimitter, std::vector<std::string>& vStr);
 
     /**
+    * @param[in] str string to be splitet
+    * @param[in] delimitter 
+    * @return vector
+    */
+    std::vector<std::string> split2(std::string str, std::string delimiter);
+    
+    /**
     * @brief cuts all non-letter-characters from end and beginning of str
     * @param[in, out] string to modify
     */
@@ -92,45 +100,8 @@ namespace func
     * @param[in] sWords string of which map shall be created 
     * @param[out] mapWords map to which new words will be added
     */
-    void extractWordsFromString(std::string sWords, std::list<std::string>& mapWords);
-
-    /**
-    * @param[in] sPathToOcr Path to ocr of a book
-    * @param[out] mapWords map to which new words will be added
-    */
-    template<typename T>
-    void extractWords(std::string sPathToOcr, T& words)
-    {
-        //Read ocr
-        std::ifstream read(sPathToOcr, std::ios::in);
-
-        //Check, whether ocr could be loaded
-        if(!read)
-            return;
-
-        //Parse through file line by line
-        while(!read.eof())
-        {
-            //Create string for current line
-            std::string sBuffer;
-            getline(read, sBuffer);
-
-            //Check whether bufffer is empty
-            if(sBuffer.length()<=1)
-                continue;
-            
-            //Create words from current line
-            extractWordsFromString(sBuffer, words);
-         }
-
-         std::cout << "succsess.\n";
-    }
-
-    /**
-    * @param[in] sPathToWords path to .txt with all words in book
-    * @param[out] mapWords map to which new words will be added.
-    */
-    void loadMapOfWords(std::string sPathToWords, std::map<std::string, int>& mapWords);
+    void extractWordsFromString(std::string sWords, std::map<std::string, std::vector<size_t>>& mapWords,
+                               size_t pageNum);
 
     /**
     * @brief check whether string indicates, that next page is reached
@@ -139,6 +110,11 @@ namespace func
     */
     bool checkPage(std::string &buffer);
 
+    /**
+    * @param[in] sPathToOcr Path to ocr of a book
+    * @param[out] mapWords map to which new words will be added
+    */
+    void extractPages(std::string sPathToOcr, std::map<std::string, std::vector<size_t>>& mapWords);
 }
 
 

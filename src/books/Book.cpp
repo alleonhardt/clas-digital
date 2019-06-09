@@ -119,94 +119,97 @@ void CBook::createMapWords()
     if(!readWords || readWords.peek() == std::ifstream::traits_type::eof() )
     {
         alx::cout.write(alx::console::yellow_black, "Creating map of words... \n");
-        func::extractWords(getOcrPath(), m_Words);
-        safeMapOfWords();
+        safePages();
     }
-    else
-        func::loadMapOfWords(m_sPath + "/words.txt", m_Words);
 
     m_bOcr = true;
 }
 
-/**
-* @brief safe created word list to file
-*/
-void CBook::safeMapOfWords()
+void CBook::safePages()
 {
-    //Open path to words
-    std::string sPathToWords = m_sPath + "/words.txt";
-    std::ofstream write(sPathToWords);
+    std::map<std::string, std::vector<size_t>> mapWordsPages;
 
-    //Iterate over map of words and write all words to file
-    for(auto it=m_Words.begin(); it != m_Words.end(); it++)
-        write << it->first << "\n";
+    func::extractPages(getOcrPath(), mapWordsPages);
+    alx::cout.write("size: ", mapWordsPages.size(), "\n");
 
+    std::ofstream write(m_sPath + "/pages.txt");
+    for(auto it=mapWordsPages.begin(); it!=mapWordsPages.end(); it++)
+    {
+        std::string sBuffer;
+        sBuffer += it->first + ";";
+        for(size_t page : it->second) {
+            sBuffer += std::to_string(page) + ",";
+        }
+        sBuffer.pop_back();
+        sBuffer += "\n";
+        write << sBuffer;
+    }
     write.close();
 }
 
+void CBook::loadPages(std::map<std::string, std::vector<size_t>>& mapWordsPages)
+{
+    //Load map
+    std::ifstream read(m_sPath + "/pages.txt");
+
+    //Check whether map could be loaded
+    if(!read)
+        return;
+   
+    std::string sBuffer;
+    while(!read.eof())
+    {
+        //Read new line
+        getline(read, sBuffer);
+
+        if(sBuffer.length() < 2)
+            continue;
+
+        //Extract word (vec[0] = word, vec[1] = sBuffer
+        std::vector<std::string> vec = func::split2(sBuffer, ";");
+
+        //Etract pages and convert to size_t
+        std::vector<size_t> pages;
+        std::vector<std::string> vecPages = func::split2(vec[1], ",");
+        for(auto page : vecPages) 
+        {
+            if(isdigit(page[0]))
+                pages.push_back(std::stoi(page));
+        }
+
+        //Add word and pages to map
+        mapWordsPages[vec[0]] = pages;
+    }
+}
+ 
 
 /*
 * @param[in] sWord searched word
 * @return list of pages on which searched word accures
 */
-std::list<int>* CBook::getPagesFull(std::string sWord)
+std::list<size_t>* CBook::getPagesFull(std::string sInput)
 {
+    std::vector<std::string> vWords;
+    func::split(sInput, "+", vWords);
+
     //Create empty list of pages
-    std::list<int>* listPages = new std::list<int>;
+    std::list<size_t>* listPages = new std::list<size_t>;
 
-    //Load ocr
-    std::ifstream read(getOcrPath(), std::ios::in);
+    //Load map of Words 
+    std::map<std::string, std::vector<size_t>> mapWordsPages;
+    loadPages(mapWordsPages);
 
-    //Check whether ocr could be loaded
-    if(!read)
-        return listPages;
+    for(auto page : mapWordsPages[vWords[0]])
+        listPages->push_back(page);
 
-    //Find pages on which searched word occures
-    func::convertToLower(sWord);
-    unsigned int pageNum = 0;
-    unsigned int lastPage = 0;
-    while(!read.eof())
+    for(size_t i=1; i<vWords.size(); i++)
     {
-        //read buffer
-        std::string sBuffer;
-        getline(read, sBuffer);
-
-        //Check new page
-        if(func::checkPage(sBuffer) == true) {
-            pageNum++;
-            continue;
+        for(auto it=listPages->begin(); it!=listPages->end(); it++) 
+        {
+            auto yt=std::find(mapWordsPages[vWords[i]].begin(), mapWordsPages[vWords[i]].end(), (*it));
+            if(yt==mapWordsPages[vWords[i]].end())
+                listPages->erase(it);
         }
-
-        //Check wether we're still on a page where a word has already been found
-        if(pageNum == lastPage)
-            continue;
-
-        //Search for word in buffer
-        func::convertToLower(sBuffer);
-        size_t found = sBuffer.find(sWord);
-
-
-        if(found == std::string::npos)
-            continue;
-
-        size_t found2 = sBuffer.find(" ", found);
-
-        size_t len = 0;
-        if(found2 == std::string::npos)
-            len = sWord.length();
-        else
-            len = found2-found;
-
-        std::string foundWord = sBuffer.substr(found, len);
-        func::transform(foundWord);
-
-        //Check whether search result is a full match
-        if(func::compare(foundWord, sWord) == false)
-            continue;
-
-        //Add page to list of pages and increase page number
-        listPages->push_back(pageNum);
-        lastPage = pageNum;
     }
 
     return listPages;
@@ -216,51 +219,31 @@ std::list<int>* CBook::getPagesFull(std::string sWord)
 * @param[in] sWord searched word
 * @return map of pages with vector of words found on this page
 */
-std::map<int, std::vector<std::string>>* CBook::getPagesContains(std::string sWord)
+std::map<int, std::vector<std::string>>* CBook::getPagesContains(std::string sInput)
 {
+    std::vector<std::string> vWords;
+    func::split(sInput, "+", vWords);
+    std::string sWord = vWords[0];
+
     //Create empty map
     std::map<int, std::vector<std::string>>* mapPages = new std::map<int, std::vector<std::string>>;
 
-    //Load ocr
-    std::ifstream read(getOcrPath(), std::ios::in);
+    //Load map of words
+    std::map<std::string, std::vector<size_t>> mapWordsPages;
+    loadPages(mapWordsPages);
 
-    //Check whether ocr has been loaded
-    if(!read)
-        return mapPages;
-
-    func::convertToLower(sWord);
-    unsigned int pageNum = 0;
-    while(!read.eof())
+    for(auto it=mapWordsPages.begin(); it!=mapWordsPages.end(); it++)
     {
-        std::string sBuffer;
-        getline(read, sBuffer);
+        if(it->first.find(vWords[0]) != std::string::npos)
+        {
+            for(auto page : it->second) {
+                if(mapPages->count(page) > 0)
+                    mapPages->at(page).push_back(it->first);
+                else
+                    mapPages->insert(std::pair<int, std::vector<std::string>> (page, {it->first}));
+            }
 
-        //Check new page
-        if(func::checkPage(sBuffer) == true) {
-            pageNum++;
-            continue;
         }
-
-        func::convertToLower(sBuffer);
-        size_t found = sBuffer.find(sWord);
-
-        if(found == std::string::npos)
-            continue;
-
-        size_t found2 = sBuffer.find(" ", found);
-        size_t len = 0;
-        if(found2 == std::string::npos)
-            len = sWord.length();
-        else
-            len = found2-found;
-
-        std::string foundWord = sBuffer.substr(found, len);
-        func::transform(foundWord);
-
-        if(mapPages->count(pageNum) > 0)
-            mapPages->at(pageNum).push_back(foundWord);
-        else
-            mapPages->insert(std::pair<int, std::vector<std::string>> (pageNum, {foundWord}));
     }
 
     return mapPages;
@@ -270,57 +253,34 @@ std::map<int, std::vector<std::string>>* CBook::getPagesContains(std::string sWo
 * @param[in] sWord searched word
 * @return map of pages with vector of words found on this page
 */
-std::map<int, std::vector<std::string>>* CBook::getPagesFuzzy(std::string sWord)
+std::map<int, std::vector<std::string>>* CBook::getPagesFuzzy(std::string sInput)
 {
-    auto start = std::chrono::system_clock::now(); 
+    std::vector<std::string> vWords;
+    func::split(sInput, "+", vWords);
+    std::string sWord = vWords[0];
+
     //Create empty map
     std::map<int, std::vector<std::string>>* mapPages = new std::map<int, std::vector<std::string>>;
 
-    std::ifstream read(getOcrPath(), std::ios::in);
+    //Load map of words
+    std::map<std::string, std::vector<size_t>> mapWordsPages;
+    loadPages(mapWordsPages);
 
-    if(!read)
-        return mapPages;
-
-    unsigned int pageNum = 0;
-    while(!read.eof())
+    for(auto it=mapWordsPages.begin(); it!=mapWordsPages.end(); it++)
     {
-        std::string sBuffer;
-        getline(read, sBuffer);
-
-        //Check new page
-        if(func::checkPage(sBuffer) == true) {
-            pageNum++;
-            continue;
-        }
-
-        std::string cur;
-        for(unsigned int i=0; i<sBuffer.length(); i++)
+        if(fuzzy::fuzzy_cmp(it->first, vWords[0]) == true)
         {
-            if(func::isLetter(sBuffer[i]) == false && cur.length() == 0)
-                continue;
-
-            if((sBuffer[i] == ' ' || sBuffer[i] == '.') && cur.length() > 0)
-            {
-                if(fuzzy::fuzzy_cmp(cur, sWord) == true)
-                {
-                    func::transform(cur);
-                    if(mapPages->count(pageNum) > 0)
-                        mapPages->at(pageNum).push_back(cur);
-                    else
-                        mapPages->insert(std::pair<int, std::vector<std::string>> (pageNum, {cur}));
-                }
-                cur = "";
+            for(auto page : it->second) {
+                if(mapPages->count(page) > 0)
+                    mapPages->at(page).push_back(it->first);
+                else
+                    mapPages->insert(std::pair<int, std::vector<std::string>> (page, {it->first}));
             }
 
-            else
-                cur += sBuffer[i];
         }
     }
 
-    auto end = std::chrono::system_clock::now();
-    std::chrono::duration<double> elapsed_seconds = end-start;
-    alx::cout.write(alx::console::yellow_black, "getPagesFuzzy took ", elapsed_seconds.count(), "s\n");
-
     return mapPages;
 }
-         
+
+        

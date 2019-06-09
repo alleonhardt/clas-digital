@@ -21,6 +21,7 @@ find_package(GTest REQUIRED)
 find_package(Fizz QUIET)
 find_package(CURL REQUIRED)
 find_package(Curses REQUIRED)
+find_package(gflags REQUIRED)
 find_path(
   PROXYGEN_INCLUDE_DIR
   NAMES "proxygen/httpserver/HTTPServer.h"
