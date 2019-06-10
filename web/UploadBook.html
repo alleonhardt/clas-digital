@@ -347,7 +347,7 @@ function UploadAll()
 	console.log("And size: "+input.files[0].size+" Bytes");
 
 	let xhr = new XMLHttpRequest();
-	let requ = "/uploadBook";
+	let requ = "/getBookMetadata";
 	let arr = permalink.split("/");
 	for(var i = 0; i < arr.length; i++)
 	{
@@ -358,8 +358,8 @@ function UploadAll()
 		}
 	}
 	console.log("Extracted item key: "+permalink);
-	xhr.open("POST",requ,true);
-	xhr.setRequestHeader("ZoteroItemKey",permalink);
+	requ=requ + "?scanId=" +permalink;
+	xhr.open("GET",requ,true);
 	xhr.onload = function() {
 		if(xhr.status != 200)
 		{
@@ -381,7 +381,7 @@ function UploadAll()
 			showError("black","red","Upload rejected");
 			setTimeout(function(){location.reload();},1000);
 		}
-
+		return;
 		//If the user clicked outside of the modal banner close the window as well
 		window.onclick = function(event) {
 			if (event.target == advancedOpts) {
@@ -586,7 +586,7 @@ window.addEventListener("load",User.initialise,false);
 		<!-- The navigation bar config -->
 		<div class="topnav">
 			<a href="/">Home</a>
-			<a href="/search.html">Search</a>
+			<a href="/search">Search</a>
 			<a class="classifiedContent" href="/administration" data-acc=4>Administration</a>
 			<a class="classifiedContent active" href="/uploadbook" data-acc=2>Upload Books</a>
 			<a class="classifiedContent" href="/managebooks" data-acc=2>Manage Books</a>

@@ -57,9 +57,11 @@ class HandlerFactory : public RequestHandlerFactory {
 			_getMap["/getBookRessources"] = &CreateHandler<GetBookRessource>;
 			_getMap["/searchword"] = &CreateHandler<GetSearchHandler>;
 			_getMap["/searchInBook"] = &CreateHandler<GetSearchInBookHandler>;
+			_getMap["/getBookMetadata"] = &CreateHandler<GetBookMetadata>;
 
 			_postMap["/changeUserTable"] = &CreateHandler<UpdateUserSystemHandler>;
 			_postMap["/logout"] = &CreateHandler<PostHandler>;
+			_postMap["/uploadBook"] = &CreateHandler<UploadBookHandler>;
 		}
 
 		/**

@@ -1,26 +1,30 @@
 #include "src/zotero/zotero.hpp"
 #include <gtest/gtest.h>
-
-TEST(Zotero,init)
-{
-	EXPECT_EQ(true,true);
-}
+#include <iostream>
 
 /**
  * This test should check if the zotero connection works by doing a simple
  * request and searching for some key which is always present in this request.
  */
-/*
+
 TEST(Zotero,zotero_test)
 {
-	//Create the connection to the server
-	Zotero zot;
+	std::string request;
+	request = std::move(Zotero::SendRequest(Zotero::Request::GetAllPillars));
 
-	//Do the most basic request in zotero
-	std::string request = std::move(zot.SendRequest(Zotero::Request::GetAllPillars));
+	if(request=="")
+	{
+		char c;
+		std::cout<<"Are you connected to the internet at the moment?(y/n): ";
+		std::cin>>c;
+		ASSERT_NE(c,'y');
+		return;
+	}
+
 	//Parse the string to a json and search for the unique key always
 	//present in this request
-	auto js = nlohmann::json::parse(request);
+	nlohmann::json js;
+	ASSERT_NO_THROW(js = nlohmann::json::parse(request));
 	bool exist = false;
 	for(auto &el : js.items())
 	{
@@ -29,5 +33,5 @@ TEST(Zotero,zotero_test)
 	}
 	//The key should be present
 	ASSERT_EQ(exist,true);
-}*/
+}
 

@@ -3,6 +3,8 @@
 #include <experimental/filesystem>
 #include <chrono>
 #include "src/server/URIObjects.hpp"
+#include "src/zotero/zotero.hpp"
+
 using namespace proxygen;
 namespace fs = std::experimental::filesystem;
 
@@ -357,5 +359,56 @@ void RedirectToHTTPSHandler::onRequest(std::unique_ptr<proxygen::HTTPMessage> /*
 		.status(301,"Moved Permanently")
 		.header("Location","https://www.clas-digital.uni-frankfurt.de")
 		.sendWithEOM();
+}
 
+void GetBookMetadata::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers) noexcept
+{
+	try
+	{
+		if(!User::AccessCheck(_user,AccessRights::USR_READ))
+			throw 0;
+		
+		auto &mapofbooks = GetSearchHandler::GetBookManager().getMapOfBooks();
+		std::string inBook = headers->getDecodedQueryParam("scanId");
+		
+		if(inBook=="") throw 0;
+
+		std::string json;
+		try
+		{
+			json = std::move(mapofbooks.at(inBook).getMetadata().getMetadata().dump());
+		}
+		catch(...)
+		{
+			json = Zotero::SendRequest(Zotero::Request::GetSpecificItem(inBook));
+			
+			if(json=="") throw 0;
+
+			nlohmann::json js;
+			js.push_back(std::move(nlohmann::json::parse(json)));
+
+			alx::cout.writeln("Adding a new json to the map of all books with key: ",alx::console::yellow_black,js[0]["data"]["key"].get<std::string>());
+			GetSearchHandler::GetBookManager().updateZotero(std::move(js));
+		}
+		ResponseBuilder(downstream_)
+			.status(200,"Ok")
+			.header("Content-Type","application/json")
+			.body(std::move(json))
+			.sendWithEOM();
+	}
+	catch(...)
+	{
+		return SendErrorNotFound(downstream_);
+	}
+}
+
+
+void UploadBookHandler::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers) noexcept
+{
+	(void)headers;
+}
+
+void UploadBookHandler::onBody(std::unique_ptr<folly::IOBuf> body) noexcept
+{
+	(void)body;
 }

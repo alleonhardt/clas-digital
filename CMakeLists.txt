@@ -79,3 +79,4 @@ add_executable(books.o src/books/Book.cpp src/books/Bookmanager.cpp src/books/Me
 target_link_libraries(clas-digital.o ${PROXYGEN_LIBRARIES} ${CURL_LIBRARIES} stdc++fs ${CURSES_LIBRARY})
 target_link_libraries(books.o ${CURL_LIBRARY} stdc++fs ${CURSES_LIBRARY})
 target_link_libraries(unittest.o ${PROXYGEN_LIBRARIES} ${GTEST_BOTH_LIBRARIES} ${CURL_LIBRARIES} stdc++fs ${CURSES_LIBRARY})
+add_dependencies(clas-digital.o books.o unittest.o)

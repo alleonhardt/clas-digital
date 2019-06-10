@@ -100,11 +100,22 @@ class RedirectToHTTPSHandler : public EmptyHandler
 		void onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 			noexcept override;
 };
-/*
+
+class GetBookMetadata : public EmptyHandler
+{
+	public:
+		/**
+		 * @brief Returns the metadata for a specified book request must be like /getBookMetadata?book=ITEM_KEY
+		 * @param headers The request headers send by the user
+		 */
+		void onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
+			noexcept override;
+};
+
 class UploadBookHandler : public EmptyHandler
 {
 	public:
 		void onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 			noexcept override;
 		void onBody(std::unique_ptr<folly::IOBuf> body) noexcept override;
-};*/
+};

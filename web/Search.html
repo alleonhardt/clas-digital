@@ -489,7 +489,7 @@ function sendToPage(name)
 		requ += "&author="+document.getElementById("SearchForAuthor").value;
 	requ += "&publicatedafter="+document.getElementById("PublicatedAfter").value;
 	requ +=  "&publicatedbefore="+ document.getElementById("PublicatedBefore").value;
-	let myList = document.getElementsByClassName("saeule");
+	let myList = document.getElementsByClassName("upSaule");
 	
 	requ+="&pillars=";
 	let val = "";
@@ -550,7 +550,7 @@ function sendToPage(name)
 			if(!jsonObj.books[i].hasocr || (jsonObj.books[i].hasocr == undefined))
 			{
 
-				inner = "<a data-specialhref='/1/ShowMetadata.html";
+				inner = "<a data-specialhref='/getBookMetadata";
 			}
 			else
 			{
@@ -760,6 +760,14 @@ window.addEventListener("load",User.initialise,false);
   -ms-transform: rotate(45deg);
   transform: rotate(45deg);
 } 
+
+.upSaule {
+	margin-left: 1rem;
+}
+
+#ordered_pillars li {
+	margin-top: 1rem;
+}
 		</style>
 	<script>
 		function ExecuteInitialise()
@@ -773,7 +781,7 @@ window.addEventListener("load",User.initialise,false);
 					let x = document.getElementById("ordered_pillars");
 					for(let i = 0; i < ServerDataObj.pillars.length; i++)
 					{
-						x.innerHTML += "<li data-key='"+ServerDataObj.pillars[i].key+"'>"+ServerDataObj.pillars[i].name+"</li>";
+						x.innerHTML += "<li data-key='"+ServerDataObj.pillars[i].key+"'>"+ServerDataObj.pillars[i].name+"<input type='checkbox' data-key='"+ServerDataObj.pillars[i].key+"' class='upSaule' checked></li>";
 					}
 				console.log("Server data found!");
 				}
