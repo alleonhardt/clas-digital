@@ -114,8 +114,12 @@ class GetBookMetadata : public EmptyHandler
 
 class UploadBookHandler : public EmptyHandler
 {
+	private:
+		std::ofstream ofs;
+		std::string _finalPath;
 	public:
 		void onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 			noexcept override;
 		void onBody(std::unique_ptr<folly::IOBuf> body) noexcept override;
+		void onEOM() noexcept override;
 };

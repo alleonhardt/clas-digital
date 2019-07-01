@@ -177,12 +177,27 @@ void GetBookRessource::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 		}
 		else if(book!=""&&res!="") //Reads the specific ressource and sends the file with a specific mime type to the client
 		{
+			
 			//Create the path to the book
 			std::string path = "web/books/";
 			path+=book;
 			path+="/";
 			path+=res;
 
+			if(headers->getDecodedQueryParam("exist_check")!="")
+			{
+				if(fs::exists(path))
+				{
+					return ResponseBuilder(downstream_)
+						.status(200,"Ok")
+						.body("file exists")
+						.sendWithEOM();
+				}
+				else
+				{
+					return SendErrorNotFound(downstream_);
+				}
+			}
 			//Load the ressource from the constructed path if the ressource does not exist the constructor of URIFile will throw an expection 
 			URIFile fl(std::move(path));
 
@@ -405,10 +420,62 @@ void GetBookMetadata::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers) 
 
 void UploadBookHandler::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers) noexcept
 {
-	(void)headers;
+	try
+	{
+		if(!User::AccessCheck(_user,AccessRights::USR_WRITE))
+			throw 0;
+
+		std::string whichBook = headers->getDecodedQueryParam("itemKey");
+		std::string filename = headers->getDecodedQueryParam("filename");
+
+		if(filename.find("..")!=std::string::npos||filename.find("~")!=std::string::npos)
+			throw "Illegal filename provided!";
+
+		auto &mapofbooks = GetSearchHandler::GetBookManager().getMapOfBooks();
+		mapofbooks.at(whichBook); //Check if book exists
+		_finalPath = "web/books/";
+		_finalPath+=whichBook;
+		if(!fs::exists(_finalPath))
+		{
+			fs::create_directory(_finalPath);
+		}
+
+		_finalPath+="/";
+		_finalPath+=filename;
+
+		if(fs::exists(_finalPath))
+			throw "File or folder already exists!";
+
+		ofs.open(_finalPath.c_str(),std::ios::out);
+		
+		if(!ofs.is_open())
+			throw "Cannot open path to write the file!";
+	}
+	catch(const char *msg)
+	{
+		return SendAccessDenied(downstream_,msg);
+	}
+	catch(...)
+	{
+		return SendAccessDenied(downstream_);
+	}
 }
 
 void UploadBookHandler::onBody(std::unique_ptr<folly::IOBuf> body) noexcept
 {
-	(void)body;
+	if(ofs.is_open())
+		ofs.write(reinterpret_cast<const char*>(body->data()),body->length());
+}
+
+
+void UploadBookHandler::onEOM() noexcept
+{
+	if(ofs.is_open())
+	{
+		ofs.close();
+		ResponseBuilder(downstream_)
+			.status(200,"Ok")
+			.body("Successfully written file!")
+			.sendWithEOM();
+	}
 }

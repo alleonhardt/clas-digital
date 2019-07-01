@@ -311,7 +311,7 @@ function ShowFile(x)
 	 	}
 		else
 		{
-			document.getElementById("frameNextTo").innerHTML=xhr.responseText;
+			document.getElementById("frameNextTo").innerHTML="<p class='ocrpage'>"+xhr.responseText+"</p>";
 			document.getElementById("frameNextTo").style["background-color"] = "white";
 		}
 	}
@@ -569,7 +569,8 @@ window.addEventListener("load",User.initialise,false);
 .filelst li{
 	width: 90%;
 	background-color: #ddd;
-	margin-top: 0.3rem;
+	margin-top: 0.5rem;
+	margin-bottom: 0.5rem;
 	padding: 0.2rem;
 }
 

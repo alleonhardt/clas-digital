@@ -123,7 +123,8 @@ std::unordered_map<std::string,URIFile> fileAccess {
 	{"/GetBooks",URIFile("web/GetBooks.html",1)},
 	{"/scan.png",URIFile("web/scan.png",1)},
 	{"/404.jpeg",URIFile("web/404.jpeg",0)},
-	{"/volltext.png",URIFile("web/volltext.png",1)}
+	{"/volltext.png",URIFile("web/volltext.png",1)},
+	{"/jszip.js",URIFile("web/jszip.js",2)}
 }; ///< The map which caches all file the get handler will return and also saves the access rights to acces these files
 
 void ReloadAllFiles()

@@ -17,7 +17,7 @@
 .button_box_top {
 	text-align: center;
 	width: 80%;
-	margin-top: 3%;
+	margin-top: 10%;
 	padding-top: 20px;
 	margin-left: 10%;
 	padding-bottom: 4rem;
@@ -359,6 +359,17 @@ class StateBanner {
 	}
 }
 
+function getSliderValue(x)
+{
+	if(x==0)
+		return "Show only exact matches               ";
+	else if(x==1)
+		return "Show all matches that contain the word";
+	else
+		return "Try fuzzy matching                    ";
+
+}
+
 //Opens the search options
 function openSearchOpts(name)
 {
@@ -377,9 +388,8 @@ function openSearchOpts(name)
 	advancedOpts.style.display = "block";
 
 	//Show the last set amount of fuzzyness in the modal banner
-	let x = document.getElementById("FuzzyID");
-	document.getElementById("SliderNum").innerHTML = x.value;
-
+	let x = document.getElementById("FuzzyID").value;
+	document.getElementById("SliderNum").innerHTML = getSliderValue(x);
 
 	//Prepare the close button, on close click it will hide the modal banner
 	let close = document.getElementById("CloseSModal");
@@ -610,11 +620,6 @@ function LoadSearchData(sp)
 	document.getElementById("PublicatedAfter").value = sp.pub_after;
 	document.getElementById("PublicatedBefore").value = sp.pub_before;
 	document.getElementById('SliderNum').innerHTML = sp.fuzzyness;
-	document.getElementById("SaeuleGeschiZoo").checked = sp.saeule_gesch_zoo;
-	document.getElementById("SaeuleGeschiLi").checked = sp.saeule_gesch_li;
-	document.getElementById("SaeuleForsch").checked = sp.saeule_forsch;
-	document.getElementById("SaeuleBuechnerLi").checked = sp.saeule_buechner_li;
-	document.getElementById("SaeuleForschBuechner").checked = sp.saeule_forsch_buechner;
 }
 
 
@@ -627,12 +632,6 @@ function ApplySearchData()
 	search_parameters.author_name = document.getElementById("SearchForAuthor").value;
 	search_parameters.pub_after = document.getElementById("PublicatedAfter").value;
 	search_parameters.pub_before = document.getElementById("PublicatedBefore").value;
-	search_parameters.saeule_gesch_zoo = document.getElementById("SaeuleGeschiZoo").checked;
-	search_parameters.saeule_gesch_li = document.getElementById("SaeuleGeschiLi").checked;
-	search_parameters.saeule_forsch = document.getElementById("SaeuleForsch").checked;
-	search_parameters.saeule_buechner_li = document.getElementById("SaeuleBuechnerLi").checked;
-	search_parameters.saeule_forsch_buechner = document.getElementById("SaeuleForschBuechner").checked;
-
 	document.getElementById("ModalBanner").style.display = "none";
 }
 
@@ -646,6 +645,11 @@ window.addEventListener("load",User.initialise,false);
 		<style>
 
 .topnav {
+	top:0;
+	left:0;
+	width: 100vw;
+	z-index: 1;
+	position: fixed;
 	background-color: #333;
 	overflow: hidden;
 }
@@ -808,16 +812,11 @@ window.addEventListener("load",User.initialise,false);
 				<div class="slider">
 					<p>Select the collections...</p>
 					<ol id="ordered_pillars"></ol>
-					<label class="checkbox-inline slider"><input id="SaeuleGeschiZoo" class="saeule" type="checkbox" value="" data-key="RFWJC42V" checked>Geschichte des Tierwissens</label>
-					<label class="checkbox-inline slider"><input id="SaeuleGeschiLi" class="saeule" type="checkbox" value="" data-key="2SWXSFCX" checked>Literarische Texte</label>
-					<label class="checkbox-inline slider"><input id="SaeuleForsch" class="saeule" type="checkbox" value="" data-key="XCFFDRQC" checked>Forschungsliteratur CLAS</label>
-					<label class="checkbox-inline slider"><input id="SaeuleBuechnerLi" class="saeule" type="checkbox" value="" data-key="WIXP3DS3" checked>Tierwissen (deprecated)</label>
-					<label class="checkbox-inline slider"><input id="SaeuleForschBuechner" class="saeule" type="checkbox" value="" data-key="RBB8DW5B" checked>Forschung Büchner</label>
 				</div>
 				<div class="slidecontainer">
 					<p class="slider">Fuzzyness (Smaller is more accurate, zero means no fuzzy search): </p>
 					<p id="SliderNum" class="sliderNum"></p>
-					<input oninput="document.getElementById('SliderNum').innerHTML=this.value;" id="FuzzyID" type="range" min="0" max="2" value="0" class="slider" id="myRange"></div>
+					<input oninput="document.getElementById('SliderNum').innerHTML=getSliderValue(this.value);" id="FuzzyID" style="float:right;"type="range" min="0" max="2" value="0" class="slider" id="myRange"></div>
 				<div class="checker">
 					<p class="slider">Search only in Titel</p>
 					<label class="checkbox-inline"><input id="SearchInTitle" type="checkbox" value=""></label>

@@ -42,5 +42,12 @@ TEST(UserClass,access_checking)
 	EXPECT_EQ(User::AccessCheck(us,7),false);
 	EXPECT_EQ(User::AccessCheck(us,AccessRights::USR_READ),false);
 	EXPECT_EQ(User::AccessCheck(us,0),true);
+
+	us = std::shared_ptr<User>();
+	EXPECT_EQ(User::AccessCheck(us, AccessRights::USR_WRITE),false);
+	EXPECT_EQ(User::AccessCheck(us,AccessRights::USR_ADMIN),false);
+	EXPECT_EQ(User::AccessCheck(us,7),false);
+	EXPECT_EQ(User::AccessCheck(us,AccessRights::USR_READ),false);
+	EXPECT_EQ(User::AccessCheck(us,0),true);
 }
 
