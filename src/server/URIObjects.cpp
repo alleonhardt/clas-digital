@@ -487,6 +487,9 @@ void StartSearch::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers) noex
 		return SendErrorNotFound(downstream_);
 	}
 
+	proxygen::ResponseHandler *rsp = downstream_;
+	std::thread t1([this,id,rsp](){
+	alx::cout.write(alx::console::green_black,"Started additional thread for searching!\n");
 	auto start = std::chrono::system_clock::now();
 	auto results = GetSearchHandler::GetBookManager().search(id);
 	auto end = std::chrono::system_clock::now();
@@ -503,11 +506,13 @@ void StartSearch::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers) noex
 			js["books"].push_back(std::move(entry));
 		}
 
-		ResponseBuilder(downstream_)
+		ResponseBuilder(rsp)
 			.status(200,"Ok")
 			.header("Content-Type","application/json")
 			.body(std::move(js.dump()))
 			.sendWithEOM();
+	});
+	t1.detach();
 }
 
 void RequestSearchProgress::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers) noexcept
