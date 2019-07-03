@@ -11,6 +11,7 @@ CSearchOptions::CSearchOptions()
     m_From = 0;
     m_To = 2018;
     m_onlyOCR = false;
+    m_fullAccess = false;
 }
 
 /**
@@ -25,7 +26,7 @@ CSearchOptions::CSearchOptions()
 * @param[in] to date to which books shall be searched
 **/
 CSearchOptions::CSearchOptions(std::string chSearchedWord, int fuzzyness, std::vector<std::string> 
-                    sCollections, bool onlyTitle, bool onlyOCR, std::string slastName, int from, int to) 
+        sCollections, bool onlyTitle, bool onlyOCR, std::string slastName, int from, int to, bool full)
 {
     func::convertToLower(chSearchedWord);
     m_chSearchedWord.assign(chSearchedWord);
@@ -36,7 +37,7 @@ CSearchOptions::CSearchOptions(std::string chSearchedWord, int fuzzyness, std::v
     m_From = from;
     m_To = to;
     m_onlyOCR = onlyOCR;
-
+    m_fullAccess = full;
 }
 
 /**
@@ -51,7 +52,7 @@ CSearchOptions::CSearchOptions(std::string chSearchedWord, int fuzzyness, std::v
 * @param[in] to date to which books shall be searched
 **/
 void CSearchOptions::initialise(std::string chSearchedWord, int fuzzyness, std::vector<std::string> 
-                            pillar, bool onlyTitle, bool onlyOCR,std::string slastName, int from, int to) 
+            pillar, bool onlyTitle, bool onlyOCR,std::string slastName, int from, int to, bool full)
 {
     m_chSearchedWord.assign(chSearchedWord);
     m_fuzzyness = static_cast<double>(fuzzyness)/10;
@@ -62,6 +63,7 @@ void CSearchOptions::initialise(std::string chSearchedWord, int fuzzyness, std::
     m_From = from;
     m_To = to;
     m_onlyOCR = onlyOCR;
+    m_fullAccess = full;
 }
 
 
@@ -120,6 +122,13 @@ int CSearchOptions::getFrom() const {
 **/
 int CSearchOptions::getTo() const {
     return m_To;
+}
+
+/**
+* @return get user access
+*/
+bool CSearchOptions::getAccess() const {
+    return m_fullAccess;
 }
 
 /**

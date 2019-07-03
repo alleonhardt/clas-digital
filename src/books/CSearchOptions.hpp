@@ -17,6 +17,7 @@ private:
     int m_To;                                   //Search books up to yeas...
     bool m_onlyOCR;                             //Search only in ocr 
     bool m_onlyTitle;                           //Search only in the title not in the text
+    bool m_fullAccess;                          //Read access for all books
 
 public:
 
@@ -37,7 +38,7 @@ public:
     * @param[in] to date to which books shall be searched
     **/
     CSearchOptions(std::string chSearchedWord, int fuzzyness, std::vector<std::string> sCollections,
-                                bool onlyTitle, bool onlyOCR, std::string slastName, int from, int to);
+                    bool onlyTitle, bool onlyOCR, std::string slastName, int from, int to, bool full);
     
     /**
     * @brief initialise search options outside of constructor
@@ -51,7 +52,7 @@ public:
     * @param[in] to date to which books shall be searched
     **/
  	void initialise(std::string chSearchedWord, int fuzzyness, std::vector<std::string> pillar, 
-                            bool onlyTitle, bool onlyOCR,std::string slastName, int from, int to);
+                    bool onlyTitle, bool onlyOCR,std::string slastName, int from, int to, bool full);
 
     //Getter
 
@@ -94,6 +95,11 @@ public:
     * @return year to which books shall be searched
     **/
     int getTo() const;
+
+    /**
+    * @return get user access
+    */
+    bool getAccess() const;
 
     /**
     * @param[in] searchedWord new searched word

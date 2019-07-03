@@ -56,12 +56,13 @@ int main()
         int fuzzy = std::stoi(sFuzzy);
 
         
-        CSearchOptions* searchOpts = new CSearchOptions(sInput, fuzzy, {}, false, true, "", 0 , 2019);
+        CSearchOptions* searchOpts = new CSearchOptions(sInput, fuzzy, {}, false, true, "", 0 , 2019, 0);
         CSearch* search = new CSearch(searchOpts, 0);
+        manager.addSearch(search);
 
         alx::cout.write ("Searching for ", sInput, "... \n");
 
-        std::map<std::string, CBook*>* searchResults = manager.search((*search));
+        std::map<std::string, CBook*>* searchResults = manager.search(0);
         unsigned int counter = 0;
         for(auto it=searchResults->begin(); it!=searchResults->end(); it++)
         {

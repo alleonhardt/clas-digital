@@ -79,25 +79,33 @@ void CBookManager::addBook(std::string sKey) {
 * @param[in] searchOPts 
 * @return list of all found books
 */
-std::map<std::string, CBook*>* CBookManager::search(CSearch& search)
+std::map<std::string, CBook*>* CBookManager::search(unsigned long long id)
 {
+    //Create empty map of results
+    std::map<std::string, CBook*>* results1 = new std::map<std::string, CBook*>;
+
+    if(m_mapSearchs.count(id) == 0)
+        return results1;
+
+    CSearch* search = m_mapSearchs[id];
+
     //Create vector of seperated words
     std::vector<std::string> vWords; 
-    func::split(search.getSearchedWord(), "+", vWords);
+    func::split(search->getSearchedWord(), "+", vWords);
 
     //Set searched word
-    search.setWord(vWords[0]);
+    search->setWord(vWords[0]);
 
     //Search main word
-    std::map<std::string, CBook*>* results1 = search.search(m_mapWords, m_mapWordsTitle);
+    results1 = search->search(m_mapWords, m_mapWordsTitle);
 
     for(unsigned int i=1; i<vWords.size(); i++)
     {
         //Change searched word
-        search.setWord(vWords[i]);
+        search->setWord(vWords[i]);
 
         //Get results for second word
-        std::map<std::string, CBook*>* results2 = search.search(m_mapWords, m_mapWordsTitle);
+        std::map<std::string, CBook*>* results2 = search->search(m_mapWords, m_mapWordsTitle);
 
         //remove all books, that don't contain both words
         for(auto it=results1->begin(); it!=results1->end(); it++)
@@ -109,6 +117,8 @@ std::map<std::string, CBook*>* CBookManager::search(CSearch& search)
         //Delete additional search results
         delete results2;
     }
+
+    deleteSearch(id);
 
     //Return search results
     return results1;
@@ -162,5 +172,38 @@ void CBookManager::createMapWordsTitle()
     }
 
     //unsigned int counter = 0;
+}
+
+/**
+* @brief add a new search
+*/
+void CBookManager::addSearch(CSearch* search) {
+    std::unique_lock lck(m_searchLock);
+    m_mapSearchs[search->getID()] = search;
+}
+
+/**
+* @brief get progress of given search
+*/
+float CBookManager::getProgress(unsigned long long id) {
+    std::shared_lock lck(m_searchLock);
+    if(m_mapSearchs.count(id) > 0)
+        return m_mapSearchs[id]->getProgress();
+    else
+        return 1;
+}
+
+
+/**
+* @brief delete given search and erase from map
+*/
+void CBookManager::deleteSearch(unsigned long long id) {
+    std::unique_lock lck(m_searchLock);
+    for(auto it=m_mapSearchs.begin(); it!=m_mapSearchs.end(); it++)
+    {
+        if(it->first == id)
+            delete it->second;
+        m_mapSearchs.erase(it);
+    }
 }
 
