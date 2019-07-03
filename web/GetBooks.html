@@ -585,7 +585,7 @@ function init() {
 	});
 
 	document.getElementsByClassName("reader")[0].addEventListener("scroll", updateAfterScroll, false);
-		Server.Get("/getBookRessources?book=" + scanId + "&ressource=info.json", function(content) {
+		Server.Get("/getBookMetadata?scanId=" + scanId, function(content) {
 		metadata = JSON.parse(content);
 	  	document.getElementById("scanBibInfo").innerHTML = metadata.bib;
 		if(metadata.data.creators[0].lastName === undefined)
