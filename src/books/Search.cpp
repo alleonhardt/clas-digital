@@ -180,8 +180,9 @@ bool CSearch::checkSearchOptions(CBook* book)
     bool match = false;
     for(auto const &collection : m_sOpts->getCollections()) {
         if(func::in(collection, book->getCollections()) == true)
-            return match;
+            match = true;
     }
+    return match;
 
     //*** Check correct access rights ***//
     if((book->getDate()==-1 || book->getDate() > 1919) && m_sOpts->getAccess()==false)
@@ -203,3 +204,9 @@ std::list<CBook*>* CSearch::convertToList(std::map<std::string, CBook*>* mapBook
 }
 
 
+/**
+* @brief delete searchOptions
+*/
+void CSearch::deleteSearchOptions() {
+    delete m_sOpts;
+}

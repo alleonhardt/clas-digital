@@ -56,7 +56,7 @@ int main()
         int fuzzy = std::stoi(sFuzzy);
 
         
-        CSearchOptions* searchOpts = new CSearchOptions(sInput, fuzzy, {}, false, true, "", 0 , 2019, 0);
+        CSearchOptions* searchOpts = new CSearchOptions(sInput, fuzzy, {}, false, true, "", 0 , 2019, 1);
         CSearch* search = new CSearch(searchOpts, 0);
         manager.addSearch(search);
 
