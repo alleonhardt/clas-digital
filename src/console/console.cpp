@@ -59,8 +59,22 @@ namespace alx
 		int ch;
 		auto it = _cmdBuffer.end();
 		std::string spcChar="";
+		int x_max, y_max;
+		getmaxyx(stdscr,y_max,x_max);
+		y_max = 0;
+
 		for(;;)
 		{
+			getyx(_cmd,ch,y_max);
+			wattrset(_cmd,COLOR_PAIR(3)|A_BOLD);
+			wmove(_cmd,0,0);
+			whline(_cmd,0,x_max);
+			wattrset(_cmd,COLOR_PAIR(4)|A_BOLD);
+			mvwaddstr(_cmd,1,0,"$> ");
+			wattrset(_cmd,COLOR_PAIR(1)|A_BOLD);
+			wmove(_cmd,1,y_max);
+			wrefresh(_cmd);
+
 			ch = wgetch(_cmd);
 			std::lock_guard lck(_outputLock);
 			
@@ -98,9 +112,7 @@ namespace alx
 					continue;
 
 				command.pop_back();
-				int x,y;
-				getyx(_cmd,y,x);
-				wmove(_cmd,y,x-1);
+				wmove(_cmd,1,y_max-1);
 				wdelch(_cmd);
 			}
 			else if(ch>255)
