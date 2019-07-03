@@ -17,7 +17,6 @@ private:
 
     std::string m_sKey;                                 //Key of the book
     std::string m_sPath;                                //Path to book (if exists)
-    std::map<std::string, int> m_Words;                 //Map of all words in book.
     bool m_bOcr;                                        //Book has ocr path
     CMetadata m_Metadata;                               //Json with all metadata 
 
@@ -55,11 +54,6 @@ public:
     * @return Boolean, whether book contains ocr or not 
     */
     bool getOcr();
-
-    /**
-    * @return map of all words in book 
-    */
-    const std::map<std::string, int>& getMapWords();
 
     /**
     * @return info.json of book
@@ -118,5 +112,15 @@ public:
     * @return map of pages with vector of words found on this page
     */
     std::map<int, std::vector<std::string>>* getPagesFuzzy(std::string sWord);
+
+    //Create map of pages and found words for i-word (Contains)
+    std::map<int, std::vector<std::string>>* findPagesContains(std::string sWord, std::map<std::string, std::vector<size_t>>& mapWordsPages);
+
+    //Create map of pages and found words for i-word (fuzzy)
+    std::map<int, std::vector<std::string>>* findPagesFuzzy(std::string sWord, std::map<std::string, std::vector<size_t>>& mapWordsPages);
+
+    //Remove all elements from mapPages, which do not exist in results2. 
+    //For all other elements, add the found string from results to on this page to the result
+    void removePages(std::map<int, std::vector<std::string>>* mapPages, std::map<int, std::vector<std::string>>* results2);
 
 };
