@@ -13,14 +13,42 @@
 class CSearch
 {
 private:
+    std::string m_sID;
+    std::string m_sWord;
     CSearchOptions* m_sOpts;
+    float m_fProgress;
 
 public:
     
     /**
     * @brief constructor
     */
-    CSearch(CSearchOptions* searchOpts);
+    CSearch(CSearchOptions* searchOpts, std::string sID);
+
+    // *** GETTER *** //
+
+    /**
+    * @return id of search
+    */
+    std::string getID();
+
+    /**
+    * @return searched word from searchOptions
+    */
+    std::string getSearchedWord();
+
+    /**
+    * @return progress
+    */
+    float getProgress();
+
+    // *** SETTER *** //
+
+    /**
+    * param[in] searchedWord set searched word
+    */
+    void setWord(std::string sWord);
+
 
     std::map<std::string, CBook*>* search(std::map<std::string, std::map<std::string, CBook*>>& mWs,
                                         std::map<std::string, std::map<std::string, CBook*>>& mWsTitle);

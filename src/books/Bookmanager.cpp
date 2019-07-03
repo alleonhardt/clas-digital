@@ -79,24 +79,22 @@ void CBookManager::addBook(std::string sKey) {
 * @param[in] searchOPts 
 * @return list of all found books
 */
-std::map<std::string, CBook*>* CBookManager::search(CSearchOptions* searchOpts)
+std::map<std::string, CBook*>* CBookManager::search(CSearch& search)
 {
     //Create vector of seperated words
     std::vector<std::string> vWords; 
-    func::split(searchOpts->getSearchedWord(), "+", vWords);
+    func::split(search.getSearchedWord(), "+", vWords);
 
-    //Create new instance of "CSearch"
-    searchOpts->setSearchedWord(vWords[0]);
-    CSearch search(searchOpts);
+    //Set searched word
+    search.setWord(vWords[0]);
 
     //Search main word
     std::map<std::string, CBook*>* results1 = search.search(m_mapWords, m_mapWordsTitle);
 
     for(unsigned int i=1; i<vWords.size(); i++)
     {
-        //Create new instance of "CSearch"
-        searchOpts->setSearchedWord(vWords[i]);
-        CSearch search2(searchOpts);
+        //Change searched word
+        search.setWord(vWords[i]);
 
         //Get results for second word
         std::map<std::string, CBook*>* results2 = search.search(m_mapWords, m_mapWordsTitle);

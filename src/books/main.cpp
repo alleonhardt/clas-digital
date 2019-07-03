@@ -57,10 +57,11 @@ int main()
 
         
         CSearchOptions* searchOpts = new CSearchOptions(sInput, fuzzy, {}, false, true, "", 0 , 2019);
+        CSearch* search = new CSearch(searchOpts, "jim");
 
         alx::cout.write ("Searching for ", sInput, "... \n");
 
-        std::map<std::string, CBook*>* searchResults = manager.search(searchOpts);
+        std::map<std::string, CBook*>* searchResults = manager.search((*search));
         unsigned int counter = 0;
         for(auto it=searchResults->begin(); it!=searchResults->end(); it++)
         {

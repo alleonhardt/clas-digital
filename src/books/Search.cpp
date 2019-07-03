@@ -3,15 +3,49 @@
 /**
 * @brief constructor
 */
-CSearch::CSearch(CSearchOptions* searchOpts) {
+CSearch::CSearch(CSearchOptions* searchOpts, std::string sID) {
     m_sOpts = searchOpts;
+    m_sID = sID;
+    m_fProgress = 0.0;
+}
+
+// *** GETTER *** //
+
+/**
+* @return id of search
+*/
+std::string CSearch::getID() {
+    return m_sID;
+}
+
+/**
+* @return searched word from searchOptions
+*/
+std::string CSearch::getSearchedWord() {
+    return m_sOpts->getSearchedWord();
+}
+
+/**
+* @return progress
+*/
+float CSearch::getProgress() {
+    return m_fProgress;
+}
+
+// *** SETTER *** //
+
+/**
+* param[in] searchedWord set searched word
+*/
+void CSearch::setWord(std::string sWord) {
+    m_sWord = sWord;
 }
 
 
 std::map<std::string, CBook*>* CSearch::search(std::map<std::string, std::map<std::string, CBook*>>& mWs,
                                         std::map<std::string, std::map<std::string, CBook*>>& mWsTitle)
 {
-    alx::cout.write("Searching for ", m_sOpts->getSearchedWord(), "\n");
+    alx::cout.write("Searching for ", m_sWord, "\n");
 
     //Create empty map of searchResults
     std::map<std::string, CBook*>* mapSearchresults = new std::map<std::string, CBook*>;
@@ -61,8 +95,11 @@ std::map<std::string, CBook*>* CSearch::search(std::map<std::string, std::map<st
 void CSearch::normalSearch(std::map<std::string, std::map<std::string, CBook*>>& mapWords, 
                                                     std::map<std::string, CBook*>* mapSR)
 {
-    if(mapWords.count(m_sOpts->getSearchedWord()) > 0) {
-        std::map<std::string, CBook*> searchResults = mapWords.at(m_sOpts->getSearchedWord());
+    //Set Progress
+    m_fProgress = 1.0;
+
+    if(mapWords.count(m_sWord) > 0) {
+        std::map<std::string, CBook*> searchResults = mapWords.at(m_sWord);
         mapSR->insert(searchResults.begin(), searchResults.end());
     }
 }
@@ -75,10 +112,15 @@ void CSearch::normalSearch(std::map<std::string, std::map<std::string, CBook*>>&
 void CSearch::containsSearch(std::map<std::string, std::map<std::string, CBook*>>& mapWords, 
                                                     std::map<std::string, CBook*>* mapSR) 
 {
+    unsigned int counter = 0;
     for(auto it= mapWords.begin(); it!=mapWords.end(); it++)
     {
-        if(func::contains(it->first, m_sOpts->getSearchedWord()) == true)
+        if(func::contains(it->first, m_sWord)== true)
             mapSR->insert(it->second.begin(), it->second.end());
+
+        //Calculate progress
+        m_fProgress = static_cast<float>(counter)/static_cast<float>(mapWords.size());
+        counter++;
     }
 }
 
@@ -90,10 +132,15 @@ void CSearch::containsSearch(std::map<std::string, std::map<std::string, CBook*>
 void CSearch::fuzzySearch(std::map<std::string, std::map<std::string, CBook*>>& mapWords, 
                                                     std::map<std::string, CBook*>* mapSR) 
 {
+    unsigned int counter = 0;
     for(auto it= mapWords.begin(); it!=mapWords.end(); it++)
     {
-        if(fuzzy::fuzzy_cmp(it->first.c_str(), m_sOpts->getSearchedWord().c_str()) == true)
+        if(fuzzy::fuzzy_cmp(it->first.c_str(), m_sWord.c_str()) == true)
             mapSR->insert(it->second.begin(), it->second.end());
+
+        //Calculate progress
+        m_fProgress = static_cast<float>(counter)/static_cast<float>(mapWords.size());
+        counter++;
     }
 }
 

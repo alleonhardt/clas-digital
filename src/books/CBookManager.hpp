@@ -52,7 +52,7 @@ public:
     * @brief search function calling fitting function from search class
     * @return list of all found books
     */
-    std::map<std::string, CBook*>* search(CSearchOptions* searchOpts);
+    std::map<std::string, CBook*>* search(CSearch& search);
 
     /**
     * @brief create map of all words (key) and books in which the word occurs (value)
