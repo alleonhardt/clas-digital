@@ -88,11 +88,18 @@ public:
     void setPath(std::string sPath);
     
     /**
-    * Create a map of all word of this book
+    * @brief Create a map of all word of this book
     */
     void createMapWords();
 
+    /**
+    * @brief safe map of all words and pages on which word occures to disc
+    */
     void safePages();
+
+    /**
+    * @brief load words and pages on which word occures into map
+    */
     void loadPages(std::map<std::string, std::vector<size_t>>& mapWordsPages);
 
     /*
@@ -113,14 +120,21 @@ public:
     */
     std::map<int, std::vector<std::string>>* getPagesFuzzy(std::string sWord);
 
-    //Create map of pages and found words for i-word (Contains)
+    /**
+    * @brief Create map of pages and found words for i-word (Contains)
+    * @return map of all pages on which word was found.
+    */
     std::map<int, std::vector<std::string>>* findPagesContains(std::string sWord, std::map<std::string, std::vector<size_t>>& mapWordsPages);
 
-    //Create map of pages and found words for i-word (fuzzy)
+    /** 
+    * @brief Create map of pages and found words for i-word (fuzzy)
+    * @return map of all pages on which word was found.
+    */
     std::map<int, std::vector<std::string>>* findPagesFuzzy(std::string sWord, std::map<std::string, std::vector<size_t>>& mapWordsPages);
 
-    //Remove all elements from mapPages, which do not exist in results2. 
-    //For all other elements, add the found string from results to on this page to the result
+    /**
+    * @brief Remove all elements from mapPages, which do not exist in results2. 
+    */
     void removePages(std::map<int, std::vector<std::string>>* mapPages, std::map<int, std::vector<std::string>>* results2);
 
 };
