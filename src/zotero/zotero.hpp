@@ -68,7 +68,7 @@ class Zotero
 		 */
 		struct Request
 		{
-			static constexpr const char GetAllItems[] = "/items?format=json&include=data,bib,citation&limit=100"; ///< The zotero request to get all items in the zotero library from zotero
+			static constexpr const char GetAllItems[] = "/items/top?format=json&include=data,bib,citation&limit=100"; ///< The zotero request to get all items in the zotero library from zotero
 			static constexpr const char GetAllPillars[] = "/collections/top?format=json"; ///< The zotero request to get all collections from the zotero api
 			static std::string GetSpecificItem(std::string key); ///< The zotero request to get a specific item from the zotero api
 			static std::string GetItemsInSpecificPillar(std::string key); ///< The zotero request to get all items from a specific collection out of zotero
@@ -86,6 +86,7 @@ class Zotero
 		 */
 		~Zotero();
 
+		static const nlohmann::json &GetPillars();
 		friend size_t zoteroHeaderReader(char *, size_t, size_t, void *); ///< Needed as curl callback on header receiving
 		friend size_t zoteroReadBuffer(void *, size_t, size_t, void *);  ///< Needed as curl callback on data receiving
 };

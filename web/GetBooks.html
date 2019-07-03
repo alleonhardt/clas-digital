@@ -417,7 +417,7 @@ function parseURLParams(url) {
 }
 function doAdditionalSearch() {
 	let parsedUrlParams = parseURLParams(window.location.href);
-	window.open("/1/GetBooks.html?query="+document.getElementById("adSrch").value+"&scanId="+parsedUrlParams['scanId']);
+	window.open("/GetBooks.html?query="+document.getElementById("adSrch").value+"&scanId="+parsedUrlParams['scanId']+"&fuzzyness="+parsedUrlParams['fuzzyness']);
 
 }
 

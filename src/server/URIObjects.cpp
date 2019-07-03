@@ -3,6 +3,8 @@
 #include <experimental/filesystem>
 #include <chrono>
 #include "src/server/URIObjects.hpp"
+#include "src/zotero/zotero.hpp"
+
 using namespace proxygen;
 namespace fs = std::experimental::filesystem;
 
@@ -175,12 +177,27 @@ void GetBookRessource::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 		}
 		else if(book!=""&&res!="") //Reads the specific ressource and sends the file with a specific mime type to the client
 		{
+			
 			//Create the path to the book
 			std::string path = "web/books/";
 			path+=book;
 			path+="/";
 			path+=res;
 
+			if(headers->getDecodedQueryParam("exist_check")!="")
+			{
+				if(fs::exists(path))
+				{
+					return ResponseBuilder(downstream_)
+						.status(200,"Ok")
+						.body("file exists")
+						.sendWithEOM();
+				}
+				else
+				{
+					return SendErrorNotFound(downstream_);
+				}
+			}
 			//Load the ressource from the constructed path if the ressource does not exist the constructor of URIFile will throw an expection 
 			URIFile fl(std::move(path));
 
@@ -296,14 +313,14 @@ void GetSearchInBookHandler::onRequest(std::unique_ptr<proxygen::HTTPMessage> he
 		if(Fuzzyness==0)
 		{
 			alx::cout.write(alx::console::yellow_black,"Using normal search!\n");
-			std::unique_ptr<std::list<int>> listPtr(book.getPagesFull(std::move(searchFor)));
-		
-		js["is_fuzzy"] = false;
-		for(auto it : *listPtr)
-		{
-			int k = it;
-			js["books"].push_back(k);
-		}
+			std::unique_ptr<std::list<size_t>> listPtr(book.getPagesFull(std::move(searchFor)));
+
+			js["is_fuzzy"] = false;
+			for(auto it : *listPtr)
+			{
+				int k = it;
+				js["books"].push_back(k);
+			}
 		}
 		else
 		{
@@ -323,7 +340,7 @@ void GetSearchInBookHandler::onRequest(std::unique_ptr<proxygen::HTTPMessage> he
 			}
 
 			js["is_fuzzy"] = true;
-	  		auto glambda = [](std::string const &str, std::string const &from,std::string const &to) -> std::string {return std::regex_replace(str,std::regex(from),to);};
+			auto glambda = [](std::string const &str, std::string const &from,std::string const &to) -> std::string {return std::regex_replace(str,std::regex(from),to);};
 			for(auto const &it : *mapPtr)
 			{
 				for(auto const &inner : it.second)
@@ -348,5 +365,117 @@ void GetSearchInBookHandler::onRequest(std::unique_ptr<proxygen::HTTPMessage> he
 	catch(...)
 	{
 		return SendErrorNotFound(downstream_);
+	}
+}
+
+void RedirectToHTTPSHandler::onRequest(std::unique_ptr<proxygen::HTTPMessage> /*headers*/) noexcept
+{
+	ResponseBuilder(downstream_)
+		.status(301,"Moved Permanently")
+		.header("Location","https://www.clas-digital.uni-frankfurt.de")
+		.sendWithEOM();
+}
+
+void GetBookMetadata::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers) noexcept
+{
+	try
+	{
+		if(!User::AccessCheck(_user,AccessRights::USR_READ))
+			throw 0;
+		
+		auto &mapofbooks = GetSearchHandler::GetBookManager().getMapOfBooks();
+		std::string inBook = headers->getDecodedQueryParam("scanId");
+		
+		if(inBook=="") throw 0;
+
+		std::string json;
+		try
+		{
+			json = std::move(mapofbooks.at(inBook).getMetadata().getMetadata().dump());
+		}
+		catch(...)
+		{
+			json = Zotero::SendRequest(Zotero::Request::GetSpecificItem(inBook));
+			
+			if(json=="") throw 0;
+
+			nlohmann::json js;
+			js.push_back(std::move(nlohmann::json::parse(json)));
+
+			alx::cout.writeln("Adding a new json to the map of all books with key: ",alx::console::yellow_black,js[0]["data"]["key"].get<std::string>());
+			GetSearchHandler::GetBookManager().updateZotero(std::move(js));
+		}
+		ResponseBuilder(downstream_)
+			.status(200,"Ok")
+			.header("Content-Type","application/json")
+			.body(std::move(json))
+			.sendWithEOM();
+	}
+	catch(...)
+	{
+		return SendErrorNotFound(downstream_);
+	}
+}
+
+
+void UploadBookHandler::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers) noexcept
+{
+	try
+	{
+		if(!User::AccessCheck(_user,AccessRights::USR_WRITE))
+			throw 0;
+
+		std::string whichBook = headers->getDecodedQueryParam("itemKey");
+		std::string filename = headers->getDecodedQueryParam("filename");
+
+		if(filename.find("..")!=std::string::npos||filename.find("~")!=std::string::npos)
+			throw "Illegal filename provided!";
+
+		auto &mapofbooks = GetSearchHandler::GetBookManager().getMapOfBooks();
+		mapofbooks.at(whichBook); //Check if book exists
+		_finalPath = "web/books/";
+		_finalPath+=whichBook;
+		if(!fs::exists(_finalPath))
+		{
+			fs::create_directory(_finalPath);
+		}
+
+		_finalPath+="/";
+		_finalPath+=filename;
+
+		if(fs::exists(_finalPath))
+			throw "File or folder already exists!";
+
+		ofs.open(_finalPath.c_str(),std::ios::out);
+		
+		if(!ofs.is_open())
+			throw "Cannot open path to write the file!";
+	}
+	catch(const char *msg)
+	{
+		return SendAccessDenied(downstream_,msg);
+	}
+	catch(...)
+	{
+		return SendAccessDenied(downstream_);
+	}
+}
+
+void UploadBookHandler::onBody(std::unique_ptr<folly::IOBuf> body) noexcept
+{
+	if(ofs.is_open())
+		ofs.write(reinterpret_cast<const char*>(body->data()),body->length());
+}
+
+
+void UploadBookHandler::onEOM() noexcept
+{
+	if(ofs.is_open())
+	{
+		ofs.close();
+		ResponseBuilder(downstream_)
+			.status(200,"Ok")
+			.body("Successfully written file!")
+			.sendWithEOM();
 	}
 }

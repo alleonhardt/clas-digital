@@ -1,5 +1,4 @@
 <!doctype html>
-<html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -40,27 +39,19 @@ class User {
     xhr.send(null);
   }
 
-  static initialise() {
-    if(window.sessionStorage.email == undefined || window.sessionStorage.access == undefined)
-	{
-		window.location.href = "/";
-	}
-	else
-	{
-        document.getElementById("LoggedInAs").innerHTML = "Logged in as <strong>"+window.sessionStorage.email+"</strong>";
-    
-        let list = document.getElementsByClassName("classifiedContent");
-        //Unlocks all the content that the user can access!
-	for(var i=0; i < list.length; i++)
-        {
-            let y = list[i].dataset.acc;
-            if((window.sessionStorage.access&y)!=0)
-            {
-                list[i].style.display="block";
-            }
-        }
+  static initialise() { 
+		document.getElementById("LoggedInAs").innerHTML = "Logged in as <strong>"+ServerDataObj.user.email+"</strong>";
 
-    }
+			let list = document.getElementsByClassName("classifiedContent");
+			//Unlocks all the content that the user can access!
+			for(var i=0; i < list.length; i++)
+			{
+				let y = list[i].dataset.acc;
+				if((ServerDataObj.user.access&y)!=0)
+				{
+					list[i].style.display="block";
+				}
+			}
     OnUserList();
   }
 }
@@ -358,4 +349,3 @@ window.addEventListener("load",User.initialise,false);
 </ul>
 <button class='btn btn-outline-warning my2 my-sm-0' id="SaveUserButton" onclick='SaveUserList()'>Save Changes</button>
 </body>
-</html>

@@ -1,5 +1,4 @@
 <!doctype html>
-<html lang="en">
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -18,7 +17,7 @@
 .button_box_top {
 	text-align: center;
 	width: 80%;
-	margin-top: 3%;
+	margin-top: 10%;
 	padding-top: 20px;
 	margin-left: 10%;
 	padding-bottom: 4rem;
@@ -295,7 +294,6 @@ class User {
 	}
 
 	static initialise() {
-		StateBanner.ChangeBanner("Fuzzy search ist momentan nicht benutzbar, also bitte nicht testen!",StateBannerType.warning);
 		let inp = document.getElementById("SpecialSID");
 		inp.addEventListener("keypress",function(event){
 			if(event.key === "Enter")
@@ -304,26 +302,18 @@ class User {
 			}
 		});
 
-		if(window.sessionStorage.email == undefined || window.sessionStorage.access == undefined)
-		{
-			window.location.href = "/";
-		}
-		else
-		{
-			document.getElementById("LoggedInAs").innerHTML = "Logged in as <strong>"+window.sessionStorage.email+"</strong>";
+		document.getElementById("LoggedInAs").innerHTML = "Logged in as <strong>"+ServerDataObj.user.email+"</strong>";
 
 			let list = document.getElementsByClassName("classifiedContent");
 			//Unlocks all the content that the user can access!
 			for(var i=0; i < list.length; i++)
 			{
 				let y = list[i].dataset.acc;
-				if((window.sessionStorage.access&y)!=0)
+				if((ServerDataObj.user.access&y)!=0)
 				{
 					list[i].style.display="block";
 				}
 			}
-
-		}
 		ApplySearchData();
 		default_search_parameters = JSON.parse(JSON.stringify(search_parameters));
 	}
@@ -369,6 +359,17 @@ class StateBanner {
 	}
 }
 
+function getSliderValue(x)
+{
+	if(x==0)
+		return "Show only exact matches               ";
+	else if(x==1)
+		return "Show all matches that contain the word";
+	else
+		return "Try fuzzy matching                    ";
+
+}
+
 //Opens the search options
 function openSearchOpts(name)
 {
@@ -387,9 +388,8 @@ function openSearchOpts(name)
 	advancedOpts.style.display = "block";
 
 	//Show the last set amount of fuzzyness in the modal banner
-	let x = document.getElementById("FuzzyID");
-	document.getElementById("SliderNum").innerHTML = x.value;
-
+	let x = document.getElementById("FuzzyID").value;
+	document.getElementById("SliderNum").innerHTML = getSliderValue(x);
 
 	//Prepare the close button, on close click it will hide the modal banner
 	let close = document.getElementById("CloseSModal");
@@ -487,7 +487,7 @@ function sendToPage(name)
 	let inputObj = document.getElementById(name);
 	let input = inputObj.value;
 	//Form the request for the server
-	let requ = "/searchword?search="+input;
+	let requ = "/searchword?search="+encodeURIComponent(input);
 
 	//Create the json file with the advanced search options
 	requ += "&fuzzyness="+document.getElementById("FuzzyID").value;
@@ -499,7 +499,7 @@ function sendToPage(name)
 		requ += "&author="+document.getElementById("SearchForAuthor").value;
 	requ += "&publicatedafter="+document.getElementById("PublicatedAfter").value;
 	requ +=  "&publicatedbefore="+ document.getElementById("PublicatedBefore").value;
-	let myList = document.getElementsByClassName("saeule");
+	let myList = document.getElementsByClassName("upSaule");
 	
 	requ+="&pillars=";
 	let val = "";
@@ -532,6 +532,11 @@ function sendToPage(name)
 		//Parse the received json file
 		jsonObj = JSON.parse(xhr.responseText);
 		lastInput = input;
+		if(jsonObj.books === undefined)
+		{
+			alert("No results found!");
+			return;
+		}
 		//corrupted json? Show error message
 		if(jsonObj.books==undefined)
 		{
@@ -560,7 +565,7 @@ function sendToPage(name)
 			if(!jsonObj.books[i].hasocr || (jsonObj.books[i].hasocr == undefined))
 			{
 
-				inner = "<a data-specialhref='/1/ShowMetadata.html";
+				inner = "<a data-specialhref='/getBookMetadata";
 			}
 			else
 			{
@@ -620,11 +625,6 @@ function LoadSearchData(sp)
 	document.getElementById("PublicatedAfter").value = sp.pub_after;
 	document.getElementById("PublicatedBefore").value = sp.pub_before;
 	document.getElementById('SliderNum').innerHTML = sp.fuzzyness;
-	document.getElementById("SaeuleGeschiZoo").checked = sp.saeule_gesch_zoo;
-	document.getElementById("SaeuleGeschiLi").checked = sp.saeule_gesch_li;
-	document.getElementById("SaeuleForsch").checked = sp.saeule_forsch;
-	document.getElementById("SaeuleBuechnerLi").checked = sp.saeule_buechner_li;
-	document.getElementById("SaeuleForschBuechner").checked = sp.saeule_forsch_buechner;
 }
 
 
@@ -637,12 +637,6 @@ function ApplySearchData()
 	search_parameters.author_name = document.getElementById("SearchForAuthor").value;
 	search_parameters.pub_after = document.getElementById("PublicatedAfter").value;
 	search_parameters.pub_before = document.getElementById("PublicatedBefore").value;
-	search_parameters.saeule_gesch_zoo = document.getElementById("SaeuleGeschiZoo").checked;
-	search_parameters.saeule_gesch_li = document.getElementById("SaeuleGeschiLi").checked;
-	search_parameters.saeule_forsch = document.getElementById("SaeuleForsch").checked;
-	search_parameters.saeule_buechner_li = document.getElementById("SaeuleBuechnerLi").checked;
-	search_parameters.saeule_forsch_buechner = document.getElementById("SaeuleForschBuechner").checked;
-
 	document.getElementById("ModalBanner").style.display = "none";
 }
 
@@ -656,6 +650,11 @@ window.addEventListener("load",User.initialise,false);
 		<style>
 
 .topnav {
+	top:0;
+	left:0;
+	width: 100vw;
+	z-index: 1;
+	position: fixed;
 	background-color: #333;
 	overflow: hidden;
 }
@@ -770,9 +769,36 @@ window.addEventListener("load",User.initialise,false);
   -ms-transform: rotate(45deg);
   transform: rotate(45deg);
 } 
+
+.upSaule {
+	margin-left: 1rem;
+}
+
+#ordered_pillars li {
+	margin-top: 1rem;
+}
 		</style>
+	<script>
+		function ExecuteInitialise()
+		{
+			if(ServerDataObj===undefined)
+				console.log("Cant find server data!");
+			else
+			{
+				if(ServerDataObj.pillars != undefined)
+				{
+					let x = document.getElementById("ordered_pillars");
+					for(let i = 0; i < ServerDataObj.pillars.length; i++)
+					{
+						x.innerHTML += "<li data-key='"+ServerDataObj.pillars[i].key+"'>"+ServerDataObj.pillars[i].name+"<input type='checkbox' data-key='"+ServerDataObj.pillars[i].key+"' class='upSaule' checked></li>";
+					}
+				console.log("Server data found!");
+				}
+			}
+		}
+	</script>
 	</head>
-	<body>
+	<body onload="ExecuteInitialise()">
 		<!-- The navigation bar config -->
 		<div class="topnav">
 			<a href="/">Home</a>
@@ -790,16 +816,12 @@ window.addEventListener("load",User.initialise,false);
 				<span id="CloseSModal" class="close">&times;</span>
 				<div class="slider">
 					<p>Select the collections...</p>
-					<label class="checkbox-inline slider"><input id="SaeuleGeschiZoo" class="saeule" type="checkbox" value="" data-key="RFWJC42V" checked>Geschichte des Tierwissens</label>
-					<label class="checkbox-inline slider"><input id="SaeuleGeschiLi" class="saeule" type="checkbox" value="" data-key="2SWXSFCX" checked>Literarische Texte</label>
-					<label class="checkbox-inline slider"><input id="SaeuleForsch" class="saeule" type="checkbox" value="" data-key="XCFFDRQC" checked>Forschungsliteratur CLAS</label>
-					<label class="checkbox-inline slider"><input id="SaeuleBuechnerLi" class="saeule" type="checkbox" value="" data-key="WIXP3DS3" checked>Tierwissen (deprecated)</label>
-					<label class="checkbox-inline slider"><input id="SaeuleForschBuechner" class="saeule" type="checkbox" value="" data-key="RBB8DW5B" checked>Forschung Büchner</label>
+					<ol id="ordered_pillars"></ol>
 				</div>
 				<div class="slidecontainer">
 					<p class="slider">Fuzzyness (Smaller is more accurate, zero means no fuzzy search): </p>
 					<p id="SliderNum" class="sliderNum"></p>
-					<input oninput="document.getElementById('SliderNum').innerHTML=this.value;" id="FuzzyID" type="range" min="0" max="2" value="0" class="slider" id="myRange"></div>
+					<input oninput="document.getElementById('SliderNum').innerHTML=getSliderValue(this.value);" id="FuzzyID" style="float:right;"type="range" min="0" max="2" value="0" class="slider" id="myRange"></div>
 				<div class="checker">
 					<p class="slider">Search only in Titel</p>
 					<label class="checkbox-inline"><input id="SearchInTitle" type="checkbox" value=""></label>
@@ -851,4 +873,3 @@ window.addEventListener("load",User.initialise,false);
 			<div id="LinkList" class="divlisttype"></div>
 		</div>
 	</body>
-</html>

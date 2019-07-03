@@ -45,11 +45,22 @@ void PostHandler::onBody(std::unique_ptr<folly::IOBuf> body) noexcept
 			sessid+="; SECURE";
 			URIFile file("web/index.html");
 
+			auto _user = UserHandler::GetUserTable().GetUserByName(msg.getDecodedQueryParam("email"));
+			nlohmann::json js;
+			if(_user)
+			{
+				nlohmann::json usr;
+				usr["email"] = _user->GetEmail();
+				usr["access"] = _user->GetAccessRights();
+				js["user"] = std::move(usr);
+			}
+
 			//Sends the response with the created cookie
 			ResponseBuilder(downstream_)
 				.status(200,"Ok")
 				.header("Set-Cookie",std::move(sessid))
 				.body(std::move(file.getBufferReference()))
+				.body(URIFile::PrepareDataForSending(std::move(js)))
 				.sendWithEOM();
 			return;
 		}

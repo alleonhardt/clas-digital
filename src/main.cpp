@@ -108,12 +108,13 @@ int main(int argc, char* argv[]) {
 				}
 				catch(...)
 				{
-					alx::cout.write("Fetching zotero metadata from the server...\n");
+					alx::cout.write(alx::console::yellow_black,"\nNo metadata found![Fetching from server...] ");
 					std::ofstream wr("bin/zotero.json",std::ios::out);
 					std::string jstr = std::move(Zotero::SendRequest(Zotero::Request::GetAllItems));
 					wr<<jstr;
 					wr.close();
 					js = std::move(nlohmann::json::parse(jstr));
+					alx::cout.write(alx::console::green_black,"done.\n");
 				}
 				try
 				{
@@ -128,6 +129,7 @@ int main(int argc, char* argv[]) {
 					return;
 				}
 				alx::cout.write(alx::console::green_black,"done.\n");
+				Zotero::GetPillars();
 
 			if(manager.initialize())
 				alx::cout.write("CBookManager initialisation: ",alx::console::green_black,"SUCCESS\n");

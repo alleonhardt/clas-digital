@@ -57,9 +57,11 @@ class HandlerFactory : public RequestHandlerFactory {
 			_getMap["/getBookRessources"] = &CreateHandler<GetBookRessource>;
 			_getMap["/searchword"] = &CreateHandler<GetSearchHandler>;
 			_getMap["/searchInBook"] = &CreateHandler<GetSearchInBookHandler>;
+			_getMap["/getBookMetadata"] = &CreateHandler<GetBookMetadata>;
 
 			_postMap["/changeUserTable"] = &CreateHandler<UpdateUserSystemHandler>;
 			_postMap["/logout"] = &CreateHandler<PostHandler>;
+			_postMap["/uploadBook"] = &CreateHandler<UploadBookHandler>;
 		}
 
 		/**
@@ -98,8 +100,12 @@ class HandlerFactory : public RequestHandlerFactory {
 			EmptyHandler *ret = nullptr;
 			try
 			{
+				//Redirect every http request to the https site
+				if(hdr->getDstPort() == "1408")
+					ret = new RedirectToHTTPSHandler;
+				else
 				//Try to get the right request handler if the path is unknown the function will throw an error
-				ret = (*mp.at(hdr->getPath()))();
+					ret = (*mp.at(hdr->getPath()))();
 			}
 			catch(...)
 			{

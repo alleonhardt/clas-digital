@@ -1,5 +1,4 @@
 <!doctype html>
-<html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -229,33 +228,19 @@ class User {
   }
 
   static initialise() {
-    let xhr = new XMLHttpRequest();
-    xhr.open("GET","/getProfileInfo",true);
-    xhr.onload = function() {
-        let jsonObj = JSON.parse(xhr.responseText);
-        if(jsonObj.email===undefined)
-            return;
-        if(jsonObj.access===undefined)
-            return;
-
-		window.sessionStorage.email = jsonObj.email;
-		window.sessionStorage.access = jsonObj.access;
-
-        document.getElementById("LoggedInAs").innerHTML = "Logged in as <strong>"+jsonObj.email+"</strong>";
+	  document.getElementById("LoggedInAs").innerHTML = "Logged in as <strong>"+ServerDataObj.user.email+"</strong>";
     
         let list = document.getElementsByClassName("classifiedContent");
+	  	let access = ServerDataObj.user.access;
         //Unlocks all the content that the user can access!
 	for(var i=0; i < list.length; i++)
         {
             let y = list[i].dataset.acc;
-            if((jsonObj.access&y)!=0)
+            if((access&y)!=0)
             {
                 list[i].style.display="block";
             }
         }
-
-    }
-    xhr.send(null);
   }
 }
 
@@ -472,4 +457,3 @@ window.addEventListener("load",User.initialise,false);
 </div>
 <div id="StateBanner"></div>
 </body>
-</html>

@@ -28,3 +28,26 @@ TEST(UserClass,to_json)
 	EXPECT_EQ(us.toJSON(),"{\"email\": \"email\",\"access\": 9}");
 }
 
+TEST(UserClass,access_checking)
+{
+	std::shared_ptr<User> us(new User("alex","leo",5));
+	EXPECT_EQ(User::AccessCheck(us, AccessRights::USR_WRITE),false);
+	EXPECT_EQ(User::AccessCheck(us,AccessRights::USR_ADMIN),true);
+	EXPECT_EQ(User::AccessCheck(us,7),false);
+	EXPECT_EQ(User::AccessCheck(us,AccessRights::USR_READ),true);
+	
+	us->SetAccessRights(0);
+	EXPECT_EQ(User::AccessCheck(us, AccessRights::USR_WRITE),false);
+	EXPECT_EQ(User::AccessCheck(us,AccessRights::USR_ADMIN),false);
+	EXPECT_EQ(User::AccessCheck(us,7),false);
+	EXPECT_EQ(User::AccessCheck(us,AccessRights::USR_READ),false);
+	EXPECT_EQ(User::AccessCheck(us,0),true);
+
+	us = std::shared_ptr<User>();
+	EXPECT_EQ(User::AccessCheck(us, AccessRights::USR_WRITE),false);
+	EXPECT_EQ(User::AccessCheck(us,AccessRights::USR_ADMIN),false);
+	EXPECT_EQ(User::AccessCheck(us,7),false);
+	EXPECT_EQ(User::AccessCheck(us,AccessRights::USR_READ),false);
+	EXPECT_EQ(User::AccessCheck(us,0),true);
+}
+
