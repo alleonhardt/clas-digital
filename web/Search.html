@@ -501,6 +501,8 @@ function UpdateProgress(sid)
 			{
 				if(Math.floor(jsonObj.progress)==1000)
 					return;
+				if(document.getElementById('srchProgress')==null)
+					return;
 				document.getElementById('srchProgress').value = Math.floor(jsObj.progress*100);
 				document.getElementById('innumberprog').innerHTML = Math.floor(jsObj.progress*100);
 			}
