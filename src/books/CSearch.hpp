@@ -85,4 +85,11 @@ public:
     * return Boolean
     */
     bool checkSearchOptions(CBook* book);
+
+    /**
+    * @brief convert to list
+    * @return list of searchresulst
+    */
+    std::list<CBook*>* convertToList(std::map<std::string, CBook*>* mapBooks);
+
 };

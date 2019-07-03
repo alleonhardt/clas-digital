@@ -177,14 +177,29 @@ bool CSearch::checkSearchOptions(CBook* book)
         return false;
          
     //*** check pillars ***//
-    /*
     bool match = false;
     for(auto const &collection : m_sOpts->getCollections()) {
         if(func::in(collection, book->getCollections()) == true)
             return match;
-    }*/
+    }
+
+    //*** Check correct access rights ***//
+    if((book->getDate()==-1 || book->getDate() > 1919) && m_sOpts->getAccess()==false)
+        return false;
 
     return true;
 }
             
+/**
+* @brief convert to list
+* @return list of searchresulst
+*/
+std::list<CBook*>* CSearch::convertToList(std::map<std::string, CBook*>* mapBooks)
+{
+    std::list<CBook*>* listBooks = new std::list<CBook*>;
+    for(auto it=mapBooks->begin(); it!=mapBooks->end(); it++)
+        listBooks->push_back(it->second);
+    return listBooks;
+}
+
 

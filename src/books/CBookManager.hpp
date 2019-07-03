@@ -4,6 +4,7 @@
 #include <map>
 #include <fstream>
 #include <dirent.h>
+#include <shared_mutex>
 #include "CBook.hpp"
 #include "CSearch.hpp"
 #include "CSearchOptions.hpp"
@@ -20,6 +21,10 @@ private:
     std::map<std::string, CBook> m_mapBooks;
     std::map<std::string, std::map<std::string, CBook*>> m_mapWords;
     std::map<std::string, std::map<std::string, CBook*>> m_mapWordsTitle;
+
+    std::map<unsigned long long, CSearch*> m_mapSearchs;
+
+    std::shared_mutex m_searchLock;
 
 public:
 
@@ -52,7 +57,7 @@ public:
     * @brief search function calling fitting function from search class
     * @return list of all found books
     */
-    std::map<std::string, CBook*>* search(CSearch& search);
+    std::map<std::string, CBook*>* search(unsigned long long id);
 
     /**
     * @brief create map of all words (key) and books in which the word occurs (value)
@@ -63,6 +68,21 @@ public:
     * @brief create map of all words (key) and book-titles in which the word occurs (value)
     */
     void createMapWordsTitle();
+
+    /**
+    * @brief add a new search
+    */
+    void addSearch(CSearch* search);
+
+    /**
+    * @brief get progress of given search
+    */
+    float getProgress(unsigned long long id);
+
+    /**
+    * @brief delete given search and erase from map
+    */
+    void deleteSearch(unsigned long long id);
 }; 
 
 
