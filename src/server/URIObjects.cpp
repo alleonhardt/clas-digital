@@ -255,26 +255,17 @@ void GetSearchHandler::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 
 		auto start = std::chrono::system_clock::now();
 		std::unique_ptr<CSearchOptions> nso(new CSearchOptions(std::move(word),Fuzzyness,std::move(pillars),onlyTitle,ocrOnly,std::move(author),from,to));
-		CSearch search_now(nso.get(),1);
-		auto results = GetBookManager().search(search_now);
-		auto end = std::chrono::system_clock::now();
-		std::chrono::duration<double> elapsed_seconds = end-start;
-		alx::cout.write(alx::console::yellow_black,"Search all books time: ",elapsed_seconds.count(),"s \n");
-		nlohmann::json js;
-
-		for(auto &it : *results)
-		{
-			nlohmann::json entry;
-			entry["scanId"] = it.first;
-			entry["hasocr"] = it.second->getOcr();
-			entry["description"] = it.second->getMetadata().getShow();
-			js["books"].push_back(std::move(entry));
-		}
-
+		
+		static std::atomic<unsigned long long> unique_sid = 0;
+		long long searchid = unique_sid.fetch_add(1);
+		CSearch * csearch = new CSearch(nso.get(),searchid);
+		GetSearchHandler::GetBookManager().addSearch(csearch);
+		nlohmann::json json;
+		json["searchid"] = std::to_string(searchid);
 		ResponseBuilder(downstream_)
 			.status(200,"Ok")
 			.header("Content-Type","application/json")
-			.body(std::move(js.dump()))
+			.body(std::move(json))
 			.sendWithEOM();
 		return;
 	}
@@ -479,4 +470,64 @@ void UploadBookHandler::onEOM() noexcept
 			.body("Successfully written file!")
 			.sendWithEOM();
 	}
+}
+
+void StartSearch::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers) noexcept
+{
+	std::string inBook = headers->getDecodedQueryParam("searchID");
+	if(inBook=="")
+		return SendErrorNotFound(downstream_);
+
+	long long id = 0;
+	try
+	{
+		id = std::stoll(inBook);
+	}
+	catch(...)
+	{
+		return SendErrorNotFound();
+	}
+
+	auto results = GetBookManager().search(id);
+	auto end = std::chrono::system_clock::now();
+	std::chrono::duration<double> elapsed_seconds = end-start;
+	alx::cout.write(alx::console::yellow_black,"Search all books time: ",elapsed_seconds.count(),"s \n");
+		nlohmann::json js;
+
+		for(auto &it : *results)
+		{
+			nlohmann::json entry;
+			entry["scanId"] = it.first;
+			entry["hasocr"] = it.second->getOcr();
+			entry["description"] = it.second->getMetadata().getShow();
+			js["books"].push_back(std::move(entry));
+		}
+
+		ResponseBuilder(downstream_)
+			.status(200,"Ok")
+			.header("Content-Type","application/json")
+			.body(std::move(js.dump()))
+			.sendWithEOM();
+}
+
+void RequestSearchProgress::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers) noexcept
+{
+	std::string inBook = headers->getDecodedQueryParam("searchID");
+	long long id;
+	float prog = 1.0;
+	try
+	{
+		id = std::stoll(inBook);
+		prog = GetSearchHandler::GetBookManager().getSearchProgress(id);
+	}
+	catch(...)
+	{}
+
+	nlohmann::json j;
+	j["progress"] = prog;
+	ResponseBuilder(downstream_)
+			.status(200,"Ok")
+			.header("Content-Type","application/json")
+			.body(j.dump())
+			.sendWithEOM();
 }

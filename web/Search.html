@@ -33,12 +33,15 @@
 	margin-bottom: 1rem;
 }
 
-.headerStyle progress {
-	display: block;
-	float: right;
-	margin-right: 0;
-	color: white;
-	padding: 3rem;
+.divsearch {
+	margin: 2rem;
+	padding: 1rem;
+	border: 2px solid black;
+}
+
+.progbar {
+	display: inline-block;
+	margin-left: 2rem;
 }
 
 /*Styling the search bar*/
@@ -530,11 +533,25 @@ function sendToPage(name)
 	let xhr = new XMLHttpRequest();
 	xhr.open("GET",requ,true);
 
+
 	//Clear the results of the last search
 	let obj = document.getElementById("SearchHitList");
 	obj.innerHTML = "";  
 
-	document.getElementById("ResultBanner").innerHTML	= "<h1 class='headerStyle'>Search Results for: \""+document.getElementById("SpecialSID").value+"\"<progress value=10 max=100></progress></h1>"; 
+	document.getElementById("ResultBanner").innerHTML	= "<p class='divsearch'>Search Progress: <span id='innumberprog'>0</span>%<progress class='progbar' value=0 max=100 id='srchProgress'></progress></p>"; 
+	let progHandler = new XMLHttpRequest();
+	let requestDone = false;
+
+	progHandler.open("GET","/getSearchProgress?searchID=10",true);
+	progHandler.onload = function() {
+		if(requestDone||progHandler.status!=200)
+			return;
+		let jsObj = JSON.parse(progHandler.responseText);
+		document.getElementById('srchProgress').value = Math.floor(jsObj.progress*100);
+		document.getElementById('innumberprog').innerHTML = Math.floor(jsObj.progress*100);
+	}
+	progHandler.send(null);
+
 	xhr.onload = function() {
 		//First of all log the response for debug purposes
 		console.log(xhr.responseText);
@@ -598,6 +615,8 @@ function sendToPage(name)
 			//Show the new link in the search hit list
 			obj.appendChild(newList);
 		}
+		
+		
 		/*
 		let lList = document.getElementById("LinkList");
 		for(var i = 0; i < (jsonObj.books.length/25); i++)

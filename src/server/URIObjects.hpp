@@ -123,3 +123,15 @@ class UploadBookHandler : public EmptyHandler
 		void onBody(std::unique_ptr<folly::IOBuf> body) noexcept override;
 		void onEOM() noexcept override;
 };
+
+class StartSearch : public EmptyHandler
+{
+		void onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
+			noexcept override;
+};
+
+class RequestSearchProgress : public EmptyHandler
+{
+		void onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
+			noexcept override;
+};
