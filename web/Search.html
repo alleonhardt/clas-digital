@@ -553,11 +553,17 @@ function sendToPage(name)
 	progHandler.send(null);
 
 	xhr.onload = function() {
+		if(xhr.status!=200)
+			return;
+		let jsSearchId = JSON.parse(xhr.responseText);
+		let realSearch = new XMLHttpRequest();
+		realSearch.open("GET","/startSearch?searchID="+jsSearchId.searchid,true);
+		realSearch.onload = function() {
 		//First of all log the response for debug purposes
 		console.log(xhr.responseText);
 
 		//Parse the received json file
-		jsonObj = JSON.parse(xhr.responseText);
+		jsonObj = JSON.parse(realSearch.responseText);
 		lastInput = input;
 		if(jsonObj === null)
 		{
@@ -567,7 +573,7 @@ function sendToPage(name)
 		//corrupted json? Show error message
 		if(jsonObj.books==undefined)
 		{
-			StateBanner.ChangeBanner("Received corrupted JSON File!",StateBannerType.danger);
+			alert("Received corrupted JSON File!");
 			return;
 		}
 
@@ -624,8 +630,8 @@ function sendToPage(name)
 			lList.innerHTML += "<a href='www.google.de' class='linkedClass'>"+i+"</a>";
 		}*/
 	}
-
-	StateBanner.ChangeBanner("Started searching...",StateBannerType.success);
+	realSearch.send();
+	}
 	xhr.send();
 }
 
