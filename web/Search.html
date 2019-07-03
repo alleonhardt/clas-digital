@@ -533,6 +533,11 @@ function sendToPage(name)
 		//Parse the received json file
 		jsonObj = JSON.parse(xhr.responseText);
 		lastInput = input;
+		if(jsonObj.books === undefined)
+		{
+			alert("No results found!");
+			return;
+		}
 		//corrupted json? Show error message
 		if(jsonObj.books==undefined)
 		{
