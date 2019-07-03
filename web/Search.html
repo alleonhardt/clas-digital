@@ -525,7 +525,7 @@ function sendToPage(name)
 	let obj = document.getElementById("SearchHitList");
 	obj.innerHTML = "";  
 
-	document.getElementById("ResultBanner").innerHTML	= "<progress value=10 max=100></progress>"; 
+	document.getElementById("ResultBanner").innerHTML	= "<h1 class='headerStyle'>Search Results for: \""+document.getElementById("SpecialSID").value+"<progress value=10 max=100></progress></h1>"; 
 	xhr.onload = function() {
 		//First of all log the response for debug purposes
 		console.log(xhr.responseText);
