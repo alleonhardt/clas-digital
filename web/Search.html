@@ -486,6 +486,26 @@ function OpenFilter()
 		}
 	}
 }
+
+function UpdateProgress(sid)
+{
+		let progHandler = new XMLHttpRequest();
+
+		progHandler.open("GET","/getSearchProgress?searchID="+sid,true);
+		progHandler.onload = function() {
+			if(progHandler.status!=200)
+				return;
+			let jsObj = JSON.parse(progHandler.responseText);
+			if(Math.floor(jsonObj.progress)==1000)
+				return;
+			document.getElementById('srchProgress').value = Math.floor(jsObj.progress*100);
+			document.getElementById('innumberprog').innerHTML = Math.floor(jsObj.progress*100);
+			window.setTimeout(function(){UpdateProgress(sid);},1000);
+		}
+		progHandler.send(null);
+}
+
+
 //Searches in the server with the given search options and displays a list of matches
 function sendToPage(name)
 {
@@ -539,25 +559,16 @@ function sendToPage(name)
 	obj.innerHTML = "";  
 
 	document.getElementById("ResultBanner").innerHTML	= "<p class='divsearch'>Search Progress: <span id='innumberprog'>0</span>%<progress class='progbar' value=0 max=100 id='srchProgress'></progress></p>"; 
-	let progHandler = new XMLHttpRequest();
-	let requestDone = false;
-
-	progHandler.open("GET","/getSearchProgress?searchID=10",true);
-	progHandler.onload = function() {
-		if(requestDone||progHandler.status!=200)
-			return;
-		let jsObj = JSON.parse(progHandler.responseText);
-		document.getElementById('srchProgress').value = Math.floor(jsObj.progress*100);
-		document.getElementById('innumberprog').innerHTML = Math.floor(jsObj.progress*100);
-	}
-	progHandler.send(null);
 
 	xhr.onload = function() {
 		if(xhr.status!=200)
 			return;
 		let jsSearchId = JSON.parse(xhr.responseText);
+
+
 		let realSearch = new XMLHttpRequest();
 		realSearch.open("GET","/startSearch?searchID="+jsSearchId.searchid,true);
+		UpdateProgress(jsSearchId.searchid);
 		realSearch.onload = function() {
 		//First of all log the response for debug purposes
 		console.log(xhr.responseText);

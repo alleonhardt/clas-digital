@@ -190,7 +190,7 @@ float CBookManager::getProgress(unsigned long long id) {
     if(m_mapSearchs.count(id) > 0)
         return m_mapSearchs[id]->getProgress();
     else
-        return 1;
+        return 1000.0;
 }
 
 
