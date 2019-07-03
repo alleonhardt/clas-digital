@@ -32,6 +32,15 @@
 	margin-top: 3rem;
 	margin-bottom: 1rem;
 }
+
+.headerStyle progress {
+	display: block;
+	float: right;
+	margin-right: 0;
+	color: white;
+	padding: 3rem;
+}
+
 /*Styling the search bar*/
 .form-wrapper-2 {
 	display: inline-block;
@@ -427,7 +436,7 @@ function ApplyFilterOptions()
 			if(!jsonObj.books[i].hasocr || (jsonObj.books[i].hasocr == undefined))
 			{
 
-				inner = "<a data-specialhref='/1/ShowMetadata.html";
+				inner = "<a data-specialhref='/ShowMetadata";
 			}
 			else
 			{
@@ -525,6 +534,7 @@ function sendToPage(name)
 	let obj = document.getElementById("SearchHitList");
 	obj.innerHTML = "";  
 
+	document.getElementById("ResultBanner").innerHTML	= "<h1 class='headerStyle'>Search Results for: \""+document.getElementById("SpecialSID").value+"\"<progress value=10 max=100></progress></h1>"; 
 	xhr.onload = function() {
 		//First of all log the response for debug purposes
 		console.log(xhr.responseText);
@@ -532,7 +542,7 @@ function sendToPage(name)
 		//Parse the received json file
 		jsonObj = JSON.parse(xhr.responseText);
 		lastInput = input;
-		if(jsonObj.books === undefined)
+		if(jsonObj === null)
 		{
 			alert("No results found!");
 			return;
@@ -565,7 +575,7 @@ function sendToPage(name)
 			if(!jsonObj.books[i].hasocr || (jsonObj.books[i].hasocr == undefined))
 			{
 
-				inner = "<a data-specialhref='/getBookMetadata";
+				inner = "<a data-specialhref='/ShowMetadata";
 			}
 			else
 			{

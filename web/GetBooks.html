@@ -417,7 +417,7 @@ function parseURLParams(url) {
 }
 function doAdditionalSearch() {
 	let parsedUrlParams = parseURLParams(window.location.href);
-	window.open("/GetBooks.html?query="+document.getElementById("adSrch").value+"&scanId="+parsedUrlParams['scanId']+"&fuzzyness="+parsedUrlParams['fuzzyness']);
+	window.open("/GetBooks?query="+document.getElementById("adSrch").value+"&scanId="+parsedUrlParams['scanId']+"&fuzzyness="+parsedUrlParams['fuzzyness']);
 
 }
 
@@ -548,7 +548,7 @@ function init() {
 	let parsedUrlParams = parseURLParams(window.location.href);
 	let scanId = parsedUrlParams['scanId'];
 	
-	Server.Get("/getBookRessources?book=" + scanId + "&ressource=readerInfo.json", function(content) {
+	Server.Get("/getBookRessources?book=" + scanId+"&ressource=readerInfo.json", function(content) {
 		let scanInfo = JSON.parse(content);
 		
 		scanInfo.pages.sort(function(a, b) {
@@ -585,7 +585,7 @@ function init() {
 	});
 
 	document.getElementsByClassName("reader")[0].addEventListener("scroll", updateAfterScroll, false);
-		Server.Get("/getBookRessources?book=" + scanId + "&ressource=info.json", function(content) {
+		Server.Get("/getBookMetadata?scanId=" + scanId, function(content) {
 		metadata = JSON.parse(content);
 	  	document.getElementById("scanBibInfo").innerHTML = metadata.bib;
 		if(metadata.data.creators[0].lastName === undefined)
