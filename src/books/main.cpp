@@ -57,7 +57,7 @@ int main()
 
         
         CSearchOptions* searchOpts = new CSearchOptions(sInput, fuzzy, {}, false, true, "", 0 , 2019);
-        CSearch* search = new CSearch(searchOpts, "jim");
+        CSearch* search = new CSearch(searchOpts, 0);
 
         alx::cout.write ("Searching for ", sInput, "... \n");
 

@@ -13,7 +13,7 @@
 class CSearch
 {
 private:
-    std::string m_sID;
+    unsigned long long m_ID;
     std::string m_sWord;
     CSearchOptions* m_sOpts;
     float m_fProgress;
@@ -23,14 +23,14 @@ public:
     /**
     * @brief constructor
     */
-    CSearch(CSearchOptions* searchOpts, std::string sID);
+    CSearch(CSearchOptions* searchOpts, unsigned long long sID);
 
     // *** GETTER *** //
 
     /**
     * @return id of search
     */
-    std::string getID();
+    unsigned long long getID();
 
     /**
     * @return searched word from searchOptions

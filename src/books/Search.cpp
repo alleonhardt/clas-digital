@@ -3,9 +3,9 @@
 /**
 * @brief constructor
 */
-CSearch::CSearch(CSearchOptions* searchOpts, std::string sID) {
+CSearch::CSearch(CSearchOptions* searchOpts, unsigned long long ID) {
     m_sOpts = searchOpts;
-    m_sID = sID;
+    m_ID = ID;
     m_fProgress = 0.0;
 }
 
@@ -14,8 +14,8 @@ CSearch::CSearch(CSearchOptions* searchOpts, std::string sID) {
 /**
 * @return id of search
 */
-std::string CSearch::getID() {
-    return m_sID;
+unsigned long long  CSearch::getID() {
+    return m_ID;
 }
 
 /**
