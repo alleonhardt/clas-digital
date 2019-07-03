@@ -495,11 +495,15 @@ function UpdateProgress(sid)
 		progHandler.onload = function() {
 			if(progHandler.status!=200)
 				return;
+
 			let jsObj = JSON.parse(progHandler.responseText);
-			if(Math.floor(jsonObj.progress)==1000)
-				return;
-			document.getElementById('srchProgress').value = Math.floor(jsObj.progress*100);
-			document.getElementById('innumberprog').innerHTML = Math.floor(jsObj.progress*100);
+			if(jsObj!=null)
+			{
+				if(Math.floor(jsonObj.progress)==1000)
+					return;
+				document.getElementById('srchProgress').value = Math.floor(jsObj.progress*100);
+				document.getElementById('innumberprog').innerHTML = Math.floor(jsObj.progress*100);
+			}
 			window.setTimeout(function(){UpdateProgress(sid);},1000);
 		}
 		progHandler.send(null);
