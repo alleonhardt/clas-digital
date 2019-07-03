@@ -34,7 +34,10 @@
 }
 
 .headerStyle progress {
-	margin-left: 2rem;
+	float: right;
+	margin-right: 0;
+	height: 100%;
+	color: white;
 }
 
 /*Styling the search bar*/
@@ -531,7 +534,7 @@ function sendToPage(name)
 	let obj = document.getElementById("SearchHitList");
 	obj.innerHTML = "";  
 
-	document.getElementById("ResultBanner").innerHTML	= "<h1 class='headerStyle'>Search Results for: \""+document.getElementById("SpecialSID").value+"<progress value=10 max=100></progress></h1>"; 
+	document.getElementById("ResultBanner").innerHTML	= "<h1 class='headerStyle'>Search Results for: \""+document.getElementById("SpecialSID").value+"\"<progress value=10 max=100></progress></h1>"; 
 	xhr.onload = function() {
 		//First of all log the response for debug purposes
 		console.log(xhr.responseText);
