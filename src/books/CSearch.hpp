@@ -92,4 +92,9 @@ public:
     */
     std::list<CBook*>* convertToList(std::map<std::string, CBook*>* mapBooks);
 
+    /**
+    * @brief delete searchOptions
+    */
+    void deleteSearchOptions();
+
 };

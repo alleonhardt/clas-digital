@@ -201,8 +201,10 @@ void CBookManager::deleteSearch(unsigned long long id) {
     std::unique_lock lck(m_searchLock);
     for(auto it=m_mapSearchs.begin(); it!=m_mapSearchs.end(); it++)
     {
-        if(it->first == id)
+        if(it->first == id) {
+            it->second->deleteSearchOptions();
             delete it->second;
+        }
         m_mapSearchs.erase(it);
     }
 }
