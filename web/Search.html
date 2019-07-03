@@ -488,6 +488,7 @@ function sendToPage(name)
 	let input = inputObj.value;
 	//Form the request for the server
 	let requ = "/searchword?search="+encodeURIComponent(input);
+	console.log(requ);
 
 	//Create the json file with the advanced search options
 	requ += "&fuzzyness="+document.getElementById("FuzzyID").value;
