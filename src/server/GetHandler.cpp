@@ -121,6 +121,7 @@ std::unordered_map<std::string,URIFile> fileAccess {
 	{"/uploadbook",URIFile("web/UploadBook.html",2)},
 	{"/managebooks",URIFile("web/ManageBooks.html",2)},
 	{"/GetBooks",URIFile("web/GetBooks.html",1)},
+	{"/ShowMetadata", URIFile("web/ShowMetadata.html",1)},
 	{"/scan.png",URIFile("web/scan.png",1)},
 	{"/404.jpeg",URIFile("web/404.jpeg",0)},
 	{"/volltext.png",URIFile("web/volltext.png",1)},
