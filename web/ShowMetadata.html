@@ -41,7 +41,7 @@ function LoadMetadata()
 {
 		let Index = window.location.href.indexOf("scanId=");
 		let value = window.location.href.substr(Index+7);
-		Server.Get("/getBookRessources?book="+value+"&ressource=info.json",function(content) {
+		Server.Get("/getBookMetadata?scanId="+value,function(content) {
 		document.getElementById("details").innerHTML += JSON.parse(content).bib;
 		},function(){});
 }
