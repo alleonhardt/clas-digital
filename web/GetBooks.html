@@ -548,7 +548,7 @@ function init() {
 	let parsedUrlParams = parseURLParams(window.location.href);
 	let scanId = parsedUrlParams['scanId'];
 	
-	Server.Get("/getBookRessources?book=" + scanId + "&ressource=readerInfo.json", function(content) {
+	Server.Get("/GetBookMetadata?scanId=" + scanId, function(content) {
 		let scanInfo = JSON.parse(content);
 		
 		scanInfo.pages.sort(function(a, b) {
