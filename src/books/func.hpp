@@ -21,7 +21,22 @@ namespace func
     * @return bool
     */
     bool in(std::string str, std::vector<std::string> vec);
-    
+
+    /*
+    * @brief: checks whether a integer is in a vector of strings
+    * @parameter int
+    * @parameter vector<int> 
+    * @return bool
+    */
+    template <typename T>
+    bool in(T val, std::vector<T> vec) {
+        for(unsigned int i=0; i<vec.size(); i++) {
+            if(vec[i] == val)
+                return true;
+        }
+        return false;
+    }
+
     /**
     * @brief expects words to be non-capital letters
     * @param[in] chT1 first string to compare
