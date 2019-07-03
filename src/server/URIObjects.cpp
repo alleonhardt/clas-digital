@@ -255,7 +255,8 @@ void GetSearchHandler::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 
 		auto start = std::chrono::system_clock::now();
 		std::unique_ptr<CSearchOptions> nso(new CSearchOptions(std::move(word),Fuzzyness,std::move(pillars),onlyTitle,ocrOnly,std::move(author),from,to));
-		auto results = GetBookManager().search(nso.get());
+		CSearch search_now(nso.get(),1);
+		auto results = GetBookManager().search(search_now);
 		auto end = std::chrono::system_clock::now();
 		std::chrono::duration<double> elapsed_seconds = end-start;
 		alx::cout.write(alx::console::yellow_black,"Search all books time: ",elapsed_seconds.count(),"s \n");
