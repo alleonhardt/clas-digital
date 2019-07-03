@@ -47,12 +47,6 @@ bool CBook::getOcr() {
     return m_bOcr;
 }
 
-/** * @return map of all words in book */
-const std::map<std::string, int>& CBook::getMapWords() {
-    return m_Words;
-}
-
-
 /**
 * @return info.json of book
 */
@@ -115,7 +109,7 @@ void CBook::createMapWords()
     if(!readOcr)
         return;
 
-    std::ifstream readWords(m_sPath + "/words.txt");
+    std::ifstream readWords(m_sPath + "/pages.txt");
     if(!readWords || readWords.peek() == std::ifstream::traits_type::eof() )
     {
         alx::cout.write(alx::console::yellow_black, "Creating map of words... \n");
@@ -190,6 +184,7 @@ void CBook::loadPages(std::map<std::string, std::vector<size_t>>& mapWordsPages)
 std::list<size_t>* CBook::getPagesFull(std::string sInput)
 {
     std::vector<std::string> vWords;
+    func::convertToLower(sInput);
     func::split(sInput, "+", vWords);
 
     //Create empty list of pages
@@ -204,11 +199,13 @@ std::list<size_t>* CBook::getPagesFull(std::string sInput)
 
     for(size_t i=1; i<vWords.size(); i++)
     {
-        for(auto it=listPages->begin(); it!=listPages->end(); it++) 
+        std::vector<size_t> results2 = mapWordsPages[vWords[i]];
+        for(auto it=listPages->begin(); it!=listPages->end();++i) 
         {
-            auto yt=std::find(mapWordsPages[vWords[i]].begin(), mapWordsPages[vWords[i]].end(), (*it));
-            if(yt==mapWordsPages[vWords[i]].end())
-                listPages->erase(it);
+            if(func::in<size_t>((*it), results2) == false)
+                listPages->erase(it--);
+            else
+                it++;
         }
     }
 
@@ -222,28 +219,26 @@ std::list<size_t>* CBook::getPagesFull(std::string sInput)
 std::map<int, std::vector<std::string>>* CBook::getPagesContains(std::string sInput)
 {
     std::vector<std::string> vWords;
+    func::convertToLower(sInput);
     func::split(sInput, "+", vWords);
-    std::string sWord = vWords[0];
-
-    //Create empty map
-    std::map<int, std::vector<std::string>>* mapPages = new std::map<int, std::vector<std::string>>;
 
     //Load map of words
     std::map<std::string, std::vector<size_t>> mapWordsPages;
     loadPages(mapWordsPages);
 
-    for(auto it=mapWordsPages.begin(); it!=mapWordsPages.end(); it++)
-    {
-        if(it->first.find(vWords[0]) != std::string::npos)
-        {
-            for(auto page : it->second) {
-                if(mapPages->count(page) > 0)
-                    mapPages->at(page).push_back(it->first);
-                else
-                    mapPages->insert(std::pair<int, std::vector<std::string>> (page, {it->first}));
-            }
+    //Create map of pages and found words for first word
+    std::map<int, std::vector<std::string>>* mapPages = findPagesContains(vWords[0], mapWordsPages);
 
-        }
+    for(unsigned int i=1; i<vWords.size(); i++)
+    {
+        //Create map of pages and found words for i-word
+        std::map<int, std::vector<std::string>>* results2 = findPagesContains(vWords[i], mapWordsPages);
+
+        //Remove all elements from mapPages, which do not exist in results2. 
+        //For all other elements, add the found string from results to on this page to the result
+        removePages(mapPages, results2); 
+
+        delete results2;
     }
 
     return mapPages;
@@ -257,18 +252,57 @@ std::map<int, std::vector<std::string>>* CBook::getPagesFuzzy(std::string sInput
 {
     std::vector<std::string> vWords;
     func::split(sInput, "+", vWords);
-    std::string sWord = vWords[0];
-
-    //Create empty map
-    std::map<int, std::vector<std::string>>* mapPages = new std::map<int, std::vector<std::string>>;
 
     //Load map of words
     std::map<std::string, std::vector<size_t>> mapWordsPages;
     loadPages(mapWordsPages);
 
+    //Map of pages + found words for first word
+    std::map<int, std::vector<std::string>>* mapPages = findPagesFuzzy(vWords[0], mapWordsPages);
+
+    for(unsigned int i=1; i<vWords.size(); i++)
+    {
+        //Create map of pages and found words for i-word
+        std::map<int, std::vector<std::string>>* results2 = findPagesFuzzy(vWords[i], mapWordsPages);
+
+        //Remove all elements from mapPages, which do not exist in results2. 
+        //For all other elements, add the found string from results to on this page to the result
+        removePages(mapPages, results2); 
+
+        delete results2;
+    }
+    return mapPages;
+}
+
+//Create map of pages and found words for i-word
+std::map<int, std::vector<std::string>>* CBook::findPagesContains(std::string sWord, std::map<std::string, std::vector<size_t>>& mapWordsPages)
+{
+    std::map<int, std::vector<std::string>>* mapPages = new std::map<int, std::vector<std::string>>;
+
     for(auto it=mapWordsPages.begin(); it!=mapWordsPages.end(); it++)
     {
-        if(fuzzy::fuzzy_cmp(it->first, vWords[0]) == true)
+        if(it->first.find(sWord) != std::string::npos)
+        {
+            for(auto page : it->second) {
+                if(mapPages->count(page) > 0)
+                    mapPages->at(page).push_back(it->first);
+                else 
+                    mapPages->insert(std::pair<int, std::vector<std::string>> (page, {it->first}));
+            }
+        }
+    }
+
+    return  mapPages;
+}
+
+//Create map of pages and found words for i-word (fuzzy)
+std::map<int, std::vector<std::string>>* CBook::findPagesFuzzy(std::string sWord, std::map<std::string, std::vector<size_t>>& mapWordsPages)
+{
+    std::map<int, std::vector<std::string>>* mapPages = new std::map<int, std::vector<std::string>>;
+
+    for(auto it=mapWordsPages.begin(); it!=mapWordsPages.end(); it++)
+    {
+        if(fuzzy::fuzzy_cmp(it->first, sWord) == true)
         {
             for(auto page : it->second) {
                 if(mapPages->count(page) > 0)
@@ -276,11 +310,27 @@ std::map<int, std::vector<std::string>>* CBook::getPagesFuzzy(std::string sInput
                 else
                     mapPages->insert(std::pair<int, std::vector<std::string>> (page, {it->first}));
             }
-
         }
     }
 
     return mapPages;
-}
+}       
 
-        
+//Remove all elements from mapPages, which do not exist in results2. 
+//For all other elements, add the found string from results to on this page to the result
+void CBook::removePages(std::map<int, std::vector<std::string>>* mapPages, std::map<int, std::vector<std::string>>* results2)
+{
+    for(auto it=mapPages->begin(); it!=mapPages->end(); ++it)
+    {
+        bool found = false;
+        for(auto jt=results2->begin(); jt!=results2->end() || found == true; jt++)
+        {
+            if(it->first == jt->first) {
+                (*mapPages)[it->first].insert((*mapPages)[it->first].end(), jt->second.begin(), jt->second.end());
+                found = true;
+            }
+        }
+        if(found == false)
+            mapPages->erase(it--);
+    }
+}
