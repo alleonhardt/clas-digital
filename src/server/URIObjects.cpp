@@ -2,6 +2,9 @@
 #include <proxygen/httpserver/ResponseBuilder.h>
 #include <experimental/filesystem>
 #include <chrono>
+#include <folly/io/async/EventBaseManager.h>
+#include <folly/FileUtil.h>
+#include <folly/executors/GlobalExecutor.h>
 #include "src/server/URIObjects.hpp"
 #include "src/zotero/zotero.hpp"
 
@@ -487,8 +490,11 @@ void StartSearch::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers) noex
 		return SendErrorNotFound(downstream_);
 	}
 
-	proxygen::ResponseHandler *rsp = downstream_;
-	std::thread t1([this,id,rsp](){
+	folly::getCPUExecutor()->add(std::bind(&StartSearch::start,this,id));
+}
+
+void StartSearch::start(long long id)
+{
 	alx::cout.write(alx::console::green_black,"Started additional thread for searching!\n");
 	auto start = std::chrono::system_clock::now();
 	auto results = GetSearchHandler::GetBookManager().search(id);
@@ -506,13 +512,11 @@ void StartSearch::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers) noex
 			js["books"].push_back(std::move(entry));
 		}
 
-		ResponseBuilder(rsp)
+		ResponseBuilder(downstream_)
 			.status(200,"Ok")
 			.header("Content-Type","application/json")
 			.body(std::move(js.dump()))
 			.sendWithEOM();
-	});
-	t1.detach();
 }
 
 void RequestSearchProgress::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers) noexcept
