@@ -3,15 +3,49 @@
 /**
 * @brief constructor
 */
-CSearch::CSearch(CSearchOptions* searchOpts) {
+CSearch::CSearch(CSearchOptions* searchOpts, unsigned long long ID) {
     m_sOpts = searchOpts;
+    m_ID = ID;
+    m_fProgress = 0.0;
+}
+
+// *** GETTER *** //
+
+/**
+* @return id of search
+*/
+unsigned long long  CSearch::getID() {
+    return m_ID;
+}
+
+/**
+* @return searched word from searchOptions
+*/
+std::string CSearch::getSearchedWord() {
+    return m_sOpts->getSearchedWord();
+}
+
+/**
+* @return progress
+*/
+float CSearch::getProgress() {
+    return m_fProgress;
+}
+
+// *** SETTER *** //
+
+/**
+* param[in] searchedWord set searched word
+*/
+void CSearch::setWord(std::string sWord) {
+    m_sWord = sWord;
 }
 
 
 std::map<std::string, CBook*>* CSearch::search(std::map<std::string, std::map<std::string, CBook*>>& mWs,
                                         std::map<std::string, std::map<std::string, CBook*>>& mWsTitle)
 {
-    alx::cout.write("Searching for ", m_sOpts->getSearchedWord(), "\n");
+    alx::cout.write("Searching for ", m_sWord, "\n");
 
     //Create empty map of searchResults
     std::map<std::string, CBook*>* mapSearchresults = new std::map<std::string, CBook*>;
@@ -61,8 +95,11 @@ std::map<std::string, CBook*>* CSearch::search(std::map<std::string, std::map<st
 void CSearch::normalSearch(std::map<std::string, std::map<std::string, CBook*>>& mapWords, 
                                                     std::map<std::string, CBook*>* mapSR)
 {
-    if(mapWords.count(m_sOpts->getSearchedWord()) > 0) {
-        std::map<std::string, CBook*> searchResults = mapWords.at(m_sOpts->getSearchedWord());
+    //Set Progress
+    m_fProgress = 1.0;
+
+    if(mapWords.count(m_sWord) > 0) {
+        std::map<std::string, CBook*> searchResults = mapWords.at(m_sWord);
         mapSR->insert(searchResults.begin(), searchResults.end());
     }
 }
@@ -75,10 +112,15 @@ void CSearch::normalSearch(std::map<std::string, std::map<std::string, CBook*>>&
 void CSearch::containsSearch(std::map<std::string, std::map<std::string, CBook*>>& mapWords, 
                                                     std::map<std::string, CBook*>* mapSR) 
 {
+    unsigned int counter = 0;
     for(auto it= mapWords.begin(); it!=mapWords.end(); it++)
     {
-        if(func::contains(it->first, m_sOpts->getSearchedWord()) == true)
+        if(func::contains(it->first, m_sWord)== true)
             mapSR->insert(it->second.begin(), it->second.end());
+
+        //Calculate progress
+        m_fProgress = static_cast<float>(counter)/static_cast<float>(mapWords.size());
+        counter++;
     }
 }
 
@@ -90,10 +132,15 @@ void CSearch::containsSearch(std::map<std::string, std::map<std::string, CBook*>
 void CSearch::fuzzySearch(std::map<std::string, std::map<std::string, CBook*>>& mapWords, 
                                                     std::map<std::string, CBook*>* mapSR) 
 {
+    unsigned int counter = 0;
     for(auto it= mapWords.begin(); it!=mapWords.end(); it++)
     {
-        if(fuzzy::fuzzy_cmp(it->first.c_str(), m_sOpts->getSearchedWord().c_str()) == true)
+        if(fuzzy::fuzzy_cmp(it->first.c_str(), m_sWord.c_str()) == true)
             mapSR->insert(it->second.begin(), it->second.end());
+
+        //Calculate progress
+        m_fProgress = static_cast<float>(counter)/static_cast<float>(mapWords.size());
+        counter++;
     }
 }
 
@@ -130,14 +177,36 @@ bool CSearch::checkSearchOptions(CBook* book)
         return false;
          
     //*** check pillars ***//
-    /*
     bool match = false;
     for(auto const &collection : m_sOpts->getCollections()) {
         if(func::in(collection, book->getCollections()) == true)
-            return match;
-    }*/
+            match = true;
+    }
+    return match;
+
+    //*** Check correct access rights ***//
+    if((book->getDate()==-1 || book->getDate() > 1919) && m_sOpts->getAccess()==false)
+        return false;
 
     return true;
 }
             
+/**
+* @brief convert to list
+* @return list of searchresulst
+*/
+std::list<CBook*>* CSearch::convertToList(std::map<std::string, CBook*>* mapBooks)
+{
+    std::list<CBook*>* listBooks = new std::list<CBook*>;
+    for(auto it=mapBooks->begin(); it!=mapBooks->end(); it++)
+        listBooks->push_back(it->second);
+    return listBooks;
+}
 
+
+/**
+* @brief delete searchOptions
+*/
+void CSearch::deleteSearchOptions() {
+    delete m_sOpts;
+}

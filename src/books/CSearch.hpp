@@ -13,14 +13,42 @@
 class CSearch
 {
 private:
+    unsigned long long m_ID;
+    std::string m_sWord;
     CSearchOptions* m_sOpts;
+    float m_fProgress;
 
 public:
     
     /**
     * @brief constructor
     */
-    CSearch(CSearchOptions* searchOpts);
+    CSearch(CSearchOptions* searchOpts, unsigned long long sID);
+
+    // *** GETTER *** //
+
+    /**
+    * @return id of search
+    */
+    unsigned long long getID();
+
+    /**
+    * @return searched word from searchOptions
+    */
+    std::string getSearchedWord();
+
+    /**
+    * @return progress
+    */
+    float getProgress();
+
+    // *** SETTER *** //
+
+    /**
+    * param[in] searchedWord set searched word
+    */
+    void setWord(std::string sWord);
+
 
     std::map<std::string, CBook*>* search(std::map<std::string, std::map<std::string, CBook*>>& mWs,
                                         std::map<std::string, std::map<std::string, CBook*>>& mWsTitle);
@@ -57,4 +85,16 @@ public:
     * return Boolean
     */
     bool checkSearchOptions(CBook* book);
+
+    /**
+    * @brief convert to list
+    * @return list of searchresulst
+    */
+    std::list<CBook*>* convertToList(std::map<std::string, CBook*>* mapBooks);
+
+    /**
+    * @brief delete searchOptions
+    */
+    void deleteSearchOptions();
+
 };

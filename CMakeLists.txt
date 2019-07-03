@@ -77,6 +77,6 @@ add_custom_command(
 add_executable(clas-digital.o ${SRC_FILES} src/console/console.cpp src/main.cpp)
 add_executable(books.o src/books/Book.cpp src/books/Bookmanager.cpp src/books/Metadata.cpp src/books/Search.cpp src/books/SearchOptions.cpp src/books/func.cpp src/zotero/zotero.cpp src/console/console.cpp src/books/main.cpp src/books/fuzzy.cpp)
 target_link_libraries(clas-digital.o ${PROXYGEN_LIBRARIES} ${CURL_LIBRARIES} stdc++fs ${CURSES_LIBRARY})
-target_link_libraries(books.o ${CURL_LIBRARY} stdc++fs ${CURSES_LIBRARY})
+target_link_libraries(books.o ${CURL_LIBRARY} stdc++fs ${CURSES_LIBRARY} pthread)
 target_link_libraries(unittest.o ${PROXYGEN_LIBRARIES} ${GTEST_BOTH_LIBRARIES} ${CURL_LIBRARIES} stdc++fs ${CURSES_LIBRARY})
 add_dependencies(clas-digital.o books.o unittest.o)
