@@ -102,21 +102,21 @@ public:
     */
     void loadPages(std::map<std::string, std::vector<size_t>>& mapWordsPages);
 
-    /*
+    /**
     * @brief return list of all pages on which word occures.
     * @param[in] sWord searched word
     * @return list of pages on which searched word accures
     */
     std::list<size_t>* getPagesFull(std::string sWord);
 
-    /*
+    /**
     * @brief return map of all pages + words found on page (Contains).
     * @param[in] sWord searched word.
     * @return map of pages with vector of words found on this page.
     */
     std::map<int, std::vector<std::string>>* getPagesContains(std::string sWord);
 
-    /*
+    /**
     * @brief return map of all pages + words found on page (fuzzy).
     * @param[in] sWord searched word
     * @return map of pages with vector of words found on this page

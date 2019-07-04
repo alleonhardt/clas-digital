@@ -3,8 +3,8 @@
 namespace func 
 {
 
-/*
-* in: checks whether a string is in a vector of strings
+/**
+* @brief checks whether a string is in a vector of strings
 * @parameter string
 * @parameter vector<string> 
 * @return bool
@@ -150,6 +150,7 @@ bool isWord(const char* chWord)
 }
 
 /**
+* @brief split a string at given delimiter. Store strings in array.
 * @param[in] str string to be splitet
 * @param[in] delimitter 
 * @param[in, out] vStr vector of slpitted strings
@@ -166,6 +167,7 @@ void split(std::string str, std::string delimiter, std::vector<std::string>& vSt
 } 
 
 /**
+* @brief split string at given delimiter. Return string in array.
 * @param[in] str string to be splitet
 * @param[in] delimitter 
 * @return vector
@@ -207,6 +209,7 @@ void transform(std::string& str)
 }
 
 /**
+* @brief extract words from a string into a map (drop all sequences which  aren't a word).
 * @param[in] sWords string of which map shall be created 
 * @param[out] mapWords map to which new words will be added
 */
