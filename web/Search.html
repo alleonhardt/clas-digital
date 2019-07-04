@@ -499,12 +499,14 @@ function UpdateProgress(sid)
 			let jsObj = JSON.parse(progHandler.responseText);
 			if(jsObj!=null)
 			{
-				if(Math.floor(jsonObj.progress)==1000)
-					return;
+				if(Math.floor(jsObj.progress)==1000)
+					jsObj.progress = 1.0;
 				if(document.getElementById('srchProgress')==null)
 					return;
 				document.getElementById('srchProgress').value = Math.floor(jsObj.progress*100);
 				document.getElementById('innumberprog').innerHTML = Math.floor(jsObj.progress*100);
+				if(Math.floor(jsObj.progress)==1)
+					return;
 			}
 			window.setTimeout(function(){UpdateProgress(sid);},1000);
 		}
