@@ -141,13 +141,18 @@ void CSearch::fuzzySearch(std::map<std::string, std::map<std::string, CBook*>>& 
                                                     std::map<std::string, CBook*>* mapSR) 
 {
     unsigned int counter = 0;
+	unsigned int counter2 = 0;
     for(auto it= mapWords.begin(); it!=mapWords.end(); it++)
     {
         if(fuzzy::fuzzy_cmp(it->first.c_str(), m_sWord.c_str()) == true)
             mapSR->insert(it->second.begin(), it->second.end());
 
-        //Calculate progress
-        m_fProgress = static_cast<float>(counter)/static_cast<float>(mapWords.size());
+		if(counter2>=10000)
+		{
+			counter2=0;
+        	m_fProgress = static_cast<float>(counter)/static_cast<float>(mapWords.size());
+		}
+		counter2++;
         counter++;
     }
 }
