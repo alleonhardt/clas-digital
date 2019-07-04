@@ -490,7 +490,8 @@ void StartSearch::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers) noex
 		return SendErrorNotFound(downstream_);
 	}
 
-	folly::getCPUExecutor()->add(std::bind(&StartSearch::start,this,id,folly::EventBaseManager::get()->getEventBase()));
+	std::thread t1(std::bind(&StartSearch::start,this,id,folly::EventBaseManager::get()->getEventBase()));
+	t1.detach();
 }
 
 void StartSearch::start(long long id, folly::EventBase *evb)
