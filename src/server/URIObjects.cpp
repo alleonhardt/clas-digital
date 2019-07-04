@@ -512,11 +512,12 @@ void StartSearch::start(long long id)
 			js["books"].push_back(std::move(entry));
 		}
 
+		folly::EventBaseManager::get()->getEventBase()->runInEventBaseThread([this,json = std::move(js)]{
 		ResponseBuilder(downstream_)
 			.status(200,"Ok")
 			.header("Content-Type","application/json")
-			.body(std::move(js.dump()))
-			.sendWithEOM();
+			.body(std::move(json.dump()))
+			.sendWithEOM();});
 }
 
 void RequestSearchProgress::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers) noexcept
