@@ -4,7 +4,7 @@ namespace fuzzy
 {
 
 /**
-* Levenshteindistance algorithm as a iterative function
+* @brief Levenshteindistance algorithm as a iterative function
 * @parameter const char* (search string)
 * @parameter const char* (target string)
 * @return int (levenshteindistance)
@@ -40,7 +40,7 @@ size_t levenshteinDistance(const char* chS, const char* chT)
 
 
 /**
-* Levenshtein Distance algorithm as a recursive function
+* @brief Levenshtein Distance algorithm as a recursive function
 * @parameter const char* (searched string)
 * @parameter const char* (targeted string)
 * @return int (levenshtein distance)
@@ -65,7 +65,7 @@ int recursiveLD(const char* chS, int len_s, const char* chT, int len_t)
 }
 
 /**
-* fuzzy_cmp: compare to words with fuzzy search and case insensetive
+* @brief compare to words with fuzzy search and case insensetive
 * @parameter string (searched word)
 * @parameter string (word)
 * @return bool 
