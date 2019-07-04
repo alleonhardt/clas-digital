@@ -512,7 +512,11 @@ void StartSearch::start(long long id, folly::EventBase *evb)
 			js["books"].push_back(std::move(entry));
 		}
 
+		alx::cout.writeln(alx::console::green_black,"Searching done! Number of results: ",results->size());
+		delete results;
+
 		evb->runInEventBaseThread([this,json = std::move(js)]{
+		alx::cout.write(alx::console::green_black,"Sending search response...\n");
 		ResponseBuilder(downstream_)
 			.status(200,"Ok")
 			.header("Content-Type","application/json")
