@@ -201,15 +201,21 @@ void GetBookRessource::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 					return SendErrorNotFound(downstream_);
 				}
 			}
+			std::thread([mypath=std::move(path),this,evb=folly::EventBaseManager::get()->getEventBase()]{
 			//Load the ressource from the constructed path if the ressource does not exist the constructor of URIFile will throw an expection 
-			URIFile fl(std::move(path));
+			URIFile *fl = new URIFile(std::move(mypath));
 
+			evb->runInEventBaseThread([fl,this]{
 			//So we know the file is good now send back the file with the detected mime type
 			ResponseBuilder(downstream_)
 				.status(200,"Ok")
-				.header("Content-Type",fl.getMimeType())
-				.body(std::move(fl.getBufferReference()))
+				.header("Content-Type",fl->getMimeType())
+				.body(std::move(fl->getBufferReference()))
 				.sendWithEOM();
+				delete fl;
+				});
+
+				}).detach();
 		}
 	}
 	catch(...)
@@ -490,8 +496,7 @@ void StartSearch::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers) noex
 		return SendErrorNotFound(downstream_);
 	}
 
-	std::thread t1(std::bind(&StartSearch::start,this,id,folly::EventBaseManager::get()->getEventBase()));
-	t1.detach();
+	std::thread(std::bind(&StartSearch::start,this,id,folly::EventBaseManager::get()->getEventBase())).detach();
 }
 
 void StartSearch::start(long long id, folly::EventBase *evb)

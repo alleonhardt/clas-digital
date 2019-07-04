@@ -59,8 +59,6 @@ int main(int argc, char* argv[]) {
 		CHECK_GT(FLAGS_threads, 0);
 		alx::cout.write("\nDetecting processor cores... ", alx::console::green_black,"done.");
 		alx::cout.write("\nDetected ",alx::console::yellow_black,(int)FLAGS_threads,alx::console::white_black," processor cores!\n");
-		FLAGS_threads = FLAGS_threads*3;
-		alx::cout.write(alx::console::yellow_black,"Continuing with ",(int)FLAGS_threads," processor threads!\n");
 	}
 	HTTPServerOptions options;
 	options.threads = static_cast<size_t>(FLAGS_threads);
