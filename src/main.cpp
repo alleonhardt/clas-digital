@@ -58,6 +58,7 @@ int main(int argc, char* argv[]) {
 		FLAGS_threads = sysconf(_SC_NPROCESSORS_ONLN);
 		CHECK_GT(FLAGS_threads, 0);
 		alx::cout.write("\nDetecting processor cores... ", alx::console::green_black,"done.");
+		FLAGS_threads*=2;
 		alx::cout.write("\nDetected ",alx::console::yellow_black,(int)FLAGS_threads,alx::console::white_black," processor cores!\n");
 	}
 	HTTPServerOptions options;
