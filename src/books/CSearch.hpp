@@ -45,6 +45,7 @@ public:
     // *** SETTER *** //
 
     /**
+    * @brief set searched word.
     * param[in] searchedWord set searched word
     */
     void setWord(std::string sWord);
@@ -76,11 +77,13 @@ public:
                                                         std::map<std::string, CBook*>* mapSR);
 
     /**
+    * @brief remove all books that do not match with searchoptions
     * @param[in, out] mapSR map of search results
     */
     void removeBooks(std::map<std::string, CBook*>* mapSR);
 
     /**
+    * @brief check whether book-metadata matches with searchoptions
     * @param[in] book to be checked
     * return Boolean
     */

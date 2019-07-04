@@ -76,6 +76,7 @@ public:
 
     /**
     * @brief get progress of given search
+    * @return float indicating progress
     */
     float getProgress(unsigned long long id);
 

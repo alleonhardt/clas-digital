@@ -17,6 +17,7 @@ public:
     CMetadata();
 
     /**
+    * @brief constructor
     * @param[in] jMetadata json with metadata
     */
     CMetadata(nlohmann::json jMetadata);
@@ -29,17 +30,20 @@ public:
 
     //************ get metadata *******************//
 
+    /**
+    * @brief return metadata as json
+    */
     nlohmann::json getMetadata();
 
     /**
-    * getter function to return selected metadata
+    * @brief getter function to return selected metadata
     * @parameter string (sSearch: which metadata (f.e. title, date...)
     * @return string 
     */
     std::string getMetadata(std::string sSearch);
     
     /**
-    * getter function to return selected metadata
+    * @brief getter function to return selected metadata
     * @parameter string (sSearch: which metadata (f.e. title, date...)
     * @parameter string (sFrom: from which json (f.e. title -> data -> title) 
     * @return string 
@@ -47,7 +51,7 @@ public:
     std::string getMetadata(std::string sSearch, std::string sFrom);
 
     /**
-    * getter function to return selected metadata
+    * @brief getter function to return selected metadata
     * @parameter string (sSearch: which metadata (f.e. title, date...)
     * @parameter string (sFrom2: from which json (f.e. title -> data -> title) 
     * @parameter string (sFrom2: in json from which json (f.e. author -> data creators -> author)
@@ -56,7 +60,7 @@ public:
     std::string getMetadata(std::string sSearch, std::string sFrom1, std::string sFrom2);
 
     /**
-    * getter function to return selected metadata
+    * @brief getter function to return selected metadata
     * @parameter string (sSearch: which metadata (f.e. title, date...)
     * @parameter string (sFrom2: from which json (f.e. title -> data -> title) 
     * @parameter string (sFrom2: in json from which json (f.e. author -> data creators -> author)
