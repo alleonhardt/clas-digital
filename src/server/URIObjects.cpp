@@ -490,10 +490,10 @@ void StartSearch::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers) noex
 		return SendErrorNotFound(downstream_);
 	}
 
-	folly::getCPUExecutor()->add(std::bind(&StartSearch::start,this,id));
+	folly::getCPUExecutor()->add(std::bind(&StartSearch::start,this,id,folly::EventBaseManager::get()->getEventBase()));
 }
 
-void StartSearch::start(long long id)
+void StartSearch::start(long long id, folly::EventBase *evb)
 {
 	alx::cout.write(alx::console::green_black,"Started additional thread for searching!\n");
 	auto start = std::chrono::system_clock::now();
@@ -512,7 +512,7 @@ void StartSearch::start(long long id)
 			js["books"].push_back(std::move(entry));
 		}
 
-		folly::EventBaseManager::get()->getEventBase()->runInEventBaseThread([this,json = std::move(js)]{
+		evb->runInEventBaseThread([this,json = std::move(js)]{
 		ResponseBuilder(downstream_)
 			.status(200,"Ok")
 			.header("Content-Type","application/json")

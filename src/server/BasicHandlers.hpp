@@ -220,6 +220,11 @@ class URIFile
 		 */
 		std::unique_ptr<folly::IOBuf> &getBufferReference();
 
+		/**
+		 * Prepares the json data for sending must be called after adding a html file with body!!
+		 * @param js The json to be appended as serverJS Object
+		 * @return The string to get appended to the http message
+		 */
 		static std::string PrepareDataForSending(nlohmann::json &&js);
 };
 

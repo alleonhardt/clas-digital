@@ -128,7 +128,7 @@ class StartSearch : public EmptyHandler
 {
 		void onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 			noexcept override;
-		void start(long long);
+		void start(long long,folly::EventBase *);
 };
 
 class RequestSearchProgress : public EmptyHandler
