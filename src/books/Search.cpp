@@ -113,13 +113,21 @@ void CSearch::containsSearch(std::map<std::string, std::map<std::string, CBook*>
                                                     std::map<std::string, CBook*>* mapSR) 
 {
     unsigned int counter = 0;
+	unsigned int counter2 = 0;
+	func::convertToLower(m_sWord);
+
     for(auto it= mapWords.begin(); it!=mapWords.end(); it++)
     {
-        if(func::contains(it->first, m_sWord)== true)
+        if(it->first.find(m_sWord.c_str())!=std::string::npos)
             mapSR->insert(it->second.begin(), it->second.end());
 
         //Calculate progress
-        m_fProgress = static_cast<float>(counter)/static_cast<float>(mapWords.size());
+		if(counter2>=10000)
+		{
+			counter2=0;
+        	m_fProgress = static_cast<float>(counter)/static_cast<float>(mapWords.size());
+		}
+		counter2++;
         counter++;
     }
 }
