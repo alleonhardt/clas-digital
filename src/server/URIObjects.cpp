@@ -123,15 +123,8 @@ std::string DirectoryFilesToJSON(const std::string &path)
 
 void GetBookRessource::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers) noexcept
 {
-	//Check if the user has the enough rights to perform the request
-	if(!User::AccessCheck(_user,AccessRights::USR_READ))
-		return SendAccessDenied(downstream_);
-
 	try
 	{
-		if(!User::AccessCheck(_user,AccessRights::USR_WRITE|AccessRights::USR_READ))
-			return SendAccessDenied(downstream_);
-
 		//Get the book part of the request as well as the ressource part of the request
 		std::string book = headers->getDecodedQueryParam("book");
 		std::string res = headers->getDecodedQueryParam("ressource");
@@ -202,10 +195,22 @@ void GetBookRessource::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 				}
 			}
 			std::thread([mypath=std::move(path),this,evb=folly::EventBaseManager::get()->getEventBase()]{
-			//Load the ressource from the constructed path if the ressource does not exist the constructor of URIFile will throw an expection 
-			URIFile *fl = new URIFile(std::move(mypath));
 
-			evb->runInEventBaseThread([fl,this]{
+			bool onerror = false;
+			URIFile *fl;
+			try
+			{
+				//Load the ressource from the constructed path if the ressource does not exist the constructor of URIFile will throw an expection 
+				fl = new URIFile(std::move(mypath));
+			}
+			catch(...)
+			{
+				onerror = true;
+			}
+
+			evb->runInEventBaseThread([fl,onerror,this]{
+			if(onerror)
+				return SendErrorNotFound(downstream_);
 			//So we know the file is good now send back the file with the detected mime type
 			ResponseBuilder(downstream_)
 				.status(200,"Ok")
@@ -231,9 +236,6 @@ void GetSearchHandler::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 {
 	try
 	{
-		if(!User::AccessCheck(_user,AccessRights::USR_READ))
-			throw 0;
-
 		alx::cout<< headers->getURL() <<alx::endl;
 		alx::cout<< headers->getDecodedQueryParam("pillars") <<alx::endl;
 		std::string word = headers->getDecodedQueryParam("search");
@@ -294,9 +296,6 @@ void GetSearchInBookHandler::onRequest(std::unique_ptr<proxygen::HTTPMessage> he
 {
 	try
 	{
-		if(!User::AccessCheck(_user,AccessRights::USR_READ))
-			throw 0;
-
 		std::string searchFor = headers->getDecodedQueryParam("query");
 		std::string inBook = headers->getDecodedQueryParam("scanId");
 		int Fuzzyness = headers->getIntQueryParam("fuzzyness",0);
@@ -380,9 +379,6 @@ void GetBookMetadata::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers) 
 {
 	try
 	{
-		if(!User::AccessCheck(_user,AccessRights::USR_READ))
-			throw 0;
-		
 		auto &mapofbooks = GetSearchHandler::GetBookManager().getMapOfBooks();
 		std::string inBook = headers->getDecodedQueryParam("scanId");
 		

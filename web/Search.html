@@ -314,7 +314,16 @@ class User {
 			}
 		});
 
-		document.getElementById("LoggedInAs").innerHTML = "Logged in as <strong>"+ServerDataObj.user.email+"</strong>";
+		if(ServerDataObj==undefined)
+			alert("Site internal error");
+		else if(ServerDataObj.user == undefined)
+		{
+				let x = document.getElementById("loggedintopnav");
+				x.innerHTML = '<form id ="LoginForm" class="form-inline my-2 my-lg-0" action="/" method="post"><input id="EmailType" class="form-control mr-sm-2" type="email" name="email" placeholder="Email" aria-label="Email" required><input id="PasswordType" class="from-control mr-sm-2" type="password" name="password" placeholder="Password" aria-label="Password" required><input class="btn btn-outline-success my-2 my-sm-0" type="submit" value="Log In"/></form>';
+		}
+		else
+		{
+			document.getElementById("LoggedInAs").innerHTML = "Logged in as <strong>"+ServerDataObj.user.email+"</strong>";
 
 			let list = document.getElementsByClassName("classifiedContent");
 			//Unlocks all the content that the user can access!
@@ -326,6 +335,7 @@ class User {
 					list[i].style.display="block";
 				}
 			}
+		}
 		ApplySearchData();
 		default_search_parameters = JSON.parse(JSON.stringify(search_parameters));
 	}
@@ -832,12 +842,21 @@ window.addEventListener("load",User.initialise,false);
 #ordered_pillars li {
 	margin-top: 1rem;
 }
+
+.topnav-right form {
+	box-sizing: border-box;
+	vertical-align: center;
+	padding: 0.4em 0.8em;
+	margin: auto;
+}
 		</style>
 	<script>
 		function ExecuteInitialise()
 		{
 			if(ServerDataObj===undefined)
+			{
 				console.log("Cant find server data!");
+			}
 			else
 			{
 				if(ServerDataObj.pillars != undefined)
@@ -861,7 +880,7 @@ window.addEventListener("load",User.initialise,false);
 			<a class="classifiedContent" href="/administration" data-acc=4>Administration</a>
 			<a class="classifiedContent" href="/uploadbook" data-acc=2>Upload Books</a>
 			<a class="classifiedContent" href="/managebooks" data-acc=2>Manage Books</a>
-			<div class="topnav-right">
+			<div class="topnav-right" id='loggedintopnav'>
 				<span id="LoggedInAs">Logged in</span>
 				<button id="logoutBut" class="btn btn-outline-info" onclick='User.DoLogout()'>Logout</button>
 			</div>

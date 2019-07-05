@@ -116,15 +116,15 @@ std::unordered_map<std::string,URIFile> fileAccess {
 	{"/",URIFile("web/guest_index.html",0)},
 	{"/favicon.ico",URIFile("web/favicon.png",0)},
 	{"/home",URIFile("web/index.html",1)},
-	{"/search",URIFile("web/Search.html",1)},
+	{"/search",URIFile("web/Search.html",0)},
 	{"/administration",URIFile("web/Administration.html",4)},
 	{"/uploadbook",URIFile("web/UploadBook.html",2)},
 	{"/managebooks",URIFile("web/ManageBooks.html",2)},
-	{"/GetBooks",URIFile("web/GetBooks.html",1)},
-	{"/ShowMetadata", URIFile("web/ShowMetadata.html",1)},
-	{"/scan.png",URIFile("web/scan.png",1)},
+	{"/GetBooks",URIFile("web/GetBooks.html",0)},
+	{"/ShowMetadata", URIFile("web/ShowMetadata.html",0)},
+	{"/scan.png",URIFile("web/scan.png",0)},
 	{"/404.jpeg",URIFile("web/404.jpeg",0)},
-	{"/volltext.png",URIFile("web/volltext.png",1)},
+	{"/volltext.png",URIFile("web/volltext.png",0)},
 	{"/jszip.js",URIFile("web/jszip.js",2)}
 }; ///< The map which caches all file the get handler will return and also saves the access rights to acces these files
 
@@ -190,11 +190,12 @@ void GetHandler::onRequest(std::unique_ptr<HTTPMessage> headers) noexcept {
 			usr["email"] = _user->GetEmail();
 			usr["access"] = _user->GetAccessRights();
 			js["user"] = std::move(usr);
-			if(file->getPath() == "web/Search.html")
-			{
-				js["pillars"] = Zotero::GetPillars();
-			}
 		}
+		if(file->getPath() == "web/Search.html")
+		{
+			js["pillars"] = Zotero::GetPillars();
+		}
+
 
 		//Build the response from the found file
 		ResponseBuilder resp(downstream_);

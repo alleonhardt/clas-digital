@@ -260,13 +260,21 @@ const nlohmann::json &Zotero::GetPillars()
 	{
 		ret.clear();
 		alx::cout.write("Trying to detect zotero pillars... ");
-		nlohmann::json js = nlohmann::json::parse(Zotero::SendRequest(Zotero::Request::GetAllPillars));
-		for(const auto &it : js)
+		try
 		{
-			nlohmann::json entry;
-			entry["key"] = it["data"]["key"].get<std::string>();
-			entry["name"] = it["data"]["name"].get<std::string>();
-			ret.push_back(std::move(entry));
+			nlohmann::json js = nlohmann::json::parse(Zotero::SendRequest(Zotero::Request::GetAllPillars));
+			for(const auto &it : js)
+			{
+				nlohmann::json entry;
+				entry["key"] = it["data"]["key"].get<std::string>();
+				entry["name"] = it["data"]["name"].get<std::string>();
+				ret.push_back(std::move(entry));
+			}
+		}
+		catch(...)
+		{
+			alx::cout.writeln(DBG_HEADER,"[Could not detect zotero pillars, exiting...]");
+			throw 0;
 		}
 		pill = false;
 		alx::cout.write(alx::console::green_black,"done.\n");
