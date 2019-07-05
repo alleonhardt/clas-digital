@@ -77,6 +77,11 @@ public:
                                                         std::map<std::string, CBook*>* mapSR);
 
     /**
+    * @brief check whether searched word matches with author of a book.
+    */
+    std::map<std::string, CBook*>* checkAuthor(std::map<std::string, CBook>& mapBooks);
+
+    /**
     * @brief remove all books that do not match with searchoptions
     * @param[in, out] mapSR map of search results
     */

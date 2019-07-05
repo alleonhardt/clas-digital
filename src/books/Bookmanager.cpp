@@ -98,6 +98,9 @@ std::map<std::string, CBook*>* CBookManager::search(unsigned long long id)
 
     //Search main word
     results1 = search->search(m_mapWords, m_mapWordsTitle);
+    std::map<std::string, CBook*>* results2 = search->checkAuthor(m_mapBooks);
+    results1->insert(results2->begin(), results2->end());
+    delete results2;
 
     for(unsigned int i=1; i<vWords.size(); i++)
     {

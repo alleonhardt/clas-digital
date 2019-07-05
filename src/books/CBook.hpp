@@ -80,6 +80,11 @@ public:
     */
     int getDate();
 
+    /**
+    * @brief return whether book is publically accessable 
+    */
+    bool getPublic();
+ 
     // **** SETTER **** //
     
     /**

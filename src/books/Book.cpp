@@ -86,6 +86,16 @@ int CBook::getDate() {
     return m_Metadata.getDate();
 }
 
+/**
+* @brief return whether book is publically accessable 
+*/
+bool CBook::getPublic() {
+    if(getDate() == -1 || getDate() > 1919)
+        return false;
+    else
+        return true;
+}
+     
 
 // **** SETTER **** //
     

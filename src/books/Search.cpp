@@ -157,8 +157,36 @@ void CSearch::fuzzySearch(std::map<std::string, std::map<std::string, CBook*>>& 
     }
 }
 
+/**
+* @brief check whether searched word matches with author of a book.
+*/
+std::map<std::string, CBook*>* CSearch::checkAuthor(std::map<std::string, CBook>& mapBooks)
+{
+    std::map<std::string, CBook*>* mapSR = new std::map<std::string, CBook*>;
+
+    int fuzzyness=m_sOpts->getFuzzyness();
+    for(auto it=mapBooks.begin(); it!=mapBooks.end(); it++)
+    {
+        if(it->second.getOcr() == false && m_sOpts->getOnlyOcr() == true)
+            continue;
+
+        if(fuzzyness == 0 && func::compare(it->second.getAuthor(), m_sWord) == true)
+            mapSR->insert(std::pair<std::string, CBook*>(it->first, &it->second));
+
+        else if(fuzzyness == 1 && it->second.getAuthor().find(m_sWord) != std::string::npos)
+            mapSR->insert(std::pair<std::string, CBook*>(it->first, &it->second));
+
+        else if(fuzzyness == 2 && fuzzy::fuzzy_cmp(it->second.getAuthor().c_str(), m_sWord) == true)
+            mapSR->insert(std::pair<std::string, CBook*>(it->first, &it->second));
+    }
+
+    return mapSR;
+}
+
+
 
 /**
+* @brief remove all books that don't agree with searchOptions.
 * @param[in, out] mapSR map of search results
 */
 void CSearch::removeBooks(std::map<std::string, CBook*>* mapSR)
@@ -198,10 +226,13 @@ bool CSearch::checkSearchOptions(CBook* book)
     return match;
 
     //*** Check correct access rights ***//
-    if((book->getDate()==-1 || book->getDate() > 1919) && m_sOpts->getAccess()==false)
-        return false;
+    if(m_sOpts->getOnlyTitle() == true)
+        return true;
 
-    return true;
+    if(book->getPublic() == false && m_sOpts->getAccess()==false)
+        return false;
+    else
+        return true;
 }
             
 /**
