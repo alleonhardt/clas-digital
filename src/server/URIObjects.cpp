@@ -547,3 +547,45 @@ void RequestSearchProgress::onRequest(std::unique_ptr<proxygen::HTTPMessage> hea
 			.body(j.dump())
 			.sendWithEOM();
 }
+
+void RequestCreateBibliography::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers) noexcept
+{
+	std::string inBook = headers->getDecodedQueryParam("books");
+	std::string_view inBookView(inBook);
+	if(inBook=="")
+		return SendErrorNotFound(downstream_);
+
+	std::string retval="<html><head></head><body>";
+	auto &mapBooks = GetSearchHandler::GetBookManager().getMapOfBooks();
+
+	size_t x_new = 0;
+	size_t x_last = 0;
+	for(;;)
+	{
+		x_new = inBookView.find(",",x_last);
+		std::string key;
+		if(x_new == std::string::npos)
+			key = inBookView.substr(x_last);
+		else
+			key = inBookView.substr(x_last,x_new-x_last);
+
+		try
+		{
+			auto &book = mapBooks[key];
+			retval+= "<p>";
+			retval+= book.getMetadata().getMetadata()["bib"];
+			retval+="</p>";
+		}
+		catch(...) {}
+		
+		if(x_new==std::string::npos) break;
+		x_last = x_new+1;
+	}
+	retval+="</body></html>";
+
+	ResponseBuilder(downstream_)
+		.status(200,"Ok")
+		.header("Content-Type","text/html")
+		.body(std::move(retval))
+		.sendWithEOM();
+}
