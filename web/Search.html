@@ -438,44 +438,22 @@ let lastInput ="";
 let filterOpts = {};
 function ApplyFilterOptions()
 {
-	console.log(jsonObj);
-	let obj = document.getElementById("SearchHitList");
-	obj.innerHTML = "";  
 	filterOpts["ShowOnlyTextsWithOCR"] = document.getElementById("ShowOnlyTextsWithOCR").checked;
 	let x = filterOpts["ShowOnlyTextsWithOCR"];
 
 	for(var i = 0; i < jsonObj.books.length; i++)
 	{
+		let xentry = document.getElementById(jsonObj.books[i].scanId);
+		console.log(jsonObj.books[i].scanId);
 		if(x && (!jsonObj.books[i].hasocr||(jsonObj.books[i].hasocr == undefined)))
-		{	continue;}
+		{
+			xentry.style.display = "None";
+		}
+		else
+		{
+			xentry.style.display = "";
+		}
 
-			let newList = document.createElement("li");
-			let inner = "";
-			if(!jsonObj.books[i].hasocr || (jsonObj.books[i].hasocr == undefined))
-			{
-
-				inner = "<a data-specialhref='/ShowMetadata";
-			}
-			else
-			{
-				inner = "<a data-specialhref='/GetBooks";
-			}
-			inner+= "?query="+lastInput;
-			inner+="&scanId="+jsonObj.books[i].scanId;
-			inner+="&fuzzyness="+document.getElementById("FuzzyID").value; 
-			inner+="' onclick='return changeColor(this);'>";
-			if(!jsonObj.books[i].hasocr || (jsonObj.books[i].hasocr == undefined))
-			{
-				inner+="<img src='/volltext.png' class='hiddenContent' alt='volltext' title='Buch besitzt Volltext'><img src='/scan.png' class='hiddenContent' alt='scan' title='Buch besitzt einen Scan'>";
-			}
-			else
-			{
-				inner+="<img src='/volltext.png' alt='volltext' title='Buch besitzt Volltext'><img src='/scan.png' alt='scan' title='Buch besitzt einen Scan'>";
-			}
-			inner+=jsonObj.books[i].description+"   "+"<input onclick='this.was_clicked=1;return true;' class='booklistinp' data-scanid='"+jsonObj.books[i].scanId+"' type='checkbox' unchecked></a>"; 
-			newList.innerHTML = inner;
-			//Show the new link in the search hit list
-			obj.appendChild(newList);
 	}
 }
 
@@ -615,7 +593,38 @@ function sendToPage(name)
 
 			document.getElementById("ResultBanner").innerHTML = "<h1 class='headerStyle'>Search Results for: \""+document.getElementById("SpecialSID").value+"\"<a class='citationButton' onclick='OpenFilter();return true;'>Filter results</a><a class='buttontwo citationButton' style='margin-left: 1rem' onclick='CreateBibliography();return true;'>Create Bibliography</a></h1>";
 
-		ApplyFilterOptions();
+	for(var i = 0; i < jsonObj.books.length; i++)
+	{
+			let newList = document.createElement("li");
+			newList.id = jsonObj.books[i].scanId;
+			let inner = "";
+			if(!jsonObj.books[i].hasocr || (jsonObj.books[i].hasocr == undefined))
+			{
+
+				inner = "<a data-specialhref='/ShowMetadata";
+			}
+			else
+			{
+				inner = "<a data-specialhref='/GetBooks";
+			}
+			inner+= "?query="+lastInput;
+			inner+="&scanId="+jsonObj.books[i].scanId;
+			inner+="&fuzzyness="+document.getElementById("FuzzyID").value; 
+			inner+="' onclick='return changeColor(this);'>";
+			if(!jsonObj.books[i].hasocr || (jsonObj.books[i].hasocr == undefined))
+			{
+				inner+="<img src='/volltext.png' class='hiddenContent' alt='volltext' title='Buch besitzt Volltext'><img src='/scan.png' class='hiddenContent' alt='scan' title='Buch besitzt einen Scan'>";
+			}
+			else
+			{
+				inner+="<img src='/volltext.png' alt='volltext' title='Buch besitzt Volltext'><img src='/scan.png' alt='scan' title='Buch besitzt einen Scan'>";
+			}
+			inner+=jsonObj.books[i].description+"   "+"<input onclick='this.was_clicked=1;return true;' class='booklistinp' data-scanid='"+jsonObj.books[i].scanId+"' type='checkbox' unchecked></a>"; 
+			newList.innerHTML = inner;
+			//Show the new link in the search hit list
+			obj.appendChild(newList);
+	}
+
 	}
 	realSearch.send();
 	}
