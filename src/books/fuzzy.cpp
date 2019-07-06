@@ -72,10 +72,6 @@ int recursiveLD(const char* chS, int len_s, const char* chT, int len_t)
 */
 bool fuzzy_cmp(std::string sWord1, std::string sWord2)
 {
-    //Change to lower string
-    func::convertToLower(sWord1);
-    func::convertToLower(sWord2);
-
     //If length is 0 skip word
     if(sWord1.length() == 0)
         return false;
@@ -106,6 +102,46 @@ bool fuzzy_cmp(std::string sWord1, std::string sWord2)
     //Check whether score is lower than given fuzzyness)
     if(score < fuzzyness && score >= 0)
         return true;
+
+    return false;
+}
+
+/**
+* @brief compare to words with fuzzy search and case insensetive, AND modify id
+* @parameter sWord1 (searched word)
+* @parameter sWord2 (word)
+* @param[out] ld indicating levenstein (-1 if false, 0 if exact-, 2 if contains-, 1-2 if fuzzy-match)
+* @return bool 
+*/
+bool fuzzy_cmp(std::string sWord1, std::string sWord2, double& ld)
+{
+    //If length is 0 skip word
+    if(sWord1.length() == 0)
+        return false;
+
+    //Calculate Levinstein distance
+    double len1 = sWord1.length();
+    double len2 = sWord2.length();
+
+    //Check whether length of words are to far appart.
+    if(len1>len2 && len2/len1 <= 0.75)
+        return false;
+    else if(len1<len2 && len1/len2 <= 0.75)
+        return false;
+
+    //Calculate levenshtein distance
+    size_t ldIterative = levenshteinDistance(sWord1.c_str(), sWord2.c_str());
+
+    //Calculate score
+    double score = static_cast<double>(ldIterative)/ std::max(sWord1.length(), sWord2.length());
+    double fuzzyness = 0.2;
+
+    //Check whether score is lower than given fuzzyness)
+    if(score < fuzzyness && score >= 0)
+    {
+        ld = 1+score;
+        return true;
+    }
 
     return false;
 }

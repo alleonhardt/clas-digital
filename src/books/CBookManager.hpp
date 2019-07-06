@@ -2,6 +2,9 @@
 #include <string>
 #include <list>
 #include <map>
+#include <set>
+#include <functional> 
+#include <algorithm> 
 #include <fstream>
 #include <dirent.h>
 #include <shared_mutex>
@@ -57,7 +60,20 @@ public:
     * @brief search function calling fitting function from search class
     * @return list of all found books
     */
-    std::map<std::string, CBook*>* search(unsigned long long id);
+    std::list<CBook*>* search(unsigned long long id);
+
+    /**
+    * @brief convert to list
+    * @return list of searchresulst
+    */
+    std::list<CBook*>* convertToList(std::map<std::string, CBook*>* mapBooks, std::map<std::string, double>& matches);
+
+    /**
+    * @brief convert to list
+    * @return list of searchresulst
+    */
+    std::list<CBook*>* convertToList(std::map<std::string, CBook*>* mapBooks);
+
 
     /**
     * @brief create map of all words (key) and books in which the word occurs (value)

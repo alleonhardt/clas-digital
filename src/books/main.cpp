@@ -56,23 +56,22 @@ int main()
         int fuzzy = std::stoi(sFuzzy);
 
         
-        CSearchOptions* searchOpts = new CSearchOptions(sInput, fuzzy, {"RFWJC42V", "XCFFDRQC", "RBB8DW5B"}, false, false, "", 0 , 2019, 1);
+        CSearchOptions* searchOpts = new CSearchOptions(sInput, fuzzy, {"RFWJC42V", "XCFFDRQC", "RBB8DW5B"}, false, true, "", 0 , 2019, 1);
         CSearch* search = new CSearch(searchOpts, 0);
         manager.addSearch(search);
 
         alx::cout.write ("Searching for ", sInput, "... \n");
 
-        std::map<std::string, CBook*>* searchResults = manager.search(0);
+        std::list<CBook*>* searchResults = manager.search(0);
         unsigned int counter = 0;
         for(auto it=searchResults->begin(); it!=searchResults->end(); it++)
         {
-            alx::cout.write (it->first, ": ", it->second->getMetadata().getShow(), "\n");
-            alx::cout.write ("-- Pages: ");
+            alx::cout.write ((*it)->getKey(), ": ", (*it)->getMetadata().getShow(), "\n");
 
             //Pages for full search
             if(fuzzy == 0)
             {
-                std::list<size_t>* listPages = it->second->getPagesFull(sInput);
+                std::list<size_t>* listPages = (*it)->getPagesFull(sInput);
                 for(auto jt=listPages->begin(); jt!=listPages->end(); jt++)
                     alx::cout.write ((*jt), ", ");
                 delete listPages;
@@ -80,9 +79,9 @@ int main()
             }
 
             //Pages for contains search
-            else if(fuzzy == 1)
+            if(fuzzy == 1)
             {
-                std::map<int, std::vector<std::string>>* mapPages = it->second->getPagesContains(sInput);
+                std::map<int, std::vector<std::string>>* mapPages = (*it)->getPagesContains(sInput);
                 for(auto jt=mapPages->begin(); jt!=mapPages->end(); jt++)
                 {
                     alx::cout.write (jt->first, " (");
@@ -97,7 +96,7 @@ int main()
             //Pages for fuzzy search
             else if(fuzzy == 2)
             {
-                std::map<int, std::vector<std::string>>* mapPages = it->second->getPagesFuzzy(sInput);
+                std::map<int, std::vector<std::string>>* mapPages = (*it)->getPagesFuzzy(sInput);
                 for(auto jt=mapPages->begin(); jt!=mapPages->end(); jt++)
                 {
                     alx::cout.write (jt->first, " (");
