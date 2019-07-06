@@ -328,19 +328,19 @@ std::map<int, std::vector<std::string>>* CBook::findPagesFuzzy(std::string sWord
 
 //Remove all elements from mapPages, which do not exist in results2. 
 //For all other elements, add the found string from results to on this page to the result
-void CBook::removePages(std::map<int, std::vector<std::string>>* mapPages, std::map<int, std::vector<std::string>>* results2)
+void CBook::removePages(std::map<int, std::vector<std::string>>* results1, std::map<int, std::vector<std::string>>* results2)
 {
-    for(auto it=mapPages->begin(); it!=mapPages->end(); ++it)
+    for(auto it=results1->begin(); it!=results1->end(); ++it)
     {
         bool found = false;
         for(auto jt=results2->begin(); jt!=results2->end() || found == true; jt++)
         {
             if(it->first == jt->first) {
-                (*mapPages)[it->first].insert((*mapPages)[it->first].end(), jt->second.begin(), jt->second.end());
+                (*results1)[it->first].insert((*results1)[it->first].end(), jt->second.begin(), jt->second.end());
                 found = true;
             }
         }
         if(found == false)
-            mapPages->erase(it--);
+            results1->erase(it--);
     }
 }

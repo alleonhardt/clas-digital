@@ -41,7 +41,10 @@ void CSearch::setWord(std::string sWord) {
     m_sWord = sWord;
 }
 
-
+/**
+* @brief calls spezific search function, searches, and creates map of  matches. Removes all 
+* books that do not match with search options.
+*/
 std::map<std::string, CBook*>* CSearch::search(std::map<std::string, std::map<std::string, CBook*>>& mWs, std::map<std::string, std::map<std::string, CBook*>>& mWsTitle, std::map<std::string, double>& matches)
 {
     alx::cout.write("Searching for ", m_sWord, "\n");
@@ -212,7 +215,6 @@ void CSearch::removeBooks(std::map<std::string, CBook*>* mapSR)
 
 }
 
-
 /**
 * @param[in] book to be checked
 * return Boolean
@@ -237,15 +239,6 @@ bool CSearch::checkSearchOptions(CBook* book)
             match = true;
     }
     return match;
-
-    //*** Check correct access rights ***//
-    if(m_sOpts->getOnlyTitle() == true)
-        return true;
-
-    if(book->getPublic() == false && m_sOpts->getAccess()==false)
-        return false;
-    else
-        return true;
 }
 
 /*

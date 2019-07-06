@@ -69,8 +69,9 @@ public:
     std::list<CBook*>* convertToList(std::map<std::string, CBook*>* mapBooks, std::map<std::string, double>& matches);
 
     /**
-    * @brief convert to list
-    * @return list of searchresulst
+    * @brief Convert to list, without sortig (only, when normal search is selected) 
+    * @param[in] mapBooks map of books that have been found to contains the searched word
+    * @return list of searchresults
     */
     std::list<CBook*>* convertToList(std::map<std::string, CBook*>* mapBooks);
 

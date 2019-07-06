@@ -118,12 +118,17 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
         for(auto it=results1->begin(); it!=results1->end(); it++)
         {
             if(results2->count(it->first) == 0)
+            {
+                matches.erase(it->first);
                 results1->erase(it);
+            }
         }
 
         //Delete additional search results
         delete results2;
     }
+
+    alx::cout.write("matches: ", matches.size(), "\nresults1: ", results1->size(), "\n");
 
     deleteSearch(id);
 
@@ -135,52 +140,52 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
 }
 
 /**
-* @brief convert to list
+* @brief convert to list and sort list
+* @param[in] mapBooks map of books that have been found to contains the searched word
+* @param[in, out] matches Map of books and there match with the searched word
 * @return list of searchresulst
 */
-std::list<CBook*>* CBookManager::convertToList(std::map<std::string, CBook*>* mapBooks, std::map<std::string, double>& matches)
+std::list<CBook*>* CBookManager::convertToList(std::map<std::string, CBook*>* mapSR, std::map<std::string, double>& matches)
 {
     std::list<CBook*>* listBooks = new std::list<CBook*>;
 
     //Change identical entrys
     double counter;
-    for(auto it=matches.begin(); it!= matches.end(); it++)
-    {
-        it->second+=counter;
-        counter+=0.000001;
-    }
+    for(auto it=matches.begin(); it!= matches.end(); it++) { it->second+=counter; counter+=0.000001; }
 
 	// Declaring the type of Predicate that accepts 2 pairs and return a bool
-	typedef std::function<bool(std::pair<std::string, double>, std::pair<std::string, double>)> Comparator;
+	typedef std::function<bool(std::pair<std::string, double>, std::pair<std::string, double>)> Comp;
  
 	// Defining a lambda function to compare two pairs. It will compare two pairs using second field
-	Comparator compFunctor =
+	Comp compFunctor =
 			[](std::pair<std::string, double> elem1, std::pair<std::string, double> elem2)
 			{
 				return elem1.second < elem2.second;
 			};
 
-    alx::cout.write("Size: ", matches.size(), "\n");
-
 	// Declaring a set that will store the pairs using above comparision logic
-	std::set<std::pair<std::string, double>, Comparator> sortedMatches (matches.begin(), matches.end(), compFunctor);
+	std::set<std::pair<std::string, double>, Comp> sorted(matches.begin(), matches.end(), compFunctor);
 
-    alx::cout.write("...\n");
+    for(std::pair<std::string, double> element : sorted)
+        listBooks->push_back(mapSR->at(element.first)); 
 
-    for(std::pair<std::string, double> element : sortedMatches)
-        listBooks->push_back(mapBooks->at(element.first)); 
-
-    delete mapBooks;
+    delete mapSR;
     return listBooks;
 }
 
-std::list<CBook*>* CBookManager::convertToList(std::map<std::string, CBook*>* mapBooks)
+/**
+* @brief Convert to list, without sortig (only, when normal search is selected) 
+* @param[in] mapBooks map of books that have been found to contains the searched word
+* @return list of searchresults
+*/
+std::list<CBook*>* CBookManager::convertToList(std::map<std::string, CBook*>* mapSR)
 {
     std::list<CBook*>* listBooks = new std::list<CBook*>;
-    for(auto it=mapBooks->begin(); it!=mapBooks->end(); it++)
+    for(auto it=mapSR->begin(); it!=mapSR->end(); it++)
         listBooks->push_back(it->second);
     return listBooks; 
 }
+
 /**
 * @brief create map of all words (key) and books in which the word occurs (value)
 */

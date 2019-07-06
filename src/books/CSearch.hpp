@@ -51,7 +51,12 @@ public:
     void setWord(std::string sWord);
 
 
+    /**
+    * @brief calls spezific search function, searches, and creates map of  matches. Removes all 
+    * books that do not match with search options.
+    */
     std::map<std::string, CBook*>* search(std::map<std::string, std::map<std::string, CBook*>>& mWs, std::map<std::string, std::map<std::string, CBook*>>& mWsTitle, std::map<std::string, double>& matches);
+
     /**
     * @brief search full-match
     * @param[in] mapWords map of all words with a list of books in which this where accures
