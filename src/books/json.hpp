@@ -11309,6 +11309,7 @@ class basic_json
     using serializer = ::nlohmann::detail::serializer<basic_json>;
 
   public:
+	std::string _lastModifiedSince;
     using value_t = detail::value_t;
     /// JSON Pointer, see @ref nlohmann::json_pointer
     using json_pointer = ::nlohmann::json_pointer<basic_json>;

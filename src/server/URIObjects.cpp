@@ -573,7 +573,7 @@ void RequestCreateBibliography::onRequest(std::unique_ptr<proxygen::HTTPMessage>
 		{
 			auto &book = mapBooks[key];
 			retval+= "<p>";
-			retval+= book.getMetadata().getMetadata()["bib"];
+			retval+= book.getMetadata().getMetadata()["citation"];
 			retval+="</p>";
 		}
 		catch(...) {}

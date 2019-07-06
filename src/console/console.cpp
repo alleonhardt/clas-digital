@@ -44,22 +44,27 @@ namespace alx
 		getmaxyx(stdscr,y,x);
 		_stdout = newwin(y-2,x,0,0);
 		_cmd = newwin(2,x,y-2,0);
+		_scrollback = newpad(2000,x);
 		keypad(_cmd,TRUE);
 		wattrset(_cmd,COLOR_PAIR(3)|A_BOLD);
 		wattrset(_stdout,COLOR_PAIR(2)|A_BOLD);
+		wattrset(_scrollback,COLOR_PAIR(2)|A_BOLD);
 		whline(_cmd,0,x);
 		scrollok(_stdout,TRUE);
+		scrollok(_scrollback,TRUE);
 		wattrset(_cmd,COLOR_PAIR(4)|A_BOLD);
 		mvwaddstr(_cmd,1,0,"$> ");
 		wattrset(_cmd,COLOR_PAIR(1)|A_BOLD);
 		wrefresh(_cmd);
 		signal(SIGWINCH, do_resize);
+		_scrolling = false;
 	}
 
 	void console::SetColor(color x)
 	{
 		std::lock_guard lck(_outputLock);
 		wattrset(_stdout,x.x);
+		wattrset(_scrollback,x.x);
 	}
 
 	std::string console::getCommand()
@@ -67,6 +72,12 @@ namespace alx
 		std::string command="";
 		int ch;
 		auto it = _cmdBuffer.end();
+
+		int currline = 0;
+		WINDOW *scrollwin;
+		int dimx,dimy;
+		getmaxyx(stdscr,dimy,dimx);
+		scrollwin = newpad(1000,dimx);
 
 		for(;;)
 		{
@@ -77,7 +88,42 @@ namespace alx
 				continue;
 			else if(ch==13||ch==10)
 				break;
-			else if(resize_window)
+			else if(ch==KEY_PPAGE)
+			{
+				if(!_scrolling)
+				{
+					int x,y;
+					_scrolling = true;
+					getyx(_scrollback,y,x);
+					currline = y-dimy+3;
+					copywin(_scrollback,scrollwin,0,0,0,0,999,dimx-1,0);
+				}
+				currline = currline-1;
+				if(currline<0)
+					currline = 0;
+				prefresh(scrollwin,currline,0,0,0,dimy-3,dimx-1);
+				continue;
+			}
+			else if(ch==KEY_NPAGE)
+			{
+				if(_scrolling)
+				{
+					currline+=1;
+					if(currline>(999-(dimy-3)))
+						currline = 999-(dimy-3);
+					prefresh(scrollwin,currline,0,0,0,dimy-3,dimx-1);
+				}
+				continue;
+			}
+
+			if(_scrolling)
+			{
+				_scrolling = false;
+				redrawwin(_stdout);
+				wrefresh(_stdout);
+			}
+
+			if(resize_window)
 			{
 				resize_window = false;
 				int x, y;
@@ -85,8 +131,12 @@ namespace alx
 				ioctl(STDOUT_FILENO,TIOCGWINSZ,&size);
 				y = size.ws_row;
 				x = size.ws_col;
+				dimx = x;
+				dimy = y;
 				resizeterm(y,x);
 				wresize(_cmd,2,x);
+				wresize(_scrollback,1000,dimx);
+				wresize(scrollwin,1000,dimx);
 				mvwin(_cmd,y-2,0);
 				wresize(_stdout,y-2,x);
 				
@@ -163,27 +213,32 @@ namespace alx
 	void console::_write(std::string s)
 	{
 		waddstr(_stdout,s.c_str());
+		waddstr(_scrollback,s.c_str());
 	}
 
 	void console::flush()
 	{
-		wrefresh(_stdout);
+		if(!_scrolling)
+			wrefresh(_stdout);
 	}
 
 
 	void console::_write(const char *x)
 	{
 		waddstr(_stdout,x);
+		waddstr(_scrollback,x);
 	}
 
 	void console::_write(int x)
 	{
 		waddstr(_stdout,std::to_string(x).c_str());
+		waddstr(_scrollback,std::to_string(x).c_str());
 	}
 
 	void console::_write(color x)
 	{
 		wattrset(_stdout,x.x);
+		wattrset(_scrollback,x.x);
 	}
 
 	console::~console()
@@ -206,7 +261,7 @@ namespace alx
 	{
 		std::lock_guard lck(_outputLock);
 		_write(std::move(strs));
-		wrefresh(_stdout);
+		flush();
 		return *this;
 	}
 }

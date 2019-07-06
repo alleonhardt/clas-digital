@@ -25,6 +25,8 @@ namespace alx
 			};
 
 			WINDOW *_stdout; ///<The stdout window all output is directed to, this is the bigger window seen in the user interface
+			WINDOW *_scrollback;
+			volatile bool _scrolling;
 			WINDOW *_cmd;	///<The command window this holds the window seperators and also the basic command line only console input will print in this window
 			std::mutex _outputLock;	///<Synchronisation of the screen to ensure conflict free printing
 			std::list<std::string> _cmdBuffer;	///<A list with the last commands used so the user can scroll back and forth in it
