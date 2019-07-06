@@ -238,6 +238,10 @@ padding-right: 0;
 	width: 100%;
 }
 
+.LinkListClass a {
+	color: blue;
+}
+
 .page svg {
 	background-repeat: no-repeat;
 	background-position: center center;
@@ -248,10 +252,6 @@ padding-right: 0;
 
 .page .placeholder {
 	background-color: white;
-}
-
-.LinkListClass a:visited{
-	color: red;
 }
 
 
@@ -512,6 +512,10 @@ function HighlightButton(x)
 }
 
 function ShowOCR(a) {
+	if(a!=undefined)
+	{
+		a.style.color = "green";
+															  }
 	document.getElementsByClassName("pageContainer")[0].style["grid-template-columns"] = "60% 0% 40%";
 		document.getElementById("InfoScreen").style.display = "none";
     HighlightButton(document.getElementById("ShowOCRButton"));

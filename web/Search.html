@@ -280,6 +280,11 @@ i
 	cursor: pointer;
 }
 
+.buttontwo {
+	color: white;
+	background-color: blue;
+}
+
 .citationButton:hover {
 	transition: all 0.4s ease;
 	background-color: black;
@@ -314,7 +319,16 @@ class User {
 			}
 		});
 
-		document.getElementById("LoggedInAs").innerHTML = "Logged in as <strong>"+ServerDataObj.user.email+"</strong>";
+		if(ServerDataObj==undefined)
+			alert("Site internal error");
+		else if(ServerDataObj.user == undefined)
+		{
+				let x = document.getElementById("loggedintopnav");
+				x.innerHTML = '<form id ="LoginForm" class="form-inline my-2 my-lg-0" action="/" method="post"><input id="EmailType" class="form-control mr-sm-2" type="email" name="email" placeholder="Email" aria-label="Email" required><input id="PasswordType" class="from-control mr-sm-2" type="password" name="password" placeholder="Password" aria-label="Password" required><input class="btn btn-outline-success my-2 my-sm-0" type="submit" value="Log In"/></form>';
+		}
+		else
+		{
+			document.getElementById("LoggedInAs").innerHTML = "Logged in as <strong>"+ServerDataObj.user.email+"</strong>";
 
 			let list = document.getElementsByClassName("classifiedContent");
 			//Unlocks all the content that the user can access!
@@ -326,6 +340,7 @@ class User {
 					list[i].style.display="block";
 				}
 			}
+		}
 		ApplySearchData();
 		default_search_parameters = JSON.parse(JSON.stringify(search_parameters));
 	}
@@ -423,44 +438,22 @@ let lastInput ="";
 let filterOpts = {};
 function ApplyFilterOptions()
 {
-	console.log(jsonObj);
-	let obj = document.getElementById("SearchHitList");
-	obj.innerHTML = "";  
 	filterOpts["ShowOnlyTextsWithOCR"] = document.getElementById("ShowOnlyTextsWithOCR").checked;
 	let x = filterOpts["ShowOnlyTextsWithOCR"];
 
 	for(var i = 0; i < jsonObj.books.length; i++)
 	{
+		let xentry = document.getElementById(jsonObj.books[i].scanId);
+		console.log(jsonObj.books[i].scanId);
 		if(x && (!jsonObj.books[i].hasocr||(jsonObj.books[i].hasocr == undefined)))
-		{	continue;}
+		{
+			xentry.style.display = "None";
+		}
+		else
+		{
+			xentry.style.display = "";
+		}
 
-			let newList = document.createElement("li");
-			let inner = "";
-			if(!jsonObj.books[i].hasocr || (jsonObj.books[i].hasocr == undefined))
-			{
-
-				inner = "<a data-specialhref='/ShowMetadata";
-			}
-			else
-			{
-				inner = "<a data-specialhref='/GetBooks";
-			}
-			inner+= "?query="+lastInput;
-			inner+="&scanId="+jsonObj.books[i].scanId;
-			inner+="&fuzzyness="+document.getElementById("FuzzyID").value; 
-			inner+="' onclick='return changeColor(this);'>";
-			if(!jsonObj.books[i].hasocr || (jsonObj.books[i].hasocr == undefined))
-			{
-				inner+="<img src='/volltext.png' class='hiddenContent' alt='volltext' title='Buch besitzt Volltext'><img src='/scan.png' class='hiddenContent' alt='scan' title='Buch besitzt einen Scan'>";
-			}
-			else
-			{
-				inner+="<img src='/volltext.png' alt='volltext' title='Buch besitzt Volltext'><img src='/scan.png' alt='scan' title='Buch besitzt einen Scan'>";
-			}
-			inner+=jsonObj.books[i].description+"   "+"<input onclick='this.was_clicked=1;return true;' type='checkbox' unchecked></a>"; 
-			newList.innerHTML = inner;
-			//Show the new link in the search hit list
-			obj.appendChild(newList);
 	}
 }
 
@@ -597,23 +590,13 @@ function sendToPage(name)
 			return;
 		}
 
-		if(jsonObj.books.length===0)
-			StateBanner.ChangeBanner("No results found!",StateBannerType.info);
-		else
-			StateBanner.ChangeBanner("",StateBannerType.release);
 
-		let maxSearchResults = 25;
-		if(jsonObj.books.length < 25)
-		{
-			maxSearchResults = jsonObj.books.length;
-		}
+			document.getElementById("ResultBanner").innerHTML = "<h1 class='headerStyle'>Search Results for: \""+document.getElementById("SpecialSID").value+"\"<a class='citationButton' onclick='OpenFilter();return true;'>Filter results</a><a class='buttontwo citationButton' style='margin-left: 1rem' onclick='CreateBibliography();return true;'>Create Bibliography</a></h1>";
 
-		document.getElementById("ResultBanner").innerHTML = "<h1 class='headerStyle'>Search Results for: \""+document.getElementById("SpecialSID").value+"\"<a class='citationButton' onclick='OpenFilter();return true;'>Filter results</a></h1>";
-		//Iterate over every book and create based on the json the links to the books
-
-		for(var i = 0; i < jsonObj.books.length; i++)
-		{
+	for(var i = 0; i < jsonObj.books.length; i++)
+	{
 			let newList = document.createElement("li");
+			newList.id = jsonObj.books[i].scanId;
 			let inner = "";
 			if(!jsonObj.books[i].hasocr || (jsonObj.books[i].hasocr == undefined))
 			{
@@ -624,7 +607,7 @@ function sendToPage(name)
 			{
 				inner = "<a data-specialhref='/GetBooks";
 			}
-			inner+= "?query="+input;
+			inner+= "?query="+lastInput;
 			inner+="&scanId="+jsonObj.books[i].scanId;
 			inner+="&fuzzyness="+document.getElementById("FuzzyID").value; 
 			inner+="' onclick='return changeColor(this);'>";
@@ -636,24 +619,40 @@ function sendToPage(name)
 			{
 				inner+="<img src='/volltext.png' alt='volltext' title='Buch besitzt Volltext'><img src='/scan.png' alt='scan' title='Buch besitzt einen Scan'>";
 			}
-			inner+="   "+jsonObj.books[i].description+"   "+"<input onclick='this.was_clicked=1;return true;' type='checkbox' unchecked></a>"; 
+			inner+=jsonObj.books[i].description+"   "+"<input onclick='this.was_clicked=1;return true;' class='booklistinp' data-scanid='"+jsonObj.books[i].scanId+"' type='checkbox' unchecked></a>"; 
 			newList.innerHTML = inner;
 			//Show the new link in the search hit list
 			obj.appendChild(newList);
-		}
-		
-		
-		/*
-		let lList = document.getElementById("LinkList");
-		for(var i = 0; i < (jsonObj.books.length/25); i++)
-		{
-			lList.innerHTML += "<a href='www.google.de' class='linkedClass'>"+i+"</a>";
-		}*/
+	}
+
 	}
 	realSearch.send();
 	}
 	xhr.send();
 }
+
+function CreateBibliography()
+{
+	let lst = document.getElementsByClassName("booklistinp");
+	let biblst = "";
+	for(let i = 0; i < lst.length; i++)
+	{
+		if(lst[i].checked)
+		{
+			if(biblst=="")
+				biblst=lst[i].dataset.scanid;
+			else
+				biblst+=","+lst[i].dataset.scanid;
+		}
+	}
+	if(biblst.length==0)
+	{
+		alert("No books selected!");
+		return;
+	}
+	window.open("/createBibliography?books="+biblst);
+}
+
 
 function changeColor(obj)
 {
@@ -832,12 +831,21 @@ window.addEventListener("load",User.initialise,false);
 #ordered_pillars li {
 	margin-top: 1rem;
 }
+
+.topnav-right form {
+	box-sizing: border-box;
+	vertical-align: center;
+	padding: 0.4em 0.8em;
+	margin: auto;
+}
 		</style>
 	<script>
 		function ExecuteInitialise()
 		{
 			if(ServerDataObj===undefined)
+			{
 				console.log("Cant find server data!");
+			}
 			else
 			{
 				if(ServerDataObj.pillars != undefined)
@@ -861,7 +869,7 @@ window.addEventListener("load",User.initialise,false);
 			<a class="classifiedContent" href="/administration" data-acc=4>Administration</a>
 			<a class="classifiedContent" href="/uploadbook" data-acc=2>Upload Books</a>
 			<a class="classifiedContent" href="/managebooks" data-acc=2>Manage Books</a>
-			<div class="topnav-right">
+			<div class="topnav-right" id='loggedintopnav'>
 				<span id="LoggedInAs">Logged in</span>
 				<button id="logoutBut" class="btn btn-outline-info" onclick='User.DoLogout()'>Logout</button>
 			</div>

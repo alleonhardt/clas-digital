@@ -101,6 +101,9 @@ class RedirectToHTTPSHandler : public EmptyHandler
 			noexcept override;
 };
 
+/**
+ * @brief Searches a specific book for a specific word with the given fuzzyness 
+ */
 class GetBookMetadata : public EmptyHandler
 {
 	public:
@@ -112,27 +115,82 @@ class GetBookMetadata : public EmptyHandler
 			noexcept override;
 };
 
+/**
+ *
+ * @brief Searches a specific book for a specific word with the given fuzzyness 
+ */
 class UploadBookHandler : public EmptyHandler
 {
 	private:
-		std::ofstream ofs;
-		std::string _finalPath;
+		std::ofstream ofs;  ///<The file handle to the file which is uploaded
+		std::string _finalPath;	///< The final path to which the file is written to
+
 	public:
+		/**
+		 * @brief handles the upload book request and tries to download the given files
+		 *
+		 * @param headers The specific header for the specific upload
+		 */
 		void onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 			noexcept override;
+
+		/**
+		 * @brief The function handles the upload of data to the server and puts the data in the right file
+		 *
+		 * @param body The data which is contained by the uploaded file
+		 */
 		void onBody(std::unique_ptr<folly::IOBuf> body) noexcept override;
+
+		/**
+		 * @brief Finalizes the data given by the user. Could be unzipping or decrypting of data
+		 */
 		void onEOM() noexcept override;
 };
 
+/**
+ * @brief Searches a specific book for a specific word with the given fuzzyness 
+ */
 class StartSearch : public EmptyHandler
 {
+	public:
+		/**
+		 * @brief Handles the start search request, this request starts a specific search registered before with /searchword
+		 *
+		 * @param headers The parameters given by the client with which we should start the search
+		 */
 		void onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 			noexcept override;
-		void start(long long,folly::EventBase *);
+
+	private:
+		/**
+		 * @brief Dummy function used as thread entry point, this function will asynchronous search for the given parameters
+		 *
+		 * @param sid The search id, of the search to be started
+		 * @param evb The event base from folly which is needed to execute ReponseBuilder on the right thread
+		 */
+		void start(long long sid,folly::EventBase *evb);
 };
 
+/**
+ *
+ * @brief Searches a specific book for a specific word with the given fuzzyness 
+ */
 class RequestSearchProgress : public EmptyHandler
 {
+	public:
+		/**
+		 * @brief Returns the search progress as JSON to the client, the headers must include the search id of the requested search if the search does not exist the server will return 1000
+		 *
+		 * @param headers The parameters given by the client packed in a http message
+		 */
+		void onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
+			noexcept override;
+};
+
+
+class RequestCreateBibliography : public EmptyHandler
+{
+	public:
 		void onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 			noexcept override;
 };
