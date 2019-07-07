@@ -129,6 +129,9 @@ void CBook::createMapWords()
     m_bOcr = true;
 }
 
+/**
+* @brief safe map of all words and pages on which word occures to disc
+*/
 void CBook::safePages()
 {
     std::map<std::string, std::vector<size_t>> mapWordsPages;
@@ -151,6 +154,9 @@ void CBook::safePages()
     write.close();
 }
 
+/**
+* @brief load words and pages on which word occures into map
+*/
 void CBook::loadPages(std::map<std::string, std::vector<size_t>>& mapWordsPages)
 {
     //Load map
@@ -172,7 +178,7 @@ void CBook::loadPages(std::map<std::string, std::vector<size_t>>& mapWordsPages)
         //Extract word (vec[0] = word, vec[1] = sBuffer
         std::vector<std::string> vec = func::split2(sBuffer, ";");
 
-        //Etract pages and convert to size_t
+        //Extract pages and convert to size_t
         std::vector<size_t> pages;
         std::vector<std::string> vecPages = func::split2(vec[1], ",");
         for(auto page : vecPages) 
@@ -222,6 +228,53 @@ std::list<size_t>* CBook::getPagesFull(std::string sInput)
     return listPages;
 }
 
+/**
+* @brief getPages calls the matching getPages... function according to fuzzyness
+*/
+std::map<int, std::vector<std::string>>* CBook::getPages(std::string sInput, int fuzzyness)
+{
+    if(fuzzyness == 0)
+        return getPagesFull2(sInput);
+    else if(fuzzyness == 1)
+        return getPagesContains(sInput);
+    else
+        return getPagesFuzzy(sInput);
+}
+
+/*
+* @param[in] sWord searched word
+* @return list of pages on which searched word accures
+*/
+std::map<int, std::vector<std::string>>* CBook::getPagesFull2(std::string sInput)
+{
+    std::vector<std::string> vWords;
+    func::convertToLower(sInput);
+    func::split(sInput, "+", vWords);
+
+    //Create empty list of pages
+    std::map<int, std::vector<std::string>>* mapPages = new std::map<int, std::vector<std::string>>;
+
+    //Load map of Words 
+    std::map<std::string, std::vector<size_t>> mapWordsPages;
+    loadPages(mapWordsPages);
+
+    for(auto page : mapWordsPages[vWords[0]])
+        (*mapPages)[page] = {};
+
+    for(size_t i=1; i<vWords.size(); i++)
+    {
+        std::map<int, std::vector<std::string>>* mapPages2 = new std::map<int, std::vector<std::string>>;
+        for(auto page : mapWordsPages[vWords[i]])
+            (*mapPages2)[page] = {};
+
+        //Remove all elements from mapPages, which do not exist in results2. 
+        removePages(mapPages, mapPages2);
+        delete mapPages2;
+    }
+
+    return mapPages;
+}
+
 /*
 * @param[in] sWord searched word
 * @return map of pages with vector of words found on this page
@@ -261,6 +314,7 @@ std::map<int, std::vector<std::string>>* CBook::getPagesContains(std::string sIn
 std::map<int, std::vector<std::string>>* CBook::getPagesFuzzy(std::string sInput)
 {
     std::vector<std::string> vWords;
+    func::convertToLower(sInput);
     func::split(sInput, "+", vWords);
 
     //Load map of words
@@ -326,21 +380,20 @@ std::map<int, std::vector<std::string>>* CBook::findPagesFuzzy(std::string sWord
     return mapPages;
 }       
 
-//Remove all elements from mapPages, which do not exist in results2. 
-//For all other elements, add the found string from results to on this page to the result
-void CBook::removePages(std::map<int, std::vector<std::string>>* mapPages, std::map<int, std::vector<std::string>>* results2)
+/**
+* @brief Remove all elements from mapPages, which do not exist in results2. 
+*  For all other elements, add the found string from results to on this page to the result
+* @param[in, out] results1
+* @param[in] results2
+* @return map of pages and words found on this page
+*/
+void CBook::removePages(std::map<int, std::vector<std::string>>* results1, std::map<int, std::vector<std::string>>* results2)
 {
-    for(auto it=mapPages->begin(); it!=mapPages->end(); ++it)
+    for(auto it=results1->begin(); it!=results1->end(); ++it)
     {
-        bool found = false;
-        for(auto jt=results2->begin(); jt!=results2->end() || found == true; jt++)
-        {
-            if(it->first == jt->first) {
-                (*mapPages)[it->first].insert((*mapPages)[it->first].end(), jt->second.begin(), jt->second.end());
-                found = true;
-            }
-        }
-        if(found == false)
-            mapPages->erase(it--);
+        if(results2->count(it->first) == 0)
+            results1->erase(it);
+        else
+            it->second.insert(it->second.end(), (*results2)[it->first].begin(), (*results2)[it->first].end());
     }
 }

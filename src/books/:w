@@ -79,13 +79,13 @@ void CBookManager::addBook(std::string sKey) {
 * @param[in] searchOPts 
 * @return list of all found books
 */
-std::list<CBook*>* CBookManager::search(unsigned long long id)
+std::map<std::string, CBook*>* CBookManager::search(unsigned long long id)
 {
     //Create empty map of results
     std::map<std::string, CBook*>* results1 = new std::map<std::string, CBook*>;
 
     if(m_mapSearchs.count(id) == 0)
-        return new std::list<CBook*>;
+        return results1;
 
     //Select search
     CSearch* search = m_mapSearchs[id];
@@ -112,88 +112,41 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
         search->setWord(vWords[i]);
 
         //Get results for second word
-        std::map<std::string, double> matches2;
-        std::map<std::string, CBook*>* results2 = search->search(m_mapWords, m_mapWordsTitle, matches2);
-
+        std::map<std::string, CBook*>* results2 = search->search(m_mapWords, m_mapWordsTitle, matches);
 
         //remove all books, that don't contain both words
         for(auto it=results1->begin(); it!=results1->end(); it++)
         {
-            //Erase element if it doesn't occure in results2
             if(results2->count(it->first) == 0)
-            {
-                matches.erase(it->first);
                 results1->erase(it);
-            }
-
-            //Erase element if it does not occure on the same page
-            else if(it->second->getPages(search->getSearchedWord(), search->getFuzzyness())->size() == 0)
-            {
-                matches.erase(it->first);
-                results1->erase(it);
-            }
         }
 
         //Delete additional search results
         delete results2;
     }
 
-    alx::cout.write("matches: ", matches.size(), "\nresults1: ", results1->size(), "\n");
-
     deleteSearch(id);
 
     //Return search results
-    if(matches.size() == 0)
-        return convertToList(results1);
-    else
-        return convertToList(results1, matches);
+    return results1;
 }
 
 /**
-* @brief convert to list and sort list
-* @param[in] mapBooks map of books that have been found to contains the searched word
-* @param[in, out] matches Map of books and there match with the searched word
+* @brief convert to list
 * @return list of searchresulst
 */
-std::list<CBook*>* CBookManager::convertToList(std::map<std::string, CBook*>* mapSR, std::map<std::string, double>& matches)
+std::list<CBook*>* CSearch::convertToList(std::map<std::string, CBook*>* mapBooks, std::map<std::string, double& matches)
 {
     std::list<CBook*>* listBooks = new std::list<CBook*>;
-
-    //Change identical entrys
-    double counter;
-    for(auto it=matches.begin(); it!= matches.end(); it++) { it->second+=counter; counter+=0.000001; }
-
-	// Declaring the type of Predicate that accepts 2 pairs and return a bool
-	typedef std::function<bool(std::pair<std::string, double>, std::pair<std::string, double>)> Comp;
- 
-	// Defining a lambda function to compare two pairs. It will compare two pairs using second field
-	Comp compFunctor =
-			[](std::pair<std::string, double> elem1, std::pair<std::string, double> elem2)
-			{
-				return elem1.second < elem2.second;
-			};
-
-	// Declaring a set that will store the pairs using above comparision logic
-	std::set<std::pair<std::string, double>, Comp> sorted(matches.begin(), matches.end(), compFunctor);
-
-    for(std::pair<std::string, double> element : sorted)
-        listBooks->push_back(mapSR->at(element.first)); 
-
-    delete mapSR;
+    for(auto it=mapBooks->begin(); it!=mapBooks->end(); it++)
+    {
+        if(matches[it->first] == 1)
+            listBooks->push_front(it->second);
+        else 
+            listBooks->push_back(it->second);
+    }
+    delete mapBooks;
     return listBooks;
-}
-
-/**
-* @brief Convert to list, without sortig (only, when normal search is selected) 
-* @param[in] mapBooks map of books that have been found to contains the searched word
-* @return list of searchresults
-*/
-std::list<CBook*>* CBookManager::convertToList(std::map<std::string, CBook*>* mapSR)
-{
-    std::list<CBook*>* listBooks = new std::list<CBook*>;
-    for(auto it=mapSR->begin(); it!=mapSR->end(); it++)
-        listBooks->push_back(it->second);
-    return listBooks; 
 }
 
 /**

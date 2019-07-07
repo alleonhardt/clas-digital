@@ -29,6 +29,14 @@ namespace fuzzy
     */
     bool fuzzy_cmp(std::string sWord1, std::string sWord2);
 
+    /**
+    * @brief compare to words with fuzzy search and case insensetive, AND modify id
+    * @parameter sWord1 (searched word)
+    * @parameter sWord2 (word)
+    * @param[out] ld indicating levenstein (-1 if false, 1 if exact-, 2 if contains-match, 0-fuzzynes)
+    * @return bool 
+    */
+    bool fuzzy_cmp(std::string sWord1, std::string sWord2, double& ld);
 }
 
 #ifdef __DEFINE_ONE__

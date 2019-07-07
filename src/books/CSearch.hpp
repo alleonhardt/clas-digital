@@ -33,15 +33,28 @@ public:
     unsigned long long getID();
 
     /**
-    * @return searched word from searchOptions
+    * @return searchOptions
     */
-    std::string getSearchedWord();
+    CSearchOptions* getSearchOptions();
 
     /**
     * @return progress
     */
     float getProgress();
 
+    // *** GETTER (from searchoptions) *** //
+
+    /**
+    * @return searched word from searchOptions
+    */
+    std::string getSearchedWord();
+
+    /** 
+    * @return fuzzynes
+    */
+    int getFuzzyness();
+    
+    
     // *** SETTER *** //
 
     /**
@@ -51,8 +64,12 @@ public:
     void setWord(std::string sWord);
 
 
-    std::map<std::string, CBook*>* search(std::map<std::string, std::map<std::string, CBook*>>& mWs,
-                                        std::map<std::string, std::map<std::string, CBook*>>& mWsTitle);
+    /**
+    * @brief calls spezific search function, searches, and creates map of  matches. Removes all 
+    * books that do not match with search options.
+    */
+    std::map<std::string, CBook*>* search(std::map<std::string, std::map<std::string, CBook*>>& mWs, std::map<std::string, std::map<std::string, CBook*>>& mWsTitle, std::map<std::string, double>& matches);
+
     /**
     * @brief search full-match
     * @param[in] mapWords map of all words with a list of books in which this where accures
@@ -66,7 +83,7 @@ public:
     * @param[in, out] mapSR map of search results
     */
     void containsSearch(std::map<std::string, std::map<std::string, CBook*>>& mapWords,
-                                                            std::map<std::string, CBook*>* mapSR);
+                     std::map<std::string, CBook*>* mapSR, std::map<std::string, double>& matches);
 
     /**
     * @brief search fuzzy 
@@ -74,7 +91,7 @@ public:
     * @param[in, out] mapSR searchresults
     */
     void fuzzySearch(std::map<std::string, std::map<std::string, CBook*>>& mapWords, 
-                                                        std::map<std::string, CBook*>* mapSR);
+                     std::map<std::string, CBook*>* mapSR, std::map<std::string, double>& matches);
 
     /**
     * @brief check whether searched word matches with author of a book.
@@ -94,11 +111,15 @@ public:
     */
     bool checkSearchOptions(CBook* book);
 
-    /**
-    * @brief convert to list
-    * @return list of searchresulst
+    /*
+    * @brief inserts searchResults into map of searchresults and assigns value of match
+    * @param[out] mapSR
+    * @param[in] found
+    * @param[out] matches
+    * @param[in] value
     */
-    std::list<CBook*>* convertToList(std::map<std::string, CBook*>* mapBooks);
+    void myInsert(std::map<std::string, CBook*>* mapSR, std::map<std::string, CBook*>& found,
+                            std::map<std::string, double>& matches, double value);
 
     /**
     * @brief delete searchOptions

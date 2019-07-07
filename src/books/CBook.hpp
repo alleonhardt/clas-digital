@@ -108,11 +108,22 @@ public:
     void loadPages(std::map<std::string, std::vector<size_t>>& mapWordsPages);
 
     /**
+    * @brief getPages calls the matching getPages... function according to fuzzyness
+    */
+    std::map<int, std::vector<std::string>>* getPages(std::string sInput, int fuzzyness);
+
+    /**
     * @brief return list of all pages on which word occures.
     * @param[in] sWord searched word
     * @return list of pages on which searched word accures
     */
     std::list<size_t>* getPagesFull(std::string sWord);
+
+    /*
+    * @param[in] sWord searched word
+    * @return list of pages on which searched word accures
+    */
+    std::map<int, std::vector<std::string>>* getPagesFull2(std::string sInput);
 
     /**
     * @brief return map of all pages + words found on page (Contains).
