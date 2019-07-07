@@ -153,6 +153,8 @@ std::string Zotero::_sendRequest(std::string requestURI)
 			alx::cout<<"Zotero _sendRequest() read global shutdown flag, shuttding down..."<<alx::endl;
 			return "{}";
 		}
+		alx::cout.writeln(alx::console::green_black,"Zotero request to url: ",st);
+
 		//Set the request url
 		curl_easy_setopt(_curl, CURLOPT_URL, st.c_str());
 
