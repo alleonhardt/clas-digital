@@ -33,15 +33,28 @@ public:
     unsigned long long getID();
 
     /**
-    * @return searched word from searchOptions
+    * @return searchOptions
     */
-    std::string getSearchedWord();
+    CSearchOptions* getSearchOptions();
 
     /**
     * @return progress
     */
     float getProgress();
 
+    // *** GETTER (from searchoptions) *** //
+
+    /**
+    * @return searched word from searchOptions
+    */
+    std::string getSearchedWord();
+
+    /** 
+    * @return fuzzynes
+    */
+    int getFuzzyness();
+    
+    
     // *** SETTER *** //
 
     /**

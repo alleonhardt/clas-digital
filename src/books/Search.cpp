@@ -18,6 +18,23 @@ unsigned long long  CSearch::getID() {
     return m_ID;
 }
 
+
+/**
+* @return searchOptions
+*/
+CSearchOptions* CSearch::getSearchOptions() {
+    return m_sOpts;
+}
+    
+/**
+* @return progress
+*/
+float CSearch::getProgress() {
+    return m_fProgress;
+}
+
+// *** GETTER (from searchoptions) *** //
+
 /**
 * @return searched word from searchOptions
 */
@@ -25,11 +42,11 @@ std::string CSearch::getSearchedWord() {
     return m_sOpts->getSearchedWord();
 }
 
-/**
-* @return progress
+/** 
+* @return fuzzynes
 */
-float CSearch::getProgress() {
-    return m_fProgress;
+int CSearch::getFuzzyness() {
+    return m_sOpts->getFuzzyness();
 }
 
 // *** SETTER *** //

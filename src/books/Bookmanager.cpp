@@ -112,12 +112,22 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
         search->setWord(vWords[i]);
 
         //Get results for second word
-        std::map<std::string, CBook*>* results2 = search->search(m_mapWords, m_mapWordsTitle, matches);
+        std::map<std::string, double> matches2;
+        std::map<std::string, CBook*>* results2 = search->search(m_mapWords, m_mapWordsTitle, matches2);
+
 
         //remove all books, that don't contain both words
         for(auto it=results1->begin(); it!=results1->end(); it++)
         {
+            //Erase element if it doesn't occure in results2
             if(results2->count(it->first) == 0)
+            {
+                matches.erase(it->first);
+                results1->erase(it);
+            }
+
+            //Erase element if it does not occure on the same page
+            else if(it->second->getPages(search->getSearchedWord(), search->getFuzzyness())->size() == 0)
             {
                 matches.erase(it->first);
                 results1->erase(it);
