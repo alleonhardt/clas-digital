@@ -260,6 +260,24 @@ function ShowPage(whichPage)
 	document.getElementById("ResultList").innerHTML = "Show Results "+whichPage*itemsPerPage+"-"+(pages[whichPage].length+whichPage*itemsPerPage)+" from "+totalItems+" total Results";
 }
 
+function UpdateZotero()
+{
+	if(currentKey!="")
+	{
+		console.log(currentKey);
+		let xml = new XMLHttpRequest();
+		xml.open("POST","/updateZotero?book="+currentKey,true);
+		xml.onload = function() {
+			if(xml.status !=200)
+				alert("Something went wrong with updating zotero data!");
+			else
+				alert("Successully updated book zotero data");
+		}
+		xml.send();
+
+	}
+}
+
 let PAGEShow = 0;
 function ShowCurrentPage(new_page)
 {
@@ -323,12 +341,13 @@ function ShowFile(x)
 	}
 	document.getElementById("frameNextTo").style.display = "inline-grid";
 }
-
+let currentKey = "";
 function slideOut(i,lstEnt)
 {
 	let xhr = new XMLHttpRequest();
 	console.log(i);
 	console.log(allBooksJS[i]);
+	currentKey = allBooksJS[i].key;
 	xhr.open("GET","/getBookRessources?book="+allBooksJS[i].key,true);
 	xhr.onload = function() {
 		if(xhr.status!=200)
@@ -439,6 +458,8 @@ class User {
 	xhr.send(null);
   }
 }
+
+
 
 //Create an enum to identify the valid types of State Banner changes
 var StateBannerType = {"success":1,"danger":2,"warning":3,"info":4,"release":5};
@@ -590,7 +611,7 @@ window.addEventListener("load",User.initialise,false);
     background-color: #333;
 }
 
-.abovegridcont a {
+.abovegridcont a{
 	display: inline-block;
   	color: #f2f2f2;
 	background-color: orange;
@@ -599,7 +620,18 @@ window.addEventListener("load",User.initialise,false);
 	padding: 0.5rem;
 }
 
-.abovegridcont a:hover {
+.abovegridcont div {
+	display: inline-block;
+  	color: #f2f2f2;
+	background-color: blue;
+	margin-left: 40vw;
+	cursor: pointer;
+	height: 100%;
+	padding: 0.5rem;
+}
+
+
+.abovegridcont a:hover,.abovegridcont div:hover {
   transition: all 0.4s ease;
   background-color: #ddd;
   color: black;
@@ -723,7 +755,7 @@ h1 {
 
 <div id="ShowBookInfo" class="GeneralPageLayout fade-out">
 <a class='citationButton' onclick='SlideBack();return true;'>&lt&lt</a>
-<div id="gridder" class="abovegridcont"><a onclick="ShowCurrentPage(0)">Go back</a></div>
+<div id="gridder" class="abovegridcont"><a onclick="ShowCurrentPage(0)">Go back</a><div onclick="UpdateZotero()">Update Zotero</div></div>
 <div id="HoldAll" class="grid-container">
 <ol id="BookFiles" class="filelst">
 <div class='loadingSpinner'></div>
