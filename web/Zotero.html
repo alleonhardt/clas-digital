@@ -1,0 +1,123 @@
+<!doctype html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <!--<link rel="stylesheet" href="style.css">-->
+    <title>Administration - clas digital</title>
+
+<style>
+
+
+/*SEARCH HIT LIST STYLE END*/
+
+/*Hides the content that the user cannot access!*/
+.classifiedContent {
+    display: None;
+}
+
+.smallerButton {
+	padding: 0.35em 0.35em;
+	font-size: 0.85em;
+}
+</style>
+
+<script>
+
+//Handles all the User related stuff
+class User {
+  //Static because it does not matter which user asks to end his session
+  static DoLogout() {
+    //Just tell the server to log the current user out, then reload the page
+    let xhr = new XMLHttpRequest();
+    xhr.open("POST","/logout",true);
+    xhr.onload = function() {
+        window.location.href = "/";
+    }
+    xhr.send(null);
+  }
+
+  static initialise() { 
+		document.getElementById("LoggedInAs").innerHTML = "Logged in as <strong>"+ServerDataObj.user.email+"</strong>";
+
+			let list = document.getElementsByClassName("classifiedContent");
+			//Unlocks all the content that the user can access!
+			for(var i=0; i < list.length; i++)
+			{
+				let y = list[i].dataset.acc;
+				if((ServerDataObj.user.access&y)!=0)
+				{
+					list[i].style.display="block";
+				}
+			}
+  }
+}
+
+window.addEventListener("load",User.initialise,false);
+</script>
+<style>
+
+.topnav {
+    background-color: #333;
+    overflow: hidden;
+}
+
+/* Style the links inside the navigation bar */
+.topnav a,.topnav .topnav-right a{
+  float: left;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 1em 1em;
+  text-decoration: none;
+  font-size: 1em;
+}
+
+/* Change the color of links on hover */
+.topnav a:hover {
+  transition: all 0.4s ease;
+  background-color: #ddd;
+  color: black;
+}
+
+/* Add a color to the active/current link */
+.topnav a.active {
+  background-color: #c66900;
+  color: white;
+}
+
+/* Right-aligned section inside the top navigation */
+.topnav-right {
+  float: right;
+}
+
+.topnav-right button{
+	box-sizing: border-box;
+	padding: 0.4em 0.8em;
+	margin: 0.5em 0.8em;
+}
+
+.topnav-right span {
+	box-sizing: border-box;
+	color: #f2f2f2;
+	font-size: 1.2em;
+	text-align: center;
+	height: 100%;
+}
+
+</style>
+  </head>
+<body>
+<!-- The navigation bar config -->
+ <div class="topnav">
+  <a href="/">Home</a>
+  <a href="/search">Search</a>
+  <a class="classifiedContent active" href="/administration" data-acc=4>Administration</a>
+  <a class="classifiedContent" href="/uploadbook" data-acc=2>Upload Books</a>
+  <a class="classifiedContent" href="/managebooks" data-acc=2>Manage Books</a>  <div class="topnav-right">
+	  <span id="LoggedInAs">Logged in</span>
+      <button id="logoutBut" class="btn btn-outline-info" onclick='User.DoLogout()'>Logout</button>
+  </div>
+</div>
+</body>

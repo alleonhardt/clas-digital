@@ -32,7 +32,7 @@
 	border-bottom: 1px solid white;
 }
 
-.filesList li p {
+.filesList li p div {
 	display: block;
 	padding-left: 3rem;
 	padding-right: 3rem;
@@ -42,8 +42,23 @@
 	color: black;
 }
 
+.filesList li button {
+	margin: auto;
+	margin-left: 1rem;
+	background-color: red;
+	color: black;
+	padding: 0.5rem;
+}
+
+.filesList li button:hover{
+	background-color: black;
+	color: white;
+	transition: all 0.4s ease;
+}
+
 .filesList p progress{
 	margin: auto;
+	margin-right: 3rem;
 }
 
 .filesList>li {
@@ -235,38 +250,7 @@ i.close {
 		</style>
 
 		<script>
-			let jsonZoteroAccess = 0;
-
-//Handles all the User related stuff
-class User {
-	//Static because it does not matter which user asks to end his session
-	static DoLogout() {
-		//Just tell the server to log the current user out, then reload the page
-		let xhr = new XMLHttpRequest();
-		xhr.open("POST","/logout",true);
-		xhr.onload = function() {
-			window.location.href = "/";
-		}
-		xhr.send(null);
-	}
-
-	static initialise() {
-		
-		document.getElementById("LoggedInAs").innerHTML = "Logged in as <strong>"+ServerDataObj.user.email+"</strong>";
-
-			let list = document.getElementsByClassName("classifiedContent");
-			//Unlocks all the content that the user can access!
-			for(var i=0; i < list.length; i++)
-			{
-				let y = list[i].dataset.acc;
-				if((ServerDataObj.user.access&y)!=0)
-				{
-					list[i].style.display="block";
-				}
-			}
-
-		let input = document.getElementById("fileUpID");
-		input.addEventListener('change',function(e) {
+			function eventoninput(e) {
 			console.log(e.target.files.length);
 			globalFileList = Array.from(e.target.files);
 			ShowFiles();
@@ -324,12 +308,46 @@ class User {
 				document.getElementById("SaveNow").disabled = false;
 				document.getElementById("SaveNow").innerHTML = "Speichern!";
 			}
-		});
+		}
+			let jsonZoteroAccess = 0;
+
+//Handles all the User related stuff
+class User {
+	//Static because it does not matter which user asks to end his session
+	static DoLogout() {
+		//Just tell the server to log the current user out, then reload the page
+		let xhr = new XMLHttpRequest();
+		xhr.open("POST","/logout",true);
+		xhr.onload = function() {
+			window.location.href = "/";
+		}
+		xhr.send(null);
+	}
+
+	static initialise() {
+		
+		document.getElementById("LoggedInAs").innerHTML = "Logged in as <strong>"+ServerDataObj.user.email+"</strong>";
+
+			let list = document.getElementsByClassName("classifiedContent");
+			//Unlocks all the content that the user can access!
+			for(var i=0; i < list.length; i++)
+			{
+				let y = list[i].dataset.acc;
+				if((ServerDataObj.user.access&y)!=0)
+				{
+					list[i].style.display="block";
+				}
+			}
+
+		let input = document.getElementById("fileUpID");
+		input.addEventListener('change',eventoninput);
 	}
 }
 
 function DeleteThis(i)
 {
+	if(document.getElementById("fileUpID")==undefined)
+		return;
 	globalFileList.splice(i,1);
 	ShowFiles();
 }
@@ -346,7 +364,7 @@ function ShowFiles()
 					continue;
 				}
 				let varstr = globalFileList[i].name.slice(globalFileList[i].name.lastIndexOf("."));
-				if(varstr!='.jpg'&&varstr!='.txt'&&varstr!='.zip')
+				if(varstr!='.jpg'&&varstr!='.txt')
 				{
 					globalFileList.splice(i,1);
 					continue;
@@ -364,7 +382,7 @@ function ShowFiles()
 					list.style["margin-left"] = "4rem";
 				}
 				let p = document.createElement("p");
-				p.innerHTML = "File selected: "+globalFileList[i].name;
+				p.innerHTML = "<div>File selected: "+globalFileList[i].name+"</div>";
 
 				let prog = document.createElement("progress");
 				let span = document.createElement("span");
@@ -443,6 +461,7 @@ function UploadAll()
 {
 	let permalink = document.getElementById("Permalink").value;
 	let elem = document.getElementById("fileUpID");
+	elem.onclick = function(){return false;}
 	elem.parentNode.removeChild(elem);
 
 	if(permalink=="")
@@ -505,12 +524,13 @@ function UploadAll()
 		}
 
 		startUpload = function() {	
+			document.getElementById("SaveNow").style.display = "None";
 			document.getElementById('ModalBanner').style.display='none';
 			document.getElementById('FileDropList').scrollIntoView();
-			for(let x = 0; x < globalFileList.length; x++)
-			{
-				instaUpload(permalink,globalFileList[x],globalFileList[x].listentry);
-			}
+
+			
+			instaUpload(permalink,0,false);
+			window.setTimeout(checkstate,1000);
 		}
 		return;
 	}
@@ -518,78 +538,64 @@ function UploadAll()
 	console.log(document.getElementById("saver").innerHTML);
 }
 
-async function instaUpload2(key,file,outlist)
+function checkstate()
 {
-	if(file.cstart_byte === undefined)
-		file.cstart_byte = 0;
-
-
-	let xval = Math.round(file.cstart_byte/file.size*100);
-	outlist.progentry.value = xval;
-	outlist.spanentry.innerHTML = xval+"%";
-	
-	let reader = new FileReader();
-	let endRead = file.cstart_byte+0x100000+1;
-	if(endRead>file.size)
-		endRead = file.size;
-	let blob = file.slice(file.cstart_byte,endRead);
-	
-	 reader.onloadend = function( event ) {
-        if ( event.target.readyState !== FileReader.DONE ) {
-            return;
-        }
-		
-		let xhr = new XMLHttpRequest();
-		let requ = "/uploadBook?itemKey="+key+"&filename="+file.name;
-		if(file.cstart_byte==0)
+	let is_finished = false;
+	let no_err = true;
+	for(let x = 0; x < globalFileList.length; x++)
+	{
+		if(globalFileList[x].processed_entry==undefined)
 		{
-			requ+="&operation=begin";
+		  	console.log(globalFileList[x].name+" is undefined");
+			window.setTimeout(checkstate,1000);
+			return;
 		}
-		else if(endRead==file.size)
-		{
-			requ+="&operation=end";
-		}
-		xhr.open("POST",requ,true);
-		xhr.onload = function() {
-			if(xhr.status!=200)
-			{
-				outlist.innerHTML = "Error the file: "+file.name+"  "+xhr.responseText;
-				outlist.style["background-color"] = "red";
-				return;
-			}
-			if(endRead==file.size)
-			{
-				outlist.style["background-color"] = "green";
-				outlist.innerHTML = "Uploaded file: "+file.name+" successfully";
-				return;
-			}
-			file.cstart_byte = endRead;
-			instaUpload2(key,file,outlist);
-		}
-		xhr.send(blob);
-	 }
-	reader.readAsArrayBuffer(blob);
+		else if(globalFileList[x].processed_entry<0)
+			no_err = false;
+	}
+
+	if(no_err)
+		alert("All files were successfully uploaded!");
+	else
+		alert("There were some errors while uploading the book!");
 }
 
-function instaUpload(key,file,outlist)
+function instaUpload(key,x,force_overwrite)
 {
+	if(x>=globalFileList.length)
+		return;
+
+	let file = globalFileList[x];
+ 	let outlist = globalFileList[x].listentry;
 	let checkfile = new XMLHttpRequest();
 	let requ_chk = "/getBookRessources?exist_check=true&book="+key+"&ressource="+file.name;
 	outlist.progentry.value = "0";
 	outlist.spanentry.innerHTML = "0%";
 	checkfile.open("GET",requ_chk,true);
 	checkfile.onload = function() {
-		if(checkfile.status==200)
+		if(checkfile.status==200&&force_overwrite==false)
 		{
-			outlist.innerHTML = "Error the file: "+file.name+" already exists!";
-			outlist.style["background-color"] = "red";
+			console.log(outlist.childNodes);
+			outlist.childNodes[0].childNodes[0].innerHTML = "File: "+file.name+" already exists, overwrite?";
+		  	let yes = document.createElement("button");
+		  	yes.innerHTML = "Yes";
+		  	yes.onclick = function(){instaUpload(key,x,true);};
+		  	outlist.childNodes[0].childNodes[0].appendChild(yes);
+
+		 	let No = document.createElement("button");
+		  	No.innerHTML = "No";
+		  No.onclick = function(){outlist.style["background-color"] = "red";file.processed_entry = 1;outlist.innerHTML = "File: "+file.name+" already exists, aborted by user!";instaUpload(key,x+1,false);};
+		  	outlist.childNodes[0].childNodes[0].appendChild(No);
+
+
+			outlist.style["background-color"] = "#C49102";
 			return;
 		}
 	let reader = new FileReader();
 		//TODO: outlist.
 	reader.onload = function() {
 		let xhr = new XMLHttpRequest();
-		let requ = "/uploadBook?itemKey="+key+"&filename="+file.name;
+		let requ = "/uploadBook?itemKey="+key+"&filename="+file.name+"&overwrite=true";
 		xhr.open("POST",requ,true);
 		xhr.upload.addEventListener("progress", function(oEvent){
 			if(oEvent.lengthComputable)
@@ -600,14 +606,17 @@ function instaUpload(key,file,outlist)
 			}
 		});
 		xhr.onload = function() {
+			instaUpload(key,x+1,false);
 			if(xhr.status!=200)
 			{
 				outlist.innerHTML = xhr.responseText;
 				outlist.style["background-color"] = "red";
+				file.processed_entry = -1;
 				return;
 			}
 			outlist.style["background-color"] = "green";
 			outlist.innerHTML = "Uploaded file: "+file.name+" successfully";
+			file.processed_entry = 0;
 		}
 		xhr.send(reader.result);
 	}

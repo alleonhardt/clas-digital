@@ -109,8 +109,13 @@ std::string DirectoryFilesToJSON(const std::string &path)
 			//Create for every entry in the directory an entry in the json
 			js+="{\"name\":\"";
 			js+=dirEntry.path().filename();
+			js+="\",\"is_dir\": ";
+			if(fs::is_directory(dirEntry.path()))
+				js+="true";
+			else
+				js+="false";
 			//The json contains at the moment only the filename
-			js+="\"},";
+			js+="},";
 		}
 		//Replace the last , by and ] to close the enumeration of files
 		js[js.length()-1]=']';
@@ -186,6 +191,7 @@ void GetBookRessource::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 				{
 					return ResponseBuilder(downstream_)
 						.status(200,"Ok")
+						.header("Content-Type","text/plain")
 						.body("file exists")
 						.sendWithEOM();
 				}
@@ -200,8 +206,19 @@ void GetBookRessource::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 			URIFile *fl;
 			try
 			{
+				if(fs::exists(mypath)&&fs::is_directory(mypath))
+				{
+					evb->runInEventBaseThread([mypath2 = std::move(mypath),this]{
+					return ResponseBuilder(downstream_)
+					.status(200,"Ok")
+					.header("Content-Type","application/json")
+					.body(std::move(DirectoryFilesToJSON(mypath2)))
+					.sendWithEOM();
+					});
+					return;
+				}
 				//Load the ressource from the constructed path if the ressource does not exist the constructor of URIFile will throw an expection 
-				fl = new URIFile(std::move(mypath));
+				fl = new URIFile(mypath);
 			}
 			catch(...)
 			{
@@ -391,6 +408,7 @@ void GetBookMetadata::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers) 
 		}
 		catch(...)
 		{
+			alx::cout.writeln("Could not find request book metadata trying to fetch from zotero, book scan id: ",inBook.c_str());
 			json = Zotero::SendRequest(Zotero::Request::GetSpecificItem(inBook));
 			
 			if(json=="") throw 0;
@@ -440,7 +458,39 @@ void UploadBookHandler::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers
 		_finalPath+=filename;
 
 		if(fs::exists(_finalPath))
-			throw "File or folder already exists!";
+		{
+			if(headers->getDecodedQueryParam("overwrite")!="true")
+			{
+				throw "File or folder already exists!";
+			}
+			else
+			{
+				std::string backupfolder = "web/books/";
+				backupfolder += whichBook;
+				backupfolder+="/backups";
+				if(!fs::exists(backupfolder))
+					fs::create_directory(backupfolder);
+				std::string newpath = backupfolder;
+				newpath+="/";
+				newpath+=filename;
+				if(!fs::exists(newpath))
+					fs::create_directory(newpath);
+
+				for(int i = 0;;i++)
+				{
+					std::string finnewpath = newpath;
+					finnewpath+= "/";
+					finnewpath+= std::to_string(i);
+					finnewpath+=_user->GetEmail();
+
+					if(!fs::exists(finnewpath))
+					{
+						fs::rename(_finalPath,finnewpath);
+						break;
+					}
+				}
+			}
+		}
 
 		ofs.open(_finalPath.c_str(),std::ios::out);
 		
@@ -471,6 +521,7 @@ void UploadBookHandler::onEOM() noexcept
 		ofs.close();
 		ResponseBuilder(downstream_)
 			.status(200,"Ok")
+			.header("Content-Type","text/plain")
 			.body("Successfully written file!")
 			.sendWithEOM();
 	}
@@ -555,7 +606,7 @@ void RequestCreateBibliography::onRequest(std::unique_ptr<proxygen::HTTPMessage>
 	if(inBook=="")
 		return SendErrorNotFound(downstream_);
 
-	std::string retval="<html><head></head><body>";
+	std::string retval="<html><head><meta charset=\"utf-8\"></head><body>";
 	auto &mapBooks = GetSearchHandler::GetBookManager().getMapOfBooks();
 
 	size_t x_new = 0;
@@ -588,4 +639,37 @@ void RequestCreateBibliography::onRequest(std::unique_ptr<proxygen::HTTPMessage>
 		.header("Content-Type","text/html")
 		.body(std::move(retval))
 		.sendWithEOM();
+}
+
+
+void RequestUpdateZotero::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers) noexcept
+{
+	std::string inBook = headers->getDecodedQueryParam("book");
+	try
+	{
+		if(inBook=="")
+		{
+			alx::cout.writeln(alx::console::yellow_black,"Updating all metadata as requested by user!");
+			nlohmann::json json = nlohmann::json::parse(Zotero::SendRequest(Zotero::Request::GetAllItems));
+			GetSearchHandler::GetBookManager().updateZotero(json);
+		}
+		else
+		{
+
+			alx::cout.writeln("Updating book metadata as requestes by user: ",inBook.c_str());
+			nlohmann::json json = nlohmann::json::parse(Zotero::SendRequest(Zotero::Request::GetSpecificItem(inBook)));
+			nlohmann::json jk;
+			jk.push_back(json);
+			GetSearchHandler::GetBookManager().updateZotero(jk);
+		}
+		return ResponseBuilder(downstream_)
+			.status(200,"Ok")
+			.header("Content-Type","tex/plain")
+			.body("success!")
+			.sendWithEOM();
+	}
+	catch(...)
+	{
+		return SendErrorNotFound(downstream_);
+	}
 }

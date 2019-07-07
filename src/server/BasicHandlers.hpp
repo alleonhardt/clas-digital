@@ -101,7 +101,7 @@ class EmptyHandler : public proxygen::RequestHandler {
  * SendErrorNotFound(downstream_, "<h1>My special error</h1>"); //Or specify a string to send a specific error message back
  * @endcode
  */
-void SendErrorNotFound(proxygen::ResponseHandler *rsp, std::string message="<center><h1>Not found!</h1></center>");
+void SendErrorNotFound(proxygen::ResponseHandler *rsp, std::string message="<html><head></head><body><center><h1>Not found!</h1></center></body></html>");
 
 /**
  * @brief Sends an 401 access denied message to the client with the given message
@@ -112,7 +112,7 @@ void SendErrorNotFound(proxygen::ResponseHandler *rsp, std::string message="<cen
  * SendAccessDenied(downstream_, "<h1>My special error</h1>"); //Or specify a string to send a specific error message back
  * @endcode
  */
-void SendAccessDenied(proxygen::ResponseHandler *rsp, std::string message="<center><h1>Access denied</h1></center>");
+void SendAccessDenied(proxygen::ResponseHandler *rsp, std::string message="<html><head></head><body><center><h1>Access denied</h1></center></body></html>");
 
 /**
  * @brief The Basic Get Handler which does almost all of the server disk IO acesses

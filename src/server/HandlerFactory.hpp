@@ -65,6 +65,7 @@ class HandlerFactory : public RequestHandlerFactory {
 			_postMap["/changeUserTable"] = &CreateHandler<UpdateUserSystemHandler>;
 			_postMap["/logout"] = &CreateHandler<PostHandler>;
 			_postMap["/uploadBook"] = &CreateHandler<UploadBookHandler>;
+			_postMap["/updateZotero"] = &CreateHandler<RequestUpdateZotero>;
 		}
 
 		/**
