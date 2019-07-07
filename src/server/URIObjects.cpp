@@ -559,9 +559,9 @@ void StartSearch::start(long long id, folly::EventBase *evb)
 		for(auto &it : *results)
 		{
 			nlohmann::json entry;
-			entry["scanId"] = it.first;
-			entry["hasocr"] = it.second->getOcr();
-			entry["description"] = it.second->getMetadata().getShow();
+			entry["scanId"] = it->getKey();
+			entry["hasocr"] = it->getOcr();
+			entry["description"] = it->getMetadata().getShow();
 			js["books"].push_back(std::move(entry));
 		}
 
