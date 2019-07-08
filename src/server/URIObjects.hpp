@@ -124,6 +124,7 @@ class UploadBookHandler : public EmptyHandler
 	private:
 		std::ofstream ofs;  ///<The file handle to the file which is uploaded
 		std::string _finalPath;	///< The final path to which the file is written to
+		std::string _whichBook;	///<The book to which the file is being uploaded
 
 	public:
 		/**
