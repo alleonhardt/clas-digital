@@ -167,7 +167,7 @@ void CSearch::containsSearch(std::map<std::string, std::map<std::string, CBook*>
         }
 
         //Calculate progress
-		if(counter2>=10000)
+		if(counter2>=500)
 		{
 			counter2=0;
         	m_fProgress = static_cast<float>(counter)/static_cast<float>(mapWords.size());
@@ -208,7 +208,7 @@ void CSearch::fuzzySearch(std::map<std::string, std::map<std::string, CBook*>>& 
             myInsert(mapSR, it->second, matches, value);
 
         //Change Progress
-		if(counter2>=10000)
+		if(counter2>=500)
 		{
 			counter2=0;
         	m_fProgress = static_cast<float>(counter)/static_cast<float>(mapWords.size());
