@@ -607,27 +607,30 @@ window.addEventListener("load",User.initialise,false);
 	top: 0;
 	left: 0;
 	width: 100%;
-	height: 8vh;
     background-color: #333;
 }
 
 .abovegridcont a{
-	display: inline-block;
-  	color: #f2f2f2;
-	background-color: orange;
-	cursor: pointer;
-	height: 100%;
-	padding: 0.5rem;
+  float: left;
+  color: black;
+  background-color: #c66900;
+  text-align: center;
+  padding: 1em 1em;
+  text-decoration: none;
+  font-size: 1em;
+  cursor: pointer;
 }
 
 .abovegridcont div {
-	display: inline-block;
-  	color: #f2f2f2;
-	background-color: blue;
-	margin-left: 40vw;
-	cursor: pointer;
-	height: 100%;
-	padding: 0.5rem;
+  margin-left: 40vw;
+  color: white;
+  background-color: #0000EE;
+  text-align: center;
+  padding: 1em 1em;
+  text-decoration: none;
+  font-size: 1em;
+  width: 10vw;
+  cursor: pointer;
 }
 
 
@@ -641,7 +644,7 @@ window.addEventListener("load",User.initialise,false);
 
 .grid-container {
 	position: fixed;
-	top: 8vh;
+	top: max(5vh,1.5rem);
 	left: 0;
 	background-color: white;
 	width: 100%;
