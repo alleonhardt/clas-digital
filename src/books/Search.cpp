@@ -234,13 +234,15 @@ std::map<std::string, CBook*>* CSearch::checkAuthor(std::map<std::string, CBook>
 */
 void CSearch::removeBooks(std::map<std::string, CBook*>* mapSR, std::map<std::string, double>& matches)
 {
-    for(auto it=mapSR->begin(); it!=mapSR->end(); it++)
+    for(auto it=mapSR->begin(); it!=mapSR->end();)
     {
         if(checkSearchOptions(it->second) == false)
         {
             matches.erase(it->first);
-            mapSR->erase(it);
+            mapSR->erase(it++);
         }
+        else
+            ++it;
     }
 
 }
@@ -267,6 +269,11 @@ bool CSearch::checkSearchOptions(CBook* book)
     for(auto const &collection : m_sOpts->getCollections()) {
         if(func::in(collection, book->getCollections()) == true)
             match = true;
+        if(book->getAuthor() == "Lorenz Oken")
+        {
+            for(auto const& coll : book->getCollections())
+                alx::cout.write("Collections: ", coll, "\n");
+        }
     }
     return match;
 }
