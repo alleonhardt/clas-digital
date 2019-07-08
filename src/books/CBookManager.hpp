@@ -9,6 +9,7 @@
 #include <fstream>
 #include <dirent.h>
 #include <shared_mutex>
+#include "src/util/debug.hpp"
 #include "CBook.hpp"
 #include "CSearch.hpp"
 #include "CSearchOptions.hpp"

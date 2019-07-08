@@ -113,6 +113,10 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
 
     for(unsigned int i=1; i<vWords.size(); i++)
     {
+
+        if(debug::gGlobalShutdown == true)
+            return NULL;
+
         //Change searched word
         search->setWord(vWords[i]);
 
@@ -124,7 +128,7 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
         std::map<std::string, CBook*>* results2 = search->search(m_mapWords, m_mapWordsTitle, matches2);
 
         //Set Status
-        search->setStatus("Checking if ", vWords[0], "and ", vWords[i], "occure on the same page...");
+        search->setStatus("Checking if "+vWords[0]+"and "+vWords[i]+"occure on the same page...");
 
         //remove all books, that don't contain both words
         unsigned int counter=0;
