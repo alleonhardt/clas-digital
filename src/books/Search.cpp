@@ -301,7 +301,8 @@ bool CSearch::checkSearchOptions(CBook* book)
     }
 
     //*** check date ***//
-    if(book->getDate()==-1 || book->getDate()<m_sOpts->getFrom() || book->getDate()>m_sOpts->getTo())
+    int date = book->getDate();
+    if(date == -1 || date < m_sOpts->getFrom() || date > m_sOpts->getTo())
         return false;
          
     //*** check pillars ***//

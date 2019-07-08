@@ -128,13 +128,13 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
 
         //remove all books, that don't contain both words
         unsigned int counter=0;
-        for(auto it=results1->begin(); it!=results1->end(); it++)
+        for(auto it=results1->begin(); it!=results1->end();)
         {
             //Erase element if it doesn't occure in results2
             if(results2->count(it->first) == 0)
             {
                 matches.erase(it->first);
-                results1->erase(it);
+                results1->erase(it++);
             }
 
             //Erase element if it does not occure on the same page
@@ -142,8 +142,11 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
             {
                 //Erase match and searchresult
                 matches.erase(it->first);
-                results1->erase(it);
+                results1->erase(it++);
             }
+
+            else
+                ++it;
 
             //Set progress
             search->setProgress(static_cast<float>(counter)/static_cast<float>(results2->size()));

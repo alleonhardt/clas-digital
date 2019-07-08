@@ -112,13 +112,6 @@ public:
     */
     std::map<int, std::vector<std::string>>* getPages(std::string sInput, int fuzzyness);
 
-    /**
-    * @brief return list of all pages on which word occures.
-    * @param[in] sWord searched word
-    * @return list of pages on which searched word accures
-    */
-    std::list<size_t>* getPagesFull(std::string sWord);
-
     /*
     * @param[in] sWord searched word
     * @return list of pages on which searched word accures

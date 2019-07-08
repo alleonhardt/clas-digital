@@ -20,7 +20,7 @@ namespace func
     * @parameter vector<string> 
     * @return bool
     */
-    bool in(std::string str, std::vector<std::string> vec);
+    bool in(const std::string& str, const std::vector<std::string>& vec);
 
     /*
     * @brief: checks whether a integer is in a vector of strings
