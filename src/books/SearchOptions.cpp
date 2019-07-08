@@ -29,35 +29,10 @@ CSearchOptions::CSearchOptions(std::string chSearchedWord, int fuzzyness, std::v
         sCollections, bool onlyTitle, bool onlyOCR, std::string slastName, int from, int to, bool full)
 {
     func::convertToLower(chSearchedWord);
-    m_chSearchedWord.assign(chSearchedWord);
+	func::convertToLower(slastName);
+	m_chSearchedWord.assign(chSearchedWord);
     m_fuzzyness = fuzzyness;
     m_sCollections = sCollections;
-    m_onlyTitle = onlyTitle;
-    m_slastName.assign(slastName); 
-    m_From = from;
-    m_To = to;
-    m_onlyOCR = onlyOCR;
-    m_fullAccess = full;
-}
-
-/**
-* @brief initialise search options outside of constructor
-* @param[in] chSearchedWord searched word
-* @param[in] fuzzyness value of fuzzyness
-* @param[in] sCollections collections in which to be searched
-* @param[in] onlyTitle search only in title?
-* @param[in] onlyOCR search only in ocr (if exists)
-* @param[in] slastName las name of author
-* @param[in] from date from which books shall be searched
-* @param[in] to date to which books shall be searched
-**/
-void CSearchOptions::initialise(std::string chSearchedWord, int fuzzyness, std::vector<std::string> 
-            pillar, bool onlyTitle, bool onlyOCR,std::string slastName, int from, int to, bool full)
-{
-    m_chSearchedWord.assign(chSearchedWord);
-    m_fuzzyness = static_cast<double>(fuzzyness)/10;
-    m_sCollections = pillar;
-
     m_onlyTitle = onlyTitle;
     m_slastName.assign(slastName); 
     m_From = from;

@@ -40,21 +40,7 @@ public:
     CSearchOptions(std::string chSearchedWord, int fuzzyness, std::vector<std::string> sCollections,
                     bool onlyTitle, bool onlyOCR, std::string slastName, int from, int to, bool full);
     
-    /**
-    * @brief initialise search options outside of constructor
-    * @param[in] chSearchedWord searched word
-    * @param[in] fuzzyness value of fuzzyness
-    * @param[in] sCollections collections in which to be searched
-    * @param[in] onlyTitle search only in title?
-    * @param[in] onlyOCR search only in ocr (if exists)
-    * @param[in] slastName las name of author
-    * @param[in] from date from which books shall be searched
-    * @param[in] to date to which books shall be searched
-    **/
- 	void initialise(std::string chSearchedWord, int fuzzyness, std::vector<std::string> pillar, 
-                    bool onlyTitle, bool onlyOCR,std::string slastName, int from, int to, bool full);
-
-    //Getter
+	//Getter
 
     /**
     * @return searched word
