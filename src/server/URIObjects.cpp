@@ -335,7 +335,7 @@ void GetSearchInBookHandler::onRequest(std::unique_ptr<proxygen::HTTPMessage> he
 			alx::cout.write(alx::console::yellow_black,"Using normal search!\n");
 			js["is_fuzzy"] = false;
 		}
-		if(Fuzzyness==1)
+		else if(Fuzzyness==1)
 		{
 			alx::cout.write(alx::console::yellow_black,"Using contains search!\n");
 		}
