@@ -69,6 +69,10 @@ void CBookManager::updateZotero(nlohmann::json j_items)
 * @param[in] sKey key to book
 */
 void CBookManager::addBook(std::string sKey) {
+
+    if(std::experimental::filesystem::exists("web/books/" + sKey))
+        return;
+
     m_mapBooks[sKey].setPath("web/books/" + sKey);
     m_mapBooks[sKey].createMapWords();
 }
