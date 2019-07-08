@@ -428,6 +428,7 @@ class User {
 		let pagesList = 0;
 		for(var i = 0; i < allBooksJS.length; i++)
 		{
+			allBooksJS[i].bib="<strong>"+allBooksJS[i].key+":</strong> "+allBooksJS[i].bib;
 			if(maxItems==itemsPerPage)
 			{
 				document.getElementsByClassName("nextPageButton")[0].classList.remove("classifiedContent");
@@ -569,7 +570,7 @@ window.addEventListener("load",User.initialise,false);
 	background-color: #ddd;
 	margin-top: 1rem;
 	padding: 1rem;
-	height: 10vh;
+	height: 12vh;
 }
 
 .bklst li:hover{
@@ -694,13 +695,13 @@ h1 {
 
 .nextPageButton {
 	float: right;
-	margin-top: 0.5rem;
+	margin-top: -1rem;
 	margin-right: 1rem;
 }
 
 .lastPageButton {
 	float: left;
-	margin-top: 0.5rem;
+	margin-top: -1rem;
 	margin-left: 1rem;
 }
 

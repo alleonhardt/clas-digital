@@ -528,13 +528,17 @@ function UpdateProgress(sid)
 			let jsObj = JSON.parse(progHandler.responseText);
 			if(jsObj!=null)
 			{
-				if(Math.floor(jsObj.progress)==1000)
-					jsObj.progress = 1.0;
+				let prog = jsObj.progress;
+				if(Math.floor(prog)==-1)
+					prog = 1.0;
+
 				if(document.getElementById('srchProgress')==null)
 					return;
-				document.getElementById('srchProgress').value = Math.floor(jsObj.progress*100);
-				document.getElementById('innumberprog').innerHTML = Math.floor(jsObj.progress*100);
-				if(Math.floor(jsObj.progress)==1)
+
+				document.getElementById('srchProgress').value = Math.floor(prog*100);
+				document.getElementById('innumberprog').innerHTML = Math.floor(prog*100);
+				document.getElementById("inumbermessage").innerHTML =  "<strong>"+jsObj.message+"</strong>";
+				if(Math.floor(jsObj.progress)==-1)
 					return;
 			}
 			window.setTimeout(function(){UpdateProgress(sid);},1000);
@@ -596,7 +600,7 @@ function sendToPage(name)
 	let obj = document.getElementById("SearchHitList");
 	obj.innerHTML = "";  
 
-	document.getElementById("ResultBanner").innerHTML	= "<p class='divsearch'>Search Progress: <span id='innumberprog'>0</span>%<progress class='progbar' value=0 max=100 id='srchProgress'></progress></p>"; 
+  document.getElementById("ResultBanner").innerHTML	= "<p class='divsearch'><span id='inumbermessage'></span><span id='innumberprog'>0</span>%<progress class='progbar' value=0 max=100 id='srchProgress'></progress></p>"; 
 
 	xhr.onload = function() {
 		if(xhr.status!=200)
@@ -610,7 +614,7 @@ function sendToPage(name)
 
 		let realSearch = new XMLHttpRequest();
 		realSearch.open("GET","/startSearch?searchID="+jsSearchId.searchid,true);
-		UpdateProgress(jsSearchId.searchid);
+
 		realSearch.onload = function() {
 
 		document.getElementById("ResultBanner").innerHTML = "";	
@@ -674,6 +678,7 @@ function sendToPage(name)
 
 	}
 	realSearch.send();
+	UpdateProgress(jsSearchId.searchid);
 	}
 	xhr.send();
 }

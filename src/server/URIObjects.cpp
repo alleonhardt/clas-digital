@@ -646,20 +646,29 @@ void RequestSearchProgress::onRequest(std::unique_ptr<proxygen::HTTPMessage> hea
 	std::string inBook = headers->getDecodedQueryParam("searchID");
 	long long id;
 	float prog = 1.0;
+	std::string message = "Sending response...";
 	try
 	{
 		id = std::stoll(inBook);
-		prog = GetSearchHandler::GetBookManager().getProgress(id);
+		if(GetSearchHandler::GetBookManager().getProgress(id,message,prog))
+		{
+			
+		}
+		else
+		{
+			prog = -1;
+		}
 	}
 	catch(...)
 	{}
 
 	nlohmann::json j;
 	j["progress"] = prog;
+	j["message"] = message;
 	ResponseBuilder(downstream_)
 		.status(200,"Ok")
 		.header("Content-Type","application/json")
-		.body(j.dump())
+		.body(std::move(j.dump()))
 		.sendWithEOM();
 }
 
