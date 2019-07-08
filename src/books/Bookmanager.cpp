@@ -85,9 +85,11 @@ void CBookManager::addBook(std::string sKey) {
 */
 std::list<CBook*>* CBookManager::search(unsigned long long id)
 {
-    //Create empty map of results
+    //Create empty map of results and matches
     std::map<std::string, CBook*>* results1 = new std::map<std::string, CBook*>;
+    std::map<std::string, double> matches;
 
+    //Check whether search exists
     if(m_mapSearchs.count(id) == 0)
         return new std::list<CBook*>;
 
@@ -98,14 +100,9 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
     std::vector<std::string> vWords; 
     func::split(search->getSearchedWord(), "+", vWords);
 
-    //Set searched word
-    search->setWord(vWords[0]);
-
-    //Create map of matches
-    std::map<std::string, double> matches;
-
     //Search main word
     search->setStatus("Searching " + vWords[0] + "... ");
+    search->setWord(vWords[0]);
     results1 = search->search(m_mapWords, m_mapWordsTitle, matches);
 
     //Searching Author
@@ -143,6 +140,7 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
             //Erase element if it does not occure on the same page
             else if(it->second->getOcr() == true && it->second->getPages(search->getSearchedWord(), search->getFuzzyness())->size() == 0)
             {
+                //Erase match and searchresult
                 matches.erase(it->first);
                 results1->erase(it);
             }
@@ -155,6 +153,7 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
         delete results2;
     }
 
+    //Delete search
     deleteSearch(id);
 
     //Return search results
@@ -280,7 +279,7 @@ bool CBookManager::getProgress(unsigned long long id, std::string& status, float
         return true;
     }
     else
-        return 1000.0;
+        return false;
 }
 
 
