@@ -150,6 +150,7 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
 
             //Set progress
             search->setProgress(static_cast<float>(counter)/static_cast<float>(results2->size()));
+            counter++;
         }
 
         //Delete additional search results
