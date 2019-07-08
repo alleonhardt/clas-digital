@@ -197,24 +197,24 @@ void CBook::loadPages(std::map<std::string, std::vector<size_t>>& mapWordsPages)
 */
 std::map<int, std::vector<std::string>>* CBook::getPages(std::string sInput, int fuzzyness)
 {
+    std::vector<std::string> vWords;
+    func::convertToLower(sInput);
+    func::split(sInput, "+", vWords);
+
     if(fuzzyness == 0)
-        return getPagesFull2(sInput);
+        return getPagesFull(vWords);
     else if(fuzzyness == 1)
-        return getPagesContains(sInput);
+        return getPagesContains(vWords);
     else
-        return getPagesFuzzy(sInput);
+        return getPagesFuzzy(vWords);
 }
 
 /*
 * @param[in] sWord searched word
 * @return list of pages on which searched word accures
 */
-std::map<int, std::vector<std::string>>* CBook::getPagesFull2(std::string sInput)
+std::map<int, std::vector<std::string>>* CBook::getPagesFull(std::vector<std::string>& vWords)
 {
-    std::vector<std::string> vWords;
-    func::convertToLower(sInput);
-    func::split(sInput, "+", vWords);
-
     //Create empty list of pages
     std::map<int, std::vector<std::string>>* mapPages = new std::map<int, std::vector<std::string>>;
 
@@ -243,12 +243,8 @@ std::map<int, std::vector<std::string>>* CBook::getPagesFull2(std::string sInput
 * @param[in] sWord searched word
 * @return map of pages with vector of words found on this page
 */
-std::map<int, std::vector<std::string>>* CBook::getPagesContains(std::string sInput)
+std::map<int, std::vector<std::string>>* CBook::getPagesContains(std::vector<std::string>& vWords)
 {
-    std::vector<std::string> vWords;
-    func::convertToLower(sInput);
-    func::split(sInput, "+", vWords);
-
     //Load map of words
     std::map<std::string, std::vector<size_t>> mapWordsPages;
     loadPages(mapWordsPages);
@@ -275,12 +271,8 @@ std::map<int, std::vector<std::string>>* CBook::getPagesContains(std::string sIn
 * @param[in] sWord searched word
 * @return map of pages with vector of words found on this page
 */
-std::map<int, std::vector<std::string>>* CBook::getPagesFuzzy(std::string sInput)
+std::map<int, std::vector<std::string>>* CBook::getPagesFuzzy(std::vector<std::string>& vWords)
 {
-    std::vector<std::string> vWords;
-    func::convertToLower(sInput);
-    func::split(sInput, "+", vWords);
-
     //Load map of words
     std::map<std::string, std::vector<size_t>> mapWordsPages;
     loadPages(mapWordsPages);
