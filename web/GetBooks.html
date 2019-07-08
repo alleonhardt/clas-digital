@@ -435,6 +435,7 @@ function GetOCRTxt() {
 			      //content = content.replace(new RegExp(parsedUrlParams['query'],'g'), '<mark>'+parsedUrlParams['query']+'</mark>');
 
 			      UpdateOCRTxt(content);
+				  loadExcept();
 			      //doc.classList.add("ocrstyle");
 
 			      //doc2.appendChild(doc);
@@ -515,7 +516,7 @@ function ShowOCR(a) {
 	if(a!=undefined)
 	{
 		a.style.color = "green";
-															  }
+	}
 	document.getElementsByClassName("pageContainer")[0].style["grid-template-columns"] = "60% 0% 40%";
 		document.getElementById("InfoScreen").style.display = "none";
     HighlightButton(document.getElementById("ShowOCRButton"));
@@ -525,6 +526,8 @@ function ShowOCR(a) {
 		a = {};
 		a.innerHTML = window.location.hash.substr(window.location.hash.search("page")+4);
 		console.log("PARSED A:"+a.innerHTML);
+		if(a.innerHTML=="")
+			a.innerHTML = "1";
 	}
 	if(parseInt(a.innerHTML)==1)
 	{
@@ -614,9 +617,10 @@ function init() {
 		document.getElementById("searchQuery").innerHTML = parsedUrlParams["query"];
 		
 		if(searchResults.is_fuzzy === false)
-		{	
+		{
+			
 		  let pagesList = [];
-		  HighlightList = [parsedUrlParams["query"]];
+		  HighlightList = parsedUrlParams["query"].split("+");
 		  for(let i = 0; i < searchResults.pages.length; i++)
 		  	pagesList.push(searchResults.pages[i]);
 		  pagesList = pagesList.filter((v, i, a) => a.indexOf(v) === i); 
@@ -755,7 +759,7 @@ window.addEventListener("load", init, false);
 		</div>
 
 	<div id="olol" class="SpecialOCR">
-		<div id="OCRBuffer" class="ocrdispstyle"></div>
+		<div id="OCRBuffer" class="ocrdispstyle"><p>Loading...</p></div>
 	</div>
 	<div class="reader" tabindex="0">
 	</div>
