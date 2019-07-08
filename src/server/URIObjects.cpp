@@ -327,46 +327,42 @@ void GetSearchInBookHandler::onRequest(std::unique_ptr<proxygen::HTTPMessage> he
 		nlohmann::json js;
 
 		auto start = std::chrono::system_clock::now();
+		std::unique_ptr<std::map<int,std::vector<std::string>>> mapPtr;
+
+		js["is_fuzzy"] = true;
 		if(Fuzzyness==0)
 		{
 			alx::cout.write(alx::console::yellow_black,"Using normal search!\n");
-			std::unique_ptr<std::list<size_t>> listPtr(book.getPagesFull(std::move(searchFor)));
-
 			js["is_fuzzy"] = false;
-			for(auto it : *listPtr)
-			{
-				int k = it;
-				js["books"].push_back(k);
-			}
+		}
+		if(Fuzzyness==1)
+		{
+			alx::cout.write(alx::console::yellow_black,"Using contains search!\n");
 		}
 		else
 		{
-			std::unique_ptr<std::map<int,std::vector<std::string>>> mapPtr;
 
-			if(Fuzzyness==1)
+			alx::cout.write(alx::console::yellow_black,"Using fuzzy search!\n");
+		}
+
+		mapPtr = std::unique_ptr<std::map<int,std::vector<std::string>>>(book.getPages(std::move(searchFor),Fuzzyness));
+
+		auto glambda = [](std::string const &str, std::string const &from,std::string const &to) -> std::string {return std::regex_replace(str,std::regex(from),to);};
+		for(auto const &it : *mapPtr)
+		{
+			if(Fuzzyness==0)
 			{
-
-				alx::cout.write(alx::console::yellow_black,"Using contains search!\n");
-				mapPtr = std::unique_ptr<std::map<int,std::vector<std::string>>>(book.getPagesContains(std::move(searchFor)));
+				int k = it.first;
+				js["books"].push_back(k);
 			}
 			else
-			{
-
-				alx::cout.write(alx::console::yellow_black,"Using fuzzy search!\n");
-				mapPtr = std::unique_ptr<std::map<int,std::vector<std::string>>>(book.getPagesFuzzy(std::move(searchFor)));
-			}
-
-			js["is_fuzzy"] = true;
-			auto glambda = [](std::string const &str, std::string const &from,std::string const &to) -> std::string {return std::regex_replace(str,std::regex(from),to);};
-			for(auto const &it : *mapPtr)
 			{
 				for(auto const &inner : it.second)
 				{
 					nlohmann::json entry;
-
 					entry["page"] = it.first;
 					entry["word"] = glambda(inner,"\"","\\\"");
-					js["books"].push_back(std::move(entry));
+					js["books"].push_back(std::move(entry));	
 				}
 			}
 		}

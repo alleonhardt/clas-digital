@@ -614,9 +614,10 @@ function init() {
 		document.getElementById("searchQuery").innerHTML = parsedUrlParams["query"];
 		
 		if(searchResults.is_fuzzy === false)
-		{	
+		{
+			
 		  let pagesList = [];
-		  HighlightList = [parsedUrlParams["query"]];
+		  HighlightList = parsedUrlParams["query"].split("+");
 		  for(let i = 0; i < searchResults.pages.length; i++)
 		  	pagesList.push(searchResults.pages[i]);
 		  pagesList = pagesList.filter((v, i, a) => a.indexOf(v) === i); 
