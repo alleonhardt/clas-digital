@@ -295,9 +295,6 @@ bool CSearch::checkSearchOptions(CBook* book)
     //*** check author ***//
     if(m_sOpts->getLastName().length() > 0)
     {
-        if(book->getAuthor() == "borgards")
-            return false;
-
         if(book->getAuthor() != m_sOpts->getLastName())
             return false;
     }
