@@ -530,9 +530,12 @@ void UploadBookHandler::onEOM() noexcept
 		auto pos = _finalPath.find_last_of('.');
 		std::string fileEnd = _finalPath.substr(pos+1,std::string::npos);
 
-		if(fileEnd=="jpg")
+		if(_finalPath.substr(_finalPath.find_last_of("/")+1)=="ocr.txt")
 		{
-
+			GetSearchHandler::GetBookManager().addBook(_whichBook);
+		}
+		else if(fileEnd=="jpg")
+		{
 			try
 			{
 				static std::mutex m;
