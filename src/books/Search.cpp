@@ -123,6 +123,7 @@ std::map<std::string, CBook*>* CSearch::search(std::map<std::string, std::map<st
     }
 
     //Check search-options and remove books from search results, that don't match
+    m_sStatus = "Checking searchoptions: ";
     removeBooks(mapSearchresults, matches);
 
     return mapSearchresults;
@@ -268,6 +269,7 @@ std::map<std::string, CBook*>* CSearch::checkAuthor(std::map<std::string, CBook>
 */
 void CSearch::removeBooks(std::map<std::string, CBook*>* mapSR, std::map<std::string, double>& matches)
 {
+    unsigned int counter = 0;
     for(auto it=mapSR->begin(); it!=mapSR->end();)
     {
         if(checkSearchOptions(it->second) == false)
@@ -277,6 +279,10 @@ void CSearch::removeBooks(std::map<std::string, CBook*>* mapSR, std::map<std::st
         }
         else
             ++it;
+
+        //Change progress
+        m_fProgress = static_cast<float>(counter)/static_cast<float>(mapSR->size()); 
+        counter++;
     }
 
 }
