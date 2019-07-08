@@ -123,8 +123,8 @@ std::map<std::string, CBook*>* CSearch::search(std::map<std::string, std::map<st
     }
 
     //Check search-options and remove books from search results, that don't match
-    m_sStatus = "Checking searchoptions: ";
-    removeBooks(mapSearchresults, matches);
+
+    //removeBooks(mapSearchresults, matches);
 
     return mapSearchresults;
 }
@@ -255,10 +255,6 @@ std::map<std::string, CBook*>* CSearch::checkAuthor(std::map<std::string, CBook>
         counter++;
     }
 
-    //Earse books that are not matching with searchoptions
-    std::map<std::string, double> matches;
-    removeBooks(mapSR, matches);
-
     return mapSR;
 }
 
@@ -269,6 +265,9 @@ std::map<std::string, CBook*>* CSearch::checkAuthor(std::map<std::string, CBook>
 */
 void CSearch::removeBooks(std::map<std::string, CBook*>* mapSR, std::map<std::string, double>& matches)
 {
+    //Update status
+    m_sStatus = "Checking searchoptions: ";
+
     unsigned int counter = 0;
     for(auto it=mapSR->begin(); it!=mapSR->end();)
     {
@@ -306,12 +305,11 @@ bool CSearch::checkSearchOptions(CBook* book)
         return false;
          
     //*** check pillars ***//
-    bool match = false;
     for(auto const &collection : m_sOpts->getCollections()) {
         if(func::in(collection, book->getCollections()) == true)
-            match = true;
+            return true;
     }
-    return match;
+    return false;
 }
 
 /*

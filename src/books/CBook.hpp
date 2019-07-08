@@ -116,21 +116,21 @@ public:
     * @param[in] sWord searched word
     * @return list of pages on which searched word accures
     */
-    std::map<int, std::vector<std::string>>* getPagesFull2(std::string sInput);
+    std::map<int, std::vector<std::string>>* getPagesFull(std::vector<std::string>& vWords);
 
     /**
     * @brief return map of all pages + words found on page (Contains).
     * @param[in] sWord searched word.
     * @return map of pages with vector of words found on this page.
     */
-    std::map<int, std::vector<std::string>>* getPagesContains(std::string sWord);
+    std::map<int, std::vector<std::string>>* getPagesContains(std::vector<std::string>& vWords);
 
     /**
     * @brief return map of all pages + words found on page (fuzzy).
     * @param[in] sWord searched word
     * @return map of pages with vector of words found on this page
     */
-    std::map<int, std::vector<std::string>>* getPagesFuzzy(std::string sWord);
+    std::map<int, std::vector<std::string>>* getPagesFuzzy(std::vector<std::string>& vWords);
 
     /**
     * @brief Create map of pages and found words for i-word (Contains).

@@ -156,6 +156,8 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
         delete results2;
     }
 
+    search->removeBooks(results1, matches);
+
     //Delete search
     deleteSearch(id);
 
