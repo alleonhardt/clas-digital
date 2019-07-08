@@ -219,7 +219,29 @@ padding: .4em .4em .4em 2em;
 .list-type2 a:hover{
 	background: #b0b0b0;
 	text-decoration:none;
-		//transform: scale(1.05);
+	transform: scale(1.01);
+}
+
+#realHeader a:hover{
+	background: #9a9a9a;
+	transform: scale(1.08);
+}
+
+#realHeader a input {
+	margin-top: 0.5rem;
+	display: inline-block;
+}
+#realHeader a span {
+	float: right;
+	display: inline-block;
+	margin-right: 0.5rem;
+	font-size: large;
+	color: white;
+}
+
+#realHeader a{
+	background: #9a9a9a;
+	transform: scale(1.08);
 }
 
 .list-type2 a:before{
@@ -241,7 +263,7 @@ padding: .4em .4em .4em 2em;
 	display: inline-block;
 	float: right;
 }
-i
+
 .list-type2 p {
 	display: inline-block;
 	float: left;
@@ -278,6 +300,16 @@ i
 	text-align: center;
 	font: bold 15px/40px 'Raleway', sans-serif;
 	cursor: pointer;
+}
+
+.spanc {
+	background-color: blue;
+	color: black;
+	height: 100%;
+}
+
+.spanc:hover {
+	background-color: red;
 }
 
 .buttontwo {
@@ -591,7 +623,12 @@ function sendToPage(name)
 		}
 
 
-			document.getElementById("ResultBanner").innerHTML = "<h1 class='headerStyle'>Search Results for: \""+document.getElementById("SpecialSID").value+"\"<a class='citationButton' onclick='OpenFilter();return true;'>Filter results</a><a class='buttontwo citationButton' style='margin-left: 1rem' onclick='CreateBibliography();return true;'>Create Bibliography</a></h1>";
+										 document.getElementById("ResultBanner").innerHTML = "<h1 class='headerStyle'>Search Results for: \""+document.getElementById("SpecialSID").value+"\", "+jsonObj.books.length+" matches<a class='citationButton' onclick='OpenFilter();return true;'>Filter results</a><a class='buttontwo citationButton' style='margin-left: 1rem' onclick='CreateBibliography();return true;'>Create Bibliography</a></h1>";
+
+	let header = document.createElement("li");
+	header.id = "realHeader";
+										 header.innerHTML = "<a>-<input type='checkbox' onclick='SelectAll(this.checked);return true;' unchecked> <span>Select all results</span></a>";
+	obj.appendChild(header);
 
 	for(var i = 0; i < jsonObj.books.length; i++)
 	{
@@ -631,6 +668,15 @@ function sendToPage(name)
 	xhr.send();
 }
 
+function SelectAll(y)
+{
+	let lst = document.getElementsByClassName("booklistinp");
+	for(let i = 0; i < lst.length; i++)
+	{
+		lst[i].checked = y;
+	}
+}
+
 function CreateBibliography()
 {
 	let lst = document.getElementsByClassName("booklistinp");
@@ -660,7 +706,7 @@ function changeColor(obj)
 	{
 		if(obj.childNodes[i].was_clicked === 1)
 		{
-			obj.childNodes[1].was_clicked = 0;
+			obj.childNodes[i].was_clicked = 0;
 			return true;
 		}
 	}
@@ -932,7 +978,7 @@ window.addEventListener("load",User.initialise,false);
 				<button class="btclass2" type="button" onclick="openSearchOpts('AdvancedSearchOptions')">Advanced</button>
 			</div>
 			<div id="ResultBanner"></div>
-			<ol id="SearchHitList" class="list-type2"></ol>
+			<ol id="SearchHitList" start="0" class="list-type2"></ol>
 			<div id="LinkList" class="divlisttype"></div>
 		</div>
 	</body>

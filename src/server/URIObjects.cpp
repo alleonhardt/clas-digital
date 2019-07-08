@@ -4,6 +4,7 @@
 #include <chrono>
 #include <folly/io/async/EventBaseManager.h>
 #include <folly/FileUtil.h>
+#include <fstream>
 #include <folly/executors/GlobalExecutor.h>
 #include "src/server/URIObjects.hpp"
 #include "src/zotero/zotero.hpp"
@@ -178,7 +179,7 @@ void GetBookRessource::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 		}
 		else if(book!=""&&res!="") //Reads the specific ressource and sends the file with a specific mime type to the client
 		{
-			
+
 			//Create the path to the book
 			std::string path = "web/books/";
 			path+=book;
@@ -202,42 +203,42 @@ void GetBookRessource::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 			}
 			std::thread([mypath=std::move(path),this,evb=folly::EventBaseManager::get()->getEventBase()]{
 
-			bool onerror = false;
-			URIFile *fl;
-			try
-			{
-				if(fs::exists(mypath)&&fs::is_directory(mypath))
-				{
+					bool onerror = false;
+					URIFile *fl;
+					try
+					{
+					if(fs::exists(mypath)&&fs::is_directory(mypath))
+					{
 					evb->runInEventBaseThread([mypath2 = std::move(mypath),this]{
-					return ResponseBuilder(downstream_)
-					.status(200,"Ok")
-					.header("Content-Type","application/json")
-					.body(std::move(DirectoryFilesToJSON(mypath2)))
-					.sendWithEOM();
-					});
+							return ResponseBuilder(downstream_)
+							.status(200,"Ok")
+							.header("Content-Type","application/json")
+							.body(std::move(DirectoryFilesToJSON(mypath2)))
+							.sendWithEOM();
+							});
 					return;
-				}
-				//Load the ressource from the constructed path if the ressource does not exist the constructor of URIFile will throw an expection 
-				fl = new URIFile(mypath);
-			}
-			catch(...)
-			{
-				onerror = true;
-			}
+					}
+					//Load the ressource from the constructed path if the ressource does not exist the constructor of URIFile will throw an expection 
+					fl = new URIFile(mypath);
+					}
+					catch(...)
+					{
+						onerror = true;
+					}
 
-			evb->runInEventBaseThread([fl,onerror,this]{
-			if(onerror)
-				return SendErrorNotFound(downstream_);
-			//So we know the file is good now send back the file with the detected mime type
-			ResponseBuilder(downstream_)
-				.status(200,"Ok")
-				.header("Content-Type",fl->getMimeType())
-				.body(std::move(fl->getBufferReference()))
-				.sendWithEOM();
-				delete fl;
-				});
+					evb->runInEventBaseThread([fl,onerror,this]{
+							if(onerror)
+							return SendErrorNotFound(downstream_);
+							//So we know the file is good now send back the file with the detected mime type
+							ResponseBuilder(downstream_)
+							.status(200,"Ok")
+							.header("Content-Type",fl->getMimeType())
+							.body(std::move(fl->getBufferReference()))
+							.sendWithEOM();
+							delete fl;
+							});
 
-				}).detach();
+			}).detach();
 		}
 	}
 	catch(...)
@@ -282,7 +283,7 @@ void GetSearchHandler::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 		alx::cout<<alx::endl;
 
 		CSearchOptions *nso = new CSearchOptions(word,Fuzzyness,std::move(pillars),onlyTitle,ocrOnly,std::move(author),from,to,true);
-		
+
 		static std::atomic<unsigned long long> unique_sid = 0;
 		long long searchid = unique_sid.fetch_add(1);
 		CSearch * csearch = new CSearch(nso,searchid);
@@ -398,7 +399,7 @@ void GetBookMetadata::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers) 
 	{
 		auto &mapofbooks = GetSearchHandler::GetBookManager().getMapOfBooks();
 		std::string inBook = headers->getDecodedQueryParam("scanId");
-		
+
 		if(inBook=="") throw 0;
 
 		std::string json;
@@ -410,7 +411,7 @@ void GetBookMetadata::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers) 
 		{
 			alx::cout.writeln("Could not find request book metadata trying to fetch from zotero, book scan id: ",inBook.c_str());
 			json = Zotero::SendRequest(Zotero::Request::GetSpecificItem(inBook));
-			
+
 			if(json=="") throw 0;
 
 			nlohmann::json js;
@@ -449,6 +450,7 @@ void UploadBookHandler::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers
 		mapofbooks.at(whichBook); //Check if book exists
 		_finalPath = "web/books/";
 		_finalPath+=whichBook;
+		_whichBook =whichBook;
 		if(!fs::exists(_finalPath))
 		{
 			fs::create_directory(_finalPath);
@@ -493,7 +495,7 @@ void UploadBookHandler::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers
 		}
 
 		ofs.open(_finalPath.c_str(),std::ios::out);
-		
+
 		if(!ofs.is_open())
 			throw "Cannot open path to write the file!";
 	}
@@ -514,11 +516,74 @@ void UploadBookHandler::onBody(std::unique_ptr<folly::IOBuf> body) noexcept
 }
 
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h" //Neeeded for image dimensions
+
+
 void UploadBookHandler::onEOM() noexcept
 {
+
 	if(ofs.is_open())
 	{
 		ofs.close();
+
+		auto pos = _finalPath.find_last_of('.');
+		std::string fileEnd = _finalPath.substr(pos+1,std::string::npos);
+
+		if(fileEnd=="jpg")
+		{
+
+			try
+			{
+				static std::mutex m;
+
+				std::string pa = "web/books/";
+				pa+=_whichBook;
+				pa+="/readerInfo.json";
+				std::lock_guard lck(m);
+				nlohmann::json file_desc;
+				if(fs::exists(pa))
+				{
+					std::ifstream readerFile(pa.c_str(),std::ios::in);
+					readerFile>>file_desc;
+					readerFile.close();
+				}
+				else
+				{
+					file_desc["maxPageNum"] = 0;
+					file_desc["pages"] = nlohmann::json::array();
+				}
+
+				std::string filename = _finalPath.substr(_finalPath.find_last_of("/")+1);
+				nlohmann::json entry;
+				entry["file"] = filename;
+				std::regex reg("page0*([1-9][0-9]*).jpg");
+				std::smatch cm;
+				int maxPageNum = file_desc["maxPageNum"];
+				if(std::regex_match(filename,cm,reg))
+				{
+					if(cm.size()<2)
+						throw "Page in the wrong format!";
+					entry["pageNumber"]=std::stoi(cm[1]);
+					maxPageNum = std::max(maxPageNum,std::stoi(cm[1]));
+				}
+
+				int width,height,z;
+				stbi_info(_finalPath.c_str(),&width,&height,&z);
+				entry["width"] = width;
+				entry["height"] = height;
+				file_desc["maxPageNum"] = maxPageNum;
+				file_desc["pages"].push_back(std::move(entry));
+
+				std::ofstream writer(pa.c_str(),std::ios::out);
+				writer<<file_desc;
+				writer.close();
+			}
+			catch(...)
+			{
+				return SendErrorNotFound(downstream_);
+			}
+		}
 		ResponseBuilder(downstream_)
 			.status(200,"Ok")
 			.header("Content-Type","text/plain")
@@ -554,23 +619,23 @@ void StartSearch::start(long long id, folly::EventBase *evb)
 	auto end = std::chrono::system_clock::now();
 	std::chrono::duration<double> elapsed_seconds = end-start;
 	alx::cout.write(alx::console::yellow_black,"Search all books time: ",elapsed_seconds.count(),"s \n");
-		nlohmann::json js;
+	nlohmann::json js;
 
-		for(auto &it : *results)
-		{
-			nlohmann::json entry;
-			entry["scanId"] = it->getKey();
-			entry["hasocr"] = it->getOcr();
-			entry["description"] = it->getMetadata().getShow();
-			js["books"].push_back(std::move(entry));
-		}
+	for(auto &it : *results)
+	{
+		nlohmann::json entry;
+		entry["scanId"] = it->getKey();
+		entry["hasocr"] = it->getOcr();
+		entry["description"] = it->getMetadata().getShow();
+		js["books"].push_back(std::move(entry));
+	}
 
-		alx::cout.writeln(alx::console::green_black,"Searching done! Number of results: ",results->size());
-		delete results;
+	alx::cout.writeln(alx::console::green_black,"Searching done! Number of results: ",results->size());
+	delete results;
 
-		evb->runInEventBaseThread([this,json = std::move(js)]{
-		alx::cout.write(alx::console::green_black,"Sending search response...\n");
-		ResponseBuilder(downstream_)
+	evb->runInEventBaseThread([this,json = std::move(js)]{
+			alx::cout.write(alx::console::green_black,"Sending search response...\n");
+			ResponseBuilder(downstream_)
 			.status(200,"Ok")
 			.header("Content-Type","application/json")
 			.body(std::move(json.dump()))
@@ -593,10 +658,10 @@ void RequestSearchProgress::onRequest(std::unique_ptr<proxygen::HTTPMessage> hea
 	nlohmann::json j;
 	j["progress"] = prog;
 	ResponseBuilder(downstream_)
-			.status(200,"Ok")
-			.header("Content-Type","application/json")
-			.body(j.dump())
-			.sendWithEOM();
+		.status(200,"Ok")
+		.header("Content-Type","application/json")
+		.body(j.dump())
+		.sendWithEOM();
 }
 
 void RequestCreateBibliography::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers) noexcept
@@ -628,7 +693,7 @@ void RequestCreateBibliography::onRequest(std::unique_ptr<proxygen::HTTPMessage>
 			retval+="</p>";
 		}
 		catch(...) {}
-		
+
 		if(x_new==std::string::npos) break;
 		x_last = x_new+1;
 	}

@@ -631,15 +631,23 @@ function init() {
 		}
 		else
 		{
-		  let resultLinks = "";
+		  let resultLinks = document.getElementById("linkList"); 
 		  for( let i = 0; i < searchResults.pages.length; i++)
 		  {
-			  resultLinks = resultLinks + " " + "<a href='#page"+searchResults.pages[i].page+"' onclick='ShowOCR(this);return true;'>" + searchResults.pages[i].page + "( "
-									 + searchResults.pages[i].word + " )</a>";
+			  let isok = document.getElementById("pageHitList"+searchResults.pages[i].page);
+			  if(isok != null)
+			  {
+				  isok.innerHTML += ", "+searchResults.pages[i].word;
+			  }
+			  else
+			  {
+			  	resultLinks.innerHTML = resultLinks.innerHTML + " " + "<a href='#page"+searchResults.pages[i].page+"' onclick='ShowOCR(this);return true;'>" + searchResults.pages[i].page + " ("
+				  + "<span id='pageHitList"+searchResults.pages[i].page +"'>"					 
+				  + searchResults.pages[i].word + "</span>)</a>";
+			  }
 		    if(HighlightList.indexOf(searchResults.pages[i].word)<0)
 		      HighlightList.push(searchResults.pages[i].word.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&'));
 		  }
-		  document.getElementById("linkList").innerHTML = resultLinks;
 		}
 		GetOCRTxt();
 	}, function() {
