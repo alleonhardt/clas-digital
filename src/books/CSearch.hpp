@@ -53,7 +53,11 @@ public:
     * @return fuzzynes
     */
     int getFuzzyness();
-    
+
+    /** 
+    * @return onlyTitle
+    */
+    int getOnlyTitle();
     
     // *** SETTER *** //
 

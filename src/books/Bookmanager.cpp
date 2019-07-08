@@ -131,7 +131,7 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
             }
 
             //Erase element if it does not occure on the same page
-            else if(it->second->getPages(search->getSearchedWord(), search->getFuzzyness())->size() == 0)
+            else if(search->getOnlyTitle() == false && it->second->getPages(search->getSearchedWord(), search->getFuzzyness())->size() == 0)
             {
                 matches.erase(it->first);
                 results1->erase(it);

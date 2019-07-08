@@ -49,6 +49,13 @@ int CSearch::getFuzzyness() {
     return m_sOpts->getFuzzyness();
 }
 
+/** 
+* @return onlyTitle
+*/
+int CSearch::getOnlyTitle() {
+    return m_sOpts->getOnlyTitle();
+}
+
 // *** SETTER *** //
 
 /**
@@ -213,6 +220,9 @@ std::map<std::string, CBook*>* CSearch::checkAuthor(std::map<std::string, CBook>
         else if(fuzzyness == 2 && fuzzy::fuzzy_cmp(it->second.getAuthor().c_str(), m_sWord) == true)
             mapSR->insert(std::pair<std::string, CBook*>(it->first, &it->second));
     }
+
+    std::map<std::string, double> matches;
+    removeBooks(mapSR, matches);
 
     return mapSR;
 }
