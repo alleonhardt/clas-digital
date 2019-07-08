@@ -373,8 +373,6 @@ class User {
 				}
 			}
 		}
-		ApplySearchData();
-		default_search_parameters = JSON.parse(JSON.stringify(search_parameters));
 	}
 }
 
@@ -433,13 +431,15 @@ function getSliderValue(x)
 function openSearchOpts(name)
 {
 
+	LoadSearchData(search_parameters);
 	//Create the json file with the advanced search options
-	document.getElementById("FuzzyID").value = search_parameters.fuzzyness;
-	document.getElementById("SearchInTitle").checked = search_parameters.title_only;
-	document.getElementById("SearchForAuthor").value = search_parameters.author_name;
-	document.getElementById("PublicatedAfter").value = search_parameters.pub_after;
-	document.getElementById("PublicatedBefore").value = search_parameters.pub_before;
-	document.getElementById("SearchInOCR").value = search_parameters.ocr_only;
+	//document.getElementById("FuzzyID").value = search_parameters.fuzzyness;
+//	document.getElementById("SearchInTitle").checked = search_parameters.title_only;
+//	document.getElementById("SearchForAuthor").value = search_parameters.author_name;
+//	document.getElementById("PublicatedAfter").value = search_parameters.pub_after;
+//	document.getElementById("PublicatedBefore").value = search_parameters.pub_before;
+//	document.getElementById("SearchInOCR").value = search_parameters.ocr_only;
+
 
 	//Get the modal banner which contains all the advanced options
 	let advancedOpts = document.getElementById("ModalBanner");
@@ -473,6 +473,7 @@ function ApplyFilterOptions()
 	filterOpts["ShowOnlyTextsWithOCR"] = document.getElementById("ShowOnlyTextsWithOCR").checked;
 	let x = filterOpts["ShowOnlyTextsWithOCR"];
 
+	let numMatches = 0;
 	for(var i = 0; i < jsonObj.books.length; i++)
 	{
 		let xentry = document.getElementById(jsonObj.books[i].scanId);
@@ -484,9 +485,12 @@ function ApplyFilterOptions()
 		else
 		{
 			xentry.style.display = "";
+			numMatches++;
 		}
-
 	}
+
+		document.getElementById("ResultBanner").innerHTML = "<h1 class='headerStyle'>Search Results for: \""+lastInput+"\", "+numMatches+" matches<a class='citationButton' onclick='OpenFilter();return true;'>Filter results</a><a class='buttontwo citationButton' style='margin-left: 1rem' onclick='CreateBibliography();return true;'>Create Bibliography</a></h1>";
+
 }
 
 function OpenFilter()
@@ -596,7 +600,11 @@ function sendToPage(name)
 
 	xhr.onload = function() {
 		if(xhr.status!=200)
+		{
+			alert("Something went wrong please show this message to your server administrator Error code E001");
 			return;
+		}
+		
 		let jsSearchId = JSON.parse(xhr.responseText);
 
 
@@ -604,6 +612,8 @@ function sendToPage(name)
 		realSearch.open("GET","/startSearch?searchID="+jsSearchId.searchid,true);
 		UpdateProgress(jsSearchId.searchid);
 		realSearch.onload = function() {
+
+		document.getElementById("ResultBanner").innerHTML = "";	
 		//First of all log the response for debug purposes
 		console.log(xhr.responseText);
 
@@ -623,7 +633,7 @@ function sendToPage(name)
 		}
 
 
-										 document.getElementById("ResultBanner").innerHTML = "<h1 class='headerStyle'>Search Results for: \""+document.getElementById("SpecialSID").value+"\", "+jsonObj.books.length+" matches<a class='citationButton' onclick='OpenFilter();return true;'>Filter results</a><a class='buttontwo citationButton' style='margin-left: 1rem' onclick='CreateBibliography();return true;'>Create Bibliography</a></h1>";
+		document.getElementById("ResultBanner").innerHTML = "<h1 class='headerStyle'>Search Results for: \""+document.getElementById("SpecialSID").value+"\", "+jsonObj.books.length+" matches<a class='citationButton' onclick='OpenFilter();return true;'>Filter results</a><a class='buttontwo citationButton' style='margin-left: 1rem' onclick='CreateBibliography();return true;'>Create Bibliography</a></h1>";
 
 	let header = document.createElement("li");
 	header.id = "realHeader";
@@ -724,7 +734,15 @@ function LoadSearchData(sp)
 	document.getElementById("SearchForAuthor").value = sp.author_name;
 	document.getElementById("PublicatedAfter").value = sp.pub_after;
 	document.getElementById("PublicatedBefore").value = sp.pub_before;
-	document.getElementById('SliderNum').innerHTML = sp.fuzzyness;
+	
+	document.getElementById('SliderNum').innerHTML = getSliderValue(sp.fuzzyness);
+	let pill = document.getElementsByClassName("upSaule");
+	for(let i = 0; i < sp.pillars.length; i++)
+	{
+		pill[i].checked = sp.pillars[i];
+	}
+
+	console.log(sp);
 }
 
 
@@ -737,12 +755,27 @@ function ApplySearchData()
 	search_parameters.author_name = document.getElementById("SearchForAuthor").value;
 	search_parameters.pub_after = document.getElementById("PublicatedAfter").value;
 	search_parameters.pub_before = document.getElementById("PublicatedBefore").value;
+	let pill = document.getElementsByClassName("upSaule");
+	search_parameters.pillars = null;
+	for(let i = 0; i < pill.length; i++)
+	{
+		if(search_parameters.pillars == null)
+			search_parameters.pillars = [pill[i].checked];
+		else
+			search_parameters.pillars.push(pill[i].checked);
+	}
 	document.getElementById("ModalBanner").style.display = "none";
+	console.log(search_parameters);
 }
 
 function ResetToDefault()
 {
 	LoadSearchData(default_search_parameters);
+	let kk = document.getElementsByClassName("upSaule");
+	for(let i = 0; i < kk.length; i++)
+	{
+		kk[i].checked = true;
+	}
 }
 
 window.addEventListener("load",User.initialise,false);
@@ -904,6 +937,8 @@ window.addEventListener("load",User.initialise,false);
 				console.log("Server data found!");
 				}
 			}
+			ApplySearchData();
+			default_search_parameters = JSON.parse(JSON.stringify(search_parameters));
 		}
 	</script>
 	</head>
