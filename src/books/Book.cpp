@@ -190,43 +190,7 @@ void CBook::loadPages(std::map<std::string, std::vector<size_t>>& mapWordsPages)
         //Add word and pages to map
         mapWordsPages[vec[0]] = pages;
     }
-}
- 
-
-/*
-* @param[in] sWord searched word
-* @return list of pages on which searched word accures
-*/
-std::list<size_t>* CBook::getPagesFull(std::string sInput)
-{
-    std::vector<std::string> vWords;
-    func::convertToLower(sInput);
-    func::split(sInput, "+", vWords);
-
-    //Create empty list of pages
-    std::list<size_t>* listPages = new std::list<size_t>;
-
-    //Load map of Words 
-    std::map<std::string, std::vector<size_t>> mapWordsPages;
-    loadPages(mapWordsPages);
-
-    for(auto page : mapWordsPages[vWords[0]])
-        listPages->push_back(page);
-
-    for(size_t i=1; i<vWords.size(); i++)
-    {
-        std::vector<size_t> results2 = mapWordsPages[vWords[i]];
-        for(auto it=listPages->begin(); it!=listPages->end();++i) 
-        {
-            if(func::in<size_t>((*it), results2) == false)
-                listPages->erase(it--);
-            else
-                it++;
-        }
-    }
-
-    return listPages;
-}
+} 
 
 /**
 * @brief getPages calls the matching getPages... function according to fuzzyness

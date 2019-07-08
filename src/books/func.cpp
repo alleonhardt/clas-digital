@@ -9,7 +9,7 @@ namespace func
 * @parameter vector<string> 
 * @return bool
 */
-bool in(std::string str, std::vector<std::string> vec)
+bool in(const std::string& str, const std::vector<std::string>& vec)
 {
     for(unsigned int i=0; i<vec.size(); i++)
     {
