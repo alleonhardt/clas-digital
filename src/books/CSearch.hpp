@@ -102,7 +102,7 @@ public:
     * @brief remove all books that do not match with searchoptions
     * @param[in, out] mapSR map of search results
     */
-    void removeBooks(std::map<std::string, CBook*>* mapSR);
+    void removeBooks(std::map<std::string, CBook*>* mapSR, std::map<std::string, double>& matches);
 
     /**
     * @brief check whether book-metadata matches with searchoptions

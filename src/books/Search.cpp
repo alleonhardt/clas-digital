@@ -100,7 +100,7 @@ std::map<std::string, CBook*>* CSearch::search(std::map<std::string, std::map<st
     }
 
     //Check search-options and remove books from search results, that don't match
-    removeBooks(mapSearchresults);
+    removeBooks(mapSearchresults, matches);
 
     return mapSearchresults;
 }
@@ -222,12 +222,15 @@ std::map<std::string, CBook*>* CSearch::checkAuthor(std::map<std::string, CBook>
 * @brief remove all books that don't agree with searchOptions.
 * @param[in, out] mapSR map of search results
 */
-void CSearch::removeBooks(std::map<std::string, CBook*>* mapSR)
+void CSearch::removeBooks(std::map<std::string, CBook*>* mapSR, std::map<std::string, double>& matches)
 {
     for(auto it=mapSR->begin(); it!=mapSR->end(); it++)
     {
         if(checkSearchOptions(it->second) == false)
+        {
+            matches.erase(it->first);
             mapSR->erase(it);
+        }
     }
 
 }
