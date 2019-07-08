@@ -18,7 +18,11 @@ private:
     std::string m_sKey;                                 //Key of the book
     std::string m_sPath;                                //Path to book (if exists)
     bool m_bOcr;                                        //Book has ocr path
+
+    //Metadata
     CMetadata m_Metadata;                               //Json with all metadata 
+    std::string m_sAuthor;
+    int m_date;
 
 public:
 

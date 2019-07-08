@@ -11,6 +11,11 @@ CBook::CBook(nlohmann::json jMetadata) : m_Metadata(jMetadata)
 {
     m_sKey = jMetadata["key"];
     m_bOcr = false;
+
+    //Metadata
+    m_sAuthor = m_Metadata.getAuthor();
+    func::convertToLower(m_sAuthor);
+    m_date = m_Metadata.getDate();
 }
 
 
@@ -69,7 +74,7 @@ std::vector<std::string> CBook::getCollections() {
 * @return lastName, or Name of author
 */
 std::string CBook::getAuthor() {
-    return m_Metadata.getAuthor();
+    return m_sAuthor;
 }
 
 /**
@@ -83,7 +88,7 @@ std::string CBook::getTitle() {
 * @return date or -1 if date does not exists or is currupted
 */
 int CBook::getDate() {
-    return m_Metadata.getDate();
+    return m_date;
 }
 
 /**
