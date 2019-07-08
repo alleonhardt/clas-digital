@@ -227,16 +227,14 @@ void CBookManager::createMapWords()
         std::map<std::string, std::vector<size_t>> mapWords;
         it->second.loadPages(mapWords);
 
-        unsigned int counter = 0;
         //Iterate over all words in this book. Check whether word already exists in list off all words.
+        unsigned int counter = 0;
         for(auto yt=mapWords.begin(); yt!=mapWords.end(); yt++)
         {
             counter++;
             m_mapWords[yt->first][it->first] = &it->second;
         }
     }
-
-    //unsigned int counter = 0;
 } 
 
 /**
@@ -256,8 +254,6 @@ void CBookManager::createMapWordsTitle()
         for(auto yt=mapWords.begin(); yt!=mapWords.end(); yt++)
             m_mapWordsTitle[yt->first][it->first] = &it->second;
     }
-
-    //unsigned int counter = 0;
 }
 
 /**
@@ -286,15 +282,20 @@ bool CBookManager::getProgress(unsigned long long id, std::string& status, float
 /**
 * @brief delete given search and erase from map
 */
-void CBookManager::deleteSearch(unsigned long long id) {
+void CBookManager::deleteSearch(unsigned long long id) 
+{
     std::unique_lock lck(m_searchLock);
+
+    //Iterate over all 
     for(auto it=m_mapSearchs.begin(); it!=m_mapSearchs.end(); it++)
     {
+        //If matches, then delete searchOptions, search, and erase object
         if(it->first == id) {
             it->second->deleteSearchOptions();
             delete it->second;
+            m_mapSearchs.erase(it);
+            break;
         }
-        m_mapSearchs.erase(it);
     }
 }
 
