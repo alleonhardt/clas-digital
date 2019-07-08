@@ -17,6 +17,7 @@ private:
     std::string m_sWord;
     CSearchOptions* m_sOpts;
     float m_fProgress;
+    std::string m_sStatus;
 
 public:
     
@@ -40,7 +41,7 @@ public:
     /**
     * @return progress
     */
-    float getProgress();
+    void getProgress(std::string& status, float& progress);
 
     // *** GETTER (from searchoptions) *** //
 
@@ -67,6 +68,15 @@ public:
     */
     void setWord(std::string sWord);
 
+    /**
+    * @brief used to change progress from bookmanager 
+    */
+    void setProgress(float progress);
+
+    /**
+    * @brief used to change stus from bookmanager 
+    */
+    void setStatus(std::string sStatus);
 
     /**
     * @brief calls spezific search function, searches, and creates map of  matches. Removes all 

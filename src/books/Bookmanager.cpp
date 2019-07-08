@@ -105,7 +105,11 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
     std::map<std::string, double> matches;
 
     //Search main word
+    search->setStatus("Searching " + vWords[0] + "... ");
     results1 = search->search(m_mapWords, m_mapWordsTitle, matches);
+
+    //Searching Author
+    search->setStatus("Searching Author...");
     std::map<std::string, CBook*>* results2 = search->checkAuthor(m_mapBooks);
     results1->insert(results2->begin(), results2->end());
     delete results2;
@@ -115,12 +119,18 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
         //Change searched word
         search->setWord(vWords[i]);
 
+        //Set Status
+        search->setStatus("Searching " + vWords[i] + "... ");
+
         //Get results for second word
         std::map<std::string, double> matches2;
         std::map<std::string, CBook*>* results2 = search->search(m_mapWords, m_mapWordsTitle, matches2);
 
+        //Set Status
+        search->setStatus("Searching pages...");
 
         //remove all books, that don't contain both words
+        unsigned int counter=0;
         for(auto it=results1->begin(); it!=results1->end(); it++)
         {
             //Erase element if it doesn't occure in results2
@@ -131,18 +141,19 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
             }
 
             //Erase element if it does not occure on the same page
-            else if(search->getOnlyTitle() == false && it->second->getPages(search->getSearchedWord(), search->getFuzzyness())->size() == 0)
+            else if(it->second->getOcr() == true && it->second->getPages(search->getSearchedWord(), search->getFuzzyness())->size() == 0)
             {
                 matches.erase(it->first);
                 results1->erase(it);
             }
+
+            //Set progress
+            search->setProgress(static_cast<float>(counter)/static_cast<float>(results2->size()));
         }
 
         //Delete additional search results
         delete results2;
     }
-
-    alx::cout.write("matches: ", matches.size(), "\nresults1: ", results1->size(), "\n");
 
     deleteSearch(id);
 
@@ -261,10 +272,13 @@ void CBookManager::addSearch(CSearch* search) {
 /**
 * @brief get progress of given search
 */
-float CBookManager::getProgress(unsigned long long id) {
+bool CBookManager::getProgress(unsigned long long id, std::string& status, float& progress) {
     std::shared_lock lck(m_searchLock);
     if(m_mapSearchs.count(id) > 0)
-        return m_mapSearchs[id]->getProgress();
+    {
+        m_mapSearchs[id]->getProgress(status, progress);
+        return true;
+    }
     else
         return 1000.0;
 }

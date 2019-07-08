@@ -96,7 +96,7 @@ public:
     * @brief get progress of given search
     * @return float indicating progress
     */
-    float getProgress(unsigned long long id);
+    bool getProgress(unsigned long long id, std::string& status, float& progress);
 
     /**
     * @brief delete given search and erase from map
