@@ -97,7 +97,7 @@ bool fuzzy_cmp(std::string sWord1, std::string sWord2)
 
     //Calculate score
     double score = static_cast<double>(ldIterative)/ std::max(sWord1.length(), sWord2.length());
-    double fuzzyness = 0.2;
+    double fuzzyness = 0.25;
 
     //Check whether score is lower than given fuzzyness)
     if(score < fuzzyness && score >= 0)
@@ -134,7 +134,10 @@ bool fuzzy_cmp(std::string sWord1, std::string sWord2, double& ld)
 
     //Calculate score
     double score = static_cast<double>(ldIterative)/ std::max(sWord1.length(), sWord2.length());
-    double fuzzyness = 0.2;
+    double fuzzyness = 0.23;
+
+    if(containsUmlaut(sWord1) == true || containsUmlaut(sWord2) == true)
+        fuzzyness = 0.26;
 
     //Check whether score is lower than given fuzzyness)
     if(score < fuzzyness && score >= 0)
@@ -142,6 +145,18 @@ bool fuzzy_cmp(std::string sWord1, std::string sWord2, double& ld)
         ld = 1+score;
         return true;
     }
+
+    return false;
+}
+
+bool containsUmlaut(std::string&  str)
+{
+    if(str.find("ä") != std::string::npos)
+        return true;
+    if(str.find("ö") != std::string::npos)
+        return true;
+    if(str.find("ü") != std::string::npos)
+        return true;
 
     return false;
 }
