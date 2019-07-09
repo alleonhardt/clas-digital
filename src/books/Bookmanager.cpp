@@ -128,10 +128,11 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
         std::map<std::string, CBook*>* results2 = search->search(m_mapWords, m_mapWordsTitle, matches2);
 
         //Set Status
-        search->setStatus("Checking if \""+vWords[0]+"\" and \""+vWords[i]+"\" are on the same page...");
+        search->setStatus("Checking if \""+vWords[0]+"\" and \""+vWords[i]+"\" are on the same page...  ");
 
         //remove all books, that don't contain both words
         unsigned int counter=0;
+        unsigned int divider = results1->size();
         for(auto it=results1->begin(); it!=results1->end();)
         {
             //Erase element if it doesn't occure in results2
@@ -153,7 +154,7 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
                 ++it;
 
             //Set progress
-            search->setProgress(static_cast<float>(counter)/static_cast<float>(results2->size()));
+            search->setProgress(static_cast<float>(counter)/static_cast<float>(divider));
             counter++;
         }
 
