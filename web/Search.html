@@ -576,6 +576,7 @@ function ShowSelectedValues(obj)
 {
 	let json = obj.drawablejson;
 	obj.innerHTML = "<li id='realHeader'><a><strong>Show result from "+json.show_from+"-"+json.show_to+"</strong><input type='checkbox' onclick='SelectAll(this.checked);return true;' unchecked> <span>Select all results</span></a></li>";
+	document.getElementById("ResultBanner").innerHTML = "<h1 class='headerStyle'>Search Results for: \""+lastInput+"\", "+json.books.length+" matches<a class='citationButton' onclick='OpenFilter();return true;'>Filter results</a><a class='buttontwo citationButton' style='margin-left: 1rem' onclick='CreateBibliography();return true;'>Create Bibliography</a></h1>";
 	//json.show_from = 0;
 	//json.show_to = Math.min(25,json.books.length);
 	obj.start = json.show_from;
@@ -775,7 +776,6 @@ function sendToPage(name)
 		}
 
 
-		document.getElementById("ResultBanner").innerHTML = "<h1 class='headerStyle'>Search Results for: \""+document.getElementById("SpecialSID").value+"\", "+jsonObj.books.length+" matches<a class='citationButton' onclick='OpenFilter();return true;'>Filter results</a><a class='buttontwo citationButton' style='margin-left: 1rem' onclick='CreateBibliography();return true;'>Create Bibliography</a></h1>";
 
 		jsonObj.show_from = 0;
 		jsonObj.show_to = Math.min(25,jsonObj.books.length);

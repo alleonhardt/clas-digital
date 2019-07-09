@@ -421,9 +421,9 @@ function doAdditionalSearch() {
 
 }
 
-let HighlightList = [];
 
 function GetOCRTxt() {
+				return new Promise(function(resolve,reject){
 			    let parsedUrlParams = parseURLParams(window.location.href);
 				Server.Get("/getBookRessources?book="+parsedUrlParams['scanId']+"&ressource=ocr.txt",function(content) {
 			    
@@ -434,32 +434,27 @@ function GetOCRTxt() {
 			      content = content.replace(new RegExp(">",'g'),"&gt;");
 			      //content = content.replace(new RegExp(parsedUrlParams['query'],'g'), '<mark>'+parsedUrlParams['query']+'</mark>');
 
-			      UpdateOCRTxt(content);
-				  if(document.getElementById("InfoScreen").style.display == "none")
-							{	ShowOCR(undefined); }
-			      //doc.classList.add("ocrstyle");
+			      UpdateOCRTxt(content,resolve);
+				  //if(document.getElementById("InfoScreen").style.display == "none")
+				  //{ShowOCR(undefined); }
 
-			      //doc2.appendChild(doc);
-			      //CurrentInfoHtml = doc2.innerHTML;
 							},function(content){
 								let Index = window.location.href.indexOf("scanId=");
 								let value = window.location.href.substr(Index+7);
-								window.location.href = "/1/ShowMetadata.html?scanId="+value;
+								window.location.href = "/getBookMetadata?scanId="+value;
+							});
 							});
 }
 
 
 let pageVal = [];
 
-async function loadExcept(x)
+function loadExcept(x)
 {
 	let lst = document.getElementsByClassName("ocrpage");
 	for(var i = 0; i < lst.length; i++)
 	{
-		if(i!=x)
-		{
 			lst[i].innerHTML = pageVal[i];
-		}
 	}
 }
 
@@ -472,16 +467,13 @@ let lst = document.getElementsByClassName("ocrpage");
 	}
 }
 
-function UpdateOCRTxt(x)
+function UpdateOCRTxt(x,res)
 {
-  console.log(HighlightList);
-  for(let i = 0; i < HighlightList.length; i++)
-      x = x.replace(new RegExp('(\\b'+HighlightList[i]+'\\b)','gi'),'<mark>$1</mark>');
-
-  let RegSrch = /\n-----\s(\d+)\s/g;
+	  let RegSrch = /\n-----\s(\d+)\s/g;
 	x = '<p data-page="1" class="ocrpage">' + x;
 	x = x.replace(RegSrch,'</p><p data-page="$1" class="ocrpage" ondblclick="SwitchToPage(this);">\n----- $1 ');
   	x+="</p>";
+	
 	document.getElementById("OCRBuffer").innerHTML = x;
 	
 	let lst = document.getElementsByClassName("ocrpage");
@@ -490,6 +482,7 @@ function UpdateOCRTxt(x)
 		pageVal[i] = lst[i].innerHTML;
 		lst[i].innerHTML = "";
 	}
+	res(10);
 }
 
 function SwitchToPage(x)
@@ -519,9 +512,10 @@ function ShowOCR(a) {
 		a.style.color = "green";
 	}
 	document.getElementsByClassName("pageContainer")[0].style["grid-template-columns"] = "60% 0% 40%";
+	
 	document.getElementById("InfoScreen").style.display = "none";
+	loadExcept();
     HighlightButton(document.getElementById("ShowOCRButton"));
-	console.log("Try to scroll!");
 	if(a===undefined)
 	{
 		a = {};
@@ -530,16 +524,17 @@ function ShowOCR(a) {
 		if(a.innerHTML=="")
 			a.innerHTML = "1";
 	}
+	document.getElementsByClassName("ocrpage")[parseInt(a.innerHTML)-1].innerHTML = pageVal[parseInt(a.innerHTML)-1];
 	if(parseInt(a.innerHTML)==1)
 	{
 		document.getElementById("olol").scrollTop = 0;
 	}
 	else
 	{
+		console.log(parseInt(a.innerHTML)-1);
+		console.log(document.getElementsByClassName("ocrpage"));
 		document.getElementsByClassName("ocrpage")[parseInt(a.innerHTML)-1].scrollIntoView();
 	}
-	document.getElementsByClassName("ocrpage")[parseInt(a.innerHTML)-1].innerHTML = pageVal[parseInt(a.innerHTML)-1];
-	loadExcept(parseInt(a.innerHTML)-1);
 }
 
 let metadata = {};
@@ -555,6 +550,7 @@ function init() {
 
 	let parsedUrlParams = parseURLParams(window.location.href);
 	let scanId = parsedUrlParams['scanId'];
+	let waitforocr = GetOCRTxt();
 	
 	Server.Get("/getBookRessources?book=" + scanId+"&ressource=readerInfo.json", function(content) {
 		let scanInfo = JSON.parse(content);
@@ -577,6 +573,7 @@ function init() {
 			pageNode.classList.add("placeholder");
 			let anchorNode = document.createElement("a");
 			anchorNode.name = "page" + scanInfo.pages[i].pageNumber;
+			anchorNode.id = "uniquePageNode"+scanInfo.pages[i].pageNumber;
 			document.querySelector(".reader").appendChild(anchorNode);			
 			document.querySelector(".reader").appendChild(pageNode);
 			pageNode.scanFilePath = "/getBookRessources?book="+scanId+ "&ressource=" + scanInfo.pages[i].file.substr(scanInfo.pages[i].file.search("page"));
@@ -616,19 +613,27 @@ function init() {
 		searchResults.pages = searchResults.books;
 
 		document.getElementById("searchQuery").innerHTML = parsedUrlParams["query"];
+		document.getElementById("linkList").innerHTML = "Loading ocr file...";
+
+		waitforocr.then(function(vwhatyever){
 		
 		if(searchResults.is_fuzzy === false)
 		{
 			
 		  let pagesList = [];
-		  HighlightList = parsedUrlParams["query"].split("+");
+		  let HighlightList = parsedUrlParams["query"].split("+");
 		  for(let i = 0; i < searchResults.pages.length; i++)
 		  	pagesList.push(searchResults.pages[i]);
 		  pagesList = pagesList.filter((v, i, a) => a.indexOf(v) === i); 
 
 		  let resultLinks = "";
 		  for(let i = 0; i < pagesList.length; i++) {
-		  resultLinks = resultLinks + " " + "<a href='#page"+pagesList[i]+"' onclick='ShowOCR(this);return true;'>" + pagesList[i] + "</a>";			
+		  resultLinks = resultLinks + " " + "<a href='#page"+pagesList[i]+"' onclick='ShowOCR(this);return true;'>" + pagesList[i] + "</a>";
+			for(let y = 0; y < HighlightList.length; y++)
+			{
+				pageVal[pagesList[i]-1]=pageVal[pagesList[i]-1].replace(new RegExp('(\\b'+HighlightList[y]+'\\b)','gi'),'<mark>$1</mark>');
+
+			}
 		  }
 
 		
@@ -637,6 +642,7 @@ function init() {
 		else
 		{
 		  let resultLinks = document.getElementById("linkList"); 
+		  resultLinks.innerHTML = "";
 		  for( let i = 0; i < searchResults.pages.length; i++)
 		  {
 			  let isok = document.getElementById("pageHitList"+searchResults.pages[i].page);
@@ -649,14 +655,19 @@ function init() {
 			  	resultLinks.innerHTML = resultLinks.innerHTML + " " + "<a href='#page"+searchResults.pages[i].page+"' onclick='ShowOCR(this);return true;'>" + searchResults.pages[i].page + " ("
 				  + "<span id='pageHitList"+searchResults.pages[i].page +"'>"					 
 				  + searchResults.pages[i].word + "</span>)</a>";
-			  }
-		    if(HighlightList.indexOf(searchResults.pages[i].word)<0)
-		      HighlightList.push(searchResults.pages[i].word.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&'));
+			  }i
+			pageVal[searchResults.pages[i].page-1]=pageVal[searchResults.pages[i].page-1].replace(new RegExp('(\\b'+searchResults.pages[i].word.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')+'\\b)','gi'),'<mark>$1</mark>');
 		  }
 		}
-		GetOCRTxt();
+
+    	document.getElementById("ShowOCRButton").disabled = false;
+		document.getElementById("ShowOCRButton").classList.add("butX");
+	});
 	}, function() {
 		// print some error message here
+//  for(let i = 0; i < HighlightList.length; i++)
+  //    x = x.replace(new RegExp('(\\b'+HighlightList[i]+'\\b)','gi'),'<mark>$1</mark>');
+
 	});
 }
 
@@ -737,7 +748,12 @@ window.addEventListener("load", init, false);
 	margin-right: 1rem;
 }
 
-.but1:hover,.but2:hover {
+.but1:hover {
+	background-color: black;
+	color: orange;
+}
+
+.butX:hover {
 	background-color: black;
 	color: orange;
 }
@@ -749,7 +765,7 @@ window.addEventListener("load", init, false);
 	<div class="pageContainer">
 		<div class="buttoncontainer">
 			<button id="ShowInfoButton" class="but1 butact" onclick="ShowInfoText();">Search</button>
-	    <button id="ShowOCRButton" class="but2" onclick="ShowOCR(undefined);">OCR</button>
+	    <button id="ShowOCRButton" class="but2" onclick="ShowOCR(undefined);" disabled>OCR</button>
 		</div>
 		<div id="InfoScreen" class="info">
 			<p id="scanBibInfo"></p>
