@@ -6,6 +6,8 @@
 #include <folly/FileUtil.h>
 #include <fstream>
 #include <folly/executors/GlobalExecutor.h>
+#include <sstream>
+#include <iomanip>
 #include "src/server/URIObjects.hpp"
 #include "src/zotero/zotero.hpp"
 
@@ -117,6 +119,11 @@ std::string DirectoryFilesToJSON(const std::string &path)
 				js+="false";
 			//The json contains at the moment only the filename
 			js+="},";
+		}
+		if(js=="[")
+		{
+			js+="]";
+			return std::move(js);
 		}
 		//Replace the last , by and ] to close the enumeration of files
 		js[js.length()-1]=']';
@@ -463,30 +470,37 @@ void UploadBookHandler::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers
 			}
 			else
 			{
+				static std::mutex ml;
+				std::lock_guard lck(ml);
 				std::string backupfolder = "web/books/";
 				backupfolder += whichBook;
 				backupfolder+="/backups";
 				if(!fs::exists(backupfolder))
 					fs::create_directory(backupfolder);
+				
 				std::string newpath = backupfolder;
 				newpath+="/";
 				newpath+=filename;
 				if(!fs::exists(newpath))
 					fs::create_directory(newpath);
 
-				for(int i = 0;;i++)
+				int version = 0;
+				for(const auto &dirEntry : fs::directory_iterator(newpath))
 				{
-					std::string finnewpath = newpath;
-					finnewpath+= "/";
-					finnewpath+= std::to_string(i);
-					finnewpath+=_user->GetEmail();
-
-					if(!fs::exists(finnewpath))
-					{
-						fs::rename(_finalPath,finnewpath);
-						break;
-					}
+					(void)dirEntry;
+					++version;
 				}
+
+				std::string finnewpath = newpath;
+				finnewpath+="/";
+
+				std::stringstream ss;
+				ss << std::setw(6) << std::setfill('0') << version;
+				finnewpath+=ss.str();
+				finnewpath+=_user->GetEmail();
+				finnewpath+="-";
+				finnewpath+=filename;
+				fs::rename(_finalPath,finnewpath);
 			}
 		}
 

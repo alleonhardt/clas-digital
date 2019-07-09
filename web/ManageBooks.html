@@ -310,14 +310,42 @@ function ShowFile(x)
 	}
 	x.classList.add('activeFile');
 
-	if(x.innerHTML.search(".jpg") === -1)
+	if((x.innerHTML.search(".jpg") === -1) || x.dataset.isdir=="true")
 	{
 	let xhr = new XMLHttpRequest();
-	xhr.open("GET","/getBookRessources?book="+x.dataset.key+"&ressource="+x.dataset.name,true);
+	xhr.open("GET","/getBookRessources?book="+x.dataset.key+"&ressource="+encodeURIComponent(x.dataset.name),true);
 	xhr.onload = function() {
 		if(xhr.status!=200)
 			return;
-	 	if(x.innerHTML==="ocr.txt")
+		
+	 	if(x.dataset.isdir=="true")
+		{
+			let jsObj = JSON.parse(xhr.responseText);
+			jsObj.sort(function(a,b){a.name<b.name});
+			for(let i = 0; i < jsObj.length; i++)
+			{
+				let lsafter = document.createElement("li");
+				lsafter.innerHTML = jsObj[i].name;
+				lsafter.style["margin-left"] = "calc(1rem * "+x.dataset.factor+")";
+				lsafter.dataset.name = x.dataset.name+"/"+jsObj[i].name;
+				if(jsObj[i].is_dir)
+				{
+					lsafter.dataset.factor = parseInt(x.dataset.factor)+1;
+					lsafter.dataset.isdir = "true";
+				}
+				else
+				{
+					lsafter.dataset.isdir = "false";
+					lsafter.innerHTML+="<a style='float:right;' href='/getBookRessources?book="+x.dataset.key+"&ressource="+lsafter.dataset.name+"' download='"+jsObj[i].name+"'>Download</a>";
+				}
+				
+				lsafter.dataset.key = x.dataset.key;
+				lsafter.onclick = function(){ShowFile(this);}.bind(lsafter);
+				x.after(lsafter);
+			}
+			return;
+	 	}
+	 	else if(x.innerHTML==="ocr.txt")
 	 	{
 		  let RegSrch = /\n-----\s(\d+)\s/g;
 			let xy = xhr.responseText;
@@ -365,18 +393,29 @@ function slideOut(i,lstEnt)
 		let xs = JSON.parse(xhr.responseText);
 		let bkList = document.getElementById("BookFiles");
 		bkList.innerHTML="";
-		let newArr = [];
-		for(var x = 0; x < xs.length; x++)
-	 	{
-	 		newArr.push(xs[x].name);
-	 	}
-	 	newArr.sort();
+		xs.sort(function(a,b){return a.name>b.name});
 
-		for(var x = 0; x < newArr.length; x++)
+		for(var x = 0; x < xs.length; x++)
 		{
-			let f ="<li onclick='ShowFile(this);' data-key='"+allBooksJS[i].key+"' data-name='"+newArr[x]+"'>";
-			f+=newArr[x];
-			f+="<a style='float:right;' href='/getBookRessources?book="+allBooksJS[i].key+"&ressource="+newArr[x]+"' download='"+newArr[x]+"'>Download</a></li>";
+			let f ="<li onclick='ShowFile(this);' data-key='"+allBooksJS[i].key+"' data-name='"+xs[x].name+"'";
+			if(xs[x].is_dir)
+			{
+				f+=" data-factor='1' data-isdir='true'>";
+			}
+			else
+			{
+				f+=" data-isdir='false'>";
+			}
+
+			f+=xs[x].name;
+			if(xs[x].is_dir)
+			{
+				f+="</li>";
+			}
+			else
+			{
+				f+="<a style='float:right;' href='/getBookRessources?book="+allBooksJS[i].key+"&ressource="+xs[x].name+"' download='"+xs[x].name+"'>Download</a></li>";
+			}
 			bkList.innerHTML+=f;
 		}
 		ShowCurrentPage(1);
