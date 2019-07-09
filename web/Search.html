@@ -202,18 +202,20 @@ padding: .4em .4em .4em 2em;
 		text-align: justify;
 		text-indent: 2.5rem;
 	 transition: all .2s ease-in-out;
+		height: 2rem;
 }
 
 .list-type2 a div{
 	float: left;
-	width: 1.4rem;
-	height: 1.4rem;
+	width: 1.5rem;
+	height: 1.5rem;
 }
 
 .list-type2 a img{
+	display: inline-block;
 	float: left;
-	width: 1.4rem;
-	height: 1.4rem;
+	width: 1.5rem;
+	height: 1.5rem;
 }
 
 .list-type2 a:hover{
@@ -664,12 +666,22 @@ function sendToPage(name)
 			inner+="' onclick='return changeColor(this);'>";
 			if(!jsonObj.books[i].hasocr || (jsonObj.books[i].hasocr == undefined))
 			{
-				inner+="<img src='/volltext.png' class='hiddenContent' alt='volltext' title='Buch besitzt Volltext'><img src='/scan.png' class='hiddenContent' alt='scan' title='Buch besitzt einen Scan'>";
+				inner+="<img src='/scan.svg' class='hiddenContent' alt='scan' title='Buch besitzt einen Scan'>";
 			}
 			else
 			{
-				inner+="<img src='/volltext.png' alt='volltext' title='Buch besitzt Volltext'><img src='/scan.png' alt='scan' title='Buch besitzt einen Scan'>";
+				inner+="<img src='/scan.svg' alt='scan' title='Buch besitzt einen Scan'>";
 			}
+		
+			if(jsonObj.books[i].copyright)
+			{
+				inner+="<img src='/copyright.svg' alt='copyright' title='Buch ist copyright geschuetzt'>";
+			}
+			else
+			{
+				inner+="<img src='/copyright.svg' class='hiddenContent' alt='copyright' title='Buch ist copyright geschuetzt'>";
+			}
+
 			inner+=jsonObj.books[i].description+"   "+"<input onclick='this.was_clicked=1;return true;' class='booklistinp' data-scanid='"+jsonObj.books[i].scanId+"' type='checkbox' unchecked></a>"; 
 			newList.innerHTML = inner;
 			//Show the new link in the search hit list

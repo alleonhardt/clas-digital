@@ -42,6 +42,8 @@ URIFile::URIFile(std::string path, int accessRights) : _path(path),_access(acces
 			_mimeType="image/png";
 		else if(filEnd=="gif")
 			_mimeType="image/gif";
+		else if(filEnd=="svg")
+			_mimeType = "image/svg+xml";
 	}
 }
 
@@ -122,11 +124,13 @@ std::unordered_map<std::string,URIFile> fileAccess {
 	{"/managebooks",URIFile("web/ManageBooks.html",2)},
 	{"/GetBooks",URIFile("web/GetBooks.html",0)},
 	{"/ShowMetadata", URIFile("web/ShowMetadata.html",0)},
-	{"/scan.png",URIFile("web/scan.png",0)},
 	{"/404.jpeg",URIFile("web/404.jpeg",0)},
-	{"/volltext.png",URIFile("web/volltext.png",0)},
 	{"/jszip.js",URIFile("web/jszip.js",2)},
-	{"/zotero",URIFile("web/Zotero.html",2)}
+	{"/zotero",URIFile("web/Zotero.html",2)},
+	{"/copyright.svg",URIFile("web/baseline-copyright-24px.svg",0)},
+	{"/folder.svg",URIFile("web/baseline-folder-24px.svg",0)},
+	{"/file.svg",URIFile("web/baseline-insert_drive_file-24px.svg",0)},
+	{"/scan.svg",URIFile("web/twotone-library_books-24px.svg",0)}
 }; ///< The map which caches all file the get handler will return and also saves the access rights to acces these files
 
 void ReloadAllFiles()

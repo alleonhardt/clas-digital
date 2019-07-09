@@ -6,6 +6,8 @@
 #include <folly/FileUtil.h>
 #include <fstream>
 #include <folly/executors/GlobalExecutor.h>
+#include <sstream>
+#include <iomanip>
 #include "src/server/URIObjects.hpp"
 #include "src/zotero/zotero.hpp"
 
@@ -118,6 +120,11 @@ std::string DirectoryFilesToJSON(const std::string &path)
 			//The json contains at the moment only the filename
 			js+="},";
 		}
+		if(js=="[")
+		{
+			js+="]";
+			return std::move(js);
+		}
 		//Replace the last , by and ] to close the enumeration of files
 		js[js.length()-1]=']';
 		//Return the json we just created
@@ -142,6 +149,9 @@ void GetBookRessource::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 		//If book and res is zero the client wants to get a list of all books on the server
 		if(book==""&&res=="")
 		{
+			if(!User::AccessCheck(_user,AccessRights::USR_WRITE|AccessRights::USR_READ))	
+				return SendAccessDenied(downstream_);
+
 			auto &mapBooks = GetSearchHandler::GetBookManager().getMapOfBooks();
 			nlohmann::json ret;
 			for(auto &it : mapBooks)
@@ -161,6 +171,9 @@ void GetBookRessource::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 		}
 		else if(book!=""&&res=="") //Returns a list of all files in a specific book
 		{
+			if(!User::AccessCheck(_user,AccessRights::USR_WRITE|AccessRights::USR_READ))	
+				return SendAccessDenied(downstream_);
+
 			//Construct the path to the book we want to have informations about
 			std::string path = "web/books/";
 			path+=book;
@@ -186,6 +199,7 @@ void GetBookRessource::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 			path+="/";
 			path+=res;
 
+
 			if(headers->getDecodedQueryParam("exist_check")!="")
 			{
 				if(fs::exists(path))
@@ -201,6 +215,10 @@ void GetBookRessource::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 					return SendErrorNotFound(downstream_);
 				}
 			}
+			if(!GetSearchHandler::GetBookManager().getMapOfBooks().at(book).getPublic()&&(!User::AccessCheck(_user,AccessRights::USR_READ)))
+				return SendAccessDenied(downstream_);
+
+			
 			std::thread([mypath=std::move(path),this,evb=folly::EventBaseManager::get()->getEventBase()]{
 
 					bool onerror = false;
@@ -321,6 +339,9 @@ void GetSearchInBookHandler::onRequest(std::unique_ptr<proxygen::HTTPMessage> he
 			throw 0;
 		auto &mapofbooks = GetSearchHandler::GetBookManager().getMapOfBooks();
 		auto &book = mapofbooks.at(inBook);
+		if(!book.getPublic()&&(!User::AccessCheck(_user,AccessRights::USR_READ))
+)
+			return SendAccessDenied(downstream_);
 		alx::cout.write(alx::console::green_black,"New search request! Searching for: ",searchFor,"\n");
 
 
@@ -463,30 +484,37 @@ void UploadBookHandler::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers
 			}
 			else
 			{
+				static std::mutex ml;
+				std::lock_guard lck(ml);
 				std::string backupfolder = "web/books/";
 				backupfolder += whichBook;
 				backupfolder+="/backups";
 				if(!fs::exists(backupfolder))
 					fs::create_directory(backupfolder);
+				
 				std::string newpath = backupfolder;
 				newpath+="/";
 				newpath+=filename;
 				if(!fs::exists(newpath))
 					fs::create_directory(newpath);
 
-				for(int i = 0;;i++)
+				int version = 0;
+				for(const auto &dirEntry : fs::directory_iterator(newpath))
 				{
-					std::string finnewpath = newpath;
-					finnewpath+= "/";
-					finnewpath+= std::to_string(i);
-					finnewpath+=_user->GetEmail();
-
-					if(!fs::exists(finnewpath))
-					{
-						fs::rename(_finalPath,finnewpath);
-						break;
-					}
+					(void)dirEntry;
+					++version;
 				}
+
+				std::string finnewpath = newpath;
+				finnewpath+="/";
+
+				std::stringstream ss;
+				ss << std::setw(6) << std::setfill('0') << version;
+				finnewpath+=ss.str();
+				finnewpath+=_user->GetEmail();
+				finnewpath+="-";
+				finnewpath+=filename;
+				fs::rename(_finalPath,finnewpath);
 			}
 		}
 
@@ -624,6 +652,7 @@ void StartSearch::start(long long id, folly::EventBase *evb)
 	{
 		nlohmann::json entry;
 		entry["scanId"] = it->getKey();
+		entry["copyright"] = !it->getPublic();
 		entry["hasocr"] = it->getOcr();
 		entry["description"] = it->getMetadata().getShow();
 		js["books"].push_back(std::move(entry));
