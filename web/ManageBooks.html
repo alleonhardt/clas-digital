@@ -355,12 +355,12 @@ function ShowFile(x)
 				{
 					lsafter.dataset.factor = parseInt(x.dataset.factor)+1;
 					lsafter.dataset.isdir = "true";
-					lsafter.innerHTML = "<img style='width:2rem;height:2rem;margin-right:1rem;' src='/folder.svg'></img>";
+					lsafter.innerHTML = "<img style='width:1.5rem;height:1.5rem;margin-right:1rem;' src='/folder.svg'></img>";
 				}
 				else
 				{
 					lsafter.dataset.isdir = "false";
-					lsafter.innerHTML = "<img style='width:2rem;height:2rem;margin-right:1rem;' src='/file.svg'></img>";
+					lsafter.innerHTML = "<img style='width:1.5rem;height:1.5rem;margin-right:1rem;' src='/file.svg'></img>";
 				}
 				lsafter.innerHTML += jsObj[i].name;
 				
@@ -434,11 +434,11 @@ function slideOut(i,lstEnt)
 			let f ="<li onclick='ShowFile(this);' data-key='"+allBooksJS[i].key+"' data-name='"+xs[x].name+"'";
 			if(xs[x].is_dir)
 			{
-				f+=" data-factor='1' data-isdir='true'><img style='width:2rem;height:2rem;margin-right:1rem;' src='/folder.svg'></img>";
+				f+=" data-factor='1' data-isdir='true'><img style='width:1.5rem;height:1.5rem;margin-right:1rem;' src='/folder.svg'></img>";
 			}
 			else
 			{
-				f+=" data-isdir='false'><img style='width:2rem;height:2rem;margin-right:1rem;' src='/file.svg'></img>";
+				f+=" data-isdir='false'><img style='width:1.5rem;height:1.5rem;margin-right:1rem;' src='/file.svg'></img>";
 			}
 
 			f+=xs[x].name;
