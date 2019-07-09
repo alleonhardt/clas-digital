@@ -435,7 +435,8 @@ function GetOCRTxt() {
 			      //content = content.replace(new RegExp(parsedUrlParams['query'],'g'), '<mark>'+parsedUrlParams['query']+'</mark>');
 
 			      UpdateOCRTxt(content);
-				  ShowOCR(undefined);
+				  if(document.getElementById("InfoScreen").style.display == "none")
+							{	ShowOCR(undefined); }
 			      //doc.classList.add("ocrstyle");
 
 			      //doc2.appendChild(doc);
@@ -518,7 +519,7 @@ function ShowOCR(a) {
 		a.style.color = "green";
 	}
 	document.getElementsByClassName("pageContainer")[0].style["grid-template-columns"] = "60% 0% 40%";
-		document.getElementById("InfoScreen").style.display = "none";
+	document.getElementById("InfoScreen").style.display = "none";
     HighlightButton(document.getElementById("ShowOCRButton"));
 	console.log("Try to scroll!");
 	if(a===undefined)
