@@ -149,6 +149,9 @@ void GetBookRessource::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 		//If book and res is zero the client wants to get a list of all books on the server
 		if(book==""&&res=="")
 		{
+			if(!User::AccessCheck(_user,AccessRights::USR_WRITE|AccessRights::USR_READ))	
+				return SendAccessDenied(downstream_);
+
 			auto &mapBooks = GetSearchHandler::GetBookManager().getMapOfBooks();
 			nlohmann::json ret;
 			for(auto &it : mapBooks)
@@ -168,6 +171,9 @@ void GetBookRessource::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 		}
 		else if(book!=""&&res=="") //Returns a list of all files in a specific book
 		{
+			if(!User::AccessCheck(_user,AccessRights::USR_WRITE|AccessRights::USR_READ))	
+				return SendAccessDenied(downstream_);
+
 			//Construct the path to the book we want to have informations about
 			std::string path = "web/books/";
 			path+=book;
@@ -193,6 +199,7 @@ void GetBookRessource::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 			path+="/";
 			path+=res;
 
+
 			if(headers->getDecodedQueryParam("exist_check")!="")
 			{
 				if(fs::exists(path))
@@ -208,6 +215,10 @@ void GetBookRessource::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 					return SendErrorNotFound(downstream_);
 				}
 			}
+			if(!GetSearchHandler::GetBookManager().getMapOfBooks().at(book).getPublic()&&(!User::AccessCheck(_user,AccessRights::USR_READ)))
+				return SendAccessDenied(downstream_);
+
+			
 			std::thread([mypath=std::move(path),this,evb=folly::EventBaseManager::get()->getEventBase()]{
 
 					bool onerror = false;
@@ -328,6 +339,9 @@ void GetSearchInBookHandler::onRequest(std::unique_ptr<proxygen::HTTPMessage> he
 			throw 0;
 		auto &mapofbooks = GetSearchHandler::GetBookManager().getMapOfBooks();
 		auto &book = mapofbooks.at(inBook);
+		if(!book.getPublic()&&(!User::AccessCheck(_user,AccessRights::USR_READ))
+)
+			return SendAccessDenied(downstream_);
 		alx::cout.write(alx::console::green_black,"New search request! Searching for: ",searchFor,"\n");
 
 
@@ -638,6 +652,7 @@ void StartSearch::start(long long id, folly::EventBase *evb)
 	{
 		nlohmann::json entry;
 		entry["scanId"] = it->getKey();
+		entry["copyright"] = !it->getPublic();
 		entry["hasocr"] = it->getOcr();
 		entry["description"] = it->getMetadata().getShow();
 		js["books"].push_back(std::move(entry));

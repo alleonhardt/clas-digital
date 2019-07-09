@@ -300,6 +300,18 @@ function ShowCurrentPage(new_page)
 	return;
 }
 
+function DeleteThisNode(x)
+{
+	if(x.special_unpacked_nodes != undefined)
+	{
+		for(let i = 0; i < x.special_unpacked_nodes.length; i++)
+		{
+			DeleteThisNode(x.special_unpacked_nodes[i]);
+		}
+	}
+	x.parentNode.removeChild(x);
+}
+
 function ShowFile(x)
 {
 	document.getElementById("HoldAll").style["grid-template-columns"] = "30% 70%";
@@ -320,28 +332,50 @@ function ShowFile(x)
 		
 	 	if(x.dataset.isdir=="true")
 		{
+			if(x.is_unpacked)
+			{
+				for(let i = 0; i < x.special_unpacked_nodes.length; i++)
+				{
+					DeleteThisNode(x.special_unpacked_nodes[i]);
+				}
+				x.is_unpacked = false;
+				x.special_unpacked_nodes = undefined;
+				return;
+			}
+
+			x.is_unpacked = true;
 			let jsObj = JSON.parse(xhr.responseText);
-			jsObj.sort(function(a,b){a.name<b.name});
+			jsObj.sort(function(a,b){a.name>b.name});
 			for(let i = 0; i < jsObj.length; i++)
 			{
 				let lsafter = document.createElement("li");
-				lsafter.innerHTML = jsObj[i].name;
 				lsafter.style["margin-left"] = "calc(1rem * "+x.dataset.factor+")";
 				lsafter.dataset.name = x.dataset.name+"/"+jsObj[i].name;
 				if(jsObj[i].is_dir)
 				{
 					lsafter.dataset.factor = parseInt(x.dataset.factor)+1;
 					lsafter.dataset.isdir = "true";
+					lsafter.innerHTML = "<img style='width:2rem;height:2rem;margin-right:1rem;' src='/folder.svg'></img>";
 				}
 				else
 				{
 					lsafter.dataset.isdir = "false";
+					lsafter.innerHTML = "<img style='width:2rem;height:2rem;margin-right:1rem;' src='/file.svg'></img>";
+				}
+				lsafter.innerHTML += jsObj[i].name;
+				
+				if(!jsObj[i].is_dir)
+				{
 					lsafter.innerHTML+="<a style='float:right;' href='/getBookRessources?book="+x.dataset.key+"&ressource="+lsafter.dataset.name+"' download='"+jsObj[i].name+"'>Download</a>";
 				}
 				
 				lsafter.dataset.key = x.dataset.key;
 				lsafter.onclick = function(){ShowFile(this);}.bind(lsafter);
 				x.after(lsafter);
+				if(x.special_unpacked_nodes==undefined)
+					x.special_unpacked_nodes = [lsafter];
+				else
+					x.special_unpacked_nodes.push(lsafter);
 			}
 			return;
 	 	}
@@ -400,11 +434,11 @@ function slideOut(i,lstEnt)
 			let f ="<li onclick='ShowFile(this);' data-key='"+allBooksJS[i].key+"' data-name='"+xs[x].name+"'";
 			if(xs[x].is_dir)
 			{
-				f+=" data-factor='1' data-isdir='true'>";
+				f+=" data-factor='1' data-isdir='true'><img style='width:2rem;height:2rem;margin-right:1rem;' src='/folder.svg'></img>";
 			}
 			else
 			{
-				f+=" data-isdir='false'>";
+				f+=" data-isdir='false'><img style='width:2rem;height:2rem;margin-right:1rem;' src='/file.svg'></img>";
 			}
 
 			f+=xs[x].name;
