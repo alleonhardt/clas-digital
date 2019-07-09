@@ -231,6 +231,8 @@ padding: .4em .4em .4em 2em;
 
 #realHeader a input {
 	margin-top: 0.5rem;
+	margin-right: 1rem;
+	margin-left: 0.5rem;
 	display: inline-block;
 }
 #realHeader a span {
@@ -242,9 +244,28 @@ padding: .4em .4em .4em 2em;
 }
 
 #realHeader a{
+	padding: 0;
+	margin: 0;
 	background: #9a9a9a;
+	font-size: large;
+	color: white;
 	transform: scale(1.08);
 }
+
+#realHeader a strong {
+	margin-left: 30%;
+}
+
+#realHeader a img {
+	height: 100%;
+	display:inline-block;
+	width: 2rem;
+}
+#realHeader a img:hover {
+	background-color: #c66900;
+	transition: all 0.4s ease;
+}
+
 
 .list-type2 a:before{
 	position: absolute;
@@ -475,24 +496,27 @@ function ApplyFilterOptions()
 	filterOpts["ShowOnlyTextsWithOCR"] = document.getElementById("ShowOnlyTextsWithOCR").checked;
 	let x = filterOpts["ShowOnlyTextsWithOCR"];
 
-	let numMatches = 0;
+	let newjson = {};
+	newjson.show_from = 0;
+	
 	for(var i = 0; i < jsonObj.books.length; i++)
 	{
-		let xentry = document.getElementById(jsonObj.books[i].scanId);
-		console.log(jsonObj.books[i].scanId);
 		if(x && (!jsonObj.books[i].hasocr||(jsonObj.books[i].hasocr == undefined)))
 		{
-			xentry.style.display = "None";
 		}
 		else
 		{
-			xentry.style.display = "";
-			numMatches++;
+			if(newjson.books==undefined)
+				newjson.books = [jsonObj.books[i]];
+			else
+				newjson.books.push(jsonObj.books[i]);
 		}
 	}
-
-		document.getElementById("ResultBanner").innerHTML = "<h1 class='headerStyle'>Search Results for: \""+lastInput+"\", "+numMatches+" matches<a class='citationButton' onclick='OpenFilter();return true;'>Filter results</a><a class='buttontwo citationButton' style='margin-left: 1rem' onclick='CreateBibliography();return true;'>Create Bibliography</a></h1>";
-
+	
+	newjson.show_to = Math.min(25,newjson.books.length);
+	let obj = document.getElementById("SearchHitList");
+	obj.drawablejson = newjson;
+	ShowSelectedValues(obj);
 }
 
 function OpenFilter()
@@ -546,6 +570,118 @@ function UpdateProgress(sid)
 			window.setTimeout(function(){UpdateProgress(sid);},1000);
 		}
 		progHandler.send(null);
+}
+
+function ShowSelectedValues(obj)
+{
+	let json = obj.drawablejson;
+	obj.innerHTML = "<li id='realHeader'><a><strong>Show result from "+json.show_from+"-"+json.show_to+"</strong><input type='checkbox' onclick='SelectAll(this.checked);return true;' unchecked> <span>Select all results</span></a></li>";
+	//json.show_from = 0;
+	//json.show_to = Math.min(25,json.books.length);
+	obj.start = json.show_from;
+
+	for(var i = json.show_from; i < json.show_to; i++)
+	{
+			let newList = document.createElement("li");
+			newList.id = json.books[i].scanId;
+			let inner = "";
+			if(!json.books[i].hasocr || (json.books[i].hasocr == undefined))
+			{
+
+				inner = "<a data-specialhref='/ShowMetadata";
+			}
+			else
+			{
+				inner = "<a data-specialhref='/GetBooks";
+			}
+			inner+= "?query="+lastInput;
+			inner+="&scanId="+json.books[i].scanId;
+			inner+="&fuzzyness="+document.getElementById("FuzzyID").value; 
+			inner+="' onclick='return changeColor(this);'>";
+			if(!json.books[i].hasocr || (json.books[i].hasocr == undefined))
+			{
+				inner+="<img src='/scan.svg' class='hiddenContent' alt='scan' title='Buch besitzt einen Scan'>";
+			}
+			else
+			{
+				inner+="<img src='/scan.svg' alt='scan' title='Buch besitzt einen Scan'>";
+			}
+		
+			if(json.books[i].copyright)
+			{
+				inner+="<img src='/copyright.svg' alt='copyright' title='Buch ist copyright geschuetzt'>";
+			}
+			else
+			{
+				inner+="<img src='/copyright.svg' class='hiddenContent' alt='copyright' title='Buch ist copyright geschuetzt'>";
+			}
+
+			inner+=json.books[i].description+"   "+"<input onclick='this.was_clicked=1;return true;' class='booklistinp' data-scanid='"+json.books[i].scanId+"' type='checkbox' unchecked></a>"; 
+			newList.innerHTML = inner;
+			//Show the new link in the search hit list
+			obj.appendChild(newList);
+	}
+	
+	let val = "<li id='realHeader'><a>"
+	if(json.show_from>0)
+	{
+		val+="<img style='float:left;margin-left:0;padding-left:0;cursor:pointer;' onclick='SelectNextSlice(false);return true;' src='/next.svg'>";
+	}
+	
+										
+	val+="<strong>Show result from "+json.show_from+"-"+json.show_to;
+	if(json.show_from>0||json.show_to<json.books.length)
+	{
+		val+="<img style='cursor:pointer;float:none;margin-left:0.5rem' onclick='SelectAllSlice();' src='/down.svg'>";
+	}
+	else if(json.show_from==0&&json.show_to==json.books.length&&json.books.length>25)
+	{
+		val+="<img style='cursor:pointer;float:none;margin-left:0.5rem' onclick='SelectSmallSlice();' src='/up.svg'>";
+	}
+	val+="</strong>";
+	
+	if(json.show_to<json.books.length)
+	{
+		val+="<img src='/last.svg' onclick='SelectNextSlice(true);return true;' style='float:right;cursor:pointer;'>";
+	}
+	
+	val+="</a></li>";
+	obj.innerHTML+=val;
+
+}
+
+function SelectSmallSlice()
+{
+	let obj = document.getElementById("SearchHitList");
+	obj.drawablejson.show_from = 0;
+	obj.drawablejson.show_to = Math.min(obj.drawablejson.books.length,25);
+	ShowSelectedValues(document.getElementById("SearchHitList"));
+
+}
+
+function SelectAllSlice()
+{
+	let obj = document.getElementById("SearchHitList");
+	obj.drawablejson.show_from = 0;
+	obj.drawablejson.show_to = obj.drawablejson.books.length;
+	ShowSelectedValues(document.getElementById("SearchHitList"));
+}
+
+function SelectNextSlice(up)
+{
+	let obj = document.getElementById("SearchHitList");
+	if(up)
+	{
+		obj.drawablejson.show_from = Math.min(obj.drawablejson.show_from+25,obj.drawablejson.books.length-1);
+		obj.drawablejson.show_to=Math.min(obj.drawablejson.show_from+25,obj.drawablejson.books.length);
+		ShowSelectedValues(document.getElementById("SearchHitList"));
+	}
+	else
+	{
+		obj.drawablejson.show_from = Math.max(obj.drawablejson.show_from-25,0);
+		obj.drawablejson.show_to=Math.min(obj.drawablejson.show_from+25,obj.drawablejson.books.length);
+		ShowSelectedValues(document.getElementById("SearchHitList"));
+	}
 }
 
 
@@ -641,53 +777,10 @@ function sendToPage(name)
 
 		document.getElementById("ResultBanner").innerHTML = "<h1 class='headerStyle'>Search Results for: \""+document.getElementById("SpecialSID").value+"\", "+jsonObj.books.length+" matches<a class='citationButton' onclick='OpenFilter();return true;'>Filter results</a><a class='buttontwo citationButton' style='margin-left: 1rem' onclick='CreateBibliography();return true;'>Create Bibliography</a></h1>";
 
-	let header = document.createElement("li");
-	header.id = "realHeader";
-										 header.innerHTML = "<a>-<input type='checkbox' onclick='SelectAll(this.checked);return true;' unchecked> <span>Select all results</span></a>";
-	obj.appendChild(header);
-
-	for(var i = 0; i < jsonObj.books.length; i++)
-	{
-			let newList = document.createElement("li");
-			newList.id = jsonObj.books[i].scanId;
-			let inner = "";
-			if(!jsonObj.books[i].hasocr || (jsonObj.books[i].hasocr == undefined))
-			{
-
-				inner = "<a data-specialhref='/ShowMetadata";
-			}
-			else
-			{
-				inner = "<a data-specialhref='/GetBooks";
-			}
-			inner+= "?query="+lastInput;
-			inner+="&scanId="+jsonObj.books[i].scanId;
-			inner+="&fuzzyness="+document.getElementById("FuzzyID").value; 
-			inner+="' onclick='return changeColor(this);'>";
-			if(!jsonObj.books[i].hasocr || (jsonObj.books[i].hasocr == undefined))
-			{
-				inner+="<img src='/scan.svg' class='hiddenContent' alt='scan' title='Buch besitzt einen Scan'>";
-			}
-			else
-			{
-				inner+="<img src='/scan.svg' alt='scan' title='Buch besitzt einen Scan'>";
-			}
-		
-			if(jsonObj.books[i].copyright)
-			{
-				inner+="<img src='/copyright.svg' alt='copyright' title='Buch ist copyright geschuetzt'>";
-			}
-			else
-			{
-				inner+="<img src='/copyright.svg' class='hiddenContent' alt='copyright' title='Buch ist copyright geschuetzt'>";
-			}
-
-			inner+=jsonObj.books[i].description+"   "+"<input onclick='this.was_clicked=1;return true;' class='booklistinp' data-scanid='"+jsonObj.books[i].scanId+"' type='checkbox' unchecked></a>"; 
-			newList.innerHTML = inner;
-			//Show the new link in the search hit list
-			obj.appendChild(newList);
-	}
-
+		jsonObj.show_from = 0;
+		jsonObj.show_to = Math.min(25,jsonObj.books.length);
+		obj.drawablejson = jsonObj;
+		ShowSelectedValues(obj);
 	}
 	realSearch.send();
 	UpdateProgress(jsSearchId.searchid);

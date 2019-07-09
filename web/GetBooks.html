@@ -532,11 +532,11 @@ function ShowOCR(a) {
 	}
 	if(parseInt(a.innerHTML)==1)
 	{
-	document.getElementById("olol").scrollTop = 0;
+		document.getElementById("olol").scrollTop = 0;
 	}
 	else
 	{
-	document.getElementById("olol").scrollTop += document.getElementsByClassName("ocrpage")[parseInt(a.innerHTML)-2].getBoundingClientRect().bottom-16;
+		document.getElementsByClassName("ocrpage")[parseInt(a.innerHTML)-1].scrollIntoView();
 	}
 	document.getElementsByClassName("ocrpage")[parseInt(a.innerHTML)-1].innerHTML = pageVal[parseInt(a.innerHTML)-1];
 	loadExcept(parseInt(a.innerHTML)-1);
