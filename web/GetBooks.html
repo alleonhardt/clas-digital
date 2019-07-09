@@ -588,7 +588,7 @@ function init() {
 			location.hash = location.hash;
 		updateAfterScroll();
 	}, function() {
-		// print some error message here
+		document.body.innerHTML = "<center><h1>Access denied!</h1></center>";
 	});
 
 	document.getElementsByClassName("reader")[0].addEventListener("scroll", updateAfterScroll, false);
