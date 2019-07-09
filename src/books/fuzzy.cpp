@@ -97,7 +97,7 @@ bool fuzzy_cmp(std::string sWord1, std::string sWord2)
 
     //Calculate score
     double score = static_cast<double>(ldIterative)/ std::max(sWord1.length(), sWord2.length());
-    double fuzzyness = 0.25;
+    double fuzzyness = 0.2;
 
     //Check whether score is lower than given fuzzyness)
     if(score < fuzzyness && score >= 0)
