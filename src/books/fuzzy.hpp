@@ -37,6 +37,8 @@ namespace fuzzy
     * @return bool 
     */
     bool fuzzy_cmp(std::string sWord1, std::string sWord2, double& ld);
+
+    bool containsUmlaut(std::string& str);
 }
 
 #ifdef __DEFINE_ONE__
