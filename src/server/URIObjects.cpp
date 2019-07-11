@@ -599,8 +599,21 @@ void UploadBookHandler::onEOM() noexcept
 				stbi_info(_finalPath.c_str(),&width,&height,&z);
 				entry["width"] = width;
 				entry["height"] = height;
+				bool replace = false;
+				for(auto &iter : file_desc["pages"])
+				{
+					if(iter["pageNumber"]==entry["pageNumber"])
+					{
+						iter["width"] = width;
+						iter["height"] = height;
+						iter["file"] = filename;
+						replace=true;
+						break;
+					}
+				}
 				file_desc["maxPageNum"] = maxPageNum;
-				file_desc["pages"].push_back(std::move(entry));
+				if(!replace)
+					file_desc["pages"].push_back(std::move(entry));
 
 				std::ofstream writer(pa.c_str(),std::ios::out);
 				writer<<file_desc;

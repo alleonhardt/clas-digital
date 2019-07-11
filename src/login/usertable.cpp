@@ -20,6 +20,28 @@ UserHandler::UserHandler(std::string filePath)
 		}
 }
 
+#include <openssl/sha.h>
+
+std::string simpleSHA512(const char* input, unsigned long length)
+{
+	std::string ret;
+	
+	unsigned char md[SHA512_DIGEST_LENGTH+1];
+	md[SHA512_DIGEST_LENGTH] = '0';
+
+    SHA512_CTX context;
+    if(!SHA512_Init(&context))
+        return std::move(ret);
+
+    if(!SHA512_Update(&context, (unsigned char*)input, length))
+        return std::move(ret);
+
+    if(!SHA512_Final(md, &context))
+        return std::move(ret);
+
+    return std::move(ret);
+}
+
 bool UserHandler::AddUser(std::string email, std::string password, int access)
 {
 	//Create a unique lock because the map is going to be modified critical section from here on

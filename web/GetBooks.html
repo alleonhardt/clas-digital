@@ -441,7 +441,7 @@ function GetOCRTxt() {
 							},function(content){
 								let Index = window.location.href.indexOf("scanId=");
 								let value = window.location.href.substr(Index+7);
-								window.location.href = "/getBookMetadata?scanId="+value;
+								document.body.innerHTML = "<center><h1>Access denied!</h1></center>";
 							});
 							});
 }
