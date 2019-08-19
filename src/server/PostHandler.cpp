@@ -42,7 +42,7 @@ void PostHandler::onBody(std::unique_ptr<folly::IOBuf> body) noexcept
 			sessid+=UserHandler::GetUserTable().DoLogin(msg.getDecodedQueryParam("email"),msg.getDecodedQueryParam("password"));
 			if(sessid=="SESSID=")
 				throw 0;
-			sessid+="; SECURE";
+			sessid+=";";
 			URIFile file("web/index.html");
 
 			auto _user = UserHandler::GetUserTable().GetUserByName(msg.getDecodedQueryParam("email"));

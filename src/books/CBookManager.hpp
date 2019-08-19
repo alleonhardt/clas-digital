@@ -71,6 +71,15 @@ public:
     std::list<CBook*>* convertToList(std::map<std::string, CBook*>* mapBooks, std::map<std::string, double>& matches);
 
     /**
+    * @brief sort list of found books by number of matches in each book
+    * @param[in] listSR (list of search results)
+    * @param[in] sInput (input string of user)
+    * @param[in] fuzzyness (set fuzzyness)
+    * @return sorted list of search results
+    */
+    std::list<CBook*>* sortByMatches(std::list<CBook*>* listSR, std::string sInput, int fuzzyness);
+
+    /**
     * @brief Convert to list, without sortig (only, when normal search is selected) 
     * @param[in] mapBooks map of books that have been found to contains the searched word
     * @return list of searchresults

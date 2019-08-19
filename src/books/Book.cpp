@@ -358,3 +358,53 @@ void CBook::removePages(std::map<int, std::vector<std::string>>* results1, std::
             it->second.insert(it->second.end(), (*results2)[it->first].begin(), (*results2)[it->first].end());
     }
 }
+
+/*
+bool samePage(std::string sInput, int fuzzyness)
+{
+    std::vector<std::string> vWords;
+    func::convertToLower(sInput);
+    func::split(sInput, "+", vWords);
+
+    if(fuzzyness == 0)
+        return samePagesFull(vWords);
+    else if(fuzzyness == 1)
+        return samePagesContains(vWords);
+    else
+        return samePagesFuzzy(vWords);
+}
+*/
+
+/*
+bool samePagesFull(std::vector<std::string>& vWords)
+{
+    //Create empty list of pages
+    std::map<int, std::vector<std::string>>* mapPages = new std::map<int, std::vector<std::string>>;
+
+    //Load map of Words 
+    std::map<std::string, std::vector<size_t>> mapWordsPages;
+    loadPages(mapWordsPages);
+
+    for(auto page : mapWordsPages[vWords[0]])
+        (*mapPages)[page] = {};
+
+    bool samePage = false;
+    for(size_t i=1; i<vWords.size(); i++)
+    {
+        for(auto page : mapWordsPages[vWords[i]]) {
+            if(mapPages->count(page->first)>0 || mapPages->count(page->first+1)>0 || mapPages->count(page->first-1)>0)
+             {
+                samePage = true;
+                continue;
+             }
+         }
+         if(i==sWord.size()-1 && samePage == false)
+            return false;
+    }
+
+    return samePage;
+}
+*/
+
+
+

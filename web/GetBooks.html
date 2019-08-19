@@ -614,6 +614,8 @@ function init() {
 		// temporary needed
 		searchResults.pages = searchResults.books;
 
+        if(searchResults.pages != undefined)
+        {
 		document.getElementById("searchQuery").innerHTML = parsedUrlParams["query"];
 		
 		if(searchResults.is_fuzzy === false)
@@ -653,6 +655,7 @@ function init() {
 		      HighlightList.push(searchResults.pages[i].word.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&'));
 		  }
 		}
+        }
 		GetOCRTxt();
 	}, function() {
 		// print some error message here

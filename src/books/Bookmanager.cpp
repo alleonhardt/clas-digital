@@ -175,6 +175,28 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
 }
 
 /**
+* @brief sort list of found books by number of matches in each book
+* @param[in] listSR (list of search results)
+* @param[in] sInput (input string of user)
+* @param[in] fuzzyness (set fuzzyness)
+* @return sorted list of search results
+*/
+std::list<CBook*>* CBookManager::sortByMatches(std::list<CBook*>* listSR, std::string sInput, int fuzzy)
+{
+    std::map<std::string, CBook*>* mapSR = new std::map<std::string, CBook*>;
+    std::map<std::string, double> matches;
+
+    for(auto it=listSR->begin(); it!=listSR->end(); it++) {
+        mapSR->insert(std::pair<std::string, CBook*> ((*it)->getKey(), (*it)));
+        double numMatches = (*it)->getPages(sInput, fuzzy)->size();
+        matches[(*it)->getKey()] = numMatches*(-1);
+    }
+    
+    return convertToList(mapSR, matches);
+}
+
+
+/**
 * @brief convert to list and sort list
 * @param[in] mapBooks map of books that have been found to contains the searched word
 * @param[in, out] matches Map of books and there match with the searched word
