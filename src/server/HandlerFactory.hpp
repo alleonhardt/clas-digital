@@ -105,9 +105,9 @@ class HandlerFactory : public RequestHandlerFactory {
 			try
 			{
 				//Redirect every http request to the https site
-				//if(hdr->getDstPort() == "1408")
-//					ret = new RedirectToHTTPSHandler;
-//				else
+            if(hdr->getDstPort() == "1408")
+					ret = new RedirectToHTTPSHandler;
+				else
 				//Try to get the right request handler if the path is unknown the function will throw an error
 					ret = (*mp.at(hdr->getPath()))();
 			}
