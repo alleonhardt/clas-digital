@@ -143,7 +143,7 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
             }
 
             //Erase element if it does not occure on the same page
-            else if(it->second->getOcr() == true && it->second->getPages(search->getSearchedWord(), search->getFuzzyness())->size() == 0)
+            else if(it->second->getOcr() == true && it->second->getNumMatches(search->getSearchedWord(), search->getFuzzyness()) == 0)
             {
                 //Erase match and searchresult
                 matches.erase(it->first);
@@ -173,6 +173,28 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
     else
         return convertToList(results1, matches);
 }
+
+/**
+* @brief sort list of found books by number of matches in each book
+* @param[in] listSR (list of search results)
+* @param[in] sInput (input string of user)
+* @param[in] fuzzyness (set fuzzyness)
+* @return sorted list of search results
+*/
+std::list<CBook*>* CBookManager::sortByMatches(std::list<CBook*>* listSR, std::string sInput, int fuzzy)
+{
+    std::map<std::string, CBook*>* mapSR = new std::map<std::string, CBook*>;
+    std::map<std::string, double> matches;
+
+    for(auto it=listSR->begin(); it!=listSR->end(); it++) {
+        mapSR->insert(std::pair<std::string, CBook*> ((*it)->getKey(), (*it)));
+        double numMatches = (*it)->getNumMatches(sInput, fuzzy);
+        matches[(*it)->getKey()] = numMatches*(-1);
+    }
+    
+    return convertToList(mapSR, matches);
+}
+
 
 /**
 * @brief convert to list and sort list

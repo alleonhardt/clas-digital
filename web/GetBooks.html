@@ -612,6 +612,8 @@ function init() {
 		// temporary needed
 		searchResults.pages = searchResults.books;
 
+        if(searchResults.pages != undefined)
+        {
 		document.getElementById("searchQuery").innerHTML = parsedUrlParams["query"];
 		document.getElementById("linkList").innerHTML = "Loading ocr file...";
 
@@ -659,10 +661,15 @@ function init() {
 			pageVal[searchResults.pages[i].page-1]=pageVal[searchResults.pages[i].page-1].replace(new RegExp('(\\b'+searchResults.pages[i].word.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')+'\\b)','gi'),'<mark>$1</mark>');
 		  }
 		}
+<<<<<<< HEAD
+        }
+		GetOCRTxt();
+=======
 
     	document.getElementById("ShowOCRButton").disabled = false;
 		document.getElementById("ShowOCRButton").classList.add("butX");
 	});
+>>>>>>> 46a24a16ef3db397c3df512e27b6adf466725553
 	}, function() {
 		// print some error message here
 //  for(let i = 0; i < HighlightList.length; i++)

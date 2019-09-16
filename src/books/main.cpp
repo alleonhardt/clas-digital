@@ -37,20 +37,23 @@ int main()
         int fuzzy = std::stoi(sFuzzy);
 
         
-        CSearchOptions* searchOpts = new CSearchOptions(sInput, fuzzy, {"RFWJC42V", "XCFFDRQC", "RBB8DW5B"}, false, false, "", 0 , 2019, 1);
+        CSearchOptions* searchOpts = new CSearchOptions(sInput, fuzzy, {"RFWJC42V", "XCFFDRQC", "RBB8DW5B", "WIXP3DS3"}, false, false, "", 0 , 2019, 1);
         CSearch* search = new CSearch(searchOpts, 0);
         manager.addSearch(search);
 
         alx::cout.write ("Searching for ", sInput, "... \n");
 
-        std::list<CBook*>* searchResults = manager.search(0);
+        std::list<CBook*>* searchResults = manager.sortByMatches(manager.search(0), sInput, fuzzy);
         unsigned int counter = 0;
         for(auto it=searchResults->begin(); it!=searchResults->end(); it++)
         {
             alx::cout.write (alx::console::green_black, (*it)->getKey(), ": ", (*it)->getMetadata().getShow(), "\n");
 
+            //alx::cout.write("num results: ", (*it)->getNumMatches(sInput, fuzzy), "\n");
+
+            // *** Print Pages *** //
             alx::cout.write(alx::console::yellow_black, "Pages: ");
-            //Pages for contains search
+
             std::map<int, std::vector<std::string>>* mapPages = (*it)->getPages(sInput, fuzzy);
             for(auto jt=mapPages->begin(); jt!=mapPages->end(); jt++)
             {
@@ -73,6 +76,7 @@ int main()
             //Delete results
             delete mapPages;
             alx::cout.write ("\b\b\n");
+
 
             counter++;
         }
