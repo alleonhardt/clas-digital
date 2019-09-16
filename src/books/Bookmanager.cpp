@@ -143,7 +143,7 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
             }
 
             //Erase element if it does not occure on the same page
-            else if(it->second->getOcr() == true && it->second->getPages(search->getSearchedWord(), search->getFuzzyness())->size() == 0)
+            else if(it->second->getOcr() == true && it->second->getNumMatches(search->getSearchedWord(), search->getFuzzyness()) == 0)
             {
                 //Erase match and searchresult
                 matches.erase(it->first);
@@ -188,7 +188,7 @@ std::list<CBook*>* CBookManager::sortByMatches(std::list<CBook*>* listSR, std::s
 
     for(auto it=listSR->begin(); it!=listSR->end(); it++) {
         mapSR->insert(std::pair<std::string, CBook*> ((*it)->getKey(), (*it)));
-        double numMatches = (*it)->getPages(sInput, fuzzy)->size();
+        double numMatches = (*it)->getNumMatches(sInput, fuzzy);
         matches[(*it)->getKey()] = numMatches*(-1);
     }
     

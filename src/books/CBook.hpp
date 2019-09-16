@@ -116,25 +116,13 @@ public:
     */
     std::map<int, std::vector<std::string>>* getPages(std::string sInput, int fuzzyness);
 
-    /*
-    * @param[in] sWord searched word
-    * @return list of pages on which searched word accures
-    */
-    std::map<int, std::vector<std::string>>* getPagesFull(std::vector<std::string>& vWords);
+    std::map<int, std::vector<std::string>>* getPages(std::vector<std::string>& vWords, std::map<int, std::vector<std::string>>* (CBook::*find)(std::string, std::map<std::string, std::vector<size_t>>&));
 
     /**
-    * @brief return map of all pages + words found on page (Contains).
-    * @param[in] sWord searched word.
-    * @return map of pages with vector of words found on this page.
+    * @brief Create map of pages and found words for i-word (full-search).
+    * @return map of all pages on which word was found.
     */
-    std::map<int, std::vector<std::string>>* getPagesContains(std::vector<std::string>& vWords);
-
-    /**
-    * @brief return map of all pages + words found on page (fuzzy).
-    * @param[in] sWord searched word
-    * @return map of pages with vector of words found on this page
-    */
-    std::map<int, std::vector<std::string>>* getPagesFuzzy(std::vector<std::string>& vWords);
+    std::map<int, std::vector<std::string>>* findPagesFull(std::string sWord, std::map<std::string, std::vector<size_t>>& mapWordsPages);
 
     /**
     * @brief Create map of pages and found words for i-word (Contains).
@@ -152,5 +140,20 @@ public:
     * @brief Remove all elements from mapPages, which do not exist in results2. 
     */
     void removePages(std::map<int, std::vector<std::string>>* mapPages, std::map<int, std::vector<std::string>>* results2);
+
+    /**
+    * @brief Remove all elements from mapPages, which do not exist in results2. 
+    * @param[in, out] results1
+    * @param[in] results2
+    * @return map of pages and words found on this page
+    */
+    void removePages2(std::map<int, std::vector<std::string>>* r1, std::map<int, std::vector<std::string>>* r2);
+    
+    /**
+    * @brief getNumMatches returns number of matches of this book
+    */
+    int getNumMatches(std::string sInput, int fuzzyness);
+
+    int getNumMatches (std::vector<std::string>& vWords, std::map<int, std::vector<std::string>>* (CBook::*find)(std::string, std::map<std::string, std::vector<size_t>>&));
 
 };

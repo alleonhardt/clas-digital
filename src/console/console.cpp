@@ -188,8 +188,8 @@ namespace alx
 				wmove(_cmd,y,x-1);
 				wdelch(_cmd);
 			}
-			else if(ch>255)
-				continue;
+			//else if(ch>255)
+			//	continue;
 			else 
 			{
 				waddch(_cmd,ch);
