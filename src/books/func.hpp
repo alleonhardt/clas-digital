@@ -52,6 +52,8 @@ namespace func
     */
     bool compare(std::string str1, std::string str2);
 
+    bool containsBegin(const char* chT1, const char* chT2);
+
     /**
     * @brief expects words to be non-capital letters
     * @param[in] chT1 first string

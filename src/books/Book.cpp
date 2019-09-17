@@ -363,3 +363,75 @@ int CBook::getNumMatches (std::vector<std::string>& vWords, std::map<int, std::v
 
     return mapPages->size();
 }
+
+std::string CBook::getPreview(std::string sWord, int fuzzyness)
+{
+    //Read ocr
+    std::ifstream read(getOcrPath(), std::ios::in);
+
+    //Check, whether ocr could be loaded
+    if(!read)
+        return "No preview";
+
+    std::string result;
+    std::string resultContains;
+    std::string resultFuzzy;
+    std::string sBuffer;
+    while(!read.eof())
+    {
+        //Read current line
+        getline(read, sBuffer);
+
+        //Check whether ". " was found
+        if(sBuffer.find(". ") != std::string::npos)
+        {
+            result.append(sBuffer.substr(0, sBuffer.find(". ")));
+
+            std::map<std::string, int> mapWords;
+            func::extractWordsFromString(result, mapWords);
+
+            //Full search
+            for(auto it : mapWords) {
+                if(it.first.compare(sWord) == 0)
+                    return result;
+            }
+
+            if(fuzzyness == 0)
+            {
+                result = sBuffer.substr(sBuffer.find(". ")+2);
+                continue;
+            }
+
+            //Contains search
+            if(result.find(sWord) != std::string::npos)
+                resultContains = result;
+
+            if(fuzzyness == 1)
+            {
+                result = sBuffer.substr(sBuffer.find(". ")+2);
+                continue;
+            }
+
+            //Contains search
+            for(auto it : mapWords) {
+                if(fuzzy::fuzzy_cmp(it.first, sWord) == true)
+                    resultFuzzy= result;
+            }
+
+            result = sBuffer.substr(sBuffer.find(". ")+2);
+        }
+        else
+            result.append(sBuffer);
+    }
+
+
+    if(resultContains != "")
+        return resultContains;
+    if(resultFuzzy != "")
+        return resultFuzzy;
+
+    return "No Preview";
+}
+
+
+

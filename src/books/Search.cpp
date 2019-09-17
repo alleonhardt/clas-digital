@@ -3,10 +3,11 @@
 /**
 * @brief constructor
 */
-CSearch::CSearch(CSearchOptions* searchOpts, unsigned long long ID) {
+CSearch::CSearch(CSearchOptions* searchOpts, unsigned long long ID, unsigned int numResults=100000) {
     m_sOpts = searchOpts;
     m_ID = ID;
     m_fProgress = 0.0;
+    m_numResults = numResults;
 }
 
 // *** GETTER *** //
@@ -157,6 +158,8 @@ void CSearch::containsSearch(std::map<std::string, std::map<std::string, CBook*>
     unsigned int counter = 0;
 	unsigned int counter2 = 0;
 
+    alx::cout.write("1-Number results: ", m_numResults, "\n");
+
     for(auto it= mapWords.begin(); it!=mapWords.end(); it++)
     {
         if(it->first.find(m_sWord.c_str())!=std::string::npos)
@@ -175,6 +178,9 @@ void CSearch::containsSearch(std::map<std::string, std::map<std::string, CBook*>
 		}
 		counter2++;
         counter++;
+
+        if(mapSR->size() == m_numResults)
+            break;
     }
 }
 
@@ -186,6 +192,8 @@ void CSearch::containsSearch(std::map<std::string, std::map<std::string, CBook*>
 void CSearch::fuzzySearch(std::map<std::string, std::map<std::string, CBook*>>& mapWords, 
                           std::map<std::string, CBook*>* mapSR, std::map<std::string, double>& matches)
 {
+    alx::cout.write("2-Number results: ", m_numResults, "\n");
+
     unsigned int counter = 0;
 	unsigned int counter2 = 0;
     for(auto it= mapWords.begin(); it!=mapWords.end(); it++)
@@ -217,6 +225,10 @@ void CSearch::fuzzySearch(std::map<std::string, std::map<std::string, CBook*>>& 
 
 		counter2++;
         counter++;
+
+        if(mapSR->size()== m_numResults)
+            break;
+
     }
 }
 

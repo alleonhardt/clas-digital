@@ -176,7 +176,6 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
 
 std::list<std::string>* CBookManager::getSuggestions(std::string sInput)
 {
-
     //Create map of suggestion (key) and probability (value)
     std::map<std::string, double> matches;
 

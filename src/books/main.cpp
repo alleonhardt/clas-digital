@@ -32,30 +32,33 @@ int main()
         if(sInput == "q")
             return 0;
 
-        /*
-        alx::cout.write ("Fuzzyness: ");
+        alx::cout.write ("\nFuzzyness: ");
         std::string sFuzzy = alx::cout.getCommand();
         int fuzzy = std::stoi(sFuzzy);
-        */
+
+        alx::cout.write ("\nnum results: ");
+        std::string sNumResults= alx::cout.getCommand();
+        int numResults = std::stoi(sNumResults);
 
         
-        CSearchOptions* searchOpts = new CSearchOptions(sInput, 0, {"RFWJC42V", "XCFFDRQC", "RBB8DW5B", "WIXP3DS3"}, false, false, "", 0 , 2019, 1);
-        CSearch* search = new CSearch(searchOpts, 0);
+        CSearchOptions* searchOpts = new CSearchOptions(sInput, fuzzy, {"RFWJC42V", "XCFFDRQC", "RBB8DW5B", "WIXP3DS3"}, false, true, "", 0 , 2019, 1);
+        CSearch* search = new CSearch(searchOpts, 0, numResults);
         manager.addSearch(search);
 
+        /*
         alx::cout.write("\n");
         std::list<std::string>* suggestions = manager.getSuggestions(sInput);
         for(auto it = suggestions->begin(); it !=suggestions->end(); it++)
             alx::cout.write((*it), "\n");
+        */
 
-        /*
-        alx::cout.write ("Searching for ", sInput, "... \n");
+        alx::cout.write ("\nSearching for ", sInput, "... \n");
 
         std::list<CBook*>* searchResults = manager.sortByMatches(manager.search(0), sInput, fuzzy);
         unsigned int counter = 0;
         for(auto it=searchResults->begin(); it!=searchResults->end(); it++)
         {
-            alx::cout.write (alx::console::green_black, (*it)->getKey(), ": ", (*it)->getMetadata().getShow(), "\n");
+            alx::cout.write (alx::console::green_black, (*it)->getKey(), ": ", (*it)->getMetadata().getShow(), "\n", alx::console::blue_black, (*it)->getPreview(sInput, fuzzy), "\n");
 
             //alx::cout.write("num results: ", (*it)->getNumMatches(sInput, fuzzy), "\n");
 
@@ -89,8 +92,6 @@ int main()
             counter++;
         }
         alx::cout.write("Results found: ", (int)counter, "\n");
-        */
-
    }
 }
      
