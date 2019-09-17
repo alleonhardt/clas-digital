@@ -32,15 +32,23 @@ int main()
         if(sInput == "q")
             return 0;
 
+        /*
         alx::cout.write ("Fuzzyness: ");
         std::string sFuzzy = alx::cout.getCommand();
         int fuzzy = std::stoi(sFuzzy);
+        */
 
         
-        CSearchOptions* searchOpts = new CSearchOptions(sInput, fuzzy, {"RFWJC42V", "XCFFDRQC", "RBB8DW5B", "WIXP3DS3"}, false, false, "", 0 , 2019, 1);
+        CSearchOptions* searchOpts = new CSearchOptions(sInput, 0, {"RFWJC42V", "XCFFDRQC", "RBB8DW5B", "WIXP3DS3"}, false, false, "", 0 , 2019, 1);
         CSearch* search = new CSearch(searchOpts, 0);
         manager.addSearch(search);
 
+        alx::cout.write("\n");
+        std::list<std::string>* suggestions = manager.getSuggestions(sInput);
+        for(auto it = suggestions->begin(); it !=suggestions->end(); it++)
+            alx::cout.write((*it), "\n");
+
+        /*
         alx::cout.write ("Searching for ", sInput, "... \n");
 
         std::list<CBook*>* searchResults = manager.sortByMatches(manager.search(0), sInput, fuzzy);
@@ -81,6 +89,7 @@ int main()
             counter++;
         }
         alx::cout.write("Results found: ", (int)counter, "\n");
+        */
 
    }
 }

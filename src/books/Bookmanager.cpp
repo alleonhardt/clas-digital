@@ -174,6 +174,56 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
         return convertToList(results1, matches);
 }
 
+std::list<std::string>* CBookManager::getSuggestions(std::string sInput)
+{
+
+    //Create map of suggestion (key) and probability (value)
+    std::map<std::string, double> matches;
+
+    for(auto it : m_mapWords) {
+        if(it.first.find(sInput.c_str())!=std::string::npos)
+            matches[it.first] = it.second.size();
+    }
+
+    for(auto it : m_mapWordsTitle) {
+        if(it.first.find(sInput.c_str())!=std::string::npos)
+            matches[it.first] = it.second.size();
+    }
+
+    //Change identical entrys
+    double counter;
+    for(auto it=matches.begin(); it!= matches.end(); it++) { it->second+=counter; counter+=0.000001; }
+
+    // Declaring the type of Predicate that accepts 2 pairs and return a bool
+	typedef std::function<bool(std::pair<std::string, double>, std::pair<std::string, double>)> Comp;
+ 
+	// Defining a lambda function to compare two pairs. It will compare two pairs using second field
+	Comp compFunctor =
+			[](std::pair<std::string, double> elem1, std::pair<std::string, double> elem2)
+			{
+				return elem1.second > elem2.second;
+			};
+
+	// Declaring a set that will store the pairs using above comparision logic
+	std::set<std::pair<std::string, double>, Comp> sorted(matches.begin(), matches.end(), compFunctor);
+
+    //Convert to list
+    std::list<std::string>* listSuggestions = new std::list<std::string>;
+    counter = 0;
+    for(std::pair<std::string, double> element : sorted) {
+        listSuggestions->push_back(element.first); 
+        if(counter==10)
+            break;
+        counter+=1;
+    }
+
+    return listSuggestions;
+}
+
+    
+
+    
+
 /**
 * @brief sort list of found books by number of matches in each book
 * @param[in] listSR (list of search results)
