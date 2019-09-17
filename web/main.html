@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+        <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0" />
+<style>
+body {
+        background: black;
+        color: white;
+}
+
+.input,.input:focus {
+        position: fixed;
+        left: 0.5rem;
+        color: yellow;
+        top: calc(100% - 2.5rem);
+        overflow: hidden;
+}
+
+.output {
+        position: fixed;
+        left: 0.5rem;
+        top: 0.3rem;
+        height: calc(100% - 4rem);
+        overflow-y: auto;
+        word-break: break-all;
+        width: calc(100% - 0.5rem);
+        font: bold 'Raleway', sans-serif;
+}
+
+hr {
+        width: 100vw;
+        color: red;
+}
+
+.red {
+        color: red;
+}
+
+.white {
+        color: white;
+}
+
+.green {
+        color: green;
+}
+
+.yellow {
+        color: yellow;
+}
+
+.blue {
+        color: blue;
+}
+#input {
+        border: None;
+        color: yellow;
+        background: black;
+        width: 80vw;
+}
+
+</style>
+<script>
+let host = "127.0.0.1";
+if(window.location.hostname!="")
+        host = window.location.hostname;
+let socket = new WebSocket("ws://"+host+":9002");
+
+function bdyonload()
+{
+        document.getElementById("input").addEventListener("keypress",function(event){
+                if(event.key === "Enter")
+                {
+                        let st = document.getElementById("input").value;
+                        let k = st.toLowerCase();
+                        document.getElementById("input").value ="";
+                        socket.send(k);
+                        let val = document.getElementById("output");
+                        val.scrollTop = val.scrollHeight;
+                }
+        });
+        document.getElementById("input").focus();
+        
+        socket.onmessage = function(event){console.log("Received: "+event.data);printString(event.data);};
+}
+
+function isspanret(isspan,colname)
+{
+        if(isspan)
+                return "</span><span class='"+colname+"'>";
+        else
+                return "<span class='"+colname+"'>";
+}
+function printString(theString)
+{
+        let out = "";
+        let isspanopen = false;
+        for(let i = 0; i < theString.length; i++)
+        {
+                if(theString[i] == '\n')
+                        out+="<br class='line'>";
+                else if(theString[i] == '\x01')
+                        out+=isspanret(isspanopen,"white");
+                else if(theString[i] == '\x02')
+                        out+=isspanret(isspanopen,"red");
+                else if(theString[i] == '\x03')
+                        out+=isspanret(isspanopen,"green");
+                else if(theString[i] == '\x04')
+                        out+=isspanret(isspanopen,"yellow");
+                else if(theString[i] == '\x05')
+                        out+=isspanret(isspanopen,"blue");
+                else{
+                        out+=theString[i];
+                }
+                if(theString[i] >= '\x01' && theString[i] <= '\x03')
+                        isspanopen = true;
+
+        }
+        if(isspanopen)
+        {
+                out+="</span>";
+        }
+        document.getElementById("output").innerHTML += out;
+}
+</script>
+</head>
+<body onload="bdyonload();return true;">
+        <strong><p id="output" class="output"></p>
+        <div class="input">
+                <hr>
+                <span>$> <input type="text" id="input" style="display:inline-block" /></span>
+        </div>
+        </strong>
+</body>
