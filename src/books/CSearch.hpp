@@ -18,13 +18,14 @@ private:
     CSearchOptions* m_sOpts;
     float m_fProgress;
     std::string m_sStatus;
+    unsigned int m_numResults;
 
 public:
     
     /**
     * @brief constructor
     */
-    CSearch(CSearchOptions* searchOpts, unsigned long long sID);
+    CSearch(CSearchOptions* searchOpts, unsigned long long sID, unsigned int numResults);
 
     // *** GETTER *** //
 

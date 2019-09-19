@@ -58,6 +58,17 @@ bool compare(std::string str1, std::string str2)
     return compare(str1.c_str(), str2.c_str());
 }
 
+bool containsBegin(const char* chT1, const char* chT2)
+{
+    for(unsigned int i=0; i<strlen(chT1); i++)
+    {
+        if(chT1[i] != chT2[i])
+            return false;
+    }
+
+    return true;
+}
+
 /**
 * @brief expects words to be non-capital letters
 * @param[in] chT1 first string

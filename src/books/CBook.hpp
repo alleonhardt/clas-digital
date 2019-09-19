@@ -156,4 +156,7 @@ public:
 
     int getNumMatches (std::vector<std::string>& vWords, std::map<int, std::vector<std::string>>* (CBook::*find)(std::string, std::map<std::string, std::vector<size_t>>&));
 
+
+    std::string getPreview(std::string sWord, int fuzzyness);
+
 };

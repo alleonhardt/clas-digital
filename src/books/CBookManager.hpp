@@ -64,6 +64,8 @@ public:
     */
     std::list<CBook*>* search(unsigned long long id);
 
+    std::list<std::string>* getSuggestions(std::string sInput);
+
     /**
     * @brief convert to list
     * @return list of searchresulst
