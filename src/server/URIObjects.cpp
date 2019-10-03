@@ -304,7 +304,7 @@ void GetSearchHandler::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 
 		static std::atomic<unsigned long long> unique_sid = 0;
 		long long searchid = unique_sid.fetch_add(1);
-		CSearch * csearch = new CSearch(nso,searchid,20);
+		CSearch * csearch = new CSearch(nso,searchid,10);
 		GetSearchHandler::GetBookManager().addSearch(csearch);
 		nlohmann::json json;
 		json["searchid"] = std::to_string(searchid);

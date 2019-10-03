@@ -521,7 +521,7 @@ function ApplyFilterOptions()
 		}
 	}
 	
-	newjson.show_to = Math.min(25,newjson.books.length);
+	newjson.show_to = Math.min(10,newjson.books.length);
 	let obj = document.getElementById("SearchHitList");
 	obj.drawablejson = newjson;
 	ShowSelectedValues(obj);
@@ -589,7 +589,7 @@ function ShowSelectedValues(obj)
 	obj.innerHTML = "<li id='realHeader'><a><strong>Show result from "+json.show_from+"-"+json.show_to+"</strong><input type='checkbox' onclick='SelectAll(this.checked);return true;' unchecked> <span>Select all results</span></a></li>";
 	document.getElementById("ResultBanner").innerHTML = "<h1 class='headerStyle'>Search Results for: \""+lastInput+"\", "+json.books.length+" matches<a class='citationButton' onclick='OpenFilter();return true;'>Filter results</a><a class='buttontwo citationButton' style='margin-left: 1rem' onclick='CreateBibliography();return true;'>Create Bibliography</a></h1>";
 	//json.show_from = 0;
-	//json.show_to = Math.min(25,json.books.length);
+	//json.show_to = Math.min(10,json.books.length);
 	obj.start = json.show_from;
 
 	for(var i = json.show_from; i < json.show_to; i++)
@@ -646,7 +646,7 @@ function ShowSelectedValues(obj)
 	{
 		val+="<img style='cursor:pointer;float:none;margin-left:0.5rem' onclick='SelectAllSlice();' src='/down.svg'>";
 	}
-	else if(json.show_from==0&&json.show_to==json.books.length&&json.books.length>25)
+	else if(json.show_from==0&&json.show_to==json.books.length&&json.books.length>10)
 	{
 		val+="<img style='cursor:pointer;float:none;margin-left:0.5rem' onclick='SelectSmallSlice();' src='/up.svg'>";
 	}
@@ -666,7 +666,7 @@ function SelectSmallSlice()
 {
 	let obj = document.getElementById("SearchHitList");
 	obj.drawablejson.show_from = 0;
-	obj.drawablejson.show_to = Math.min(obj.drawablejson.books.length,25);
+	obj.drawablejson.show_to = Math.min(obj.drawablejson.books.length,10);
 	ShowSelectedValues(document.getElementById("SearchHitList"));
 
 }
@@ -684,14 +684,14 @@ function SelectNextSlice(up)
 	let obj = document.getElementById("SearchHitList");
 	if(up)
 	{
-		obj.drawablejson.show_from = Math.min(obj.drawablejson.show_from+25,obj.drawablejson.books.length-1);
-		obj.drawablejson.show_to=Math.min(obj.drawablejson.show_from+25,obj.drawablejson.books.length);
+		obj.drawablejson.show_from = Math.min(obj.drawablejson.show_from+10,obj.drawablejson.books.length-1);
+		obj.drawablejson.show_to=Math.min(obj.drawablejson.show_from+10,obj.drawablejson.books.length);
 		ShowSelectedValues(document.getElementById("SearchHitList"));
 	}
 	else
 	{
-		obj.drawablejson.show_from = Math.max(obj.drawablejson.show_from-25,0);
-		obj.drawablejson.show_to=Math.min(obj.drawablejson.show_from+25,obj.drawablejson.books.length);
+		obj.drawablejson.show_from = Math.max(obj.drawablejson.show_from-10,0);
+		obj.drawablejson.show_to=Math.min(obj.drawablejson.show_from+10,obj.drawablejson.books.length);
 		ShowSelectedValues(document.getElementById("SearchHitList"));
 	}
 }
@@ -788,7 +788,7 @@ function sendToPage(name)
 
 
 		jsonObj.show_from = 0;
-		jsonObj.show_to = Math.min(25,jsonObj.books.length);
+		jsonObj.show_to = Math.min(10,jsonObj.books.length);
 		obj.drawablejson = jsonObj;
 		ShowSelectedValues(obj);
 	}
