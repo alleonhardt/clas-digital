@@ -487,7 +487,7 @@ function UpdateOCRTxt(x,res)
 
 function SwitchToPage(x)
 {
-	window.location = "#page"+x.dataset.page;
+	window.location.replace("#page"+x.dataset.page);
 }
 
 let onChangeFunc = function() {};
@@ -630,7 +630,7 @@ function init() {
 
 		  let resultLinks = "";
 		  for(let i = 0; i < pagesList.length; i++) {
-		  resultLinks = resultLinks + " " + "<a href='#page"+pagesList[i]+"' onclick='ShowOCR(this);return true;'>" + pagesList[i] + "</a>";
+		  resultLinks = resultLinks + " " + "<a onclick='window.location.replace(\"#page"+pagesList[i]+"\");ShowOCR(this);return true;'>" + pagesList[i] + "</a>";
 			for(let y = 0; y < HighlightList.length; y++)
 			{
 				pageVal[pagesList[i]-1]=pageVal[pagesList[i]-1].replace(new RegExp('(\\b'+HighlightList[y]+'\\b)','gi'),'<mark>$1</mark>');
