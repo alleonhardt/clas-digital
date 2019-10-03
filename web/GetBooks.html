@@ -634,7 +634,7 @@ function init() {
 			for(let y = 0; y < HighlightList.length; y++)
 			{
 				//TODO: Search Dieter with full search and get the results to be highlighted....
-				pageVal[pagesList[i]-1]=pageVal[pagesList[i]-1].replace(new RegExp('([\\W|\\b]'+HighlightList[y]+'[\\b|\\W])','gi'),'<mark>$1</mark>');
+				pageVal[pagesList[i]-1]=pageVal[pagesList[i]-1].replace(new RegExp('(\\b'+HighlightList[y]+'\\b)','gi'),'<mark>$1</mark>');
 
 			}
 		  }
