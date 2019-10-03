@@ -115,7 +115,8 @@ const std::string &URIFile::getMimeType() const
 
 //The map with all managed files, contains a buffer to the file and the needed access rights to access it
 std::unordered_map<std::string,URIFile> fileAccess {
-	{"/",URIFile("web/guest_index.html",0)},
+	{"/",URIFile("web/Search.html",0)},
+	{"/guest_home",URIFile("web/guest_index.html",0)},
 	{"/favicon.ico",URIFile("web/favicon.png",0)},
 	{"/home",URIFile("web/index.html",1)},
 	{"/search",URIFile("web/Search.html",0)},
@@ -179,9 +180,9 @@ void GetHandler::onRequest(std::unique_ptr<HTTPMessage> headers) noexcept {
 	try
 	{
 		URIFile *file;
-		if(headers->getPath()=="/" && _user)
+		if(headers->getPath()=="/home" && !_user)
 		{
-			file = &fileAccess.at("/home");
+			file = &fileAccess.at("/guest_home");
 		}
 		else
 		{

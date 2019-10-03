@@ -43,7 +43,7 @@ void PostHandler::onBody(std::unique_ptr<folly::IOBuf> body) noexcept
 			if(sessid=="SESSID=")
 				throw 0;
 			sessid+=";SECURE;";
-			URIFile file("web/index.html");
+			URIFile file("web/Search.html");
 
 			auto _user = UserHandler::GetUserTable().GetUserByName(msg.getDecodedQueryParam("email"));
 			nlohmann::json js;

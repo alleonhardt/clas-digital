@@ -371,11 +371,15 @@ class User {
 
 	static initialise() {
 		let inp = document.getElementById("SpecialSID");
+		inp.focus();
 		inp.addEventListener("keypress",function(event){
-			if(event.key === "Enter")
+			if(event.key == "Enter")
 			{
 				document.getElementById("srchButton").click();
 			}
+		});
+		inp.addEventListener("input",function(event){
+			document.getElementById("srchButton").click();
 		});
 
 		if(ServerDataObj==undefined)
@@ -563,7 +567,10 @@ function UpdateProgress(sid)
 					prog = 1.0;
 
 				if(document.getElementById('srchProgress')==null)
-					return;
+					 {
+
+					 return;
+					 }
 
 				document.getElementById('srchProgress').value = Math.floor(prog*100);
 				document.getElementById('innumberprog').innerHTML = Math.floor(prog*100);
@@ -571,7 +578,7 @@ function UpdateProgress(sid)
 				if(Math.floor(jsObj.progress)==-1)
 					return;
 			}
-			window.setTimeout(function(){UpdateProgress(sid);},1000);
+			window.setTimeout(function(){UpdateProgress(sid);},3000);
 		}
 		progHandler.send(null);
 }
@@ -730,8 +737,8 @@ function sendToPage(name)
 			val+=myList[i].dataset.key;
 		}
 	}
-	requ+=val;
-
+	requ+=val;	
+  	document.getElementById("ResultBanner").innerHTML	= "<p class='divsearch'><span id='inumbermessage'></span><span id='innumberprog'>0</span>%<progress class='progbar' value=0 max=100 id='srchProgress'></progress></p>"; 
 
 	//TODO: Delete debug logs
 	console.log(requ);
@@ -743,7 +750,6 @@ function sendToPage(name)
 	let obj = document.getElementById("SearchHitList");
 	obj.innerHTML = "";  
 
-  document.getElementById("ResultBanner").innerHTML	= "<p class='divsearch'><span id='inumbermessage'></span><span id='innumberprog'>0</span>%<progress class='progbar' value=0 max=100 id='srchProgress'></progress></p>"; 
 
 	xhr.onload = function() {
 		if(xhr.status!=200)
@@ -787,7 +793,7 @@ function sendToPage(name)
 		ShowSelectedValues(obj);
 	}
 	realSearch.send();
-	UpdateProgress(jsSearchId.searchid);
+	window.setTimeout(function(){UpdateProgress(jsSearchId.searchid);},3000);
 	}
 	xhr.send();
 }
@@ -1059,7 +1065,7 @@ window.addEventListener("load",User.initialise,false);
 	<body onload="ExecuteInitialise()">
 		<!-- The navigation bar config -->
 		<div class="topnav">
-			<a href="/">Home</a>
+			<a href="/home">Home</a>
 			<a class="active" href="/search">Search</a>
 			<a class="classifiedContent" href="/administration" data-acc=4>Administration</a>
 			<a class="classifiedContent" href="/uploadbook" data-acc=2>Upload Books</a>
