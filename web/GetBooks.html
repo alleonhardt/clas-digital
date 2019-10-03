@@ -633,7 +633,8 @@ function init() {
 		  resultLinks = resultLinks + " " + "<a onclick='window.location.replace(\"#page"+pagesList[i]+"\");ShowOCR(this);return true;'>" + pagesList[i] + "</a>";
 			for(let y = 0; y < HighlightList.length; y++)
 			{
-				pageVal[pagesList[i]-1]=pageVal[pagesList[i]-1].replace(new RegExp('(\\b'+HighlightList[y]+'\\b)','gi'),'<mark>$1</mark>');
+				//TODO: Search Dieter with full search and get the results to be highlighted....
+				pageVal[pagesList[i]-1]=pageVal[pagesList[i]-1].replace(new RegExp('([\\W|\\b]'+HighlightList[y]+'[\\b|\\W])','gi'),'<mark>$1</mark>');
 
 			}
 		  }
@@ -657,8 +658,8 @@ function init() {
 			  	resultLinks.innerHTML = resultLinks.innerHTML + " " + "<a href='#page"+searchResults.pages[i].page+"' onclick='ShowOCR(this);return true;'>" + searchResults.pages[i].page + " ("
 				  + "<span id='pageHitList"+searchResults.pages[i].page +"'>"					 
 				  + searchResults.pages[i].word + "</span>)</a>";
-			  }i
-			pageVal[searchResults.pages[i].page-1]=pageVal[searchResults.pages[i].page-1].replace(new RegExp('(\\b'+searchResults.pages[i].word.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')+'\\b)','gi'),'<mark>$1</mark>');
+			  }
+			pageVal[searchResults.pages[i].page-1]=pageVal[searchResults.pages[i].page-1].replace(new RegExp('(\\b'+searchResults.pages[i].word+'\\b)','gi'),'<mark>$1</mark>');
 		  }
 		}
 	GetOCRTxt();
