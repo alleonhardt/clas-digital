@@ -89,6 +89,7 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
     std::map<std::string, CBook*>* results1 = new std::map<std::string, CBook*>;
     std::map<std::string, double> matches;
 
+
     //Check whether search exists
     if(m_mapSearchs.count(id) == 0)
         return new std::list<CBook*>;
@@ -96,9 +97,12 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
     //Select search
     CSearch* search = m_mapSearchs[id];
 
+    std::string sInput = search->getSearchedWord();
+    int fuzzyness = search->getFuzzyness();
+
     //Create vector of seperated words
     std::vector<std::string> vWords; 
-    func::split(search->getSearchedWord(), "+", vWords);
+    func::split(sInput, "+", vWords);
 
     //Search main word
     search->setStatus("Searching " + vWords[0] + "... ");
@@ -169,9 +173,9 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
 
     //Return search results
     if(matches.size() == 0)
-        return sortByMatches(convertToList(results1), search->getSearchedWord(), search->getFuzzyness());
+        return sortByMatches(convertToList(results1), sInput, fuzzyness);
     else
-        return sortByMatches(convertToList(results1, matches), search->getSearchedWord(), search->getFuzzyness());
+        return sortByMatches(convertToList(results1, matches), sInput, fuzzyness); 
 }
 
 std::list<std::string>* CBookManager::getSuggestions(std::string sInput)
