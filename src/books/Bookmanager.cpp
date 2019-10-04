@@ -169,9 +169,9 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
 
     //Return search results
     if(matches.size() == 0)
-        return convertToList(results1);
+        return sortByMatches(convertToList(results1), search->getSearchedWord(), search->getFuzzyness());
     else
-        return convertToList(results1, matches);
+        return sortByMatches(convertToList(results1, matches), search->getSearchedWord(), search->getFuzzyness());
 }
 
 std::list<std::string>* CBookManager::getSuggestions(std::string sInput)

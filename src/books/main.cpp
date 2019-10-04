@@ -54,7 +54,7 @@ int main()
 
         alx::cout.write ("\nSearching for ", sInput, "... \n");
 
-        std::list<CBook*>* searchResults = manager.sortByMatches(manager.search(0), sInput, fuzzy);
+        std::list<CBook*>* searchResults = manager.search(0);
         unsigned int counter = 0;
         for(auto it=searchResults->begin(); it!=searchResults->end(); it++)
         {
