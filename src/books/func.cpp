@@ -124,6 +124,18 @@ void convertToLower(std::string &str)
         str[i] = tolower(str[i], loc1);
 }
 
+/**
+* @param[in, out] str string to be modified
+*/
+std::string returnToLower(std::string &str)
+{
+    std::locale loc1("de_DE.UTF8");
+    std::string str2;
+    for(unsigned int i=0; i<str.length(); i++)
+        str2 += tolower(str[i], loc1);
+
+    return str2;
+}
 /** 
 * @brief function checks whether character is a letter with de and fr local
 * @param[in] s char to be checked

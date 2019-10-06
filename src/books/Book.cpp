@@ -373,9 +373,13 @@ std::string CBook::getPreview(std::string sWord, int fuzzyness)
     if(!read)
         return "No preview";
 
+    std::string finalResult;
+    std::string finalMatch;
     std::string result;
     std::string resultContains;
+    std::string containsMatch;
     std::string resultFuzzy;
+    std::string fuzzyMatch;
     std::string sBuffer;
     while(!read.eof())
     {
@@ -393,7 +397,10 @@ std::string CBook::getPreview(std::string sWord, int fuzzyness)
             //Full search
             for(auto it : mapWords) {
                 if(it.first.compare(sWord) == 0)
-                    return result;
+                {
+                    finalResult = result;
+                    break;
+                }
             }
 
             if(fuzzyness == 0)
@@ -403,8 +410,13 @@ std::string CBook::getPreview(std::string sWord, int fuzzyness)
             }
 
             //Contains search
-            if(result.find(sWord) != std::string::npos)
-                resultContains = result;
+            for(auto it : mapWords) {
+                if(it.first.find(sWord) != std::string::npos)
+                {
+                    resultContains = result;
+                    containsMatch = it.first;
+                }
+            }
 
             if(fuzzyness == 1)
             {
@@ -412,10 +424,13 @@ std::string CBook::getPreview(std::string sWord, int fuzzyness)
                 continue;
             }
 
-            //Contains search
+            //Fuzzy search
             for(auto it : mapWords) {
                 if(fuzzy::fuzzy_cmp(it.first, sWord) == true)
-                    resultFuzzy= result;
+                {
+                    resultFuzzy = result;
+                    fuzzyMatch = it.first;
+                }
             }
 
             result = sBuffer.substr(sBuffer.find(". ")+2);
@@ -424,13 +439,50 @@ std::string CBook::getPreview(std::string sWord, int fuzzyness)
             result.append(sBuffer);
     }
 
+    if(finalResult != "")
+        finalMatch = sWord;
+    else if(resultContains != "")
+    {
+        finalResult = resultContains;
+        finalMatch = containsMatch;
+    }
 
-    if(resultContains != "")
-        return resultContains;
-    if(resultFuzzy != "")
-        return resultFuzzy;
+    else if(resultFuzzy != "")
+    {
+        finalResult = resultFuzzy;
+        finalMatch = fuzzyMatch;
+   }
 
-    return "No Preview";
+    else
+        return "No Preview";
+
+    //Highlight found word
+    size_t pos = func::returnToLower(finalResult).find(finalMatch);
+    finalResult.insert(pos, "<mark>");
+    finalResult.insert(pos+6+finalMatch.length(), "</mark>");
+
+    /*
+    //Shorten preview if needed
+    if(finalMatch.length() >= 150)
+    {
+        size_t minus = finalResult.length() - 150;
+        size_t pos2 = finalResult.length() - pos;
+        double fakFront = pos/minus;
+        double fakBack = pos2/minus;
+
+        if(fakFront > 1.0)
+            fakFront = 1.0;
+        if(fakBack > 1.0)
+            fakBack = 1.0;
+        size_t earaseFront = minus*fakFront;
+        size_t earaseBack = minus - earaseFront;
+
+        finalResult.erase(0, earaseFront);
+        finalResult.erase(finalResult.end()-earaseBack, finalResult.end());
+    } 
+    */
+    
+    return finalResult;
 }
 
 

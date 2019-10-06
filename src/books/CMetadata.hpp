@@ -85,12 +85,23 @@ public:
     std::string getTitle();
 
     /**
+    * @return shrottitle of book (titel if not exists)
+    */
+    std::string getShortTitle();
+
+    /**
     * @return date or -1 if date does not exists or is currupted
     */
     int getDate();
 
     /**
-    * @return string with Auhtor + first 6 words 15 words of title + date
+    * @return string with "[Auhtor], [date]"
     */
     std::string getShow();
+
+    /**
+    * @return string with Auhtor + first 10 words title + date
+    */
+    std::string getShow2();
+
 };

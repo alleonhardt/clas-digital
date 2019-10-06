@@ -75,6 +75,11 @@ namespace func
     */
     void convertToLower(std::string &str);
 
+    /**
+    * @param[in] str
+    */
+    std::string returnToLower(std::string &str);
+
     /** 
     * @brief function checks whether character is a letter with de and fr local
     * @param[in] s char to be checked

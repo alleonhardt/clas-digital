@@ -165,6 +165,17 @@ std::string CMetadata::getTitle() {
 }
 
 /**
+* @return short-title of book (Title if not exists)
+*/
+std::string CMetadata::getShortTitle() {
+    std::string sReturn = getMetadata("shortTitle", "data");
+    if(sReturn == "")
+        return getTitle();
+    else
+        return sReturn;
+}
+
+/**
 * @return date or -1 if date does not exists or is currupted
 */
 int CMetadata::getDate()
@@ -188,18 +199,32 @@ int CMetadata::getDate()
     return -1;
 }
 
-
 /**
 * @return string with Auhtor + first 6 words 15 words of title + date
 */
 std::string CMetadata::getShow()
 {
     // *** Add Author *** //
+    std::string sResult = getAuthor();
+
+    if(getDate() != -1)
+        sResult += ", " + getDate();
+
+    sResult += ".";
+
+    return sResult;
+}
+/**
+* @return string with Auhtor + first 6 words 15 words of title + date
+*/
+std::string CMetadata::getShow2()
+{
+    // *** Add Author *** //
     std::string sResult = getAuthor() + ", \"";
 
     // *** Add first [num] words of title *** //
     std::vector<std::string> vStrs;
-    func::split(getMetadata("title", "data"), " ", vStrs);
+    func::split(getShortTitle(), " ", vStrs);
     for(unsigned int i=0; i<10 && i<vStrs.size(); i++)
         sResult += vStrs[i] + " ";
 
@@ -208,13 +233,8 @@ std::string CMetadata::getShow()
     else
         sResult += "\"";
 
-    // *** Add date *** //
-    int date = getDate();
-    if(date != -1)
-    {
-        sResult.append(", ");
-        sResult.append(std::to_string(date));
-    }
+    if(getDate() != -1)
+        sResult += ", " + getDate();
 
     sResult += ".";
 

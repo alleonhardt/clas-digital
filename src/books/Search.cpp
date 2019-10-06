@@ -160,6 +160,9 @@ void CSearch::containsSearch(std::map<std::string, std::map<std::string, CBook*>
 
     alx::cout.write("1-Number results: ", m_numResults, "\n");
 
+    if(mapSR->size() == m_numResults)
+        return;
+
     for(auto it= mapWords.begin(); it!=mapWords.end(); it++)
     {
         if(it->first.find(m_sWord.c_str())!=std::string::npos)
