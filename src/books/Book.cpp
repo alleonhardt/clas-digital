@@ -374,7 +374,7 @@ std::string CBook::getPreview(std::string sWord, int fuzzyness)
         return "Book not loaded - No preview";
 
     if(sWord.find("+") != std::string::npos)
-        return "search for two words - No preview";
+        return "Searching for two words - No preview";
 
     //Load map of Words
     std::map<std::string, std::vector<size_t>> mapWordsPages;
