@@ -371,8 +371,61 @@ std::string CBook::getPreview(std::string sWord, int fuzzyness)
 
     //Check, whether ocr could be loaded
     if(!read)
-        return "No preview";
+        return "Book not loaded - No preview";
 
+    if(sWord.find("+") != std::string::npos)
+        return "search for two words - No preview";
+
+    //Load map of Words
+    std::map<std::string, std::vector<size_t>> mapWordsPages;
+    loadPages(mapWordsPages);
+
+    size_t page=0;
+    size_t containsPage=0;
+    size_t fuzzyPage=0;
+    for(auto it=mapWordsPages.begin(); it!=mapWordsPages.end(); it++)
+    {
+        if(it->first.compare(sWord) == true)
+        {
+            if(it->second.size() == 0)
+                continue;
+            page = it->second.front();
+        }
+
+        else if(fuzzyness == 1 && containsPage == 0)
+        {
+            if(it->first.find(sWord) != std::string::npos)
+            {
+                if(it->second.size() == 0)
+                    continue;
+                containsPage = it->second.front();
+            }
+        }
+
+        else if(fuzzyness == 2 && fuzzyPage == 0)
+        {
+            if(fuzzy::fuzzy_cmp(it->first, sWord) == true)
+            {
+                if(it->second.size() == 0)
+                    continue;
+                fuzzyPage = it->second.front();
+            }
+        }
+    }
+
+    if(page==0)
+    {
+        if(containsPage!=0)
+            page = containsPage;
+        else if(fuzzyPage != 0)
+            page = fuzzyPage;
+    }
+
+
+    size_t curPage = 0;
+    bool pageFound = false;
+    if(page==0 && containsPage==0 && fuzzyPage==0)
+        pageFound = true;
     std::string finalResult;
     std::string finalMatch;
     std::string result;
@@ -385,6 +438,16 @@ std::string CBook::getPreview(std::string sWord, int fuzzyness)
     {
         //Read current line
         getline(read, sBuffer);
+
+        if(pageFound == false)
+        {
+            if(func::checkPage(sBuffer) == true)
+                curPage++;
+            if(curPage != page)
+                continue;
+            if(curPage == page)
+                pageFound = true;
+        }
 
         //Check whether ". " was found
         if(sBuffer.find(". ") != std::string::npos)
@@ -439,6 +502,9 @@ std::string CBook::getPreview(std::string sWord, int fuzzyness)
             result.append(sBuffer);
     }
 
+    if(pageFound == false)
+        return "Page not found - no preview";
+
     if(finalResult != "")
         finalMatch = sWord;
     else if(resultContains != "")
@@ -451,29 +517,30 @@ std::string CBook::getPreview(std::string sWord, int fuzzyness)
     {
         finalResult = resultFuzzy;
         finalMatch = fuzzyMatch;
-   }
+    }
 
     else
-        return "No Preview";
+        return "no match - No Preview";
 
     //Highlight found word
     size_t pos = func::returnToLower(finalResult).find(finalMatch);
     finalResult.insert(pos, "<mark>");
     finalResult.insert(pos+6+finalMatch.length(), "</mark>");
 
-    /*
     //Shorten preview if needed
+    /*
     if(finalMatch.length() >= 150)
     {
         size_t minus = finalResult.length() - 150;
         size_t pos2 = finalResult.length() - pos;
-        double fakFront = pos/minus;
+        double fakFront = static_cast<double>(pos)/static_cast<double>(minus);
         double fakBack = pos2/minus;
 
         if(fakFront > 1.0)
             fakFront = 1.0;
         if(fakBack > 1.0)
             fakBack = 1.0;
+
         size_t earaseFront = minus*fakFront;
         size_t earaseBack = minus - earaseFront;
 
