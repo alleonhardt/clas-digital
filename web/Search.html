@@ -13,6 +13,11 @@
 
 /*SEARCHBAR STYLE BEGIN ________________ */
 
+.some_grid_class {
+	display: grid;
+	grid-column-gap: 0;
+	grid-template-columns: 90% 10%;
+}
 /*Keeping the search box in the middle in the top of the screen*/
 .button_box_top {
 	text-align: center;
@@ -174,56 +179,6 @@
 	overflow-wrap: anywhere;
 }
 
-.list-type2 ol{
-	list-style: none;
-	*list-style: decimal;
-font-size: 15px;
-font-family: 'Raleway', sans-serif;
-padding: 0;
-margin-bottom: 4em;
-}
-
-.list-type2 ol ol{
-	margin: 0 0 0 2em;
-}
-
-.list-type2 a{
-	list-style: none;
-	*list-style: decimal;
-position: relative;
-display: block;
-padding: .4em .4em .4em 2em;
-		 *padding: .4em;
-	 margin: .7em 0;
-	 background: #eaeaea;
-	 color: #444;
-	 text-decoration: none;
-		 padding-left: 2rem;
-		text-align: justify;
-		text-indent: 2.5rem;
-	 transition: all .2s ease-in-out;
-		height: 2rem;
-}
-
-.list-type2 a div{
-	float: left;
-	width: 1.5rem;
-	height: 1.5rem;
-}
-
-.list-type2 a img{
-	display: inline-block;
-	float: left;
-	width: 1.5rem;
-	height: 1.5rem;
-}
-
-.list-type2 a:hover{
-	background: #b0b0b0;
-	text-decoration:none;
-	transform: scale(1.01);
-}
-
 #realHeader {
 	list-style-type: none;
 }
@@ -268,36 +223,6 @@ padding: .4em .4em .4em 2em;
 #realHeader a img:hover {
 	background-color: #c66900;
 	transition: all 0.4s ease;
-}
-
-
-.list-type2 a:before{
-	position: absolute;
-	left: -1.3em;
-	top: 50%;
-	margin-top: -1.3em;
-	background:#FC756F;
-	height: 2em;
-	width: 2em;
-	line-height: 2em;
-	border: .3em solid #fff;
-	text-align: center;
-	font-weight: bold;
-	color:#FFF;
-}
-
-.list-type2 input{
-	display: inline-block;
-	float: right;
-}
-
-.list-type2 p {
-	display: inline-block;
-	float: left;
-	margin-right: 1rem;
-	color: red;
-	border: solid #FF0000 .1em;
-	padding: .1em;
 }
 
 .linkedClass {
@@ -586,49 +511,43 @@ function UpdateProgress(sid)
 function ShowSelectedValues(obj)
 {
 	let json = obj.drawablejson;
-	obj.innerHTML = "<li id='realHeader'><a><strong>Show result from "+json.show_from+"-"+json.show_to+"</strong><input type='checkbox' onclick='SelectAll(this.checked);return true;' unchecked> <span>Select all results</span></a></li>";
+	obj.innerHTML = "";
 	document.getElementById("ResultBanner").innerHTML = "<h1 class='headerStyle'>Search Results for: \""+lastInput+"\", "+json.books.length+" matches<a class='citationButton' onclick='OpenFilter();return true;'>Filter results</a><a class='buttontwo citationButton' style='margin-left: 1rem' onclick='CreateBibliography();return true;'>Create Bibliography</a></h1>";
 	//json.show_from = 0;
 	//json.show_to = Math.min(10,json.books.length);
 	obj.start = json.show_from;
+	
+	let bookvalues="";
 
 	for(var i = json.show_from; i < json.show_to; i++)
 	{
-			let newList = document.createElement("li");
+			if(bookvalues!="")
+				bookvalues+=",";
+			bookvalues+=json.books[i].scanId;
+			
+			let newList = document.createElement("div");
 			newList.id = json.books[i].scanId;
 			let inner = "";
 			if(!json.books[i].hasocr || (json.books[i].hasocr == undefined))
 			{
 
-				inner = "<a data-specialhref='/ShowMetadata";
+				inner = "<div class='some_grid_class'><a href='/ShowMetadata";
 			}
 			else
 			{
-				inner = "<a data-specialhref='/GetBooks";
+				inner = "<div class='some_grid_class'><a href='/GetBooks";
 			}
 			inner+= "?query="+lastInput;
 			inner+="&scanId="+json.books[i].scanId;
 			inner+="&fuzzyness="+document.getElementById("FuzzyID").value; 
-			inner+="' onclick='return changeColor(this);'>";
-			if(!json.books[i].hasocr || (json.books[i].hasocr == undefined))
-			{
-				inner+="<img src='/scan.svg' class='hiddenContent' alt='scan' title='Buch besitzt einen Scan'>";
-			}
-			else
-			{
-				inner+="<img src='/scan.svg' alt='scan' title='Buch besitzt einen Scan'>";
-			}
-		
-			if(json.books[i].copyright)
-			{
-				inner+="<img src='/copyright.svg' alt='copyright' title='Buch ist copyright geschuetzt'>";
-			}
-			else
-			{
-				inner+="<img src='/copyright.svg' class='hiddenContent' alt='copyright' title='Buch ist copyright geschuetzt'>";
-			}
-
-			inner+=json.books[i].description+"   "+"<input onclick='this.was_clicked=1;return true;' class='booklistinp' data-scanid='"+json.books[i].scanId+"' type='checkbox' unchecked></a>"; 
+			inner+="' style='display: inline-grid;margin-right: 0.5rem;grid-column-start:1;grid-column-end:2;'><h4>";
+			
+			inner+=json.books[i].description+"</h4></a>   "+"<input onclick='this.was_clicked=1;return true;' class='booklistinp' style='display: inline-grid;grid-column-start:2;grid-column-end:3' data-scanid='"+json.books[i].scanId+"' type='checkbox' unchecked></div>";
+			inner+="<div style='color: green;font-size: small;margin-top: -0.5rem;'>";
+			inner+=json.books[i].bibliography;
+			inner+="</div><p id='";
+			inner+=json.books[i].scanId;
+			inner+="-preview'></p>";
 			newList.innerHTML = inner;
 			//Show the new link in the search hit list
 			obj.appendChild(newList);
@@ -659,7 +578,26 @@ function ShowSelectedValues(obj)
 	
 	val+="</a></li>";
 	obj.innerHTML+=val;
+	
+	let requ = "/getBookPreviews?query="+lastInput;
+	requ+="&fuzzyness=";
+	requ+=document.getElementById("FuzzyID").value;
+	requ+="&books=";
+	requ+=bookvalues;
+	let xhr = new XMLHttpRequest();
+	xhr.open("GET",requ,true);
+	xhr.onload = function() {
+		if(xhr.status!=200)
+			return;
+		let resp = JSON.parse(xhr.responseText);
 
+		for(var i = 0; i < resp.books.length; i++)
+		{
+			document.getElementById(resp.books[i].key+"-preview").innerHTML = resp.books[i].preview;
+		}
+
+	}
+	xhr.send(null);
 }
 
 function SelectSmallSlice()
@@ -723,6 +661,7 @@ function sendToPage(name)
 		requ += "&author="+document.getElementById("SearchForAuthor").value;
 	requ += "&publicatedafter="+document.getElementById("PublicatedAfter").value;
 	requ +=  "&publicatedbefore="+ document.getElementById("PublicatedBefore").value;
+	requ+="&sortway="+document.getElementById("sortway").value;
 	let myList = document.getElementsByClassName("upSaule");
 	
 	requ+="&pillars=";
@@ -786,6 +725,16 @@ function sendToPage(name)
 		}
 
 
+
+		if(document.getElementById("sortway").value == "sortbyalphabeticalaz")
+		{
+			jsonObj.books.sort(function(a,b){if(a.description.toUpperCase()>b.description.toUpperCase())return 1;if(b.description.toUpperCase()>a.description.toUpperCase()) return -1;return 0;});
+		}
+
+		if(document.getElementById("sortway").value == "sortbyalphabeticalza")
+		{
+			jsonObj.books.sort(function(a,b){if(a.description.toUpperCase()<b.description.toUpperCase())return 1;if(b.description.toUpperCase()<a.description.toUpperCase()) return -1;return 0;});
+		}
 
 		jsonObj.show_from = 0;
 		jsonObj.show_to = Math.min(10,jsonObj.books.length);
@@ -854,6 +803,7 @@ function LoadSearchData(sp)
 	document.getElementById("SearchForAuthor").value = sp.author_name;
 	document.getElementById("PublicatedAfter").value = sp.pub_after;
 	document.getElementById("PublicatedBefore").value = sp.pub_before;
+	document.getElementById("sortway").value = sp.sortway;
 	
 	document.getElementById('SliderNum').innerHTML = getSliderValue(sp.fuzzyness);
 	let pill = document.getElementsByClassName("upSaule");
@@ -875,6 +825,7 @@ function ApplySearchData()
 	search_parameters.author_name = document.getElementById("SearchForAuthor").value;
 	search_parameters.pub_after = document.getElementById("PublicatedAfter").value;
 	search_parameters.pub_before = document.getElementById("PublicatedBefore").value;
+	search_parameters.sortway = document.getElementById("sortway").value;
 	let pill = document.getElementsByClassName("upSaule");
 	search_parameters.pillars = null;
 	for(let i = 0; i < pill.length; i++)
@@ -1104,6 +1055,13 @@ window.addEventListener("load",User.initialise,false);
 					<p class="slider"> until </p>
 					<input id="PublicatedBefore" type="number" step="1" min="1" value="2018">
 				</div>
+				<select id='sortway' style='margin-bottom: 1rem;'>
+					<option value="sortbyrevelance">Sort hits by relevance</option>
+					<option value="sortbyalphabeticalaz" selected>Sort hits alphabetically ascending</option>
+					<option value="sortbyalphabeticalza">Sort hits alphabetically descending</option>
+
+				</select>
+				
 				<div>
 					<button class='btn btn-outline-success my2 my-sm-0 inlineButton' onclick="ApplySearchData();">Apply</button>
 					<button class='btn btn-outline-info my2 my-sm-0 inlineButton' onclick="ResetToDefault();">Reset to default</button>
@@ -1133,7 +1091,7 @@ window.addEventListener("load",User.initialise,false);
 				<button class="btclass2" type="button" onclick="openSearchOpts('AdvancedSearchOptions')">Advanced</button>
 			</div>
 			<div id="ResultBanner"></div>
-			<ol id="SearchHitList" start="0" class="list-type2"></ol>
+			<div id="SearchHitList" start="0" class="list-type2"></div>
 			<div id="LinkList" class="divlisttype"></div>
 		</div>
 	</body>
