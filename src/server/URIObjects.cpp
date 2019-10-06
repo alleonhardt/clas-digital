@@ -276,6 +276,7 @@ void GetSearchHandler::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 		alx::cout<< headers->getDecodedQueryParam("pillars") <<alx::endl;
 		std::string word = headers->getDecodedQueryParam("search");
 		std::string author = headers->getDecodedQueryParam("author");
+		std::string srchway = headers->getDecodedQueryParam("sortway");
 		int Fuzzyness = headers->getIntQueryParam("fuzzyness",0);
 		int from = headers->getIntQueryParam("publicatedafter",0);
 		int to = headers->getIntQueryParam("publicatedbefore",0);
@@ -300,7 +301,12 @@ void GetSearchHandler::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 		}
 		alx::cout<<alx::endl;
 
-		CSearchOptions *nso = new CSearchOptions(word,Fuzzyness,std::move(pillars),onlyTitle,ocrOnly,std::move(author),from,to,true);
+		alx::cout<<srchway<<" sortway is : ";
+		if(srchway=="sortbyrevelance")
+			alx::cout<<"true filter\n";
+		else
+			alx::cout<<"false filter\n";
+		CSearchOptions *nso = new CSearchOptions(word,Fuzzyness,std::move(pillars),onlyTitle,ocrOnly,std::move(author),from,to,true,srchway=="sortbyrevelance");
 
 		static std::atomic<unsigned long long> unique_sid = 0;
 		long long searchid = unique_sid.fetch_add(1);
@@ -668,6 +674,7 @@ void StartSearch::start(long long id, folly::EventBase *evb)
 		entry["copyright"] = !it->getPublic();
 		entry["hasocr"] = it->getOcr();
 		entry["description"] = it->getMetadata().getShow();
+		entry["bibliography"] = it->getMetadata().getMetadata("bib");
 		js["books"].push_back(std::move(entry));
 	}
 
@@ -787,4 +794,37 @@ void RequestUpdateZotero::onRequest(std::unique_ptr<proxygen::HTTPMessage> heade
 	{
 		return SendErrorNotFound(downstream_);
 	}
+}
+
+
+
+void GetBookPreviews::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers) noexcept
+{
+	std::vector<std::string> pillars;
+	std::stringstream ss(headers->getDecodedQueryParam("books"));
+	std::string search = headers->getDecodedQueryParam("query");
+	int fuzzynes = headers->getIntQueryParam("Fuzzyness",0);	
+	
+	auto &books = GetSearchHandler::GetBookManager().getMapOfBooks();
+	std::string fill;
+	nlohmann::json js;
+	while(getline(ss,fill,','))
+		if(fill!="")
+		{
+			try
+			{
+				nlohmann::json entry;
+				entry["key"] = fill;
+
+				entry["preview"] = books.at(fill).getPreview(search,fuzzynes);
+				js["books"].push_back(entry);
+			}
+			catch(...)
+			{}
+		}
+	return ResponseBuilder(downstream_)
+			.status(200,"Ok")
+			.header("Content-Type","application/json")
+			.body(std::move(js.dump()))
+			.sendWithEOM();
 }

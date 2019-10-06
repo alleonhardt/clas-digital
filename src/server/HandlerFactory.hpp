@@ -61,6 +61,7 @@ class HandlerFactory : public RequestHandlerFactory {
 			_getMap["/getSearchProgress"] = &CreateHandler<RequestSearchProgress>;
 			_getMap["/startSearch"] = &CreateHandler<StartSearch>;
 			_getMap["/createBibliography"] = &CreateHandler<RequestCreateBibliography>;
+			_getMap["/getBookPreviews"] = &CreateHandler<GetBookPreviews>;
 
 			_postMap["/changeUserTable"] = &CreateHandler<UpdateUserSystemHandler>;
 			_postMap["/logout"] = &CreateHandler<PostHandler>;
