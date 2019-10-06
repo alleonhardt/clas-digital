@@ -178,7 +178,6 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
     //Delete search
     deleteSearch(id);
 
-    alx::cout<<"SEARCH PARAMS: Sort by relevance: "<<filterResults<<"\nsInput: "<<sInput<<"\nFuzzyness: "<<fuzzyness<<alx::endl;
     //Return search results
     if(matches.size() == 0)
         return convertToList(results1);
