@@ -147,7 +147,7 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
             }
 
             //Erase element if it does not occure on the same page
-            else if(it->second->getOcr() == true && it->second->getNumMatches(search->getSearchedWord(), search->getFuzzyness()) == 0)
+            else if(it->second->getOcr() == true && it->second->getNumMatches(sInput, fuzzyness) == 0)
             {
                 //Erase match and searchresult
                 matches.erase(it->first);
@@ -169,13 +169,16 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
     search->removeBooks(results1, matches);
 
     //Delete search
+    bool filterResults = search->getSearchOptions()->getFilterResults();
     deleteSearch(id);
 
     //Return search results
     if(matches.size() == 0)
-        return sortByMatches(convertToList(results1), sInput, fuzzyness);
-    else
+        return convertToList(results1);
+    else if (filterResults == true)
         return sortByMatches(convertToList(results1, matches), sInput, fuzzyness); 
+    else
+        return convertToList(results1, matches); 
 }
 
 std::list<std::string>* CBookManager::getSuggestions(std::string sInput)

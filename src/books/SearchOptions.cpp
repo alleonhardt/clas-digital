@@ -25,8 +25,7 @@ CSearchOptions::CSearchOptions()
 * @param[in] from date from which books shall be searched
 * @param[in] to date to which books shall be searched
 **/
-CSearchOptions::CSearchOptions(std::string chSearchedWord, int fuzzyness, std::vector<std::string> 
-        sCollections, bool onlyTitle, bool onlyOCR, std::string slastName, int from, int to, bool full)
+CSearchOptions::CSearchOptions(std::string chSearchedWord, int fuzzyness, std::vector<std::string> sCollections, bool onlyTitle, bool onlyOCR, std::string slastName, int from, int to, bool full, bool filterResults)
 {
     func::convertToLower(chSearchedWord);
 	func::convertToLower(slastName);
@@ -39,6 +38,7 @@ CSearchOptions::CSearchOptions(std::string chSearchedWord, int fuzzyness, std::v
     m_To = to;
     m_onlyOCR = onlyOCR;
     m_fullAccess = full;
+    m_filterResults = filterResults;
 }
 
 
@@ -104,6 +104,13 @@ int CSearchOptions::getTo() const {
 */
 bool CSearchOptions::getAccess() const {
     return m_fullAccess;
+}
+
+/**
+* @return return whether results shall be filtered or not
+*/
+bool CSearchOptions::getFilterResults() const {
+    return m_filterResults;
 }
 
 /**
