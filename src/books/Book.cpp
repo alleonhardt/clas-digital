@@ -488,7 +488,7 @@ size_t CBook::getBestMatch(std::string sWord, int fuzzyness, std::string& sMatch
 
         else if(fuzzyness == 2 && fuzzyPage == 0)
         {
-            if(fuzzy::fuzzy_cmp(it->first, sWord) == true)
+            if(fuzzy::fuzzy_cmp(it->first.c_str(), sWord.c_str()) == true)
             {
                 if(it->second.size() == 0)
                     continue;
@@ -518,6 +518,7 @@ size_t CBook::getBestMatch(std::string sWord, int fuzzyness, std::string& sMatch
 */
 std::string CBook::getPreviewMatch(std::string sWord, size_t page)
 {
+    alx::cout.write("Match: ", sWord, "\n");
     //Read ocr
     std::ifstream read(getOcrPath(), std::ios::in);
 
@@ -550,7 +551,8 @@ std::string CBook::getPreviewMatch(std::string sWord, size_t page)
 
             //Full search
             for(auto it : mapWords) {
-                if(it.first.compare(sWord) == 0)
+                //if(it.first.compare(sWord) == 0)
+                if(func::compare(it.first.c_str(), sWord.c_str()) == true)
                     return result;
             }
 
