@@ -436,8 +436,11 @@ std::string CBook::getPreview(std::string sWord, int fuzzyness)
     } 
 
     //*** Append [...] front and back ***//
+    alx::cout.write(alx::console::red_black, "Appending [...]... \n");
     finalResult.insert(0, "[...] ");
     finalResult.append(" [...]");
+
+    alx::cout.write(alx::console::red_black, "returning result.\n");
     
     return finalResult;
 }
