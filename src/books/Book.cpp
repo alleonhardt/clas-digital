@@ -442,6 +442,12 @@ std::string CBook::getPreview(std::string sWord, int fuzzyness)
     finalResult.insert(0, "[...] ");
     finalResult.append(" [...]");
 
+    for(unsigned int i=0; i<finalResult.length(); i++)
+    {
+        if(finalResult[i] == '"')
+            finalResult[i] = '\'';
+    }
+
     alx::cout.write(alx::console::red_black, "returning result.\n");
     
     return finalResult;
