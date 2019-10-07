@@ -158,5 +158,6 @@ public:
 
 
     std::string getPreview(std::string sWord, int fuzzyness);
-
+    size_t getBestMatch(std::string sWord, int fuzzyness, std::string& sMatch);
+    std::string getPreviewMatch(std::string sWord, size_t page);
 };
