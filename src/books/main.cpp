@@ -63,7 +63,6 @@ int main()
             //alx::cout.write("num results: ", (*it)->getNumMatches(sInput, fuzzy), "\n");
 
             // *** Print Pages *** //
-            /*
             alx::cout.write(alx::console::yellow_black, "Pages: ");
 
             std::map<int, std::vector<std::string>>* mapPages = (*it)->getPages(sInput, fuzzy);
@@ -88,8 +87,6 @@ int main()
             //Delete results
             delete mapPages;
             alx::cout.write ("\b\b\n");
-            */
-
 
             counter++;
         }

@@ -371,10 +371,10 @@ std::string CBook::getPreview(std::string sWord, int fuzzyness)
 
     //Check, whether ocr could be loaded
     if(!read)
-        return "Book not loaded - No preview";
+        return "No Ocr";
 
     if(sWord.find("+") != std::string::npos)
-        return "Searching for two words - No preview";
+        return "No preview - (Searching for two words)";
 
     //Load map of Words
     std::map<std::string, std::vector<size_t>> mapWordsPages;
@@ -390,6 +390,7 @@ std::string CBook::getPreview(std::string sWord, int fuzzyness)
             if(it->second.size() == 0)
                 continue;
             page = it->second.front();
+            break;
         }
 
         else if(fuzzyness == 1 && containsPage == 0)
@@ -413,19 +414,31 @@ std::string CBook::getPreview(std::string sWord, int fuzzyness)
         }
     }
 
+    bool pageFound = false;
+    fuzzyness = 0;
     if(page==0)
     {
         if(containsPage!=0)
+        {
+            fuzzyness = 1;
             page = containsPage;
+        }
         else if(fuzzyPage != 0)
+        {
+            fuzzyness = 2;
             page = fuzzyPage;
+        }
+        else
+            pageFound = true;
     }
+
+    if(!pageFound)
+        alx::cout.write("Page with match found.\n");
+
+    alx::cout.write("Page with match: ", page, "\n");
 
 
     size_t curPage = 0;
-    bool pageFound = false;
-    if(page==0 && containsPage==0 && fuzzyPage==0)
-        pageFound = true;
     std::string finalResult;
     std::string finalMatch;
     std::string result;
@@ -466,36 +479,30 @@ std::string CBook::getPreview(std::string sWord, int fuzzyness)
                 }
             }
 
-            if(fuzzyness == 0)
-            {
-                result = sBuffer.substr(sBuffer.find(". ")+2);
-                continue;
-            }
-
             //Contains search
-            for(auto it : mapWords) {
-                if(it.first.find(sWord) != std::string::npos)
-                {
-                    resultContains = result;
-                    containsMatch = it.first;
-                }
-            }
-
-            if(fuzzyness == 1)
+            if((fuzzyness == 1 || fuzzyness == 2) && containsMatch == "")
             {
-                result = sBuffer.substr(sBuffer.find(". ")+2);
-                continue;
+                for(auto it : mapWords) {
+                    if(it.first.find(sWord) != std::string::npos)
+                    {
+                        resultContains = result;
+                        containsMatch = it.first;
+                    }
+                }
             }
 
             //Fuzzy search
-            for(auto it : mapWords) {
-                if(fuzzy::fuzzy_cmp(it.first, sWord) == true)
-                {
-                    resultFuzzy = result;
-                    fuzzyMatch = it.first;
+            if(fuzzyness == 2 && fuzzyMatch == "")
+            {
+                for(auto it : mapWords) {
+                    if(fuzzy::fuzzy_cmp(it.first, sWord) == true)
+                    {
+                        resultFuzzy = result;
+                        fuzzyMatch = it.first;
+                    }
                 }
             }
-
+            
             result = sBuffer.substr(sBuffer.find(". ")+2);
         }
         else
@@ -503,54 +510,56 @@ std::string CBook::getPreview(std::string sWord, int fuzzyness)
     }
 
     if(pageFound == false)
-        return "Page not found - no preview";
+        return "No preview";
 
+    //Set final result and match
     if(finalResult != "")
         finalMatch = sWord;
-    else if(resultContains != "")
-    {
+    else if(resultContains != "") {
         finalResult = resultContains;
         finalMatch = containsMatch;
     }
-
-    else if(resultFuzzy != "")
-    {
+    else if(resultFuzzy != "") {
         finalResult = resultFuzzy;
         finalMatch = fuzzyMatch;
     }
-
     else
-        return "no match - No Preview";
+        return "No Preview";
 
     //Highlight found word
     size_t pos = func::returnToLower(finalResult).find(finalMatch);
     finalResult.insert(pos, "<mark>");
     finalResult.insert(pos+6+finalMatch.length(), "</mark>");
 
+
     //Shorten preview if needed
-    /*
-    if(finalMatch.length() >= 150)
+    if(finalResult.length() >= 150)
     {
         size_t minus = finalResult.length() - 150;
         size_t pos2 = finalResult.length() - pos;
-        double fakFront = static_cast<double>(pos)/static_cast<double>(minus);
-        double fakBack = pos2/minus;
+        double fakFront = static_cast<double>(pos)/static_cast<double>(finalResult.length());
+        double fakBack = static_cast<double>(pos2)/static_cast<double>(finalResult.length());
 
         if(fakFront > 1.0)
             fakFront = 1.0;
         if(fakBack > 1.0)
             fakBack = 1.0;
 
-        size_t earaseFront = minus*fakFront;
-        size_t earaseBack = minus - earaseFront;
+        size_t eraseFront = minus*fakFront;
+        size_t eraseBack = minus - eraseFront;
 
-        finalResult.erase(0, earaseFront);
-        finalResult.erase(finalResult.end()-earaseBack, finalResult.end());
+        alx::cout.write("Front: ", eraseFront, ", Back: ", eraseBack, "\n");
+
+        finalResult.erase(0, eraseFront);
+        finalResult.erase(finalResult.end()-eraseBack, finalResult.end());
     } 
-    */
+
+    finalResult.insert(0, "[...] ");
+    finalResult.append(" [...]");
     
     return finalResult;
 }
+
 
 
 
