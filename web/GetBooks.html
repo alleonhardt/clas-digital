@@ -655,11 +655,11 @@ function init() {
 			  }
 			  else
 			  {
-			  	resultLinks.innerHTML = resultLinks.innerHTML + " " + "<a href='#page"+searchResults.pages[i].page+"' onclick='ShowOCR(this);return true;'>" + searchResults.pages[i].page + " ("
+			  	resultLinks.innerHTML = resultLinks.innerHTML + " " + "<a onclick='window.location.replace(\"#page"+searchResults.pages[i].page+"\");ShowOCR(this);return true;'>" + searchResults.pages[i].page + " ("
 				  + "<span id='pageHitList"+searchResults.pages[i].page +"'>"					 
 				  + searchResults.pages[i].word + "</span>)</a>";
 			  }
-			pageVal[searchResults.pages[i].page-1]=pageVal[searchResults.pages[i].page-1].replace(new RegExp('(\\b'+searchResults.pages[i].word+'\\b)','gi'),'<mark>$1</mark>');
+			pageVal[searchResults.pages[i].page-1]=pageVal[searchResults.pages[i].page-1].replace(new RegExp('(\\b'+searchResults.pages[i].word.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')+'\\b)','gi'),'<mark>$1</mark>');
 		  }
 		}
 	GetOCRTxt();
