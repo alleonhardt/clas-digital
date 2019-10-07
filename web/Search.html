@@ -13,6 +13,11 @@
 
 /*SEARCHBAR STYLE BEGIN ________________ */
 
+mark {
+	font-weight: bold;
+	background: white;
+}
+
 .some_grid_class {
 	display: grid;
 	margin-top: 3rem;
@@ -592,16 +597,19 @@ function ShowSelectedValues(obj)
 	requ+="&fuzzyness=";
 	requ+=document.getElementById("FuzzyID").value;
 	requ+="&books=";
-	SpecialFunctionWhatever(gCurrentSearchId,requ,bookvalues.reverse());
+	SpecialFunctionWhatever(gCurrentSearchId,requ,JSON.parse(JSON.stringify(bookvalues.reverse())));
 }
 
-function SpecialFunctionWhatever(startaddr,addr,booklist)
+async function SpecialFunctionWhatever(startaddr,addr,booklist)
 {
-	if((booklist == []) ||(startaddr!=gCurrentSearchId))
+	if((booklist == [])||(startaddr!=gCurrentSearchId))
 	{
 		return 0;
 	}
-	let requ = addr+booklist.pop();
+	let bk = booklist.pop();
+	if(bk==undefined)
+		return 0;
+	let requ = addr+bk;
 	let xhr = new XMLHttpRequest();
 	xhr.open("GET",requ,true);
 	xhr.onload = function() {

@@ -208,4 +208,5 @@ class GetBookPreviews : public EmptyHandler
 	public:
 		void onRequest(std::unique_ptr<proxygen::HTTPMessage> headers)
 			noexcept override;
+		void load_preview(std::string bookname,std::string query,int fuzzyness, folly::EventBase *evb);
 };

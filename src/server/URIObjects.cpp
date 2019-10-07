@@ -800,10 +800,16 @@ void RequestUpdateZotero::onRequest(std::unique_ptr<proxygen::HTTPMessage> heade
 
 void GetBookPreviews::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers) noexcept
 {
+	std::thread(std::bind(&GetBookPreviews::load_preview,this,headers->getDecodedQueryParam("books"),headers->getDecodedQueryParam("query"),headers->getIntQueryParam("Fuzzyness",0),folly::EventBaseManager::get()->getEventBase())).detach();
+}
+
+
+void GetBookPreviews::load_preview(std::string bookname,std::string query,int fuzzyness, folly::EventBase *evb)
+{
 	std::vector<std::string> pillars;
-	std::stringstream ss(headers->getDecodedQueryParam("books"));
-	std::string search = headers->getDecodedQueryParam("query");
-	int fuzzynes = headers->getIntQueryParam("Fuzzyness",0);	
+	std::stringstream ss(bookname);
+	std::string search = query;
+	int fuzzynes = fuzzyness;
 	
 	auto &books = GetSearchHandler::GetBookManager().getMapOfBooks();
 	std::string fill;
@@ -822,9 +828,11 @@ void GetBookPreviews::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers) 
 			catch(...)
 			{}
 		}
-	return ResponseBuilder(downstream_)
-			.status(200,"Ok")
-			.header("Content-Type","application/json")
-			.body(std::move(js.dump()))
-			.sendWithEOM();
+	evb->runInEventBaseThread([resp = std::move(js.dump()),this]{
+							return ResponseBuilder(downstream_)
+							.status(200,"Ok")
+							.header("Content-Type","application/json")
+							.body(std::move(resp))
+							.sendWithEOM();
+});
 }
