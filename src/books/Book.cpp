@@ -403,7 +403,7 @@ std::string CBook::getPreview(std::string sWord, int fuzzyness)
 
 
     //*** Highlight found word ***//
-    size_t pos = func::returnToLower(finalResult).find(sWord);
+    size_t pos = func::returnToLower(finalResult).find(sMatch);
     finalResult.insert(pos, "<mark>");
     finalResult.insert(pos+6+sWord.length(), "</mark>");
 
