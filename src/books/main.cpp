@@ -88,7 +88,6 @@ int main()
             delete mapPages;
             alx::cout.write ("\b\b\n");
 
-
             counter++;
         }
         alx::cout.write("Results found: ", (int)counter, "\n");

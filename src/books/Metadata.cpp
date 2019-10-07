@@ -208,7 +208,7 @@ std::string CMetadata::getShow()
     std::string sResult = getAuthor();
 
     if(getDate() != -1)
-        sResult += ", " + getDate();
+        sResult += ", " + std::to_string(getDate());
 
     sResult += ".";
 
