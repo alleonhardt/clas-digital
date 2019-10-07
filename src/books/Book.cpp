@@ -399,6 +399,7 @@ std::string CBook::getPreview(std::string sWord, int fuzzyness)
 
     //*** Get Preview ***//
     alx::cout.write(alx::console::red_black, "GET PREVIEW.\n");
+    
     std::string finalResult = getPreviewMatch(sMatch, page);
 
     //Check whether preview found
@@ -408,9 +409,10 @@ std::string CBook::getPreview(std::string sWord, int fuzzyness)
 
     //*** Highlight found word ***//
     alx::cout.write(alx::console::red_black, "HIGHLIGHT PREVIEW.\n");
+
     size_t pos = func::returnToLower(finalResult).find(sMatch);
     finalResult.insert(pos, "<mark>");
-    finalResult.insert(pos+6+sWord.length(), "</mark>");
+    finalResult.insert(pos+6+sMatch.length(), "</mark>");
 
 
     //*** Shorten preview if needed ***//
@@ -469,7 +471,6 @@ size_t CBook::getBestMatch(std::string sWord, int fuzzyness, std::string& sMatch
         {
             if(it->second.size() == 0)
                 continue;
-
             sMatch = it->first;
             return it->second.front(); 
         }
