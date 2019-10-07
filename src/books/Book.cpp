@@ -373,6 +373,8 @@ int CBook::getNumMatches (std::vector<std::string>& vWords, std::map<int, std::v
 std::string CBook::getPreview(std::string sWord, int fuzzyness)
 {
     //*** Read ocr ***//
+    alx::cout.write(alx::console::red_black, "READ OCR.\n");
+
     std::ifstream read(getOcrPath(), std::ios::in);
 
     //Check, whether ocr could be loaded, or search is correct
@@ -383,18 +385,20 @@ std::string CBook::getPreview(std::string sWord, int fuzzyness)
 
 
     //*** Get page and match ***//
+    alx::cout.write(alx::console::red_black, "GET PAGE AND MATCH.\n");
     std::string sMatch;
     size_t page = getBestMatch(sWord, fuzzyness, sMatch);
 
     //Check whether page is correct
     if(page == 0)
     {
-        alx::cout.write(alx::console::red_black, getMetadata().getShow(), " - NO PAGE FOUND!!!!\n");
+        alx::cout.write(alx::console::red_black, " - NO PAGE FOUND!!!!\n");
         return "No preview";
     }
     
 
     //*** Get Preview ***//
+    alx::cout.write(alx::console::red_black, "GET PREVIEW.\n");
     std::string finalResult = getPreviewMatch(sMatch, page);
 
     //Check whether preview found
@@ -403,12 +407,15 @@ std::string CBook::getPreview(std::string sWord, int fuzzyness)
 
 
     //*** Highlight found word ***//
+    alx::cout.write(alx::console::red_black, "HIGHLIGHT PREVIEW.\n");
     size_t pos = func::returnToLower(finalResult).find(sMatch);
     finalResult.insert(pos, "<mark>");
     finalResult.insert(pos+6+sWord.length(), "</mark>");
 
 
     //*** Shorten preview if needed ***//
+    alx::cout.write(alx::console::red_black, "SHORTEN PREVIEW.\n");
+    
     if(finalResult.length() >= 150)
     {
         size_t minus = finalResult.length() - 150;
