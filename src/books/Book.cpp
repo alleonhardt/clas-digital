@@ -445,7 +445,7 @@ std::string CBook::getPreview(std::string sWord, int fuzzyness)
     for(unsigned int i=0; i<finalResult.length(); i++)
     {
         if(finalResult[i] == '\"' || finalResult[i] == '\'' || finalResult[i] == '\\') {
-            finalResult.insert(i-1, "\\");
+            finalResult.insert(i, "\\");
             i++;
         }
     }
