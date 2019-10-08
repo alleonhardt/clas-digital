@@ -373,7 +373,7 @@ int CBook::getNumMatches (std::vector<std::string>& vWords, std::map<int, std::v
 std::string CBook::getPreview(std::string sWord, int fuzzyness)
 {
     //*** Read ocr ***//
-    alx::cout.write(alx::console::red_black, "READ OCR.\n");
+    //alx::cout.write(alx::console::red_black, "READ OCR.\n");
 
     std::ifstream read(getOcrPath(), std::ios::in);
 
@@ -385,7 +385,7 @@ std::string CBook::getPreview(std::string sWord, int fuzzyness)
 
 
     //*** Get page and match ***//
-    alx::cout.write(alx::console::red_black, "GET PAGE AND MATCH.\n");
+    //alx::cout.write(alx::console::red_black, "GET PAGE AND MATCH.\n");
     std::string sMatch;
     size_t page = getBestMatch(sWord, fuzzyness, sMatch);
 
@@ -398,7 +398,7 @@ std::string CBook::getPreview(std::string sWord, int fuzzyness)
     
 
     //*** Get Preview ***//
-    alx::cout.write(alx::console::red_black, "GET PREVIEW.\n");
+    //alx::cout.write(alx::console::red_black, "GET PREVIEW.\n");
     
     std::string finalResult = getPreviewMatch(sMatch, page);
 
@@ -408,7 +408,7 @@ std::string CBook::getPreview(std::string sWord, int fuzzyness)
 
 
     //*** Highlight found word ***//
-    alx::cout.write(alx::console::red_black, "HIGHLIGHT PREVIEW.\n");
+    //alx::cout.write(alx::console::red_black, "HIGHLIGHT PREVIEW.\n");
 
     size_t pos = func::returnToLower(finalResult).find(sMatch);
     finalResult.insert(pos, "<mark>");
@@ -416,29 +416,43 @@ std::string CBook::getPreview(std::string sWord, int fuzzyness)
 
 
     //*** Shorten preview if needed ***//
-    alx::cout.write(alx::console::red_black, "SHORTEN PREVIEW.\n");
-    
+    //alx::cout.write(alx::console::red_black, "SHORTEN PREVIEW.\n");
+
     if(finalResult.length() >= 150)
     {
         size_t minus = finalResult.length() - 150;
-        size_t pos2 = finalResult.length() - pos;
         double fakFront = static_cast<double>(pos)/static_cast<double>(finalResult.length());
-        double fakBack = static_cast<double>(pos2)/static_cast<double>(finalResult.length());
 
         if(fakFront > 1.0)
             fakFront = 1.0;
-        if(fakBack > 1.0)
-            fakBack = 1.0;
 
         size_t eraseFront = minus*fakFront;
         size_t eraseBack = minus - eraseFront;
 
-        finalResult.erase(0, eraseFront);
-        finalResult.erase(finalResult.end()-eraseBack, finalResult.end());
+        finalResult.erase(0, (eraseFront-6));
+        finalResult.erase(finalResult.end()-(eraseBack-(sMatch.length()+7)), finalResult.end());
+
+        //Delete invalid chars front
+        for(;;)
+        {
+            if((int)finalResult.front() < 0)
+                finalResult.erase(0,1);
+            else
+                break;
+        }
+
+        //Delete invalid chars back
+        for(;;)
+        {
+            if((int)finalResult.back() < 0)
+                finalResult.pop_back();
+            else
+                break;
+        }
     } 
 
     //*** Append [...] front and back ***//
-    alx::cout.write(alx::console::red_black, "Appending [...]... \n");
+    //alx::cout.write(alx::console::red_black, "Appending [...]... \n");
     finalResult.insert(0, "[...] ");
     finalResult.append(" [...]");
 
@@ -451,8 +465,7 @@ std::string CBook::getPreview(std::string sWord, int fuzzyness)
         }
     }
 
-    alx::cout.write(alx::console::red_black, "returning result.\n");
-    
+    //alx::cout.write(alx::console::red_black, "returning result.\n");
     return finalResult;
 }
 
@@ -484,7 +497,7 @@ size_t CBook::getBestMatch(std::string sWord, int fuzzyness, std::string& sMatch
             return it->second.front(); 
         }
 
-        else if(fuzzyness == 1 && containsPage == 0)
+        if(fuzzyness == 1 && containsPage == 0)
         {
             if(it->first.find(sWord) != std::string::npos)
             {
@@ -495,7 +508,7 @@ size_t CBook::getBestMatch(std::string sWord, int fuzzyness, std::string& sMatch
             }
         }
 
-        else if(fuzzyness == 2 && fuzzyPage == 0)
+        if(fuzzyness == 2 && fuzzyPage == 0)
         {
             if(fuzzy::fuzzy_cmp(it->first.c_str(), sWord.c_str()) == true)
             {
@@ -540,6 +553,8 @@ std::string CBook::getPreviewMatch(std::string sWord, size_t page)
         //Read current line
         getline(read, sBuffer);
 
+
+        //*** FIND PAGE ***//
         if(pageFound == false)
         {
             if(func::checkPage(sBuffer) == true)
@@ -550,26 +565,45 @@ std::string CBook::getPreviewMatch(std::string sWord, size_t page)
                 pageFound = true;
         }
 
+
+        //*** FIND MATCH ***//
+
         //Check whether ". " was found
         if(sBuffer.find(". ") != std::string::npos)
         {
             result.append(sBuffer.substr(0, sBuffer.find(". ")));
 
+            //create map of words
             std::map<std::string, int> mapWords;
             func::extractWordsFromString(result, mapWords);
 
-            //Full search
+            //Full search, return current result if found
             for(auto it : mapWords) {
-                //if(it.first.compare(sWord) == 0)
-                if(func::compare(it.first.c_str(), sWord.c_str()) == true)
+                if(it.first.find(sWord) != std::string::npos)
                     return result;
             }
 
+            //Create new result with words after "."
             result = sBuffer.substr(sBuffer.find(". ")+2);
         }
+
+        //If no "." found, add complete buffer to result
         else
             result.append(sBuffer);
+
+
+        //*** FIND END OF PAGE ***//
+        if(func::checkPage(sBuffer) == true)
+           curPage++;
+        if(curPage>(page+1))
+            break;
     }
+
+    //Error output, why the match wasn't found (page not found or match not found on page)
+    if(pageFound == false)
+        alx::cout.write(alx::console::red_black, "PAGE NOT FOUND!\n");
+    else
+        alx::cout.write(alx::console::red_black, "MATCH NOT FOUDN!\n");
 
     return "No Preview";
 }
