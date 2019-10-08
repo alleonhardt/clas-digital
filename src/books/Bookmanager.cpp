@@ -170,6 +170,12 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
 
     //Delete search
     bool filterResults = search->getSearchOptions()->getFilterResults();
+    
+    //Set Status
+    if(filterResults==true)
+        search->setStatus("Checking if \""+vWords[0]+"\" and \""+vWords[i]+"\" are on the same page...  ");
+
+    //Delete search
     deleteSearch(id);
 
     //Create list of search results

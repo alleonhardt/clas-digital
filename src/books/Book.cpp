@@ -604,7 +604,7 @@ void CBook::shortenPreview(size_t pos, std::string& finalResult, size_t len_matc
     {
         if(finalResult[i] == '\"' || finalResult[i] == '\'' || finalResult[i] == '\\') {
             alx::cout.write("Here is a problem!\n");
-            finalResult.insert(i, "\\");
+            finalResult.insert(i, '\\');
             i++;
         }
     }
