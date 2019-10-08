@@ -581,7 +581,10 @@ void CBook::shortenPreview(size_t pos, std::string& finalResult, size_t len_matc
     size_t eraseFront = minus*fakFront;
     size_t eraseBack = minus - eraseFront;
 
-    finalResult.erase(0, (eraseFront-6));
+    if(eraseFront>6)
+        eraseFront-6;
+
+    finalResult.erase(0, eraseFront);
     finalResult.erase(finalResult.end()-(eraseBack-(len_match+7)), finalResult.end());
 
     //Delete invalid chars front
