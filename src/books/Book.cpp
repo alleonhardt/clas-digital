@@ -604,6 +604,7 @@ void CBook::shortenPreview(size_t pos, std::string& finalResult, size_t len_matc
             break;
     }
     
+    alx::cout.write(alx::console::red_black, "ESCAPING... ", finalResult, "...\n");
     //Check vor invalid literals and escape
     for(unsigned int i=0; i<finalResult.length(); i++)
     {
@@ -613,4 +614,5 @@ void CBook::shortenPreview(size_t pos, std::string& finalResult, size_t len_matc
             i++;
         }
     }
+    alx::cout.write(alx::console::red_black, "ESCAPING COMPLETE\n");
 }
