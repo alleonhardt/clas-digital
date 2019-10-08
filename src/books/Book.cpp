@@ -437,6 +437,8 @@ size_t CBook::getBestMatch(std::string sWord, int fuzzyness, std::string& sMatch
     std::string fuzzyMatch; 
     size_t containsPage=0;
     size_t fuzzyPage=0;
+    double ld_score = -1;
+    double cur_score = -1;
     for(auto it=mapWordsPages.begin(); it!=mapWordsPages.end(); it++)
     {
         //Full match
@@ -461,14 +463,15 @@ size_t CBook::getBestMatch(std::string sWord, int fuzzyness, std::string& sMatch
         }
 
         //Fuzzymatch
-        if(fuzzyness == 2 && fuzzyPage == 0)
+        if(fuzzyness == 2)
         {
-            if(fuzzy::fuzzy_cmp(it->first.c_str(), sWord.c_str()) == true)
+            if(fuzzy::fuzzy_cmp(it->first.c_str(), sWord.c_str(), cur_score) == true)
             {
-                if(it->second.size() == 0)
+                if(it->second.size() == 0 || cur_score < ld_score)
                     continue;
                 fuzzyPage = it->second.front();
                 fuzzyMatch = it->first;
+                ld_score = cur_score;
             }
         }
     }
@@ -601,7 +604,7 @@ void CBook::shortenPreview(size_t pos, std::string& finalResult, size_t len_matc
     {
         if(finalResult[i] == '\"' || finalResult[i] == '\'' || finalResult[i] == '\\') {
             alx::cout.write("Here is a problem!\n");
-            finalResult.insert(i, "\\");
+            finalResult.insert(i, '\\');
             i++;
         }
     }
