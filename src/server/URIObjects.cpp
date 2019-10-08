@@ -814,6 +814,7 @@ void GetBookPreviews::load_preview(std::string bookname,std::string query,int fu
 	auto &books = GetSearchHandler::GetBookManager().getMapOfBooks();
 	std::string fill;
 	nlohmann::json js;
+	std::string holdit = "";
 	while(getline(ss,fill,','))
 		if(fill!="")
 		{
@@ -821,13 +822,29 @@ void GetBookPreviews::load_preview(std::string bookname,std::string query,int fu
 			{
 				nlohmann::json entry;
 				entry["key"] = fill;
-
+				holdit += books.at(fill).getPreview(search,fuzzynes);
 				entry["preview"] = books.at(fill).getPreview(search,fuzzynes);
 				js["books"].push_back(entry);
 			}
 			catch(...)
 			{}
 		}
+	try
+	{
+		std::string x=js.dump();
+	}
+	catch(...)
+	{
+		alx::cout<<"Server crash on: "<<holdit<<alx::endl;
+		evb->runInEventBaseThread([this]{
+							return ResponseBuilder(downstream_)
+							.status(200,"Ok")
+							.header("Content-Type","application/json")
+							.body("{\"books\": []}")
+							.sendWithEOM();
+				});
+		return;
+	}
 	evb->runInEventBaseThread([resp = std::move(js.dump()),this]{
 							return ResponseBuilder(downstream_)
 							.status(200,"Ok")
@@ -835,4 +852,5 @@ void GetBookPreviews::load_preview(std::string bookname,std::string query,int fu
 							.body(std::move(resp))
 							.sendWithEOM();
 });
+	
 }
