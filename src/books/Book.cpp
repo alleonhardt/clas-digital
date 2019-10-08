@@ -587,6 +587,7 @@ void CBook::shortenPreview(size_t pos, std::string& finalResult, size_t len_matc
     //Delete invalid chars front
     for(;;)
     {
+        alx::cout.write(alx::console::red_black, "DELETE FRONT\n");
         if((int)finalResult.front() < 0)
             finalResult.erase(0,1);
         else
@@ -596,6 +597,7 @@ void CBook::shortenPreview(size_t pos, std::string& finalResult, size_t len_matc
     //Delete invalid chars back
     for(;;)
     {
+        alx::cout.write(alx::console::red_black, "DELETE BACK\n");
         if((int)finalResult.back() < 0)
             finalResult.pop_back();
         else
