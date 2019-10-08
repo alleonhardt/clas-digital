@@ -822,12 +822,18 @@ void GetBookPreviews::load_preview(std::string bookname,std::string query,int fu
 			{
 				nlohmann::json entry;
 				entry["key"] = fill;
+				alx::cout<<"Preview length: "<<books.at(fill).getPreview(search,fuzzynes).length()<<alx::endl;
+
 				holdit += books.at(fill).getPreview(search,fuzzynes);
+				alx::cout<<"Still alive"<<alx::endl;
 				entry["preview"] = books.at(fill).getPreview(search,fuzzynes);
+				alx::cout<<"Still alive2"<<alx::endl;
 				js["books"].push_back(entry);
 			}
-			catch(...)
-			{}
+			catch(std::exception &e)
+			{
+				alx::cout<<"Massive error: "<<e.what()<<alx::endl;
+			}
 		}
 	try
 	{
