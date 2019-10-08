@@ -168,7 +168,6 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
 
     search->removeBooks(results1, matches);
 
-        
     //Delete search
     bool filterResults = search->getSearchOptions()->getFilterResults();
     deleteSearch(id);
