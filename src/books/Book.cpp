@@ -570,7 +570,7 @@ std::string CBook::getPreviewMatch(std::string sWord, size_t page)
 void CBook::shortenPreview(size_t pos, std::string& finalResult, size_t len_match)
 {
 
-    alx::cout.write(alx::console::red_black, "SHORTEN PREVIEW\n");
+    alx::cout.write(alx::console::red_black, "SHORTEN PREVIEW: ", finalResult, "\n");
 
     size_t minus = finalResult.length() - 150;
     double fakFront = static_cast<double>(pos)/static_cast<double>(finalResult.length());
@@ -604,12 +604,12 @@ void CBook::shortenPreview(size_t pos, std::string& finalResult, size_t len_matc
             break;
     }
     
-    alx::cout.write(alx::console::red_black, "ESCAPING... ", finalResult, "...\n");
+    alx::cout.write(alx::console::red_black, "ESCAPING... \n");
     //Check vor invalid literals and escape
     for(unsigned int i=0; i<finalResult.length(); i++)
     {
         if(finalResult[i] == '\"' || finalResult[i] == '\'' || finalResult[i] == '\\') {
-            alx::cout.write("Here is a problem! - ", finalResult, "\n");
+            alx::cout.write("Here is a problem! - \n");
             finalResult.insert(i, "\\");
             i++;
         }
