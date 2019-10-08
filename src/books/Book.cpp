@@ -569,6 +569,9 @@ std::string CBook::getPreviewMatch(std::string sWord, size_t page)
 
 void CBook::shortenPreview(size_t pos, std::string& finalResult, size_t len_match)
 {
+
+    alx::cout.write(alx::console::red_black, "SHORTEN PREVIEW\n");
+
     size_t minus = finalResult.length() - 150;
     double fakFront = static_cast<double>(pos)/static_cast<double>(finalResult.length());
 
