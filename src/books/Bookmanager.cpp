@@ -168,21 +168,22 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
 
     search->removeBooks(results1, matches);
 
-    //Filter results
-    if(search->getSearchOptions()->getFilterResults() == true) {
-        //Delete search
-        deleteSearch(id);
-        return sortByMatches(convertToList(results1, matches), sInput, fuzzyness); 
-    }
         
     //Delete search
+    bool filterResults = search->getSearchOptions()->getFilterResults();
     deleteSearch(id);
 
-    //Return search results
+    //Create list of search results
+    std::list<CBook*>* listResults = new std::list<CBook*>;
     if(matches.size() == 0)
-        return convertToList(results1);
+        listResults = convertToList(results1);
     else
-        return convertToList(results1, matches); 
+        listResults = convertToList(results1, matches); 
+    
+    if(filterResults == true)
+        return sortByMatches(listResults, sInput, fuzzyness);
+    else
+        return listResults;
 }
 
 std::list<std::string>* CBookManager::getSuggestions(std::string sInput)

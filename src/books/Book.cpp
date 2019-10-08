@@ -373,8 +373,6 @@ int CBook::getNumMatches (std::vector<std::string>& vWords, std::map<int, std::v
 std::string CBook::getPreview(std::string sWord, int fuzzyness)
 {
     //*** Read ocr ***//
-    //alx::cout.write(alx::console::red_black, "READ OCR.\n");
-
     std::ifstream read(getOcrPath(), std::ios::in);
 
     //Check, whether ocr could be loaded, or search is correct
@@ -385,21 +383,17 @@ std::string CBook::getPreview(std::string sWord, int fuzzyness)
 
 
     //*** Get page and match ***//
-    //alx::cout.write(alx::console::red_black, "GET PAGE AND MATCH.\n");
     std::string sMatch;
     size_t page = getBestMatch(sWord, fuzzyness, sMatch);
 
     //Check whether page is correct
     if(page == 0)
     {
-        alx::cout.write(alx::console::red_black, " - NO PAGE FOUND!!!!\n");
+        alx::cout.write(alx::console::red_black, getMetadata().getShow(), " - NO PAGE FOUND!!!!\n");
         return "No preview";
     }
     
-
     //*** Get Preview ***//
-    //alx::cout.write(alx::console::red_black, "GET PREVIEW.\n");
-    
     std::string finalResult = getPreviewMatch(sMatch, page);
 
     //Check whether preview found
@@ -408,64 +402,20 @@ std::string CBook::getPreview(std::string sWord, int fuzzyness)
 
 
     //*** Highlight found word ***//
-    //alx::cout.write(alx::console::red_black, "HIGHLIGHT PREVIEW.\n");
-
     size_t pos = func::returnToLower(finalResult).find(sMatch);
     finalResult.insert(pos, "<mark>");
     finalResult.insert(pos+6+sMatch.length(), "</mark>");
 
 
     //*** Shorten preview if needed ***//
-    //alx::cout.write(alx::console::red_black, "SHORTEN PREVIEW.\n");
-
-    if(finalResult.length() >= 150)
-    {
-        size_t minus = finalResult.length() - 150;
-        double fakFront = static_cast<double>(pos)/static_cast<double>(finalResult.length());
-
-        if(fakFront > 1.0)
-            fakFront = 1.0;
-
-        size_t eraseFront = minus*fakFront;
-        size_t eraseBack = minus - eraseFront;
-
-        finalResult.erase(0, (eraseFront-6));
-        finalResult.erase(finalResult.end()-(eraseBack-(sMatch.length()+7)), finalResult.end());
-
-        //Delete invalid chars front
-        for(;;)
-        {
-            if((int)finalResult.front() < 0)
-                finalResult.erase(0,1);
-            else
-                break;
-        }
-
-        //Delete invalid chars back
-        for(;;)
-        {
-            if((int)finalResult.back() < 0)
-                finalResult.pop_back();
-            else
-                break;
-        }
-    } 
+    if(finalResult.length() > 150)
+        shortenPreview(pos, finalResult, sMatch.length());
+     
 
     //*** Append [...] front and back ***//
-    //alx::cout.write(alx::console::red_black, "Appending [...]... \n");
     finalResult.insert(0, "[...] ");
     finalResult.append(" [...]");
 
-    for(unsigned int i=0; i<finalResult.length(); i++)
-    {
-        if(finalResult[i] == '\"' || finalResult[i] == '\'' || finalResult[i] == '\\') {
-            alx::cout.write("Here is a problem!\n");
-            finalResult.insert(i, "\\");
-            i++;
-        }
-    }
-
-    //alx::cout.write(alx::console::red_black, "returning result.\n");
     return finalResult;
 }
 
@@ -489,6 +439,7 @@ size_t CBook::getBestMatch(std::string sWord, int fuzzyness, std::string& sMatch
     size_t fuzzyPage=0;
     for(auto it=mapWordsPages.begin(); it!=mapWordsPages.end(); it++)
     {
+        //Full match
         if(func::compare(it->first.c_str(), sWord.c_str()) == true)
         {
             if(it->second.size() == 0)
@@ -497,6 +448,7 @@ size_t CBook::getBestMatch(std::string sWord, int fuzzyness, std::string& sMatch
             return it->second.front(); 
         }
 
+        //Contains match
         if(fuzzyness == 1 && containsPage == 0)
         {
             if(it->first.find(sWord) != std::string::npos)
@@ -508,6 +460,7 @@ size_t CBook::getBestMatch(std::string sWord, int fuzzyness, std::string& sMatch
             }
         }
 
+        //Fuzzymatch
         if(fuzzyness == 2 && fuzzyPage == 0)
         {
             if(fuzzy::fuzzy_cmp(it->first.c_str(), sWord.c_str()) == true)
@@ -520,6 +473,7 @@ size_t CBook::getBestMatch(std::string sWord, int fuzzyness, std::string& sMatch
         }
     }
 
+    //Check for best match!
     if(containsPage!=0)
     {
         sMatch = containsMatch;
@@ -536,11 +490,12 @@ size_t CBook::getBestMatch(std::string sWord, int fuzzyness, std::string& sMatch
 
 /**
 * @brief Find preview with matched word (best match), and page on which the match was found.
-* @ 
+* @param[in] sWord (best Match)
+* @param[in] page (page on which match was found)
+* @return preview for this book
 */
 std::string CBook::getPreviewMatch(std::string sWord, size_t page)
 {
-    alx::cout.write("Match: ", sWord, "\n");
     //Read ocr
     std::ifstream read(getOcrPath(), std::ios::in);
 
@@ -606,4 +561,48 @@ std::string CBook::getPreviewMatch(std::string sWord, size_t page)
         alx::cout.write(alx::console::red_black, "MATCH NOT FOUDN!\n");
 
     return "No Preview";
+}
+
+
+void CBook::shortenPreview(size_t pos, std::string& finalResult, size_t len_match)
+{
+    size_t minus = finalResult.length() - 150;
+    double fakFront = static_cast<double>(pos)/static_cast<double>(finalResult.length());
+
+    if(fakFront > 1.0)
+        fakFront = 1.0;
+
+    size_t eraseFront = minus*fakFront;
+    size_t eraseBack = minus - eraseFront;
+
+    finalResult.erase(0, (eraseFront-6));
+    finalResult.erase(finalResult.end()-(eraseBack-(len_match+7)), finalResult.end());
+
+    //Delete invalid chars front
+    for(;;)
+    {
+        if((int)finalResult.front() < 0)
+            finalResult.erase(0,1);
+        else
+            break;
+    }
+
+    //Delete invalid chars back
+    for(;;)
+    {
+        if((int)finalResult.back() < 0)
+            finalResult.pop_back();
+        else
+            break;
+    }
+    
+    //Check vor invalid literals and escape
+    for(unsigned int i=0; i<finalResult.length(); i++)
+    {
+        if(finalResult[i] == '\"' || finalResult[i] == '\'' || finalResult[i] == '\\') {
+            alx::cout.write("Here is a problem!\n");
+            finalResult.insert(i, "\\");
+            i++;
+        }
+    }
 }
