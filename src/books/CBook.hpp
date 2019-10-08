@@ -157,7 +157,32 @@ public:
     int getNumMatches (std::vector<std::string>& vWords, std::map<int, std::vector<std::string>>* (CBook::*find)(std::string, std::map<std::string, std::vector<size_t>>&));
 
 
+    // ***** GET PREVIEW - functions ***** //
+
+    /**
+    * @brief get a preview of the page where the searched word has been found
+    * @param sWord (searched word)
+    * @param fuzzyness
+    * @return Preview
+    */
     std::string getPreview(std::string sWord, int fuzzyness);
+
+    /**
+    * @brief find page with best match. Deliver page and match
+    * @param[in] sWord (searched word)
+    * @param[in] fuzzyness
+    * @param[in, out] sMatch (found match)
+    * @return Page on which the match was found.
+    */
     size_t getBestMatch(std::string sWord, int fuzzyness, std::string& sMatch);
+
+    /**
+    * @brief Find preview with matched word (best match), and page on which the match was found.
+    * @param[in] sWord (best Match)
+    * @param[in] page (page on which match was found)
+    * @return preview for this book
+    */
     std::string getPreviewMatch(std::string sWord, size_t page);
+
+    void shortenPreview(size_t pos, std::string& finalResult, size_t len_match);
 };
