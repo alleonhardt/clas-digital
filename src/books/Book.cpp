@@ -372,8 +372,6 @@ int CBook::getNumMatches (std::vector<std::string>& vWords, std::map<int, std::v
 */
 std::string CBook::getPreview(std::string sWord, int fuzzyness)
 {
-    alx::cout.write(alx::console::red_black, "FUZZYNESS = ", fuzzyness, "\n");
-
     //*** Read ocr ***//
     std::ifstream read(getOcrPath(), std::ios::in);
 
@@ -469,7 +467,7 @@ size_t CBook::getBestMatch(std::string sWord, int fuzzyness, std::string& sMatch
         {
             if(fuzzy::fuzzy_cmp(it->first.c_str(), sWord.c_str(), cur_score) == true)
             {
-                if(it->second.size() == 0 || cur_score < ld_score)
+                if(it->second.size() == 0 || cur_score > ld_score)
                     continue;
                 fuzzyPage = it->second.front();
                 fuzzyMatch = it->first;
