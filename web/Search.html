@@ -65,6 +65,10 @@ mark {
 	margin-left: 2rem;
 }
 
+.specialultbut:hover {
+	box-shadow: 0px 3px 0px #0000FF;
+}
+
 /*Styling the search bar*/
 .form-wrapper-2 {
 	display: inline-block;
@@ -529,7 +533,8 @@ function ShowSelectedValues(obj)
 {
 	let json = obj.drawablejson;
 	obj.innerHTML = "";
-	document.getElementById("ResultBanner").innerHTML = "<h1 class='headerStyle'>Search Results for: \""+lastInput+"\", "+json.books.length+" matches<a class='citationButton' onclick='OpenFilter();return true;'>Filter results</a><a class='buttontwo citationButton' style='margin-left: 1rem' onclick='CreateBibliography();return true;'>Create Bibliography</a></h1>";
+					 document.getElementById("ResultBanner").innerHTML =  "<div style='margin-top: 2rem;margin-bottom:0;'><button class='specialultbut' onclick='OpenFilter();return true;' style='background:white;margin-right: 0.5rem;border: 0;'>Filter Results</button><button class='specialultbut' style='background:white;border: 0;' onclick='CreateBibliography();return true;'>Create Bibliography</button></div><hr style='padding: 0;'><span style='color: grey;'>"+json.books.length+" Ergebnisse</span>";
+	//"<h1 class='headerStyle'>Search Results for: \""+lastInput+"\", "+json.books.length+" matches<a class='citationButton' onclick='OpenFilter();return true;'>Filter results</a><a class='buttontwo citationButton' style='margin-left: 1rem' onclick='CreateBibliography();return true;'>Create Bibliography</a></h1>";
 	//json.show_from = 0;
 	//json.show_to = Math.min(10,json.books.length);
 	obj.start = json.show_from;
