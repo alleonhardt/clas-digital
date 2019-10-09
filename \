@@ -17,10 +17,6 @@ mark {
 	font-weight: bold;
 	background: white;
 }
-.resultbox {
-	margin-left: 11%;
-	margin-right: 11%;
-}
 
 .some_grid_class {
 	display: grid;
@@ -31,10 +27,10 @@ mark {
 /*Keeping the search box in the middle in the top of the screen*/
 .button_box_top {
 	text-align: center;
-	width: 100%;
+	width: 80%;
 	margin-top: 10%;
 	padding-top: 20px;
-	margin-left: 0;
+	margin-left: 10%;
 	padding-bottom: 4rem;
 	background: white;
 	overflow: visible;
@@ -61,6 +57,7 @@ mark {
 .divsearch {
 	margin: 2rem;
 	padding: 1rem;
+	border: 2px solid black;
 }
 
 .progbar {
@@ -90,14 +87,16 @@ mark {
 	border: 0;
 	background: #ffffff;
 }
-
-.btclass2 {
-	background: white;
+.form-wrapper-2 .btclass2 {
+	color: #FFFFFF;
+	position: relative;
+	overflow: visible;
+	background: #777777;
+	padding: 0;
+	position: relative;
 	border: 0;
-}
-
-.btclass2:hover {
-	border-bottom: 3px solid green;
+	height: 40px;
+	width: 10%;
 }
 
 .form-wrapper-2 .btclass2:hover {
@@ -525,7 +524,7 @@ function UpdateProgress(sid)
 				if(Math.floor(jsObj.progress)==-1)
 					return;
 			}
-			window.setTimeout(function(){UpdateProgress(sid);},500);
+			window.setTimeout(function(){UpdateProgress(sid);},3000);
 		}
 		progHandler.send(null);
 }
@@ -548,7 +547,6 @@ function ShowSelectedValues(obj)
 			
 			let newList = document.createElement("div");
 			newList.id = json.books[i].scanId;
-			newList.classList.add("resultbox");
 			let inner = "";
 			if(!json.books[i].hasocr || (json.books[i].hasocr == undefined))
 			{
@@ -598,10 +596,9 @@ function ShowSelectedValues(obj)
 	}
 	
 	val+="</h1>";
-	//let val="<hr>";
 	obj.innerHTML+=val;
 	
-	let requ = "/getBookPreviews?query="+encodeURIComponent(lastInput);
+	let requ = "/getBookPreviews?query="+lastInput;
 	requ+="&fuzzyness=";
 	requ+=document.getElementById("FuzzyID").value;
 	requ+="&books=";
@@ -672,7 +669,6 @@ function sendToPage(name)
 	filterOpts["ShowOnlyTextsWithOCR"] = false;
 	document.getElementById("ResultBanner").innerHTML="";
 	//First of all put the search box to the top in order to show the results
-	
 	let searchbox = document.getElementById("searchboxid");
 	searchbox.setAttribute("class","button_box_top");
 
@@ -1070,7 +1066,7 @@ window.addEventListener("load",User.initialise,false);
 					<ol id="ordered_pillars"></ol>
 				</div>
 				<div class="slidecontainer">
-					<p class="slider">Fuzzyness: </p>
+					<p class="slider">Fuzzyness (Smaller is more accurate, zero means no fuzzy search): </p>
 					<p id="SliderNum" class="sliderNum"></p>
 					<input oninput="document.getElementById('SliderNum').innerHTML=getSliderValue(this.value);" id="FuzzyID" style="float:right;"type="range" min="0" max="2" value="0" class="slider" id="myRange"></div>
 				<div class="checker">
@@ -1120,11 +1116,11 @@ window.addEventListener("load",User.initialise,false);
 		</div>
 
 
-		<div id="searchboxid" class="button_box_top">
-				<!--<div class="form-wrapper-2 cf"> -->
-					<input id="SpecialSID" style='padding: 0.3rem;width: 20%;border-radius: 25px;' type="text" placeholder="Search here..." required>
-					<button id="srchButton" class="srchBtrn" style='display:none;' type="button" onclick="sendToPage('SpecialSID')">Search</button></input>
-					<button class="btclass2" type="button" onclick="openSearchOpts('AdvancedSearchOptions')">Advanced</button>
+		<!--<div id="searchboxid" class="button_box_top">
+				<div class="form-wrapper-2 cf"> -->
+					<div style='top: 5rem;'><input id="SpecialSID" type="text" placeholder="Search here..." required>
+						<button id="srchButton" class="srchBtrn" type="button" onclick="sendToPage('SpecialSID')">Search</button></div>
+				<!--<button class="btclass2" type="button" onclick="openSearchOpts('AdvancedSearchOptions')">Advanced</button>-->
 				<!--</div>-->
 			<div id="ResultBanner"></div>
 			<div id="SearchHitList" start="0" class="list-type2"></div>
