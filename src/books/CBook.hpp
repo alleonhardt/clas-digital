@@ -24,6 +24,11 @@ private:
     std::string m_sAuthor;
     int m_date;
 
+    //Map of matches
+    std::map<std::string, std::list<std::string>> m_mapContains;      
+    std::map<std::string, std::list<std::string>> m_mapFuzzy;
+
+
 public:
 
     CBook();
@@ -88,6 +93,10 @@ public:
     * @brief return whether book is publically accessable 
     */
     bool getPublic();
+
+
+    std::map<std::string, std::list<std::string>>& getMapContains();
+    std::map<std::string, std::list<std::string>>& getMapFuzzy();
  
     // **** SETTER **** //
     
@@ -157,6 +166,8 @@ public:
     int getNumMatches (std::vector<std::string>& vWords, std::map<int, std::vector<std::string>>* (CBook::*find)(std::string, std::map<std::string, std::vector<size_t>>&));
 
 
+    int getMatches(std::string sInput, int fuzzyness);
+
     // ***** GET PREVIEW - functions ***** //
 
     /**
@@ -165,7 +176,7 @@ public:
     * @param fuzzyness
     * @return Preview
     */
-    std::string getPreview(std::string sWord, int fuzzyness);
+    std::string getPreview(std::string sWord);
 
     /**
     * @brief find page with best match. Deliver page and match
@@ -174,9 +185,9 @@ public:
     * @param[in, out] sMatch (found match)
     * @return Page on which the match was found.
     */
-    size_t getBestMatch(std::string sWord, int fuzzyness, std::string& sMatch);
+    size_t getBestMatch(std::string sWord, std::string &sMatch);
 
-    /**
+    /*
     * @brief Find preview with matched word (best match), and page on which the match was found.
     * @param[in] sWord (best Match)
     * @param[in] page (page on which match was found)

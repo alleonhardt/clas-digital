@@ -59,6 +59,12 @@ CMetadata& CBook::getMetadata() {
     return m_Metadata;
 }
 
+std::map<std::string, std::list<std::string>>& CBook::getMapContains() {
+    return m_mapContains;
+}
+std::map<std::string, std::list<std::string>>& CBook::getMapFuzzy() {
+    return m_mapFuzzy;
+}
 
 // **** Setter **** //
 
@@ -325,6 +331,33 @@ void CBook::removePages2(std::map<int, std::vector<std::string>>* r1, std::map<i
     }
 }
 
+int CBook::getMatches(std::string sInput, int fuzzyness) 
+{
+    //Load map of Words 
+    std::map<std::string, std::vector<size_t>> mapWordsPages;
+    loadPages(mapWordsPages);
+
+
+    if(fuzzyness == 0)
+        return mapWordsPages[sInput].size();
+
+    int matches=0;
+    if(fuzzyness==1)
+    {
+        for(std::string sMatch : m_mapContains[sInput])
+            matches += mapWordsPages[sMatch].size();
+    }
+
+    if(fuzzyness==2)
+    {
+        for(std::string sMatch : m_mapFuzzy[sInput])
+            matches += mapWordsPages[sMatch].size();
+    }
+    
+    return matches;
+}
+    
+
 /**
 * @brief getNumMatches returns number of matches of this book
 */
@@ -370,24 +403,24 @@ int CBook::getNumMatches (std::vector<std::string>& vWords, std::map<int, std::v
 * @param fuzzyness
 * @return Preview
 */
-std::string CBook::getPreview(std::string sWord, int fuzzyness)
+std::string CBook::getPreview(std::string sWord)
 {
     //*** Read ocr ***//
     std::ifstream read(getOcrPath(), std::ios::in);
 
     //Check, whether ocr could be loaded, or search is correct
     if(!read)
-        return "<span style='color:red;'> NO OCR </span>";
+        return "<span style='color:red;'> NO SCANS EXIST - sorry for that.</span>";
     if(sWord.find("+") != std::string::npos)
         return "No preview - (Searching for two words)";
 
 
     //*** Get page and match ***//
     std::string sMatch;
-    size_t page = getBestMatch(func::returnToLower(sWord), fuzzyness, sMatch);
+    size_t page = getBestMatch(func::returnToLower(sWord), sMatch);
 
     //Check whether page is correct
-    if(page == 0)
+    if(page == 10000000)
     {
         alx::cout.write(alx::console::red_black, getMetadata().getShow(), " - NO PAGE FOUND!!!!\n");
         return "No preview";
@@ -427,68 +460,31 @@ std::string CBook::getPreview(std::string sWord, int fuzzyness)
 * @param[in, out] sMatch (found match)
 * @return Page on which the match was found.
 */
-size_t CBook::getBestMatch(std::string sWord, int fuzzyness, std::string& sMatch)
+size_t CBook::getBestMatch(std::string sWord, std::string& sMatch)
 {
     //Load map of Words
     std::map<std::string, std::vector<size_t>> mapWordsPages;
     loadPages(mapWordsPages);
 
-    std::string containsMatch;
-    std::string fuzzyMatch; 
-    size_t containsPage=1000000;
-    size_t fuzzyPage=1000000;
-    double ld_score = 100;
-    double cur_score = -1;
-    for(auto it=mapWordsPages.begin(); it!=mapWordsPages.end(); it++)
-    {
-        //Full match
-        if(func::compare(it->first.c_str(), sWord.c_str()) == true)
-        {
-            if(it->second.size() == 0)
-                continue;
-            sMatch = it->first;
-            return it->second.front(); 
-        }
-
-        //Contains match
-        if(fuzzyness == 1 && containsPage == 0)
-        {
-            if(it->first.find(sWord) != std::string::npos)
-            {
-                if(it->second.size() == 0)
-                    continue;
-                containsPage = it->second.front();
-                containsMatch=it->first;
-            }
-        }
-
-        //Fuzzymatch
-        if(fuzzyness == 2)
-        {
-            if(fuzzy::fuzzy_cmp(it->first.c_str(), sWord.c_str(), cur_score) == true)
-            {
-                if(it->second.size() == 0 || cur_score > ld_score)
-                    continue;
-                fuzzyPage = it->second.front();
-                fuzzyMatch = it->first;
-                ld_score = cur_score;
-            }
-        }
+    //Try Full match
+    if(mapWordsPages.count(sWord) > 0) {
+        sMatch = sWord;
+        return mapWordsPages[sWord].front();
     }
 
-    //Check for best match!
-    if(containsPage!= 1000000)
-    {
-        sMatch = containsMatch;
-        return containsPage;
+    //Try Contains match
+    if(m_mapContains.count(sWord)>0 && mapWordsPages.count(m_mapContains[sWord].front()) > 0) {
+        sMatch = m_mapContains[sWord].front();
+        return mapWordsPages[sMatch].front();
     }
-    else if(fuzzyPage != 1000000)
-    {
-        sMatch = fuzzyMatch;
-        return fuzzyPage;
+
+    //Try Fuzzy match
+    if(mapWordsPages.count(m_mapFuzzy[sWord].front()) > 0) {
+        sMatch = m_mapFuzzy[sWord].front();
+        return mapWordsPages[sMatch].front();
     }
-    else
-        return 0;
+
+    return 10000000;
 } 
 
 /**
@@ -501,6 +497,8 @@ std::string CBook::getPreviewMatch(std::string sWord, size_t page)
 {
     //Read ocr
     std::ifstream read(getOcrPath(), std::ios::in);
+
+    alx::cout.write("Match: ", sWord, "\n", "Page: ", page, "\n");
 
     size_t curPage = 0;
     bool pageFound = false;

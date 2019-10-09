@@ -83,7 +83,7 @@ public:
     * @brief calls spezific search function, searches, and creates map of  matches. Removes all 
     * books that do not match with search options.
     */
-    std::map<std::string, CBook*>* search(std::map<std::string, std::map<std::string, CBook*>>& mWs, std::map<std::string, std::map<std::string, CBook*>>& mWsTitle, std::map<std::string, double>& matches);
+    std::map<std::string, CBook*>* search(std::map<std::string, std::map<std::string, CBook*>>& mWs, std::map<std::string, std::map<std::string, CBook*>>& mWsTitle);
 
     /**
     * @brief search full-match
@@ -98,7 +98,7 @@ public:
     * @param[in, out] mapSR map of search results
     */
     void containsSearch(std::map<std::string, std::map<std::string, CBook*>>& mapWords,
-                     std::map<std::string, CBook*>* mapSR, std::map<std::string, double>& matches);
+                     std::map<std::string, CBook*>* mapSR);
 
     /**
     * @brief search fuzzy 
@@ -106,7 +106,7 @@ public:
     * @param[in, out] mapSR searchresults
     */
     void fuzzySearch(std::map<std::string, std::map<std::string, CBook*>>& mapWords, 
-                     std::map<std::string, CBook*>* mapSR, std::map<std::string, double>& matches);
+                     std::map<std::string, CBook*>* mapSR);
 
     /**
     * @brief check whether searched word matches with author of a book.
@@ -117,7 +117,7 @@ public:
     * @brief remove all books that do not match with searchoptions
     * @param[in, out] mapSR map of search results
     */
-    void removeBooks(std::map<std::string, CBook*>* mapSR, std::map<std::string, double>& matches);
+    void removeBooks(std::map<std::string, CBook*>* mapSR);
 
     /**
     * @brief check whether book-metadata matches with searchoptions
@@ -133,8 +133,7 @@ public:
     * @param[out] matches
     * @param[in] value
     */
-    void myInsert(std::map<std::string, CBook*>* mapSR, std::map<std::string, CBook*>& found,
-                            std::map<std::string, double>& matches, double value);
+    void myInsert(std::map<std::string, CBook*>* mapSR, std::map<std::string, CBook*>& found, std::string sMatch);
 
     /**
     * @brief delete searchOptions

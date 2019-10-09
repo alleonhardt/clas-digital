@@ -87,8 +87,6 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
 {
     //Create empty map of results and matches
     std::map<std::string, CBook*>* results1 = new std::map<std::string, CBook*>;
-    std::map<std::string, double> matches;
-
 
     //Check whether search exists
     if(m_mapSearchs.count(id) == 0)
@@ -107,7 +105,7 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
     //Search main word
     search->setStatus("Searching " + vWords[0] + "... ");
     search->setWord(vWords[0]);
-    results1 = search->search(m_mapWords, m_mapWordsTitle, matches);
+    results1 = search->search(m_mapWords, m_mapWordsTitle);
 
     //Searching Author
     search->setStatus("Searching Author...");
@@ -128,8 +126,7 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
         search->setStatus("Searching " + vWords[i] + "... ");
 
         //Get results for second word
-        std::map<std::string, double> matches2;
-        std::map<std::string, CBook*>* results2 = search->search(m_mapWords, m_mapWordsTitle, matches2);
+        std::map<std::string, CBook*>* results2 = search->search(m_mapWords, m_mapWordsTitle);
 
         //Set Status
         search->setStatus("Checking if \""+vWords[0]+"\" and \""+vWords[i]+"\" are on the same page...  ");
@@ -141,18 +138,11 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
         {
             //Erase element if it doesn't occure in results2
             if(results2->count(it->first) == 0)
-            {
-                matches.erase(it->first);
                 results1->erase(it++);
-            }
 
             //Erase element if it does not occure on the same page
             else if(it->second->getOcr() == true && it->second->getNumMatches(sInput, fuzzyness) == 0)
-            {
-                //Erase match and searchresult
-                matches.erase(it->first);
                 results1->erase(it++);
-            }
 
             else
                 ++it;
@@ -166,26 +156,21 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
         delete results2;
     }
 
-    search->removeBooks(results1, matches);
+    search->removeBooks(results1);
 
     //Delete search
     bool filterResults = search->getSearchOptions()->getFilterResults();
     
     //Create list of search results
-    std::list<CBook*>* listResults = new std::list<CBook*>;
-    if(matches.size() == 0)
-        listResults = convertToList(results1);
-    else
-        listResults = convertToList(results1, matches); 
+    std::list<CBook*>* listResults = convertToList(results1); 
     
+    //Filter results
     if(filterResults == true)
         return sortByMatches(listResults, sInput, fuzzyness, search);
-    else
-    {
-        //Delete search
-        deleteSearch(id);
-        return listResults;
-    }
+
+    //Delete search
+    deleteSearch(id);
+    return listResults;
 }
 
 std::list<std::string>* CBookManager::getSuggestions(std::string sInput)
@@ -254,8 +239,9 @@ std::list<CBook*>* CBookManager::sortByMatches(std::list<CBook*>* listSR, std::s
 
     for(auto it=listSR->begin(); it!=listSR->end(); it++) {
         mapSR->insert(std::pair<std::string, CBook*> ((*it)->getKey(), (*it)));
-        double numMatches = (*it)->getNumMatches(sInput, fuzzy);
+        double numMatches = (*it)->getMatches(sInput, fuzzy);
         matches[(*it)->getKey()] = numMatches*(-1);
+
         search->setStatus("Calculating matches: " + (*it)->getMetadata().getShow() + " ");
         search->setProgress(static_cast<float>(counter)/static_cast<float>(listSR->size()));
     }
