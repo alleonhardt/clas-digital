@@ -249,11 +249,15 @@ std::list<CBook*>* CBookManager::sortByMatches(std::list<CBook*>* listSR, std::s
     std::map<std::string, CBook*>* mapSR = new std::map<std::string, CBook*>;
     std::map<std::string, double> matches;
 
+    search->setProgress(0);
+    size_t counter=0;
+
     for(auto it=listSR->begin(); it!=listSR->end(); it++) {
         mapSR->insert(std::pair<std::string, CBook*> ((*it)->getKey(), (*it)));
         double numMatches = (*it)->getNumMatches(sInput, fuzzy);
         matches[(*it)->getKey()] = numMatches*(-1);
-        search->setStatus("Calculating matches: " + (*it)->getMetadata().getShow());
+        search->setStatus("Calculating matches: " + (*it)->getMetadata().getShow() + " ");
+        search->setProgress(static_cast<float>(counter)/static_cast<float>(listSR->size()));
     }
     
     return convertToList(mapSR, matches);
