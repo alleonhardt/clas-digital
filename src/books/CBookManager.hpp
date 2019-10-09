@@ -79,7 +79,7 @@ public:
     * @param[in] fuzzyness (set fuzzyness)
     * @return sorted list of search results
     */
-    std::list<CBook*>* sortByMatches(std::list<CBook*>* listSR, std::string sInput, int fuzzyness);
+    std::list<CBook*>* sortByMatches(std::list<CBook*>* listSR, std::string sInput, int fuzzyness, CSearch* search);
 
     /**
     * @brief Convert to list, without sortig (only, when normal search is selected) 
