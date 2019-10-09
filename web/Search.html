@@ -752,12 +752,15 @@ function sendToPage(name)
 
 		if(document.getElementById("sortway").value == "sortbyalphabeticalaz")
 		{
-			jsonObj.books.sort(function(a,b){if(a.description.toUpperCase()>b.description.toUpperCase())return 1;if(b.description.toUpperCase()>a.description.toUpperCase()) return -1;return 0;});
+			jsonObj.books.sort(function(a,b){if(a.description[0]==',') return 1;if(b.description[0]==',') return -1;
+			if(a.description.toUpperCase()>b.description.toUpperCase())return 1;if(b.description.toUpperCase()>a.description.toUpperCase()) return -1;return 0;});
 		}
 
 		if(document.getElementById("sortway").value == "sortbyalphabeticalza")
 		{
-			jsonObj.books.sort(function(a,b){if(a.description.toUpperCase()<b.description.toUpperCase())return 1;if(b.description.toUpperCase()<a.description.toUpperCase()) return -1;return 0;});
+			jsonObj.books.sort(function(a,b){
+			if(a.description[0]==',') return -1;if(b.description[0]==',') return 1;
+					 if(a.description.toUpperCase()<b.description.toUpperCase())return 1;if(b.description.toUpperCase()<a.description.toUpperCase()) return -1;return 0;});
 		}
 
 		jsonObj.show_from = 0;

@@ -800,7 +800,7 @@ void RequestUpdateZotero::onRequest(std::unique_ptr<proxygen::HTTPMessage> heade
 
 void GetBookPreviews::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers) noexcept
 {
-	std::thread(std::bind(&GetBookPreviews::load_preview,this,headers->getDecodedQueryParam("books"),headers->getDecodedQueryParam("query"),headers->getIntQueryParam("Fuzzyness",0),folly::EventBaseManager::get()->getEventBase())).detach();
+	std::thread(std::bind(&GetBookPreviews::load_preview,this,headers->getDecodedQueryParam("books"),headers->getDecodedQueryParam("query"),headers->getIntQueryParam("fuzzyness",0),folly::EventBaseManager::get()->getEventBase())).detach();
 }
 
 
