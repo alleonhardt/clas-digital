@@ -41,7 +41,7 @@ int main()
         int numResults = std::stoi(sNumResults);
 
         
-        CSearchOptions* searchOpts = new CSearchOptions(sInput, fuzzy, {"RFWJC42V", "XCFFDRQC", "RBB8DW5B", "WIXP3DS3"}, false, true, "", 0 , 2019, 1, true);
+        CSearchOptions* searchOpts = new CSearchOptions(sInput, fuzzy, {"RFWJC42V", "XCFFDRQC", "RBB8DW5B", "WIXP3DS3"}, false, false, "", 0 , 2019, 1, true);
         CSearch* search = new CSearch(searchOpts, 0, numResults);
         manager.addSearch(search);
 
