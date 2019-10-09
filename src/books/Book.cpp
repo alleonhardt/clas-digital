@@ -437,7 +437,7 @@ size_t CBook::getBestMatch(std::string sWord, int fuzzyness, std::string& sMatch
     std::string fuzzyMatch; 
     size_t containsPage=0;
     size_t fuzzyPage=0;
-    double ld_score = -1;
+    double ld_score = 100;
     double cur_score = -1;
     for(auto it=mapWordsPages.begin(); it!=mapWordsPages.end(); it++)
     {
