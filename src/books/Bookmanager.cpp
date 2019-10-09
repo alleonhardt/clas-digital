@@ -171,13 +171,6 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
     //Delete search
     bool filterResults = search->getSearchOptions()->getFilterResults();
     
-    //Set Status
-    if(filterResults==true)
-        search->setStatus("Sorting results by relevance...  ");
-
-    //Delete search
-    deleteSearch(id);
-
     //Create list of search results
     std::list<CBook*>* listResults = new std::list<CBook*>;
     if(matches.size() == 0)
@@ -186,9 +179,13 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
         listResults = convertToList(results1, matches); 
     
     if(filterResults == true)
-        return sortByMatches(listResults, sInput, fuzzyness);
+        return sortByMatches(listResults, sInput, fuzzyness, search);
     else
+    {
+        //Delete search
+        deleteSearch(id);
         return listResults;
+    }
 }
 
 std::list<std::string>* CBookManager::getSuggestions(std::string sInput)
@@ -247,7 +244,7 @@ std::list<std::string>* CBookManager::getSuggestions(std::string sInput)
 * @param[in] fuzzyness (set fuzzyness)
 * @return sorted list of search results
 */
-std::list<CBook*>* CBookManager::sortByMatches(std::list<CBook*>* listSR, std::string sInput, int fuzzy)
+std::list<CBook*>* CBookManager::sortByMatches(std::list<CBook*>* listSR, std::string sInput, int fuzzy, CSearch* search)
 {
     std::map<std::string, CBook*>* mapSR = new std::map<std::string, CBook*>;
     std::map<std::string, double> matches;
@@ -256,6 +253,7 @@ std::list<CBook*>* CBookManager::sortByMatches(std::list<CBook*>* listSR, std::s
         mapSR->insert(std::pair<std::string, CBook*> ((*it)->getKey(), (*it)));
         double numMatches = (*it)->getNumMatches(sInput, fuzzy);
         matches[(*it)->getKey()] = numMatches*(-1);
+        search->setStatus("Calculating matches: " + (*it)->getMetadata().getShow());
     }
     
     return convertToList(mapSR, matches);
