@@ -372,6 +372,8 @@ int CBook::getNumMatches (std::vector<std::string>& vWords, std::map<int, std::v
 */
 std::string CBook::getPreview(std::string sWord, int fuzzyness)
 {
+    alx::cout.write(alx::console::red_black, "FUZZYNESS = ", fuzzyness, "\n");
+
     //*** Read ocr ***//
     std::ifstream read(getOcrPath(), std::ios::in);
 
@@ -569,9 +571,6 @@ std::string CBook::getPreviewMatch(std::string sWord, size_t page)
 
 void CBook::shortenPreview(size_t pos, std::string& finalResult, size_t len_match)
 {
-
-    alx::cout.write(alx::console::red_black, "SHORTEN PREVIEW: ", finalResult, "\n");
-
     size_t minus = finalResult.length() - 150;
     double fakFront = static_cast<double>(pos)/static_cast<double>(finalResult.length());
 
@@ -590,7 +589,6 @@ void CBook::shortenPreview(size_t pos, std::string& finalResult, size_t len_matc
     //Delete invalid chars front
     for(;;)
     {
-        alx::cout.write(alx::console::red_black, "DELETE FRONT\n");
         if((int)finalResult.front() < 0)
             finalResult.erase(0,1);
         else
@@ -600,22 +598,18 @@ void CBook::shortenPreview(size_t pos, std::string& finalResult, size_t len_matc
     //Delete invalid chars back
     for(;;)
     {
-        alx::cout.write(alx::console::red_black, "DELETE BACK\n");
         if((int)finalResult.back() < 0)
             finalResult.pop_back();
         else
             break;
     }
     
-    alx::cout.write(alx::console::red_black, "ESCAPING... ", finalResult, "\n");
     //Check vor invalid literals and escape
     for(unsigned int i=0; i<finalResult.length(); i++)
     {
         if(finalResult[i] == '\"' || finalResult[i] == '\'' || finalResult[i] == '\\') {
-            alx::cout.write("Here is a problem! - \n");
             finalResult.insert(i, "\\");
             i++;
         }
     }
-    alx::cout.write(alx::console::red_black, "ESCAPING COMPLETE\n");
 }
