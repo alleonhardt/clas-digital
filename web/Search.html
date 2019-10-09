@@ -17,6 +17,10 @@ mark {
 	font-weight: bold;
 	background: white;
 }
+.resultbox {
+	margin-left: 11%;
+	margin-right: 11%;
+}
 
 .some_grid_class {
 	display: grid;
@@ -27,10 +31,10 @@ mark {
 /*Keeping the search box in the middle in the top of the screen*/
 .button_box_top {
 	text-align: center;
-	width: 80%;
+	width: 100%;
 	margin-top: 10%;
 	padding-top: 20px;
-	margin-left: 10%;
+	margin-left: 0;
 	padding-bottom: 4rem;
 	background: white;
 	overflow: visible;
@@ -57,12 +61,15 @@ mark {
 .divsearch {
 	margin: 2rem;
 	padding: 1rem;
-	border: 2px solid black;
 }
 
 .progbar {
 	display: inline-block;
 	margin-left: 2rem;
+}
+
+.specialultbut:hover {
+	box-shadow: 0px 3px 0px #0000FF;
 }
 
 /*Styling the search bar*/
@@ -83,16 +90,14 @@ mark {
 	border: 0;
 	background: #ffffff;
 }
-.form-wrapper-2 .btclass2 {
-	color: #FFFFFF;
-	position: relative;
-	overflow: visible;
-	background: #777777;
-	padding: 0;
-	position: relative;
+
+.btclass2 {
+	background: white;
 	border: 0;
-	height: 40px;
-	width: 10%;
+}
+
+.btclass2:hover {
+	border-bottom: 3px solid green;
 }
 
 .form-wrapper-2 .btclass2:hover {
@@ -520,7 +525,7 @@ function UpdateProgress(sid)
 				if(Math.floor(jsObj.progress)==-1)
 					return;
 			}
-			window.setTimeout(function(){UpdateProgress(sid);},3000);
+			window.setTimeout(function(){UpdateProgress(sid);},500);
 		}
 		progHandler.send(null);
 }
@@ -529,7 +534,8 @@ function ShowSelectedValues(obj)
 {
 	let json = obj.drawablejson;
 	obj.innerHTML = "";
-	document.getElementById("ResultBanner").innerHTML = "<h1 class='headerStyle'>Search Results for: \""+lastInput+"\", "+json.books.length+" matches<a class='citationButton' onclick='OpenFilter();return true;'>Filter results</a><a class='buttontwo citationButton' style='margin-left: 1rem' onclick='CreateBibliography();return true;'>Create Bibliography</a></h1>";
+					 document.getElementById("ResultBanner").innerHTML =  "<div style='margin-top: 2rem;margin-bottom:0;'><button class='specialultbut' onclick='OpenFilter();return true;' style='background:white;margin-right: 0.5rem;border: 0;'>Filter Results</button><button class='specialultbut' style='background:white;border: 0;' onclick='CreateBibliography();return true;'>Create Bibliography</button></div><hr style='padding: 0;'><span style='color: grey;'>"+json.books.length+" Ergebnisse</span>";
+	//"<h1 class='headerStyle'>Search Results for: \""+lastInput+"\", "+json.books.length+" matches<a class='citationButton' onclick='OpenFilter();return true;'>Filter results</a><a class='buttontwo citationButton' style='margin-left: 1rem' onclick='CreateBibliography();return true;'>Create Bibliography</a></h1>";
 	//json.show_from = 0;
 	//json.show_to = Math.min(10,json.books.length);
 	obj.start = json.show_from;
@@ -542,6 +548,7 @@ function ShowSelectedValues(obj)
 			
 			let newList = document.createElement("div");
 			newList.id = json.books[i].scanId;
+			newList.classList.add("resultbox");
 			let inner = "";
 			if(!json.books[i].hasocr || (json.books[i].hasocr == undefined))
 			{
@@ -591,9 +598,10 @@ function ShowSelectedValues(obj)
 	}
 	
 	val+="</h1>";
+	//let val="<hr>";
 	obj.innerHTML+=val;
 	
-	let requ = "/getBookPreviews?query="+lastInput;
+	let requ = "/getBookPreviews?query="+encodeURIComponent(lastInput);
 	requ+="&fuzzyness=";
 	requ+=document.getElementById("FuzzyID").value;
 	requ+="&books=";
@@ -664,6 +672,7 @@ function sendToPage(name)
 	filterOpts["ShowOnlyTextsWithOCR"] = false;
 	document.getElementById("ResultBanner").innerHTML="";
 	//First of all put the search box to the top in order to show the results
+	
 	let searchbox = document.getElementById("searchboxid");
 	searchbox.setAttribute("class","button_box_top");
 
@@ -1040,7 +1049,7 @@ window.addEventListener("load",User.initialise,false);
 		}
 	</script>
 	</head>
-	<body onload="ExecuteInitialise()">
+	<body style='width: 100%; height: 100%;' onload="ExecuteInitialise()">
 		<!-- The navigation bar config -->
 		<div class="topnav">
 			<a href="/home">Home</a>
@@ -1061,7 +1070,7 @@ window.addEventListener("load",User.initialise,false);
 					<ol id="ordered_pillars"></ol>
 				</div>
 				<div class="slidecontainer">
-					<p class="slider">Fuzzyness (Smaller is more accurate, zero means no fuzzy search): </p>
+					<p class="slider">Fuzzyness: </p>
 					<p id="SliderNum" class="sliderNum"></p>
 					<input oninput="document.getElementById('SliderNum').innerHTML=getSliderValue(this.value);" id="FuzzyID" style="float:right;"type="range" min="0" max="2" value="0" class="slider" id="myRange"></div>
 				<div class="checker">
@@ -1112,11 +1121,11 @@ window.addEventListener("load",User.initialise,false);
 
 
 		<div id="searchboxid" class="button_box_top">
-			<div class="form-wrapper-2 cf">
-				<input id="SpecialSID" type="text" placeholder="Search here..." required>
-				<button id="srchButton" class="srchBtrn" type="button" onclick="sendToPage('SpecialSID')">Search</button>
-				<button class="btclass2" type="button" onclick="openSearchOpts('AdvancedSearchOptions')">Advanced</button>
-			</div>
+				<!--<div class="form-wrapper-2 cf"> -->
+					<input id="SpecialSID" style='padding: 0.3rem;width: 20%;border-radius: 25px;' type="text" placeholder="Search here..." required>
+					<button id="srchButton" class="srchBtrn" style='display:none;' type="button" onclick="sendToPage('SpecialSID')">Search</button></input>
+					<button class="btclass2" type="button" onclick="openSearchOpts('AdvancedSearchOptions')">Advanced</button>
+				<!--</div>-->
 			<div id="ResultBanner"></div>
 			<div id="SearchHitList" start="0" class="list-type2"></div>
 			<div id="LinkList" class="divlisttype"></div>
