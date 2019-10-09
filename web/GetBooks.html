@@ -524,7 +524,7 @@ function ShowOCR(a) {
 		if(a.innerHTML=="")
 			a.innerHTML = "1";
 	}
-	document.getElementsByClassName("ocrpage")[parseInt(a.innerHTML)-1].innerHTML = pageVal[parseInt(a.innerHTML)-1];
+	//document.getElementsByClassName("ocrpage")[parseInt(a.innerHTML)-1].innerHTML = pageVal[parseInt(a.innerHTML)-1];
 	if(parseInt(a.innerHTML)==1)
 	{
 		document.getElementById("olol").scrollTop = 0;
@@ -637,9 +637,8 @@ function init() {
 				//TODO: Search Dieter with full search and get the results to be highlighted....
 				console.log("show me what: "+HighlightList[y]);
 				let strts = ocrlst[pagesList[i]-1].innerHTML;
-				console.log(strts);
-				ocrlst[pagesList[i]-1].innerHTML=strts.replace(new RegExp(' '+HighlightList[y]+' ','gi'),'<mark>'+HighlightList[y]+'</mark>');
-			
+				ocrlst[pagesList[i]-1].innerHTML=strts.replace(new RegExp('\\b'+HighlightList[y]+'\\b','gi'),' <mark>'+HighlightList[y]+'</mark> ');
+				console.log(ocrlst[pagesList[i]-1].innerHTML);
 			}
 		  }
 
@@ -663,10 +662,10 @@ function init() {
 				  + "<span id='pageHitList"+searchResults.pages[i].page +"'>"					 
 				  + searchResults.pages[i].word + "</span>)</a>";
 			  }
-			pageVal[searchResults.pages[i].page-1]=pageVal[searchResults.pages[i].page-1].replace(new RegExp('(\\b'+searchResults.pages[i].word.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')+'\\b)','gi'),'<mark>$1</mark>');
+			ocrlst[searchResults.pages[i].page-1].innerHTML=ocrlst[searchResults.pages[i].page-1].innerHTML.replace(new RegExp('(\\b'+searchResults.pages[i].word.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')+'\\b)','gi'),'<mark>$1</mark>');
 		  }
 		}
-	GetOCRTxt();
+	//GetOCRTxt();
 
     	document.getElementById("ShowOCRButton").disabled = false;
 	document.getElementById("ShowOCRButton").classList.add("butX");
