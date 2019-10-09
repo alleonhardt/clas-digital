@@ -553,7 +553,7 @@ std::string CBook::getPreviewMatch(std::string sWord, size_t page)
         //*** FIND END OF PAGE ***//
         if(func::checkPage(sBuffer) == true)
            curPage++;
-        if(curPage>(page+1))
+        if(curPage>(page+2))
             break;
     }
 
