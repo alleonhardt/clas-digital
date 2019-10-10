@@ -435,9 +435,9 @@ std::string CBook::getPreview(std::string sWord)
 
     //Check, whether ocr could be loaded, or search is correct
     if(!read)
-        return "<span style='color:red;'> NO SCANS EXIST - sorry for that.</span>";
+        return "<span style='color:orange;'> Book is not yet scanned, sorry for that.</span>";
     if(sWord.find("+") != std::string::npos)
-        return "No preview - (Searching for two words)";
+        return "<span style='color:orange;'> No preview - (Searching for two words)";
 
 
     //*** Get page and match ***//
@@ -448,7 +448,7 @@ std::string CBook::getPreview(std::string sWord)
     if(page == 10000000)
     {
         alx::cout.write(alx::console::red_black, getMetadata().getShow(), " - NO PAGE FOUND!!!!\n");
-        return "No preview";
+        return "<span style='color:orange;'> No preview";
     }
     
     //*** Get Preview ***//
@@ -456,7 +456,7 @@ std::string CBook::getPreview(std::string sWord)
 
     //Check whether preview found
     if(func::compare(finalResult.c_str(), "No Preview") == true)
-        return "No Preview";
+        return "<span style='color:orange;'> No Preview";
 
 
     //*** Highlight found word ***//
