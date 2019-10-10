@@ -122,8 +122,7 @@ namespace func
     * @param[in] sWords string of which map shall be created 
     * @param[out] mapWords map to which new words will be added
     */
-    void extractWordsFromString(std::string sWords, std::map<std::string, std::vector<size_t>>& mapWords,
-                               size_t pageNum);
+    void extractWordsFromString(std::string sWords, std::unordered_map<std::string, std::vector<size_t>>& mapWords, size_t pageNum);
 
     /**
     * @brief check whether string indicates, that next page is reached
@@ -136,7 +135,7 @@ namespace func
     * @param[in] sPathToOcr Path to ocr of a book
     * @param[out] mapWords map to which new words will be added
     */
-    void extractPages(std::string sPathToOcr, std::map<std::string, std::vector<size_t>>& mapWords);
+    void extractPages(std::string sPathToOcr, std::unordered_map<std::string, std::vector<size_t>>& mapWords);
 }
 
 

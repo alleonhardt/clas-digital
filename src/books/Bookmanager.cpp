@@ -218,9 +218,6 @@ std::list<std::string>* CBookManager::getSuggestions(std::string sInput)
     return listSuggestions;
 }
 
-    
-
-    
 
 /**
 * @brief sort list of found books by number of matches in each book
@@ -238,9 +235,9 @@ std::list<CBook*>* CBookManager::sortByMatches(std::list<CBook*>* listSR, std::s
     size_t counter=0;
 
     for(auto it=listSR->begin(); it!=listSR->end(); it++) {
+
         mapSR->insert(std::pair<std::string, CBook*> ((*it)->getKey(), (*it)));
-        double numMatches = (*it)->getMatches(sInput, fuzzy);
-        matches[(*it)->getKey()] = numMatches*(-1);
+        matches[(*it)->getKey()] = (*it)->getMatches(sInput, fuzzy)*(-1);
 
         search->setStatus("Calculating matches: " + (*it)->getMetadata().getShow() + " ");
         search->setProgress(static_cast<float>(counter)/static_cast<float>(listSR->size()));
@@ -311,7 +308,7 @@ void CBookManager::createMapWords()
             continue;
 
         //Get map of words of current book
-        std::map<std::string, std::vector<size_t>> mapWords;
+        std::unordered_map<std::string, std::vector<size_t>> mapWords;
         it->second.loadPages(mapWords);
 
         //Iterate over all words in this book. Check whether word already exists in list off all words.

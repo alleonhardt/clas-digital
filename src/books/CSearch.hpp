@@ -83,21 +83,21 @@ public:
     * @brief calls spezific search function, searches, and creates map of  matches. Removes all 
     * books that do not match with search options.
     */
-    std::map<std::string, CBook*>* search(std::map<std::string, std::map<std::string, CBook*>>& mWs, std::map<std::string, std::map<std::string, CBook*>>& mWsTitle);
+    std::map<std::string, CBook*>* search(std::unordered_map<std::string, std::map<std::string, CBook*>>& mWs, std::unordered_map<std::string, std::map<std::string, CBook*>>& mWsTitle);
 
     /**
     * @brief search full-match
     * @param[in] mapWords map of all words with a list of books in which this where accures
     * @param[in, out] mapSR map of search results
     */
-    void normalSearch(std::map<std::string, std::map<std::string, CBook*>>& mapWords,
+    void normalSearch(std::unordered_map<std::string, std::map<std::string, CBook*>>& mapWords,
                                                             std::map<std::string, CBook*>* mapSR);
     /**
     * @brief search contains
     * @param[in] mapWords map of all words with a list of books in which this where accures
     * @param[in, out] mapSR map of search results
     */
-    void containsSearch(std::map<std::string, std::map<std::string, CBook*>>& mapWords,
+    void containsSearch(std::unordered_map<std::string, std::map<std::string, CBook*>>& mapWords,
                      std::map<std::string, CBook*>* mapSR);
 
     /**
@@ -105,7 +105,7 @@ public:
     * @param[in] mapWords map of all words with a list of books in which this word accures
     * @param[in, out] mapSR searchresults
     */
-    void fuzzySearch(std::map<std::string, std::map<std::string, CBook*>>& mapWords, 
+    void fuzzySearch(std::unordered_map<std::string, std::map<std::string, CBook*>>& mapWords, 
                      std::map<std::string, CBook*>* mapSR);
 
     /**

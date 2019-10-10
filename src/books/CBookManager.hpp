@@ -24,8 +24,8 @@ private:
 
     //Map of all books
     std::map<std::string, CBook> m_mapBooks;
-    std::map<std::string, std::map<std::string, CBook*>> m_mapWords;
-    std::map<std::string, std::map<std::string, CBook*>> m_mapWordsTitle;
+    std::unordered_map<std::string, std::map<std::string, CBook*>> m_mapWords;
+    std::unordered_map<std::string, std::map<std::string, CBook*>> m_mapWordsTitle;
 
     std::map<unsigned long long, CSearch*> m_mapSearchs;
 

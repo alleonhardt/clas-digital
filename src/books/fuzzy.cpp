@@ -97,7 +97,7 @@ bool fuzzy_cmp(std::string sWord1, std::string sWord2)
 
     //Calculate score
     double score = static_cast<double>(ldIterative)/ std::max(sWord1.length(), sWord2.length());
-    double fuzzyness = 0.21;
+    double fuzzyness = 0.19;
 
     //Check whether score is lower than given fuzzyness)
     if(score < fuzzyness && score >= 0)
@@ -134,7 +134,7 @@ bool fuzzy_cmp(std::string sWord1, std::string sWord2, double& ld)
 
     //Calculate score
     double score = static_cast<double>(ldIterative)/ std::max(sWord1.length(), sWord2.length());
-    double fuzzyness = 0.21;
+    double fuzzyness = 0.19;
 
     if(containsUmlaut(sWord1) == true || containsUmlaut(sWord2) == true)
         fuzzyness = 0.26;

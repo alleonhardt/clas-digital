@@ -86,7 +86,7 @@ void CSearch::setStatus(std::string sStatus) {
 * @brief calls spezific search function, searches, and creates map of  matches. Removes all 
 * books that do not match with search options.
 */
-std::map<std::string, CBook*>* CSearch::search(std::map<std::string, std::map<std::string, CBook*>>& mWs, std::map<std::string, std::map<std::string, CBook*>>& mWsTitle)
+std::map<std::string, CBook*>* CSearch::search(std::unordered_map<std::string, std::map<std::string, CBook*>>& mWs, std::unordered_map<std::string, std::map<std::string, CBook*>>& mWsTitle)
 {
     alx::cout.write("Searching for ", m_sWord, "\n");
 
@@ -135,7 +135,7 @@ std::map<std::string, CBook*>* CSearch::search(std::map<std::string, std::map<st
 * @param[in] mapWords map of all words with a list of books in which this word accures
 * @param[in, out] mapSR searchresults
 */
-void CSearch::normalSearch(std::map<std::string, std::map<std::string, CBook*>>& mapWords, 
+void CSearch::normalSearch(std::unordered_map<std::string, std::map<std::string, CBook*>>& mapWords, 
                                                     std::map<std::string, CBook*>* mapSR)
 {
     //Set Progress
@@ -152,7 +152,7 @@ void CSearch::normalSearch(std::map<std::string, std::map<std::string, CBook*>>&
 * @param[in] mapWords map of all words with a list of books in which this word accures
 * @param[in, out] mapSR searchresults
 */
-void CSearch::containsSearch(std::map<std::string, std::map<std::string, CBook*>>& mapWords, 
+void CSearch::containsSearch(std::unordered_map<std::string, std::map<std::string, CBook*>>& mapWords, 
                            std::map<std::string, CBook*>* mapSR) 
 {
     unsigned int counter = 0;
@@ -185,7 +185,7 @@ void CSearch::containsSearch(std::map<std::string, std::map<std::string, CBook*>
 * @param[in] mapWords map of all words with a list of books in which this word accures
 * @param[in, out] mapSR searchresults
 */
-void CSearch::fuzzySearch(std::map<std::string, std::map<std::string, CBook*>>& mapWords, 
+void CSearch::fuzzySearch(std::unordered_map<std::string, std::map<std::string, CBook*>>& mapWords, 
                           std::map<std::string, CBook*>* mapSR)
 {
     alx::cout.write("2-Number results: ", m_numResults, "\n");
