@@ -59,6 +59,9 @@ CMetadata& CBook::getMetadata() {
     return m_Metadata;
 }
 
+std::unordered_map<std::string, std::vector<size_t>>& CBook::getMapWordsPages() {
+    return m_mapWordsPages;
+}
 std::unordered_map<std::string, std::list<std::string>>& CBook::getMapContains() {
     return m_mapContains;
 }

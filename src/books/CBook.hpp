@@ -98,6 +98,7 @@ public:
     bool getPublic();
 
 
+    std::unordered_map<std::string, std::vector<size_t>>& getMapWordsPages();
     std::unordered_map<std::string, std::list<std::string>>& getMapContains();
     std::unordered_map<std::string, std::list<std::string>>& getMapFuzzy();
  

@@ -312,12 +312,8 @@ void CBookManager::createMapWords()
         it->second.loadPages(mapWords);
 
         //Iterate over all words in this book. Check whether word already exists in list off all words.
-        unsigned int counter = 0;
-        for(auto yt=mapWords.begin(); yt!=mapWords.end(); yt++)
-        {
-            counter++;
-            m_mapWords[yt->first][it->first] = &it->second;
-        }
+        for(auto yt : it->second.getMapWordsPages())
+            m_mapWords[yt.first][it->first] = &it->second;
     }
 } 
 
