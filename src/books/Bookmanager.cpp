@@ -310,10 +310,6 @@ void CBookManager::createMapWords()
         if(it->second.getOcr() == false)
             continue;
 
-        //Get map of words of current book
-        std::unordered_map<std::string, std::vector<size_t>> mapWords;
-        it->second.loadPages(mapWords);
-
         //Iterate over all words in this book. Check whether word already exists in list off all words.
         for(auto yt : it->second.getMapWordsPages())
             m_mapWords[yt.first][it->first] = &it->second;
