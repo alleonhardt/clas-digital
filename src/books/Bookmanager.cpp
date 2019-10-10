@@ -242,6 +242,9 @@ std::list<CBook*>* CBookManager::sortByMatches(std::list<CBook*>* listSR, std::s
         search->setStatus("Calculating matches: " + (*it)->getMetadata().getShow() + " ");
         search->setProgress(static_cast<float>(counter)/static_cast<float>(listSR->size()));
     }
+
+    //Delete search
+    deleteSearch(search->getID());
     
     return convertToList(mapSR, matches);
 }

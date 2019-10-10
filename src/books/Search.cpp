@@ -218,7 +218,7 @@ void CSearch::fuzzySearch(std::unordered_map<std::string, std::map<std::string, 
 		counter2++;
         counter++;
 
-        if(mapSR->size()== m_numResults)
+        if(mapSR->size() == m_numResults)
             break;
     }
 }
