@@ -36,13 +36,8 @@ int main()
         std::string sFuzzy = alx::cout.getCommand();
         int fuzzy = std::stoi(sFuzzy);
 
-        alx::cout.write ("\nnum results: ");
-        std::string sNumResults= alx::cout.getCommand();
-        int numResults = std::stoi(sNumResults);
-
-        
-        CSearchOptions* searchOpts = new CSearchOptions(sInput, fuzzy, {"RFWJC42V", "XCFFDRQC", "RBB8DW5B", "WIXP3DS3"}, false, true, "", 0 , 2019, 1, true);
-        CSearch* search = new CSearch(searchOpts, 0, numResults);
+        CSearchOptions* searchOpts = new CSearchOptions(sInput, fuzzy, {"RFWJC42V", "XCFFDRQC", "RBB8DW5B", "WIXP3DS3"}, false, false, "", 0 , 2019, 1, true);
+        CSearch* search = new CSearch(searchOpts, 0, 100000);
         manager.addSearch(search);
 
         /*

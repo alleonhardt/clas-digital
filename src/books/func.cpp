@@ -165,12 +165,8 @@ bool isWord(const char* chWord)
             counter++;
     }
 
-    double fak=0.3;
-    if(strlen(chWord)<5)
-        fak=0.4;
-
     //Calculate whether more the 30% of characters are non-letters (return false)
-    if(static_cast<double>(counter)/static_cast<double>(strlen(chWord)) <= fak)
+    if(static_cast<double>(counter)/static_cast<double>(sizeof(chWord)) <= 0.3)
         return true;
 
     return false;
