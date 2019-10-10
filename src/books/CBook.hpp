@@ -28,6 +28,9 @@ private:
     std::unordered_map<std::string, std::list<std::string>> m_mapContains;      
     std::unordered_map<std::string, std::list<std::string>> m_mapFuzzy;
 
+    //Map of words_pages
+    std::unordered_map<std::string, std::vector<size_t>> m_mapWordsPages;
+
 
 public:
 
@@ -119,6 +122,7 @@ public:
     * @brief load words and pages on which word occures into map
     */
     void loadPages(std::unordered_map<std::string, std::vector<size_t>>& mapWordsPages);
+    void loadPages();
 
     /**
     * @brief getPages calls the matching getPages... function according to fuzzyness

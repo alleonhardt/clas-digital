@@ -137,6 +137,7 @@ void CBook::createMapWords()
         safePages();
     }
 
+    loadPages();
     m_bOcr = true;
 }
 
@@ -204,6 +205,43 @@ void CBook::loadPages(std::unordered_map<std::string, std::vector<size_t>>& mapW
 } 
 
 /**
+* @brief load words and pages on which word occures into map
+*/
+void CBook::loadPages()
+{
+    //Load map
+    std::ifstream read(m_sPath + "/pages.txt");
+
+    //Check whether map could be loaded
+    if(!read)
+        return;
+   
+    std::string sBuffer;
+    while(!read.eof())
+    {
+        //Read new line
+        getline(read, sBuffer);
+
+        if(sBuffer.length() < 2)
+            continue;
+
+        //Extract word (vec[0] = word, vec[1] = sBuffer
+        std::vector<std::string> vec = func::split2(sBuffer, ";");
+
+        //Extract pages and convert to size_t
+        std::vector<size_t> pages;
+        std::vector<std::string> vecPages = func::split2(vec[1], ",");
+        for(auto page : vecPages) 
+        {
+            if(isdigit(page[0]))
+                pages.push_back(std::stoi(page));
+        }
+
+        //Add word and pages to map
+        m_mapWordsPages[vec[0]] = pages;
+    }
+}
+/**
 * @brief getPages calls the matching getPages... function according to fuzzyness
 */
 std::map<int, std::vector<std::string>>* CBook::getPages(std::string sInput, int fuzzyness)
@@ -223,15 +261,15 @@ std::map<int, std::vector<std::string>>* CBook::getPages(std::string sInput, int
 std::map<int, std::vector<std::string>>* CBook::getPages(std::vector<std::string>& vWords, std::map<int, std::vector<std::string>>* (CBook::*find)(std::string, std::unordered_map<std::string, std::vector<size_t>>&))
 {
     //Load map of Words 
-    std::unordered_map<std::string, std::vector<size_t>> mapWordsPages;
-    loadPages(mapWordsPages);
+    //std::unordered_map<std::string, std::vector<size_t>> mapWordsPages;
+    //loadPages(mapWordsPages);
 
     //Create map of pages and found words for first word
-    std::map<int, std::vector<std::string>>* mapPages = (this->*find)(vWords[0], mapWordsPages);
+    std::map<int, std::vector<std::string>>* mapPages = (this->*find)(vWords[0], m_mapWordsPages);
 
     for(size_t i=1; i<vWords.size(); i++)
     {
-        std::map<int, std::vector<std::string>>* mapPages2 = (this->*find)(vWords[i], mapWordsPages);
+        std::map<int, std::vector<std::string>>* mapPages2 = (this->*find)(vWords[i], m_mapWordsPages);
 
         //Remove all elements from mapPages, which do not exist in results2. 
         removePages(mapPages, mapPages2);
@@ -318,24 +356,24 @@ void CBook::removePages2(std::map<int, std::vector<std::string>>* r1, std::map<i
 int CBook::getMatches(std::string sInput, int fuzzyness) 
 {
     //Load map of Words 
-    std::unordered_map<std::string, std::vector<size_t>> mapWordsPages;
-    loadPages(mapWordsPages);
+    //std::unordered_map<std::string, std::vector<size_t>> mapWordsPages;
+    //loadPages(mapWordsPages);
 
 
     if(fuzzyness == 0)
-        return mapWordsPages[sInput].size();
+        return m_mapWordsPages[sInput].size();
 
     int matches=0;
     if(fuzzyness==1)
     {
         for(std::string sMatch : m_mapContains[sInput])
-            matches += mapWordsPages[sMatch].size();
+            matches += m_mapWordsPages[sMatch].size();
     }
 
     if(fuzzyness==2)
     {
         for(std::string sMatch : m_mapFuzzy[sInput])
-            matches += mapWordsPages[sMatch].size();
+            matches += m_mapWordsPages[sMatch].size();
     }
     
     return matches;
@@ -362,15 +400,15 @@ int CBook::getNumMatches(std::string sInput, int fuzzyness)
 int CBook::getNumMatches (std::vector<std::string>& vWords, std::map<int, std::vector<std::string>>* (CBook::*find)(std::string, std::unordered_map<std::string, std::vector<size_t>>&))
 {
     //Load map of Words 
-    std::unordered_map<std::string, std::vector<size_t>> mapWordsPages;
-    loadPages(mapWordsPages);
+    //std::unordered_map<std::string, std::vector<size_t>> mapWordsPages;
+    //loadPages(mapWordsPages);
 
     //Create map of pages and found words for first word
-    std::map<int, std::vector<std::string>>* mapPages = (this->*find)(vWords[0], mapWordsPages);
+    std::map<int, std::vector<std::string>>* mapPages = (this->*find)(vWords[0], m_mapWordsPages);
 
     for(size_t i=1; i<vWords.size(); i++)
     {
-        std::map<int, std::vector<std::string>>* mapPages2 = (this->*find)(vWords[i], mapWordsPages);
+        std::map<int, std::vector<std::string>>* mapPages2 = (this->*find)(vWords[i], m_mapWordsPages);
 
         //Remove all elements from mapPages, which do not exist in results2. 
         removePages2(mapPages, mapPages2);
@@ -447,25 +485,25 @@ std::string CBook::getPreview(std::string sWord)
 size_t CBook::getBestMatch(std::string sWord, std::string& sMatch)
 {
     //Load map of Words
-    std::unordered_map<std::string, std::vector<size_t>> mapWordsPages;
-    loadPages(mapWordsPages);
+    //std::unordered_map<std::string, std::vector<size_t>> mapWordsPages;
+    //loadPages(mapWordsPages);
 
     //Try Full match
-    if(mapWordsPages.count(sWord) > 0) {
+    if(m_mapWordsPages.count(sWord) > 0) {
         sMatch = sWord;
-        return mapWordsPages[sWord].front();
+        return m_mapWordsPages[sWord].front();
     }
 
     //Try Contains match
-    if(m_mapContains.count(sWord)>0 && mapWordsPages.count(m_mapContains[sWord].front()) > 0) {
+    if(m_mapContains.count(sWord)>0 && m_mapWordsPages.count(m_mapContains[sWord].front()) > 0) {
         sMatch = m_mapContains[sWord].front();
-        return mapWordsPages[sMatch].front();
+        return m_mapWordsPages[sMatch].front();
     }
 
     //Try Fuzzy match
-    if(mapWordsPages.count(m_mapFuzzy[sWord].front()) > 0) {
+    if(m_mapWordsPages.count(m_mapFuzzy[sWord].front()) > 0) {
         sMatch = m_mapFuzzy[sWord].front();
-        return mapWordsPages[sMatch].front();
+        return m_mapWordsPages[sMatch].front();
     }
 
     return 10000000;
