@@ -106,6 +106,7 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
     search->setStatus("Searching " + vWords[0] + "... ");
     search->setWord(vWords[0]);
     results1 = search->search(m_mapWords, m_mapWordsTitle);
+    alx::cout.write("num results: ", results1->size(), "\n");
 
     //Searching Author
     search->setStatus("Searching Author...");

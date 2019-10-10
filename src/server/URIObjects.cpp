@@ -804,12 +804,12 @@ void GetBookPreviews::onRequest(std::unique_ptr<proxygen::HTTPMessage> headers) 
 }
 
 
-void GetBookPreviews::load_preview(std::string bookname,std::string query,int fuzzyness, folly::EventBase *evb)
+void GetBookPreviews::load_preview(std::string bookname,std::string query,int, folly::EventBase *evb)
 {
 	std::vector<std::string> pillars;
 	std::stringstream ss(bookname);
 	std::string search = query;
-	int fuzzynes = fuzzyness;
+	//int fuzzynes = fuzzyness;
 	
 	auto &books = GetSearchHandler::GetBookManager().getMapOfBooks();
 	std::string fill;
@@ -822,11 +822,11 @@ void GetBookPreviews::load_preview(std::string bookname,std::string query,int fu
 			{
 				nlohmann::json entry;
 				entry["key"] = fill;
-				alx::cout<<"Preview length: "<<books.at(fill).getPreview(search,fuzzynes).length()<<alx::endl;
+				alx::cout<<"Preview length: "<<books.at(fill).getPreview(search).length()<<alx::endl;
 
-				holdit += books.at(fill).getPreview(search,fuzzynes);
+				holdit += books.at(fill).getPreview(search);
 				alx::cout<<"Still alive"<<alx::endl;
-				entry["preview"] = books.at(fill).getPreview(search,fuzzynes);
+				entry["preview"] = books.at(fill).getPreview(search);
 				alx::cout<<"Still alive2"<<alx::endl;
 				js["books"].push_back(entry);
 			}

@@ -158,9 +158,6 @@ void CSearch::containsSearch(std::unordered_map<std::string, std::map<std::strin
     unsigned int counter = 0;
 	unsigned int counter2 = 0;
 
-    if(mapSR->size() == m_numResults)
-        return;
-
     for(auto it= mapWords.begin(); it!=mapWords.end(); it++)
     {
         if(it->first.find(m_sWord.c_str())!=std::string::npos)
@@ -188,10 +185,8 @@ void CSearch::containsSearch(std::unordered_map<std::string, std::map<std::strin
 void CSearch::fuzzySearch(std::unordered_map<std::string, std::map<std::string, CBook*>>& mapWords, 
                           std::map<std::string, CBook*>* mapSR)
 {
-    alx::cout.write("2-Number results: ", m_numResults, "\n");
-
     unsigned int counter = 0;
-	unsigned int counter2 = 0;
+    unsigned int counter2 = 0;
     for(auto it= mapWords.begin(); it!=mapWords.end(); it++)
     {
         double value = -1;
@@ -209,17 +204,14 @@ void CSearch::fuzzySearch(std::unordered_map<std::string, std::map<std::string, 
             myInsert(mapSR, it->second, it->first);
 
         //Change Progress
-		if(counter2>=500)
-		{
-			counter2=0;
-        	m_fProgress = static_cast<float>(counter)/static_cast<float>(mapWords.size());
-		}
+	if(counter2>=500)
+	{
+	    counter2=0;
+	    m_fProgress = static_cast<float>(counter)/static_cast<float>(mapWords.size());
+	}
 
 		counter2++;
         counter++;
-
-        if(mapSR->size() == m_numResults)
-            break;
     }
 }
 

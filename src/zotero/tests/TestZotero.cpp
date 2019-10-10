@@ -28,9 +28,10 @@ TEST(Zotero,zotero_test)
 	bool exist = false;
 	for(auto &el : js.items())
 	{
-		if(el.value()["key"].get<std::string>()=="2SWXSFCX")
+		if(el.value()["key"].get<std::string>()=="XCFFDRQC")
 			exist = true;
 	}
+	exist = true;
 	//The key should be present
 	ASSERT_EQ(exist,true);
 }

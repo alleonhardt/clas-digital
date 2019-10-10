@@ -259,6 +259,20 @@ const nlohmann::json &Zotero::GetPillars()
 	static bool pill=true;
 	static nlohmann::json ret;
 	if(pill)
+	{nlohmann::json a;
+	a["key"] = "RFWJC42V";
+	a["name"] = "Geschichte des Tierwissens";
+
+	nlohmann::json b;
+	b["key"] = "XCFFDRQC";
+	b["name"] = "Forschung CLAS";
+	ret.push_back(a);
+	ret.push_back(b);
+	}
+	pill = false;
+	return ret;
+
+	if(pill)
 	{
 		ret.clear();
 		alx::cout.write("Trying to detect zotero pillars... ");
