@@ -136,19 +136,7 @@ std::string returnToLower(std::string &str)
 
     return str2;
 }
-/** 
-* @brief function checks whether character is a letter with de and fr local
-* @param[in] s char to be checked
-*/
-bool isLetter(const char s)
-{
-    std::locale loc1("de_DE.UTF8");
-    //std::locale loc2("fr_FR");
-    if(std::isalpha(s, loc1) == true) 
-        return true;
-    else
-        return false;
-}
+
 
 /**
 * @brief checks whether a string is a word
