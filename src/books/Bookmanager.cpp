@@ -7,6 +7,7 @@ std::map<std::string, CBook>& CBookManager::getMapOfBooks() {
     return m_mapBooks;
 }
 
+
 /**
 * @brief load all books.
 */

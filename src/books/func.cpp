@@ -137,7 +137,6 @@ std::string returnToLower(std::string &str)
     return str2;
 }
 
-
 /**
 * @brief checks whether a string is a word
 * @param[in] chWord string to be checked
@@ -220,13 +219,13 @@ void transform(std::string& str)
     if(str.length() == 0)
         return;
 
-    if(isLetter(str.front()) == false)
+    if(isalpha(str.front()) == false)
         transform(str.erase(0,1));
 
     if(str.length() == 0)
         return;
 
-    if(isLetter(str.back()) == false)
+    if(isalpha(str.back()) == false)
     {
         str.pop_back();
         transform(str);
