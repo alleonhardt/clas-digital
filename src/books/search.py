@@ -25,7 +25,9 @@ class CSearch:
             if self.searchOpts.onlyOcr == False:
                 self.fuzzySearch(mapWordsTitle)          #search in title
             
-        self.authorSearch(mapBooks)
+        #Search for author
+        if self.searchOpts.onlyOcr == False:
+            self.authorSearch(mapBooks)
 
 
         return self.searchResults   #return results
@@ -37,12 +39,20 @@ class CSearch:
         if self.searchOpts.word in mapWords: 
             self.searchResults.update(mapWords[self.searchOpts.word])
 
+
     #Find fuzzy matches (not implemented yet - O(n*fuzzysearch)
     def fuzzySearch(self, mapWords):
+
         print("Cheking fuzzy for: ", self.searchOpts.word)
+
+        #Iterating over all words in map
         for word, res in mapWords.items():
-            if fuzz.ratio(word, self.searchOpts.word) >= 85 :
+
+            #If Match, add match to results
+            if fuzz.ratio(word, self.searchOpts.word) >= 89 :
                 self.searchResults.update(res)
+
+                #Add matcg to list of words matching searched word
                 for key, book in res.items():
                     if self.searchOpts.word not in book.mapFuzzyMatches:
                         book.mapFuzzyMatches[self.searchOpts.word] = []

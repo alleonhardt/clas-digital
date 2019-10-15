@@ -1,3 +1,4 @@
+from fuzzywuzzy import fuzz
 import json
 import book 
 import manager 
@@ -14,7 +15,7 @@ while sInput != "q" :
     sSearch = input("Search: ")
 
     for str in func.extractWords(sInput):
-        print (fuzz.partial_ratio(str.lower(), sSearch.lower()))
+        print (fuzz.ratio(str.lower(), sSearch.lower()))
 
 ''' 
 
@@ -32,20 +33,15 @@ search = search.CSearch(searchOpts, 0)
 bookmanager.addSearch(search)
 
 results = bookmanager.search(0)
-for key, book in results.items():
-    print (book.metadata.getAuthor(), ", ", book.metadata.getTitle(), ", ", book.metadata.getDate())
+for key in results:
+    print (bookmanager.getBook(key).metadata.getAuthor(), ", ", bookmanager.getBook(key).metadata.getTitle(), ", ", bookmanager.getBook(key).metadata.getDate())
+    print ("Relevance: ", bookmanager.getBook(key).getRelevance(searchOpts.word, fuzzy))
+
+    '''
     pages = book.getPages(searchOpts.word, fuzzy)
-    for page in pages: 
-        print (page)
-        print ("Matches: ", pages[page])
+    print (type(pages))
+    for page, matches in pages.items(): 
+        print (page, matches, end=", ")
+    print()
+    '''
 
-'''
-
-for key, book in bookmanager.search(0).items():
-    print (book.metadata.getAuthor(), ", ", book.metadata.getTitle(), ", ", book.metadata.getDate())
-    if len(book.getPages(searchOpts.word, fuzzy)) > 0:
-        for page, matches in book.getPages(searchOpts.word, fuzzy).items():
-            print (page, matches)
-    else:
-        print ("No pages found!")
-'''

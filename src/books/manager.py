@@ -12,6 +12,12 @@ class CManager:
         self.mapWordsTitle = {}
         self.mapSearch = {}
 
+    #Get book
+    def getBook(self, key):
+        if key in self.mapBooks:
+            return self.mapBooks[key]
+        return 
+
     #Update zotero: updates all books in zotero and metadata
     def updateZotero(self, j_items):
         for it in j_items: 
@@ -81,7 +87,14 @@ class CManager:
         search = self.mapSearch[searchID]
 
         #start normal search
-        return search.search(self.mapWords, self.mapWordsTitle, self.mapBooks)
+        word = search.searchOpts.word
+        fuzzyness = search.searchOpts.fuzzyness
+        results = search.search(self.mapWords, self.mapWordsTitle, self.mapBooks)
+
+        return list(map(lambda x:x[1], sorted((v.getRelevance(word, fuzzyness)*(-1),k) for(k, v) in results.items())))
+            
+            
+
 
 
 

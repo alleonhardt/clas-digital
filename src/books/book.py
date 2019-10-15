@@ -40,7 +40,7 @@ class CBook:
 
             vStrs = line.split(";")
             pages = []
-            for page in vStrs[1].split():
+            for page in vStrs[1].split(","):
                 pages.append(page)  
             self.mapWordsPages[vStrs[0]] = pages
 
@@ -58,15 +58,41 @@ class CBook:
             return mapPages
        
         #Fuzzy search
-        print (self.metadata.getAuthor(), self.metadata.getTitle())
         for fuzzyMatch in self.mapFuzzyMatches[sInput] :
             for page in self.mapWordsPages[fuzzyMatch] :
                 if page not in mapPages :
                     mapPages[page] = [fuzzyMatch]
                 else:
                     mapPages[page].append(fuzzyMatch) 
+
         return mapPages
             
+    #Get Relevance
+    def getRelevance(self, sInput, fuzzyness):
+        if self.hasOcr == False:
+            return 0
+
+        #Full search
+        if fuzzyness == 0:
+            return len(self.mapWordsPages[sInput])
+
+        #Fuzzy search
+        if fuzzyness == 1:
+            numPages = 0
+            for fuzzyMatch in self.mapFuzzyMatches[sInput]:
+                numPages += len(self.mapWordsPages[fuzzyMatch])
+            return numPages
+        else:
+            return 100000
+
+    def getPreview(self, sInput):
+        return "No Preview" 
+        #getPages
+        #page = getPage()
+
+    #def getPage(self, sInput)
+
+       
 
         
 
