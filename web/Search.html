@@ -747,7 +747,8 @@ function sendToPage(name)
 		lastInput = input;
 		if(jsonObj === null)
 		{
-			alert("No results found!");
+		document.getElementById("ResultBanner").innerHTML =  "<div style='margin-top: 2rem;margin-bottom:0;'><button class='specialultbut' onclick='OpenFilter();return true;' style='background:white;margin-right: 0.5rem;border: 0;'>Filter Results</button><button class='specialultbut' style='background:white;border: 0;' onclick='CreateBibliography();return true;'>Create Bibliography</button></div><hr style='padding: 0;'><span style='color: grey;'>0 Ergebnisse</span>";
+	
 			return;
 		}
 		//corrupted json? Show error message
