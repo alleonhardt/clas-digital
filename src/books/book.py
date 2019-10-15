@@ -51,11 +51,13 @@ class CBook:
             return {}
 
         #Full search
+        mapPages = {}
         if fuzzyness == 0:
-            return self.mapWordsPages[sInput]
+            for page in self.mapWordsPages[sInput]:
+                mapPages[page] = [] 
+            return mapPages
        
         #Fuzzy search
-        mapPages = {}
         print (self.metadata.getAuthor(), self.metadata.getTitle())
         for fuzzyMatch in self.mapFuzzyMatches[sInput] :
             for page in self.mapWordsPages[fuzzyMatch] :

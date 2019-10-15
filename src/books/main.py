@@ -17,6 +17,7 @@ while sInput != "q" :
         print (fuzz.partial_ratio(str.lower(), sSearch.lower()))
 
 ''' 
+
 with open("zotero.json") as read_file:
     data = json.load(read_file)
 
@@ -34,9 +35,9 @@ results = bookmanager.search(0)
 for key, book in results.items():
     print (book.metadata.getAuthor(), ", ", book.metadata.getTitle(), ", ", book.metadata.getDate())
     pages = book.getPages(searchOpts.word, fuzzy)
-    if len(pages) > 0 :
-        for page, matches in pages.items() :
-            print (page, matches)
+    for page in pages: 
+        print (page)
+        print ("Matches: ", pages[page])
 
 '''
 
