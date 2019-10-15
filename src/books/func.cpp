@@ -157,16 +157,30 @@ bool isLetter(const char s)
 */
 bool isWord(const char* chWord) 
 {
-    //Count number of non-letters in string
-    unsigned int counter = 0;
-    for(unsigned int i=0; i<strlen(chWord); i++)
-    {
-        if(isLetter(chWord[i]) == false)
-            counter++;
+    //Variables 
+    size_t count_err = 0;
+    size_t count_len = 0;
+    size_t max = strlen(chWord);
+    int length;
+    wchar_t dest;
+
+    //Set locale
+    std::locale loc("de_DE.utf8");
+    std::setlocale(LC_ALL, "de_DE.utf8");
+
+    mbtowc (NULL, NULL, 0); 
+
+    //Calculate number of non-letter
+    while (max>0) {
+        length = mbtowc(&dest, chWord, max);
+        if(length<1) break;
+        if(isalpha(dest, loc) == false) count_err++;
+        count_len++;
+        chWord+=length; max-=length;
     }
 
     //Calculate whether more the 30% of characters are non-letters (return false)
-    if(static_cast<double>(counter)/static_cast<double>(sizeof(chWord)) <= 0.3)
+    if(static_cast<double>(count_err)/static_cast<double>(count_len) <= 0.3)
         return true;
 
     return false;
