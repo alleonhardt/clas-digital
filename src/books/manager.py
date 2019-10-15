@@ -93,12 +93,4 @@ class CManager:
 
         return list(map(lambda x:x[1], sorted((v.getRelevance(word, fuzzyness)*(-1),k) for(k, v) in results.items())))
             
-            
-
-
-
-
-        
-        
-            
         

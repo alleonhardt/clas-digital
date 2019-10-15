@@ -90,10 +90,8 @@ class CBook:
         #getPages
         #page = getPage()
 
-    #def getPage(self, sInput)
+    def getPage(self, sInput)
+        
 
        
 
-        
-
-   
