@@ -1,0 +1,114 @@
+=T
+II55
+Es ſey x = q die Abſciſſe, welche den Punkt be-
+ſtimmt, wo das Waſſer mit der Stange gleich läuft, ein
+Punkt, welcher die Gränzlinie zwiſchen den beiden Stre-
+cken, der obern und der untern bezeichnet, in welche wir
+die perpendikulare Linie getheilt denken; und die Scale
+der Geſchwindigkeiten in der obern Strecke ſoll zu ihrer
+Gleichung n = V – fx haben, und in der untern
+Strecke u = c – h CX – q). Die Neigungen der beiden
+graden, welcheindieſer Hypotheſe die Scale der Geſchwindig-
+keiten ausmachen, werden beſtimmt von den beiden Coef-
+ſeienten f, h. Und ſo ſieht man, daß ſo wie die Be-
+wegung der Stange allezeit zwey Gleichungen darbietet,
+ſo können wir vermittelſ dieſer allemal die beiden unbe-
+kannten Coefficienten beſtimmt finden, und welches Syſtem
+von zwey graden vollkommen mit der beobachteten Be-
+wegung der Stange übereinſtimme.
+Und in der That giebt man nach dem Beiſpiele der
+vorgehenden Berechnung die beiden Gleichungen an, welche
+von der gleichförmigen Bewegung und von dem Paralle-
+lismus der Stange abhängen, und ſetzt man der Kürze
+W h ?
+3 &
+W h* + V ſ”
+Gleichungen:
+(a) c = V–2a fH Coſ. w, (b) Sin. w *+Ä: Sin. wTTI,
+wegen = H, ſo finde ich dieſe beiden
+Dieſen beiden Gleichungen können wir allezeit genug
+thun, mittelſt der Beſtimmung d. beiden Coeffizient. fu. H;
+woraus man hernach auch den andern Coeffizienten h ken:
+nenlernt; und die Poſition der beiden graden, welche die
+Scale der Geſchwindigkeiten bilden, wird dadurch be-
+ftimmt, oder zum wenigſten Aequivalente dafür. Es wird
+jedoch die Abſciſſe q bekannt ſeyn, welche die Strecke der
+Perpendiculare, zu welcher die obere Scale der Geſchwin-
+digkeiten gehört, beendigt, während die untere Scale
+der übrigen Strecke angehört; es kommt alſo her-
+aus q = F.
+Nachdem wir auf dieſe Weiſe die beiden graden be-
+ſtimmt haben, auf welche man die Schnelligkeiten des Fluſ-
+ſes in jeder der beiden Strecken der Perpendiculare, welche
+ſchon oben getheilt und geſchieden worden ſind, als ſich
+endigend anſehen kann, ſo iſt nichts leichter, als die F-
+gur wieder zu quadrieren, indem man auf jeder Scale
+die halbe Ordinate nimmt und ſie durch die Höhe
+multiplicirt. Die Summe der Produkte wird die Fläche
+der Figur ſeyn, und wird uns den Ertrag der ganzen
+Perpendikuſare (Durchſchnitts) geben. -
+Ich will ein Beiſpiel zur Erklärung der vorgetrage-
+nen Methode anführen. Es ſen der Durchmeſſer oder die
+Dicke der Stange o,054 Meter; die Länge der ganzen
+eingetauchten Strecke 5,9o M. Die Länge von der Waſſer-
+fläche bis zum Mittelpunkt der Schwere 2,365 M. So
+wird die Stange mit gleichförmiger Geſchwindigkeit zu
+1,55 M. in der Secunde laufen; und die Geſchwin-
+digkeit des Stromes auf der Oberfläche gemeſſen mit
+einem ſchwimmenden Stab wird 2 M. ſeyn. –
+Berechnet man nach dieſen Daten den Coefficienten
+- 1156
+k, ſo geht - = 636 hervor. Wenn daher die Seale der
+Geſchwindigkeiten gradlinig iſt, ſo muß die Neigung a
+der Stange entſprechen der Gleichung 2) Sin- w”-- 636
+sin. « = 1, welche giebt Sin. « = 0,15; und den Win-
+kel w = 8°57'35“.
+Wenn alſo die Reigung der Stange vom Perpendi
+kel wirklich acht und einen halben Grad iſt, oder daher
+um, ſo darf die Hypotheſe der gradlinigen Scale für gut
+gelten; und wir können die mittlere Geſchwindigkeit 155
+M. ſchätzen; und multipliziren wir dieſelbe mit der Höhe
+der Perpendikulare, welches = 2 a Coſ. « – 5,8Ö gibt,
+ſo wird der Ertrag 5,977. Quadrat Meter ſeyn.
+Allein wenn der Winkel w ſich weit von den 8 Gra:
+den entfernte, ſo müßten wir fürchten zu irren. Man finde
+zum Beiſpiel den Winkel w = 15° faſt das Doppelte.
+Da eine ſolche Neigung der Stange ſich nicht vertragen
+kann mit der Annahme einer gradlinigen Scale, ſo wol:
+len wir auf dem Wege der Gleichungen a) b) das Sy:
+ſtem zweier graden auffinden, welche, als Scale der Ge-
+ſchwindigkeiten angenommen, darinn übereinſtimmen, daß
+ſie der Scale die Geſchwindigkeit von 1,55 M. und die
+Abweichung von 15° geben. –
+Die Gleichung b) giebt gleich H = 0,88; und
+die Gleichung a) zeigt mir f = o, 14, und die ſub-
+ſtituirte Gleichung giebt h = 2,8; und q = 3,53.
+Die Scale der Geſchwindigkeiten iſt daher von der
+Oberfläche des Waſſers bis zu der Tiefe, von 5,55 M. –
+eine gradlinige, welche zur Gleichung u = 2 – 9, 14 x
+hat. Von da bis zum niedrigſten Punkte, 9 - "* F
+5,33 bis zu x = 2a Cos. = 3,77 iſt die Sale der
+Geſchwindigkeiten eine andere grad" welche zur Gleichung
+hat u = 1,55 – 2, 8 (* Tº? Nach dem die Figur
+wieder quadriert worden, findet ſich der Betrag des gan-
+zen perpenditularen Durchſchnitts 6,328 QuadratMeter.
+Kryſtallbildung auf trockenem Wege,
+von Methuon.
+Der Vfr. behauptet, er habe entdeckt, wie die erdigen
+und metalliſchen (nicht Salzkryſtalle) Kryſtalle gebildet
+werden: und habe einen Apparat ausgedacht, vermittelſt
+deſſen dieſe Kryſtalle künſtlicher Weiſe in Menge erhalten
+werden können.
+Die Sprache des Vfs. iſt verwirrt, und er ſucht nichts
+geringeres als Hauys Syſtem umzuwerfen, allein er hat
+wenig chemiſche Kenntniſſe.
+Kryſtalle ſind na Hr. Methuon nicht die unmittel-
+bare Folge ungeſtörter Auflöſung oder Schmelzung; ſon:
+dern die Wirkung einer beſondern Zerſetzung ungeſtalte-
+ter kryſtal ſi barer Maſſen, deren Theiſe ſich während der
+Zerſetzung nach gewiſſen Geſetzen der Attraction ord-
+nen, wobey der Prozeß auf troknem Wege oder in der
+Luft vorgeht. Das iſt Methuons Theorie. Seine Ver-
+ſuche ſind bey weitem intereſſanter und, wenn ſie ächt ſind,
+wahrhaft erſtaunend.
+Vor etwa zwölf Jahrn hatte M. Gelegenheit die weſ-

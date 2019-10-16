@@ -1,0 +1,105 @@
+5- T I52
+-
+–=== .
+oder dt = o; woher ſich beſtättigt, was wir geſagt ha-
+ben, daß die Spannung beſtändig ſey, und durch die ganz“
+Curve ſich gleich. Die zweyte Gleichung wird – Td m
+- kuds Coſ. m”, und durch Integration kſuds =
+Conſtante–T Tang. m. Um die Beſtändige zu be-
+ſtimmen, nennen wir «, das, was der Winkel m in dem
+Puncte A wird, ſo daß a der Winkel ABT fey. Wir wer-
+dem alsdann haben Conſtante = T Tang. «, und die
+Gleichung, welche die Curve A MG vorſtellt, wird zu-
+letzt ſeyn:
+Tang. « - Tang. m = k ſuds.
+- T-
+Dieſe Gleichung zeigt klar die Betrüglichkeit des hy-
+drometriſchen Pendels, wenn er auf die bis jetzt übliche
+Weiſe angewandt wird. Denn da fuds immerfort wächſt,
+während wir von A gegen Ghin abſteigen, ſo ſieht man,
+daß wie auch die Skale der Schnelligkeit beſchaffen ſeyn
+möge, der Winkel m immer keiner wird; und es wird
+die Curve AMG hohl ſeyn, auf der Seite, von welcher
+das Waſſer kommt. Die ſcheinbare Abweichung a, oder
+der Winkeſ A BT wird allzeit größer ſenn, als die Ab-
+weichung m in dem Puncte M, und viel nehr als die
+Abweichung FGH in dem unterſten Puncle G. Man
+braucht ſich nicht zu wundern, daß jemehr die Kugel ſich
+einſenkt, deſto mehr der Faden von dem Perpendikel ſich
+entfernt. Und dies iſt in der That mit allen den Ver-
+ſuchen geſchehen, die mit dem hydrometiſchen Pendel
+gemacht worden ſind. Allein daher ableiten wollen, daß
+die Schnelligkeiten des Waſſers wachſen, je tiefer es fließt,
+iſt ºn Irryum: denn daſſelbe müßte zutreffen, wenn ſie
+abnähmen.
+Wäre die Schnelligkeit des Fluſſes überall ſich gleich,
+ſo zeigt deutlich die Gleichung
+Tang. « – Tang. m = kus
+- T
+daß die Curve AMG die homogene Kettenlinie iſt. Und
+ſchon anders woher weiß man, daß die Geſtalt eines
+vom Winde angeſchwollenen Segels auch die Kettenlinie
+ſey und in unſerer Hypotheſe giebt es zwiſchen dem Fa-
+den AMG, und einem an den Puncten A, G befeſtigten
+Segel, das von einem in horizontaler Richtung wehen
+den Winde getrieben wird, keinen andern Unterſchied, a”
+daß dieſes von der Luft, jener von dem Waſſer bººst
+Wird. -
+Zulez , wir bemerken, daß die Gleichung, wº
+che wir von v. rve AMG gegeben haben, auf der ge-
+meinen Vorausſetzung beruhe, daß die ſchiefe Eindrücke
+eines Fluſſes ſeyen wie die Quadraten der Sin. Der Einfall-
+winkeſ. Die Erfahrungen aber lehren uns, daß in den
+größeren Einfallwinkeln dieſes Geſetz ſich, bis auf weni-
+ges bewähre; nicht bey kleinen Einfallswinkeln. Deshalb
+wird jene Gleichung nicht allemal reu und mit aller
+Strenge die genaue Eurve des Fadens angeben. Es ver-
+hält ſich nicht ſo mit der erſten d T = 0, welche uns ver:
+gewiſſert, daß die Spannung des Fadens beſtändig ſey. In
+dieſelbe geht der Ausdruck kuds Coſ. m” für den Trieb
+des Waſſers gar nicht ein, und doch herrſcht ſie wie auch
+immer der Werth des Triebes ſeyn möge. Man erſieht
+alſo daraus, daß dieſe Weiſe, die Schnelligkeiten zu er-
+forſchen, indem man die auf verſchiedenen punten ein-
+getauchte Kugel abwägt, allezeit gut und ſicher ſey, wie
+ungewiß und unbekannt auch die Kräfte ſeyn mögen,
+welche unter dem Waſſer den Faden drehen und bewegen,
+B
+HLXF
+Ueber die Hydrometriſche Stange,
+von Veituroli (Ebend. III.)
+Wenn uns der Wille oder das Bedürfniß antreibt,
+die Schnelligkeit des Waſſers in irgend einem beſtimmten
+Punkte eines Fluſſes kennen zu lernen, ſo kenne ich kein
+wirkſameres und einfacheres Mittel, als das Pendel mit
+dem Faden, indem die andern Werkzeuge, webe hieu ent-
+deckt wurden, entweder mehr Mühe zu ihrer Verfertigung
+oder zu ihrem Gebrauche erfordern. Äſt jedoch nicht
+dienlich, die Schnelligkeit nach dem Winkel zu meſſen, in
+welchem das Senkloth ſich von dem Perpendikel entfernt,
+wohl aber von der Spannung der Schnur, oder von dem
+Gewichte, welches die Kugel unter dem Fluſſe (Waſſer)
+regiert! auf dieſe Weiſe nämlich erhält man das Maaß "
+der Schnelligkeit mit gröſter Gewißheit, wie ich vorher
+erklärt habe. -
+Aber manchmal liegt einem nichts daran, dieGeſchwindig-
+keit in dieſem oder jenem Punct einer ſenkrechten Linie zu er-
+fahren, ſondern vielmehr auf einmahl die mittlere Ge-
+ſchwindigkeit des ganzen Durchſchnitts um ſchnell zur Kennt-
+ni der ganzen Waſſermaſſe zu gelangen, welche in einer
+beſtimmten Zeit durchgeht. Und das wird beſonders in
+dem praktiſchen Gebrauche geſucht, um durch Erfahrung
+den Waſſerertrag der Flüſſe bey dem niedern und hohen
+Stande kennen zu lernen, indem wir bis jetzt weder Theo
+rien, noch allgemein hinlänglich ſichere Regeln haben,
+welche uns von dieſem Ertrage das Maaß angeben.
+Hierzu wünſcht man kurze und leichte Mittel, welche ohne
+großen Zeit Aufwand bey der Unterſuchung, und ohne
+viel Mühe in der Berechnung der Reſultate des Experi-
+ments angewandt werden können. -
+Das hydrometriſche Inſtrument, welches mehr als jedes
+andre hiezu paßt, iſt nach meinen Bedünken, die hydro-
+metriſche Stange (Asa Ritrometica), von Cav. Teodoro
+Bonati vorgeſchlagen. Memorie della Societa 1talians
+
+

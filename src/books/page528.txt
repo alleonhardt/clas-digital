@@ -1,0 +1,124 @@
+937
+Berthollet behauptet. Der berühmte ſchwediſche Chemiſt
+ſagt, er finde keine Urſache, die Meynung von der Zu-
+ſammengeſetztheit der Chlorine zu verlaſſen, weil ſich mit
+ihr alle Phänomene erklären laſſen, und auf eine Art,
+welche mehr als die andere mit den übrigen chemiſchen
+Lehren übereinſtimmt. Das ſo große ſpecifiſche Gewicht
+der Chlorine, welche 44 zur Proportionalzahl hat,
+und ihre Eigenſchaft mit Waſſer zu kryſtalliſiren, ſind
+ſtarke Anzeigen, daß ſie Orygen enthalte. Mit der al-
+ten Lehre erklärt es ſich, daß Licht uud Wärme ſich ent-
+wickeln, während die Euchlorine bey der Zerſetzung an
+Volumen zunimmt, ein Phänomen, das den Grundleh-
+ren der Chemie widerſtreitet, wenn die Chlorine als ein-
+fach betrachtet wird. Von einer andern Seite ſcheint es
+widerſinnig, den Muriaten den Begriff des Salzes zu
+nehmen, wie die neue Lehre thut, beſonders da ſich das
+gemeine Salz darunter findet. Endlich ſtützt er ſeine
+ſtärkſten Beweiſe auf die Theorie der ſtöchiometriſchen
+Verhältniſſe, welche nach ſeinen Bedinken in vielen
+Puncten ſich nur mit der alten Lehre vertragen kann, und
+beſonders wenn man die Muriate mit Ueberſchuß von
+Baſe betrachtet, welche chemiſch gebundenes Waſſer
+enthält. -
+Ridolfi hat einen Verſuch für die Compoſition der
+Chlorine gemacht. Er behandelte 315 Theile geſchwefelte
+Salzſäure mit Salpeterſäure (durch Syntheſis bereitet)
+und verwandelte mit 16o Theilen dieſer Säure allen
+Schwefel (1oo Theile) in dieſer Subſtanz in Schwefel-
+ſaure. 100 Schwefel aber erfordern 133 Orgen zur
+Schw.ſäure, von welcher die 169 Salpeterſäure (Ossi-
+settonico) nur 97 haben verſchaffen konnen; die 36 feh-
+lenden Theile finden ſich nun, nach der alten Theorie,
+wenn man mit Berthollet 315 geſchwefelte Salzſäure als
+beſtehend aus 100 Schwefel, 18 Salzſäure und 34 Ory-
+gen anſteht. So könnte dieſer neue Verſuch nicht nach
+der neuen Theorie erklärt werden, welche Chlorine als
+ganz ohne Orygen betrachtet.
+Kurze Ueberſicht
+der neuen und merkwürdigen mathematiſchen Werke, die
+von den Italiänern in den verfloſſenen funfzehn Jahren
+herausgegeben worden ſind. (Bibl. Ital. 1816.)
+/ Reine Mathematik.
+Wir wollenbier nicht von den verſchiedenen Unter-
+richtsbüchern in der Geometrie und Algebra, oder von
+Cinleitungen zum höhern Calcul und der höhern Geome-
+trie ſprechen, die in gegenwärtigem Jahrhundert her-
+ausgekommen ſind, obſchon ſie faſt alle irgend einen
+Werth entweder der Neuheit der Deutlichkeit oder
+der Beſtimmung haben; und beſchränken uns dar-
+auf, den Corso di Matematica sublime zu erwähnen,
+den Ritter Brunacci Prof. bey der Univerſität zu Pavia,
+in den Jahren 1804 und 1808 in vier Bänden in 4 her-
+ausgegeben hat. In dieſem Werk erklärt der Verf. mit
+Deutlichkeit und erläutert durch Beyſpiele die Haupt-
+grundſätze der Differential- und Integral-Rechnung, ſo
+ºe ſie einige Jahre vorher von den großen Geometer
+*srange in ſeinem unſterblichen Werke Théorie de
+Pfi* 1818. Heft 6,
+-
+-
+ke itsrechnung.
+beſtimmte Auflöſung der Aufgabe, im Baſſette-Spiel
+938
+fonctions analytiques waren vorgetragen worden; er
+bildet daraus eine Art neuer Analyſis, welche er die
+abgeleitete (Analysis derivata) nennt, und aus der Be-
+trachtung der functiones derivatae ad indicem fractio-
+narium zieht er einen vollſtändigen Begriff der eingebil-
+deten Größen. -Es finden ſich daſelbſt ſehr wichtige
+Theoreme über die Integrale der Linear - Gleichungen
+von endlichen Differenzen der höhern Ordnungen; Theo-
+reme, welche der Verf. einige Jahre vorher zu Florenz
+in ſeinem Calcolo integrale delle equazioni lineariher-
+ausgegeben hatte. Die Integrirung der Linear- Glei-
+chungen von gewöhnlichen Differentialen und jener von
+partialen Differentialen der höhern Ordnungen in
+d'Alembert's Methode blieb unvollſtändig, wenn ſich
+daſelbſt gleiche Wurzeln fanden in den Algebraiſchen Glei-
+chungen, welche die beſtimmten Konſtanten des
+Integrals ausdrücken. Ritter Brunacci hat dafür eine
+andere Methode angegeben, abgeleitet aus der Eigen-
+ſchaft der Gränzen der Wurzeln in den algebraiſchen
+Gleichungen, aus welchen er immer ein vollſtändiges Inte-
+gral erhält im Falle zweyer oder mehrerer gleicher Wurzeln.
+Es verdient hier die vom Verf. angewandte Methode int
+Integriren einer Claſſe Gleichungen von endlichen Diſſe-
+renzen, deren Coefficienten veränderlich ſind, bemerkt zu
+werden. In Fall beſtändiger Coefficienten integrierte
+man dieſe Gleichungen nach den von Lagrange in den
+Mémoires de l'Academie de Berlin 1775 gegebenen Re-
+geln; aber dieſe Regeln wurden unzureichend, wenn die
+Coefficienten veränderlich waren. Der Verf. zeigt nach-
+her die bequemen Anwendungen dieſer Integrierungen in
+vrrſchiedenen Aufgaben über die Wabrſcheinlich -
+Uleberdieß gibt er eine klare und
+das Verhältniß des Sezers und des Bankhalters zu be-
+rechnen. Jacob Bernoulli in ſeinem Buche Ars conje-
+ctandi und Abraham de Moirre in ſeinem Werk The
+doctrine of chances hatten das nämliche Problem ge-
+löſt, und beſonders hatte der Letztere gefunden, daß der
+Bankhalter im Pharao - Spiel drey von hundert,
+und in dem der Baſſette von 1oo an allem im Spiel
+beſindlichen Gelde gewinne; aber die Geſetze des Spieles
+waren damals von den ggenwärtig angenommenen ver-
+ſchieden. -
+Ritter Brunacci macht vermittelſ des Calculs der
+endlichen Differenzen ſeine Auflöſung leichter, und den
+jetzt angenommenen Spiel- Geſetzen angemeſſener, und
+findet, daß das Verhältniß des Bankhalters zu dem des
+Sezers ſich wie 115 zu 1oo verhält, d. h. daß
+er im ganzen Spiele 15 von 100 gewinnt. Es wäre zu
+wünſchen, daß ſo beſchaffene Rechnungen von einer gro-
+ßern Anzahl von Perſonen geleſen und verſtanden werden
+könnten, damit die Betrüger eine kleinere Anzahl von
+Schlachtopfern fänden. Die Unterſuchung der Kennze-
+chen, an denen man die Marina von den Minimis in den
+Integralformeln unterſcheiden kann, iſt dieſem Werte
+eingeſchaltet, und findet ſich auch im erſten Bande der
+Verhandlungen des ita Inſtituts der Wiſſenſchaften.
+(Atti dell' Istituto italiano delle scienze).
+Der berühmte Geometer Legendre hatte ſich mit
+einer ſolchen unterſuchung, den Mémoires der par.
+09

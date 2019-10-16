@@ -21,9 +21,9 @@ class CSearch:
         #Fuzzy search
         elif self.searchOpts.fuzzyness == 1:
             if self.searchOpts.onlyTitle == False:
-                self.fuzzySearch(mapWords)          #search in ocr
+                self.fuzzySearch(mapWords, mapBooks)          #search in ocr
             if self.searchOpts.onlyOcr == False:
-                self.fuzzySearch(mapWordsTitle)          #search in title
+                self.fuzzySearch(mapWordsTitle, mapBooks)          #search in title
             
         #Search for author
         if self.searchOpts.onlyOcr == False:
@@ -41,7 +41,7 @@ class CSearch:
 
 
     #Find fuzzy matches (not implemented yet - O(n*fuzzysearch)
-    def fuzzySearch(self, mapWords):
+    def fuzzySearch(self, mapWords, mapBooks):
 
         print("Cheking fuzzy for: ", self.searchOpts.word)
 
@@ -49,14 +49,15 @@ class CSearch:
         for word, res in mapWords.items():
 
             #If Match, add match to results
-            if fuzz.ratio(word, self.searchOpts.word) >= 89 :
-                self.searchResults.update(res)
+            ratio = fuzz.ratio(word, self.searchOpts.word)
+            if ratio >= 89 :
+                self.myUpdate(self.searchResults, res, ratio)
 
-                #Add matcg to list of words matching searched word
-                for key, book in res.items():
-                    if self.searchOpts.word not in book.mapFuzzyMatches:
-                        book.mapFuzzyMatches[self.searchOpts.word] = []
-                    book.mapFuzzyMatches[self.searchOpts.word].append(word) 
+                #Add match to list of words matching searched word
+                for key, rel in res.items():
+                    if self.searchOpts.word not in mapBooks[key].mapFuzzyMatches:
+                        mapBooks[key].mapFuzzyMatches[self.searchOpts.word] = []
+                    mapBooks[key].mapFuzzyMatches[self.searchOpts.word].append(word) 
                     
 
     #Find author
@@ -64,6 +65,14 @@ class CSearch:
         for key, book in mapBooks.items() :
             if book.metadata.getAuthor().lower() == self.searchOpts.word :
                 self.searchResults[key] = book
+
+    def myUpdate(selfd, results1, results2, ratio):
+        for key, relevance in results2.items() :
+            if key in results1:
+                results1[key] += relevance*(ratio/100)
+            else:
+                results1[key] = relevance
+        
 
 
 

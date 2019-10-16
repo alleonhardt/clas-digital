@@ -62,18 +62,22 @@ class CManager:
     #  a list of book containing the word (value)
     def createMapWords(self):
         for key, book in self.mapBooks.items():
-            self.storeWords(self.mapWords, book.mapWordsPages, key, book)
+            self.storeWords(self.mapWords, book.mapWordsPages, key, book, True)
     #Creates "big" map of word, containing all words from all booktitles (key) and 
     #  a list of book containing the word (value)
     def createMapWordsTitle(self):
         for key, book in self.mapBooks.items():
-            self.storeWords(self.mapWordsTitle, func.extractWords(book.metadata.getTitle()), key, book)
+            self.storeWords(self.mapWordsTitle, func.extractWords(book.metadata.getTitle()), key, book, False)
+
     #store words
-    def storeWords(self, mapWords, mapFrom, key, book):
+    def storeWords(self, mapWords, mapFrom, key, book, relevance):
         for word, pages in mapFrom.items():
             if word not in mapWords:
                 mapWords[word] = {}
-            mapWords[word][key] = book
+            if word in book.mapRelevance and book.numPages > 0:
+                mapWords[word][key] = (book.mapRelevance[word]/book.numPages)*(-1)
+            else:
+                mapWords[word][key] = 0
 
 
     #Main search function callig searchfunction from CSearch
@@ -91,6 +95,7 @@ class CManager:
         fuzzyness = search.searchOpts.fuzzyness
         results = search.search(self.mapWords, self.mapWordsTitle, self.mapBooks)
 
-        return list(map(lambda x:x[1], sorted((v.getRelevance(word, fuzzyness)*(-1),k) for(k, v) in results.items())))
+        return sorted((v,k) for(k, v) in results.items())
+        #return list(map(lambda x:x[1], sorted((v,k) for(k, v) in results.items())))
             
         

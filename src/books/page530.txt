@@ -1,0 +1,121 @@
+942.
+5 oder 6te numeriſche Ziffer erhalten könne, ohne zur
+beſchwerlichen Methode der Grenzen ſeine Zuflucht zu
+nehmen. Wenn wir auch trigonometriſche Werke der
+reinen Mathematik beyzählen wollen, ſo dürfen wir hier
+nicht unterlaſſen, der 2ten Ausgabe von der Trigono-
+metria piana e sferica des Ritter Antonio Cagnoli zu
+erwähnen, die zur Bologna 1804 herauskam. Die erſte
+Ausgabe erſchien 1786, und ſie ward wegen der Menge
+ihrer Formeln, wegen der Deutlichkeit ihrer Beweiſe;
+und durch die vielen Anwendungen dieſer Formeln zur
+Auſlöſung verſchiedener geodätiſchen und aſtronomiſchen
+Probleme von Geometern und Aſtronomen mit ſehr
+viel Beyfall anfgenommen und als ein claſſiſches Werk
+betrachtet. Die wichtigen und nützlichen Vermehrungen,
+ſo der Vf. dieſer 2ten Auflage hinzugefügt, belaufen
+ſich auf 400 neue Paragraphen. Unter dieſen Zuſätzen
+zeichnen ſich beſonders aus, das Cap. VIII, XIV,
+XVI, in welchen von trigonometriſchen Formeln, impli-
+cirt mit eingebildeten, von der trigonometriſchen Auflö-
+ſung der Gleichungen des 4ten Grades und der nume-
+riſchen Auflöſung einer jeden Art der Gleichungen ge-
+handelt wird.
+H. Franchini, Prof. auf der Univ. zu Lucca hat
+einen Trattato analitico di trigonometria poligonome-
+tria rettilinea e sferica herausgegeben, den er in ſeiner
+zu Lu c ca 1808 gedruckten Memoria trigonometrica
+erweitert, und durch neue Methoden und neue Theore-
+me vervollkommmnet hat. In dieſer Abh. geht der
+Hauptzweck des Vfs auf die analytiſche Auflöſung der
+ebenen und ſphäriſchen Tetragone.
+Auch H. Magistrini, Prof. des höhern Calculs auf
+der Univ. zu Bologna, gab vor einigen Jahren eine
+ſehr ſchätzensweethe analytiſche Abh. über die Polygo-
+nometrie heraus. In den Verhandlungen (atti) des ital.
+Inſtituts der Wiſſenſ finden ſich die Anfangsgründe der
+ſphäroidiſchen Trigonometrie (Elementi di trigonome-
+tria sferoidica) des Hrn Oriani Aufſeher der Stern-
+warte in Mayland. Im vergangenen Jahrhundert hat-
+ten Clairaut, Euler und Du Sejour die Auflöſung
+zweyer oder dreyer Probleme über einen ſphäroidiſchen
+Triangel gegeben, d. i. über einen Triangel, beſchrieben
+über eine Sphäroide, erzeugt aus der Revolution einer
+Ellipſe um ihre kleine Achſe. Allein ihre Auflöſung war
+ſehr beſchränkt, denn man hatte in ihr die multiplicir-
+ten Termini in Quadrat und in den höhern Potenzen
+des Unterfhiedes der Achſen ausgelaſſen. Der einzige
+berühmte Geometer Legendre in den Memoiren der
+Acad. zu Paris auf das Jahr 1787 gab die Formeln zur
+Löſung des einen der beſagten Probleme, welche auch
+zugleich die multiplicirten Termini enthalten im Qua-
+drat der Differenz der Achſen. Dieſe Formeln wurden
+aber von ihrem Verf, ohne hinzugefügten Beweis her-
+ausgegeben. In den angeführten Anfangsgründen der
+ſphäroidiſchen Trigonometrie werden alle Probleme auf
+verſchiedene Weiſen aufgelößt, welche in einem ſpäroidi-
+fchen Triangel vorkommen können, es mag nun ein ſol-
+cher ſchief oder rechtwinklig ſeyn; von denen der größte
+Theit von den Geometern nie in Betracht gezogen wor-
+den iſt, und die daraus entſpringende Formeln erſtrecken
+ſich auch auf die multiplicirten Terminos im Quadrat
+-
+und in den andern höhern Potenzen der Differenz der
+Achſen. Aus dieſen Formeln werden als ein Corollari-
+um und als ein ganz beſonderer Fall jene des Legendre
+abgeleitet. Man kann alſo ſchließen, daß die beſagten
+Anfangsgründe eine neue und ganz vollſtändige Abh.
+der ſphäroidiſchen Trigonometrie in ſich enthalten.
+Angewandte Mathematik.
+Unter den vielen Werken der Italiäner, welche die
+auf Phyſik oder Mechanik durch Hülfe des Calculs oder
+der Geometrie angewendete Mathematik abhandeln,
+wollen wir hier nur einige der vornehmſten anzeigen,
+die in den letzt abgelaufenen 15 Jahren ans Licht ge“
+treten ſind; vielleicht zeigt ſich in der Zukunft Gelegen-
+heit weitläuftiger von dieſen neuen ſo wie auch von e-
+nen, die wir jetzt auslaſſen, zu reden.
+Zuerſt erwähnen wir eine Abh. des Hrn Prof.
+Paoli über die berühmte Aufgabe der Unterlagen
+Cdegli appoggi) gedruckt im 9ten Bande der ital. Geſellſ.
+Die Wahrheit zu ſagen, bleibt die Frage im Allgemei-
+nen Fall noch immer unentſchieden, aber dei Betrachtun
+gen des Hrn Paoli über dieſes Argument verdienen hier
+dennoch alle unſere Aufmerkſamkeit; ſie war von ihm
+ſchon einige Zeit vorher unter Begleitung des fruchtba-
+ren Grundſatzes der Virtual - Geſchwindigkeit abgehan-
+delt worden. Es wird nicht unſchicklich ſeyn hier zu
+bemerken, daß die Verſuche italiäniſcher Geometer ſehr
+vieles Licht über dieſe Aufgabe verbreitet, und wenn
+man ſich nur ein wenig Mühe geben will, die zahlreichen
+von ihnen herausgegebenen Abhandlungen über dieſen
+Gegenſtand nachzuleſen, ſo ſollte man glauben, daß
+Italien das Geſchäft über ſich genommen, uns entweder
+eine vollſtändige Löſung deſſelben zu geben, oder die
+Unmöglichkeit zu zeigen.
+Im 14ten Bande der ital. Geſellſch. der Wiſſenſ.
+befindet ſich eine ſehr ſchätzbare Abh. des ſeel. H. Peſ-
+ſut i Prof. bey der Sapienza in Rom. Der Gegen-
+ſtand derſelben iſt, die abſtruſe Analyſis des berühmten
+Laplace in ſeiner Theorie der Haarröhrchenaction zu
+erläutern und zu erklären. Der größte Theit der Phy-
+ſiker wird Peſſuti dankbar ſeyn für die Gelegenheit, ſo
+er ihnen verſchafft, eine der allerwichtigſten Entdeckun-
+gen über die Attraction der Moleculen gehörig ſchätzen
+zu können.
+Conte Paradisi hat eine höchſt wichtige Arbeit so-
+pra la vibraziane delle lamine elastiche dem 1t. Ban-
+de des ital. Inſtit. der Wiſſenſ einrücken laſſen. Den
+Phyſikern iſt es bekannt, daß Chladni der erſte Erfin-
+der der wunderbaren Phänomen, iſt, welche eine in
+Vibration geſetzte Glastafel darbietet. Aber welches
+iſt die Art und Weiſe, dieſe Bewegung unter einen ana-
+lytiſchen Calcul zu bringen, um die beobachteten Phäno-
+mene a priori daraus ableiten zu können? Vielleicht iſt
+dieſes die ſchwerſte Aufgabe der neuern Mechanik. Herr
+Paradisi, der dieſe Schwierigkeit fühlte, hat den Weg der
+Erfahrung vorgezogen, um wenigſtens zur Entdeckung
+einiger Geſetze dieſer Vibration zu kommen, und in der
+That, indem er mit vielen Scharfſinn das Hauptphäno-
+men der Knotenlinien behandelt, iſt es ihm gelungen,
+ſolche Eigenfchaften zu finden, die in ſich ſelbſt höchſt

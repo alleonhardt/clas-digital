@@ -1,0 +1,130 @@
+II49
+Äu
+ü
+u.
+s
+Tr
+ºr
+t
+- II 5G
+mengeſetzten Kraft GF in der Richtung des Fadens ſeyn,
+der Winte1 FGH wird die Abweichung des Fadens von
+der Vertikale tedeuten. Wir haben jetzt GK = HF =
+GH Tangent. FGH. Der Anſtoß GK des Fluſſes C weil
+GK beſtändig iſt ), iſt proportional der Tang. FGH.
+lud weil die Anſtöße des Waſſers proportional ſind dem
+Quadrate der Geſchwindigkeit, ſo folgt daraus, daß die
+Geſchwindigkeit des Waſſers in Gproportional ſeyn wer-
+de mit VGK oder mit V Tang. FG H. - -
+Dieſe Theorie des hydrometriſchen Pendels iſt einem
+großen Irrthum unterworfen, wie unſer berühmte Colle-
+ge Cav. Bonati, vor nicht vielen Jahren, erinnerte.
+Der Faden des Pendels unter dem Waſſer dehnt ſich nicht
+grade aus, ſondern krümmt ſich, wie im AMG. Der
+Winkel der Abweichung, den wir außer dem Waſſer ma-
+ßen, nämlich der Winkel ABT iſt nichts anders, als die
+Abweichung der Tangente an der Curve, in ihrem Anfan-
+ge; das heißt in A. Allein der Winkel, mit welchem man die
+Schnelligkeit meſſen müßte, iſt der Winkel FGH, oder die Ab-
+wichung der Tangente an der Curve in dem unterſten Pun-
+cte G. Nun können dieſe beiden Winkel A BT, FGH ſehr von
+einander verſchieden ſeyn. Auch giebt es keine Weiſe, um
+den nöthigen Winkel FGH unter dem Waſſer zu meſ-
+ſen, und um ihn dennoch theoretiſch zu beſtimmen, wür-
+de es dienlich für uns ſeyn, bie Natur der Curve A M1 G
+zu kennen, welche niemals erkannt werden kann, ohne die
+Skale der Schnelligkeiten des Waſſers zwiſchen den Pun-
+eten A und G zu kennen. Daher urheilt mit Recht Bo-
+nati, daß dieſes betrügliche Inſtrument aus der Hydro-
+metrie verbannt werden müſſe.
+Der Eindruck des Stromes, welcher den Faden
+A MG krümmt, treibt jedes ſeiner graden Stücke oder
+Elemente M N nach der Richtung NR ſenkrecht auf je
+ein grades Element. Wenn wir alſo das eigene Gewicht
+des Fadens, das etwas Unbedeutendes gegen den äußern
+Antrieb des Waſſers iſt, welches ihn umgiebt, weglaſſen,
+ſo wird dieſer Faden AMG in jedem ſeiner Punkte von ei-
+ner ihm normalen Kraft bewegt. Es iſt eine bekannte
+Eigenſchaft eines biegſamen von normalen Kräften ge-
+krümmten Fadens, daß die Spannung des Fadens beſtän-
+dig, d. h. gleichförmig in allen Punkten der Krummen ſey.
+Deswegen wie auch immer die Leiter der Schnelligkeiten
+des Fluſſes zwiſchen den Puncten Annd G ſeyn mögen,
+und wie immer auch die Eurve AMG, welche der Fa-
+den beſchreibt, ſeyn möge, ſo wiſſen wir, daß die SpÄn-
+nung des Fadens in allen ihren Puncten dieſelbe ſeyn
+werde, und demnach gleich der GF, welche die zuſam-
+mengeſetzte Kraft des eigenen Gewichts der Kugel und des
+Stoßes, den ſie von dem Waſſer empfängt, vorſtellt.
+Dieſe einfache Bemerkung bietet von ſich ſelbſt die
+Weiſe dar, um von dem Pendei einen guten und ſichern
+Nutzen für die Ausmeſſung der Schnelligkeiten zu ziehen.
+Man vernachläſſige die Abweichung des Fadens, ſo der
+ſelben meſſe man vielmehr ſeine Spannung, welche kei-
+neswegs von der unbekannten Curve AMG abhängt,
+Änd mit Sicherheit ausgedrückt wird, durch die Diagona-
+eGF. Die Spannung läßt ſich auf die leichteſte Weiſe
+ausmeſſen. Es iſt hinreichend, den Faden in B auf
+*ner ſehr beweglichen Rolle gehen zu laſſen, auf dem
+"dern Ende ein Gegengewicht T, als Gleichgewicht der
+Kugel zu befeſtigen. Das Gewicht T wird die geſuchte
+Spannung oorſtellen, und daher GF. Da MUM GF Dif
+Diagonale eines Rechtecks iſt, deſſen Vertical - Seite G
+jas Gewicht der Kugel unter Waſſer " bekannt ſind,
+ſº wird man gleich die horizºn“ Seite GK tennen
+das heißt den Trieb des Waſſers gegen die Kugel, und
+daher die Geſchwindigkeit des Laufs in Puncte G. So
+jrd die Ausmeſſung der Schnelligkeit" welche durch
+den Abweichungs-Winkel ungewiß und trüglich wird
+mit größter Sicherheit erhalten º des Gewichs,
+die Kugel im Gleichgewicht hat- -
+da6 Zur Ä und Ergänzung des Geſagten wird,
+es gut ſeyn, die Gleichung der Curve AMG zu erfor-
+ſchen, aus welcher noch weit beſſer ſowohl die Trüglichkeit der
+gewöhnlichen Methode als die Sicherheit und Zuverläſ-
+ſigkeit der uufern erſcheinen wird: Es ey der Bogen
+Ä– j, MN = s. Man ziehe Ä Ä
+N o durch M und N; der Winte OMN ſey s n Ä
+weichung des graden Stücks M N vor" Verttoe;
+je WjN n = m+dm ſeon Gººg. Ä
+die Schnelligkeit des Waſſers, welche da“ Genen Ä
+ſtößt, der Höhe u, die Normale NR ſtelle den Trieb des Waſ
+ſers gegen das grade Stück MN vºr ſo erhalten wir
+nach bekannten Geſetzen vom Widerſtand de Füſſigt -
+ten, daß dieſer Trieb proportional iſt mit uds Com-
+was ſich ausdrücken läßt kuds coſ. m*, indem kein be-
+indiaer Coefficient iſt. -
+ſtän Ä Ä T die Spannung des Fadens un dem
+Punete M u. T + dT die Spannung in " nächſten
+Puncte N. Die Spannung T wird bewirkt na Der
+Richtung M P, Verlängerung des Seitenſtücks MN, und
+gleicherweiſe wird die Spannung T + T Ä nach
+der Richtung NQ, Verlängerung des folgende" SeileN-
+ücks Nn.
+ſt Es ſey der Faden in M abgeſchnitten, der Bogen
+AM weggenommen, in M ſetze man Kraft = T,
+welche das Seitenſtückchen MN in der Richtung Mir §1°-
+he. Es wird ſich darum nichts verändern, um Ä fol-
+gende Seitenſtückchen Nn wird immerhin nach N9 Ä
+zogen werden mit einer Kraft = T + d . Hier iſt e
+djlich, daß dieſe Kraft T + d T, welche nach Nº ziehſ,
+von zwey Kräften herrühre, d. h. von T- welches noch
+NP wirkt, und von Kuds Coſ. m*, das nach Ä wirkſ.
+Wird nun die Kraft T + d T in zwey aufgelöſt, deren
+eine nach NP wirke, die andere nach NR, ſº wird die e
+ſte=T ſich finden müſſen, die zweyte = kud 9°"
+Allein wenn man die gedachte Zerlegung der "
+T + d T macht, ſo findet ſich die nach NP geridee
+– CT + d T) Coſ. PN Q, und die nach NR wird F-
+CT + dr) Sin. P NQ ſeyn. Wir erhalten alle de
+bei den Gleichungen
+CT + d T) Coſ. PN Q = T
+CT + d T ) Sin. PNQ = Kuds Coſ. m”.
+Daher nichts mehr übrig bleibt, als den Sinus und
+Cosinus des Berührungswinkels PNQ auszudrücken.
+Es iſt der Winkel PN Q = PNó – QNó = OMX
+– oN n = m ( m + d in ) = – dn. Daye Co.
+PNO = Cof. – dm = Coſ. dm = 1 und
+Sin. PN Q = Sim. – dm = – dm. Subſtituirt man die
+ſe Werthe, ſo wird die erſte Gleichung 1 + d TFT-
+

@@ -1,0 +1,119 @@
+§4“ V - – - -
+848
+und individueller ſeyn ſoll; ſo muß ſich dieſe Behaup-
+fung in dem Urſprung und in der Entwickelung deſſel-
+ben aus dem Grund - Ausdrucke nachweiſen und erwei-
+ſen laſſen.
+Dieſer urſprüngliche Ausdruck iſt der Satz: daß der
+durchbewegte Raum s gleich ſey dem Produkt aus der
+Zeitt in die verbrauchte oder hier am Ende jeder Zeit
+erzeugte und erlangte Geſchwindigkeit c. Alſo s = c><t.
+Wenn nun die Geſchwindigkeit c, – – wie beym Fal-
+Men oder Senken der Körper, – – der Fall - Raums
+und die Fallzeit t im Moment des Anfangs, alle drey
+zugleich null ſind, und zugleich die Geſchwindigkeit ein
+einem gewiſſen Verhältniß mit der Zeit t hier beim
+ungehinderten geraden Fallen erzeugt wird und wächſt;
+ſo muß in der Größe c die Zeit t ſeldſt als Faktor
+vorkommen. Es ſey daher c = gpt, wo p die ur-
+ſprüngliche unveränderliche beſchleunigende Kraft
+und g die in dieſer Zeit Einheit erzeugte hier unverän-
+derliche und erlangte Geſchwindigkeit iſt, welche in die-
+ſer Zeit: Einheit der Fall - Höhe ſelbſt gleich werden muß
+und gleich wird. Mithin, nach gehöriger Stattſetzung
+in die Grund - Gleichung s = ct, s = gpt* oder
+= 3. Wenn nämlich angenommen und gefunden
+S - - »
+8 -
+wird, daß die Geſchwindigkeit c im einfachen Verhält-
+niß der Zeit t ſtehet. Denn es könnte gar wohl in an -
+der n Dingen, Umſtänden und Bewegungen die Ge-
+ſchwindigkeit in irgend einem andern Verhältniß mit
+der Zeit ſtehen und wachſen z. B. in der 2ten, 5ten
+oder, und dergl. Potenz der Zeit t, welches die
+Grundgleichung s = c >< t in s, = gpt*, – gpt“,
+= gpt, oder – gpt umändern und in dividuali-
+ſiren würde. Dieſe Fälle bleiben jedoch hier unbeach-
+tet und es wird hier bloß der Fall s = gpt* = #
+in Betracht gezogen, weil es Erfahrung und Vernunft
+ſo lehren, daß beym Trieb der Schwere die Fall - Räu-
+mes und S im ſenkrecht - wie im ſchiefgeradlinigen Fall:
+Raume ſich wie c“: C* oder wie t*: T* d. h. wie die
+2ten Potenzen der Geſchwindigkeiten oder Zeiten verhal-
+ten. Mit dem Ausſpruche Archimeds A2; «o ret erz«
+etc. beginnt der Vf. ſeine eigentlichen Kriterien. Er
+ſagt: differenziirt man nun dieſe beiden Gleichungen,
+Gs = gpt* und s = Ä), für dieſe zwey ganz in -
+O -
+dividuellen – Fälle, des Fallens der Körper in
+ſenkrechter oder in ſchiefer gerade r Linie
+ſo erhält man rückſichtlich ds = 2gptdt und ds = #
+und da gpt = c aus = t, ſo wird aus beiden
+rückſichtlich ds = 2cdt und ds - 2.tdc oder -
+Alſo bey dieſen zwey einzelnen Fällen der Senkung der
+Körper in der ſenkrechten und in der ſchiefen gerade m
+Linie allein - verhält ſich die Zeit t zu ihrem Diffe-
+renzial dt, wie die Geſchwindigkeit c zu ihrem Diffe-
+renzial dc. – – Und alſo nur bey dieſen ganz beſon-
+dern Fällen des geradlinigen Fallens kann nur der Dif-
+ferenzial : Ausdruck * = dt oder * = de güſtig und an:
+* 2C 2t -
+wendbar ſeyn. Allein in allen andern Fällen der Sen-
+kungen der Körper in irgend einer Eurve oder in einer
+wiederholt gebrochenen Polygonallinie, wo die Ge-
+ſchwindigkeiten nicht – im Verhältniß der Zeiten wach-
+ſen können, weil die ſtetig veränderte Richtung in den
+Curven, oder die rückweiſe veränderte Richtung in der
+Polygonal-Linie, eine ſtetig oder ruckweiſe zunehmende
+Stauchung inner der hohlen Seite und eine ebenſo
+abnehmende Stauchung auf der ausgebogenen Seite
+derſelben erzeugt; da kann auch dieſes beſondere gleiche
+Verhältniß der Zeit und der Geſchwindigkeit zu ihren
+rückſichtlichen Differenzialen, und was rückwärts voraus
+gelten muß, nicht ſtattfinden und anwendbar oder gül-
+tig ſeyn, – weil es alsdann nicht aus der urſprüng-
+lichen oder Grund - Gleichung s = ct und ihrem Dif
+ferenzial ds = cdt + tdc folgt. Hier ſind ds = cdt
+-- tdc., alſo eizes = dt, und do – T-
+die allein gültigen Fundamental - Differenziale; key
+zwey gegebenen Größen unter den dreyen: Fall: Raum,
+Fall - Zeit und Geſchwindigkeit, die dritte zu beſtimmen.
+Kennt man jedoch den nähern verhältnißmäßigen Werth
+der Geſchwindigkeit, ſo laſſen ſich durch Stattſeßung
+deſſelben dieſe Gleichungen mehr individualiſieren.
+In der Logik und Mathematik wurde es aber ſonſt
+für einen Irrthum und Fehler erkannt, wenn man
+enge und beſondere Begriffe und Ausdrücke zu wei-
+ſen, allgemeinen oder generellen Begriffen und Ausdrü-
+cken ausdehnte und erhob, weil ſie dann zu wenig be-
+greifen und ausdrücken, und gerade ein ſolcher irrig
+und fehlerhaft erweiterter Begriff und Ausdruck war
+das Differenzial dt = # auf Curven angewandt. –
+C
+Beym Fallen oder Senken der Körper in nicht ſtetig
+dt - -
+gerader Linie kann und darf nicht – geſeßt
+werden, alſo können auch nicht dt – oder dc -
+C 2
+beym krummlinigen Fallen von Gültigkeit und
+Wahrheit ſeyn. Weil der Trieb der Schaere über-
+haupt ein unveränderlich ſenkrechter iſt, ſo iſt jede Ge-
+ſchwindigkeit in allem und jedem Fallen in jeder Linie
+oder Curve bey aller Stauchung in derſelben immer ge:
+nau im Verhältniß der Potenz der ſenkrechten Fall: Hö-
+hen. Oder c = (gph) daher ds = d (tc) = dt(gph)l,
+dt = "GÄT odert - wo h die ſenkrechte
+Fall - Höhe bedeutet.
+In §. 14. begegnet W. der Einwendung: die Diffe:
+renzial - Gleichung dt = # oder 2cdt - ds entſtehe da:
+C
+S
+(8 ph)
+her, daß jeder von einer gewiſſen ſenkrechten Höhe in
+irgend einer geraden oder krummen Linie herabfallende
+Körper, dadurch eine der Höhe h zugehörige doppelte Ge-
+ſchwindigkeit = 2c für den weitern Fortgang in dem
+nächſten Zeit - Glenment dt erlangt habe und mit dieſer
+weiter zu gehen beſtrebt ſey, auch wenn nun die Schwere
+weiter zu wirken aufhören würde; und da das nächſte in
++
