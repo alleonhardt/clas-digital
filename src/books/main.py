@@ -8,22 +8,28 @@ import func
 
 bookmanager = manager.CManager()
 
-dict_my = {"jan":1, "Alex":1, "Tobi": 3, "Ferdi":2}
-print (sorted((v,k) for(k, v) in dict_my.items()))
+language = {'ä': 'a', 'ö':'o', 'ü':'u', 'Ä':'A', 'Ö':'O', 'Ü':'U', 'è':'e', 'é':'e'}
 
-'''
 sInput = ""
 while sInput != "q" :
     sInput = input("Strings: ")
     sSearch = input("Search: ")
+    for char in sSearch:
+        if char in language:
+            sSearch= sSearch.replace(char, language[char])
 
     for strs, num in func.extractWords(sInput).items():
-        print (strs, num)
-        #print (fuzz.ratio(str.lower(), sSearch.lower()))
-'''
+        '''
+        for char in strs:
+            if char in language:
+                strs = strs.replace(char, language[char])
+        '''
+        print (strs, sSearch, fuzz.partial_ratio(strs.lower(), sSearch.lower()))
 
+'''
 with open("zotero.json") as read_file:
     data = json.load(read_file)
+
 
 bookmanager.updateZotero(data)
 bookmanager.initialize()
@@ -41,8 +47,7 @@ for key in results:
     print (bookmanager.getBook(key[1]).getPreview(searchOpts.word))
     print ("relevance: ", key[0], ", Num Pages: ", bookmanager.getBook(key[1]).numPages)
 
-    '''
     for page, matches in bookmanager.getBook(key).getPages(searchOpts.word, fuzzy).items(): 
         print (page, matches, end=", ")
     print()
-    '''
+'''
