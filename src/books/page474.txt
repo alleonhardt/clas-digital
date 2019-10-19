@@ -1,0 +1,122 @@
+849.
+dieſem Zeit- Element damit beſchriebene Fall- Raum
+Element ds dem Produkte aus dieſer zwofachen Fort-
+gangs - Geſchwindigkeit in das Zeit - Element dt gleich
+ſey, wenn man auf den Zuwachs der Geſchwindigkeit
+durch den Fall in dieſem Zeit- Element nicht achte, ſo
+habe man nothwendig 2cdt = ds alſo dt = # Durch
+C
+ſolche Anwendung dieſer Formel auf die Curve wird dieſe
+als in eine ebenſo große gerade Linie verwandelte be:
+handelt.
+Wendet man aber den Ausdruck dt = *
+“ auf das
+2C
+Fallen in Curven an, ſo müſſen auch alle die übrigen
+andern: als 2tdc – ds, t F#. dc = 2'' adc –
+(sp)dt: ac = gpt, s = -, 2c = 2 (érº).
+SP) WC gPt, s jp ' QC 2 (Ä) f
+ads – s N. e - -
+gF; T ad () es a das beſtändige Ver:
+hältniß der Fallhöhe zur Falllinie bedeutet, wenn sein
+ſchiefer geradliniger Fall: Raum iſt und auch dt =
+Ä. (gp) 2tdt = (ads, as = gpt", t = (#).
+zumal dabey gültig, richtig und an wen d-
+bar ſe yn.
+Eben ſo muß auch Ja = * = r“
+* mit adc mul-
+2C
+tipliciert und integriert oder /2tdc = ſ2 (ſj) de
+wiederum s geben, was jedoch alle bekannten zeitheri-
+gen Zeit - Integrale des Fallens in den Curven mit dem
+2fachen Differenzial der zugehörigen Geſchwindigkeit
+multiplicirt und alsdann integrirt, ganz und gar nicht
+geben und nicht geben können. Denn alle dieſe zwölf
+Ausdrücke können nur allzu mal gültig ſeyn, und
+wenn einer nur davon ungültig und unanwend:
+bar ſeyn ſoll, ſo müſſen es auch alle übrigen ſeyn. Hr
+W. gibt dieſe untrügliche und nothwendige Rechen:
+Probe bey den Kreis- und Cykloiden- Bogen §. 15 und
+16. CIn $. 15. iſt gleich nach dem erſten Gleichheits-
+zeichen ſtatt der einen 1 der Faktor a zu ſetzen.)
+Dieſer S. enthält zugleich ein ſehr kurzes und
+ſcharfes Integral für die zeitherige Beſtimmung der
+Fall - Zeit durch die Differenz der Bögen deren Quer-
+ſnuſe b und x ſind, welches wir allen empfehlen.
+Nicht ſtatt - ſondern - ſtatt muß man S. 18.
+Z. 7 v. o. ſaſſen.
+Statt daß s = a (Bog. quer wieder gefunden
+werden ſollte, ſo gibt die Probe - Rechnung. -
+- b"\. 1 N 2 b 1. 3 N" /^ b N*
+= --(Ä) +G) +(D' ()“
+1 . 3.5"N" / b N* 1. 3. 5. 7 N*/ b N«
++(#)' (Ä)'+(#) (#) etc. –
+– a (Bog. quers º).
+d
+Die Formeln welche der Vf. für die richtigen hält
+ſind in Ö. 16 ud 17. der Schrift ſelbſt nachzuſehen.
+Zur Encht der Behauptung von 9. 18. braucht
+man nnr bey dem Krets - Bogen abd vom untern
+Ifls 133. Heft .
+850
+Scheitel: Puuct d bis zum obern Anfangs. Punct a def-
+ſelben eine Chorde da, und mit dieſer Chorde parallel
+eine Tangenten - Linie am Bogen, vom Punct a eine
+Vertical-Linie zu ziehen; ſo berührt dieſe Tangenten-
+Linie den Bogen in ſeiner Mitte und macht mit der
+Vertical: Linie einen eben ſo großen Winkel als die
+Chorde. Alle und jede Tangenten- Linie an die Puncte
+zwiſchen dem oberſten und mittelſten Punct im Kreis:
+Bogen abd machen, mit den rückſichtlichen Vertikal-Li-
+mien aus jenen Puncten, kleinere Winkel als die
+Chorde und die Vertical-Linie; dagegen alle und jede
+Tangenten - Linie an die Puncte zwiſchen dem mittelſten
+und unterſten Puncte im Kreis-Bogen mit ihren rück-
+ſichtlichen Vertikal- Linien größere Winkel als die
+Chorde mit ihrer Vertikal-Linie machen. Dieſe Win-
+kel wachſen von ihrem Kleinſten = 90°–« bis zu ih-
+rem Größten = 90° ſtetig fort, dagegen jener Winkel
+an der neuen Chorde ſtets = 90°– « bleibt. Alſo
+muß die Beſchleunigung im Bogen ſtetig abnehmen und
+endlich zu null werden, in der Chorde ſich gleich bleiben,
+und daher die Fall-Zeit im Bogen ſtetig wachſendem
+Zuwachs unterworfen ſeyn und am Ende größer als
+in der Chorde werden; wogegen der Zuwachs der Fall-
+zeit in der Chorde ein in dieſem Sinne unveränderli-
+cher bleibt. Bey jedem andern Eurven Bogen wäre mit
+der Chorde, welche durch die End-Puncte deſſelben geht,
+eine parallele Tangenten - Linie an den Eurven - Bogen
+zu ziehen, und dann werden alle berührenden Linien
+oder Bogen - Elemente zwiſchen dem obern Anfangs-
+Punct und jenem mittlern Berührungs-Punct – klei-
+nere Winkel mit den vertikalen Linien machen, und
+umgekehrt alle Tangenten-Linien oder Bogen - Ele-
+mente zwiſchen dem mittlern Berührungs-Puncte und
+dem untern End: Puncte der Curve mit ſolchen Verti-
+kal - Linien größere Winkel, als der Winkel iſt, den
+die Chorde mit der Vertikal - Linie macht. Daher gleiche
+Folgerungen für die Beſchleunigung und für die Fall:
+zeit im Curven - Bogen und in ihrer Chorde, wie beym
+Kreisbogen.
+§. 21. iſt am Schluſſe gezeigt, daß z. B. bey einem
+Fall-Bogen von 6 Graden, es kaum den letzten 2oooſten
+Theil dieſes Bogens am Ende – beträgt, wo die Fall-
+zeit durch den Bogen erſt anfängt in ein Größeres als
+durch die Chorde über zu gehen. In S. 22 und 25. for-
+dert der Vf, die Math. und Phyſiker bey Verfechtung
+der Galliläiſchen Beweis Art auf, die folgende Be-
+trachtung anzuſtellen: Einen Kreisbogen « in n gleiche
+Theile vom unterſten Punct herauf zu heilen, darinn
+von Punct zu Punkt n gleiche Sehnen zu zieten, und
+mit jeder dieſer Sehne parallel n äußere Tangenten-
+Linien, alſo n innere und n äußere Polygonal - Li-
+nien. Durch dieſe dreyerley Fall - Räume drey Körper
+von einerley ſenkrechter Höhe = quers « herabfallen
+zu laſſen; ſo mußte, wenn nach der seitherigen Behaup-
+tung – die Falle durch die n Sehnen größer ſeyn
+ſoll als durch den Bogen -- ebenfalls auch die Fal.
+zeit durch den Bogen größer ſeyn als durch die n tan-
+gierenden äußern Sehnen; - denn der Bogen liegt
+inner dieſen äußern Sehnen, wie die innern Schnen
+inner dem Bogen, - und wenn dem Innern Berühr-
+54

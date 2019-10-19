@@ -1,0 +1,120 @@
+-
+1485
+wird; auf dieſer Ebene befinden ſich die Anfänge aller
+Bogen, welche die Winkel w meſſen. -
+Ich nehme an, daß eine endliche oder unendliche Zahl
+von materiellen Punkten - ihre Stelle verändere, indem
+jeder einen gleichen Winkel Aw um die Achſe der x be-
+ſchreibt, ohne daß irgend einer derſelben aus der auf
+dieſe Achſe ſenkrechten Ebene weiche, worin er ſich in
+ſeiner anfänglichen Lage befand; die daraus hervorge-
+hende Veränderung für das Trägheits - Moment in Be-
+zug auf die horizontale Umſchwungs-Achſe des ganzen
+- Körpers genommen, wird ſeyn
+SÄu 2 ° C sin* (e: + A «) – sin* «?
+Es ſey . die Länge des, mit dem zuſammengeſetzten, .
+gleichzeitigen, einfachen Pendels vor der Umordnung eines
+Theils ſeiner Maſſe, A. a. die Veränderung von A rücf-
+ſichtlich dieſer Umordnung. M die Maſſe des zuſammen-
+-memº-m
+1486
+geſetzten Pendels und die Entfernung des Schwerpunkts
+von M auf der Senkachſe vor der Umordnung. Man
+ſetze die Bedingungs - Gleichungen 2 ( 4 sin w) – o;
+S. 4 . sin (w + A «) = 0, XE ( 4 : cos« ) = o,
+Sº “e cos. (« + A «) = o welchen mein Apparat ge-
+nüget, und mittelſt welchen der Schwerpunkt von M
+in der nämlichen Stellung vor und nach der Umord-
+nung der materiellen Punkte ſich befindet, ſo hat man
+J 2 ( sin? A – sin* w) L
+A = = ge (sin -Ä w) – sin -2, welchen
+Werth, den man auch unter die Form
+sin Aw 2 4 g * (sin (A * + 2 %)!?
+- Y TV
+(1) AA = a MI
+bringen kann, oder, wenn man die Größe Awº außer dem
+Zeichen X bringt, weil ſie in Bezug auf dieſes Zeichen
+beſtändig iſt, unter folgende:
+Wenn man annimmt, daß die ganze Maſſe den Bo-
+gen Aw um die Achſe der x beſchreibe, ſo hat man
+M = edº d K. dw., und man wird die endlichen drey-
+fachen Integrale in Verhältniß zu ? , X und « genom-
+1nen berechnen müſſen, deren abſolute Werthe von der
+Geſtalt und Ausdehnung des Körpers abhangen werden.
+Wie man aber nur eine endliche Zahl von Kör-
+perchen - betrachtet, ſo wird der einfachſte Fall der von
+zwev materiellen Punkten ſeyn, gleich an Maſſe, in
+der die Achſen der Aufhängung und der x enthaltenden
+Ebene gelegen, beyde in - gleichen Entfernungen von
+dieſer letzten Achſe, in einer Parallele der Aufhängungs-
+o{* =
+Und wenn der Werth von A w von o bis zu r wächſt,
+ſo erhält man für die letzte Gränze,
+2 * * (sin 2. (A «).
+bm – 2 # «
+# bm AXN
+3 /4 - T., -
++ FA2)
+/ 2 « ? 2.
+Es fey n die Zahl der Schwingungen, welche das
+-
+(6) an = 4 2“ sin” (A)
+E-
+n
+XT' bin – 2 # «
+Hierin beſteht die Theorie meines neuen Verfahrens,
+die Pendeluhren recht zu ſtellen. Die Anwendung davon
+wachte ich durch Anbringung eines Metalldrathes von
+kleinem Durchmeſſer über der Aufhängungs-Achſe in der
+Verlängerung der durch den Schwerpunkt auf dieſe Achſe
+gezogenen Senkrechten. Eine andere auch ſehr kleine Ruthe
+umkreißt unter einem rechten Winkel die erſte bey ſehr
+ſchwacher Reibung; an den Enden dieſer zweyten Ruthe
+und unter gleichen Entfernungen von der erſten ſind
+zwey kleine Kugeln von Platina, welche ſich mit der
+- Ruthe, an welche ſie beveſtigt ſind,
+Schwingungen verzögern oder beſchleunigen, je nachdem
+man ſie von der durch den Schwerpunkt und der Auf-
+hängungs- Achſe gehenden Ebene entfernt oder derſelben
+; sin (Awº) =
+– ; sin Av:
+drehen und die
+(2) AX F sin A «. . sin A « B (- 2 *eos 2 w) + cos A v. S (- 2 * sin 2 x),
+a M.
+Achſe. Noch mehr, ich nehme an, daß ſie, für den im
+Augenmerk ſeyenden Gegenſtand, auf der den Schwer-
+punkt entgegengeſetzten Seite in Bezug der Aufhängungs-
+Achſe angebracht ſind. -
+Für dieſen beſondern Fall, nenne ich m die Maſſe,
+welche der M übrig bleibt, wenn man die beyden Körper
+/4 davon nimmt; und ich bezeichne durch b und # rück-
+ſichtlich die Entfernungen der Schwerpunkte von m und
+von den Maſſen - von der Aufhängungs-Achſe. Erwägt
+man zugleich, daß in dieſem angegebenen Fall w - o
+ſeyn muß, ſo erhält man durch die eine oder durch die
+andere Gleichungen (1) und (2).
+-
+VÄ(bm – TFF)TXS)
+eV 2 - J
+Pendel ... in einem mittlern Tag macht, An die Verän-
+derung von n gehörig zur Variation A ., auch ſey An
+ſehr klein in Bezug auf n angenommen. So hat man
+A A -
+(5) AA = Ä, und dieſe Gleichung mit der erſten
+von den Gleichungen (3) verbunden, giebt
+VTB m FG aF).
+? n «
+nähert; welche Verzögerung nach der Gleichung (6) dent
+- sin? (Aw) proportional iſt, und ihr Größtes erreicht,
+wenn die die beyde Kügelchen tragende Ruthe mit der
+eben erwähnten Ebene einen rechten Winkel macht.
+Im Allgemeinen ſind die Größen m, b, e und 5 im
+voraus durch das Gewicht und die Geſtalt des Pendels
+gegeben, der Conſtruction des Pendels und des Ap-
+parats angehörige Bedingungen. Es iſt gut das Größte
+von A n oder vom Verzug, welcher ſtets kleiner als 2o“
+und oft kleiner als 9“ ſeyn ſoll, zu geben. In Hinſicht
+auf A und n kann man da das Pendel vorläufig und
+unabhängig von den kleinen Maſſen u bis nahe auf einige
+Sekunden recht geſtellt oder geordnet iſt, ohne einen Irr-
+thum von Folgen zu befürchten, ihnen diejenigen Werthe

@@ -1,0 +1,126 @@
+I487
+I488
+-
+beylegen, welche ſie nach der beſtintnten Rechtſtellung
+haben werden. Mittelſt dieſer Gegebenen berechnet man
+Ax durch die Gleichung (5), (für verſchiedene Werthe
+von A n findet man AA in der, Connaissance des temps
+von 1817 S. 234, gegebenen Tafel berechnet), indem man
+darein den größten Werth von A n ſetzt, dem zufolge hat
+man “ durch die zwevte Gleichung (4), in welcher man ge-
+wöhnlich den Satz #AX in Bezug ſeiner außerordent-,
+lichen Kleinheit vernachläſſigen kann.
+Iſt - alſo beſtimmt,–ſo hat man durch die zweyte Glei-
+chung (6) die Winkel A «, entſprechend, von Sekunde zu
+Sekunde genommen, den Verzögerungen An. Davon bil-
+det man eine Tabelle. Auch kann man auf einen Viertels-
+kreis dieſe Winkel auftragen, welchem entlang die eine der
+Maſſen - ſich bewegt; die Berechnung dieſer Tafel iſt ſehr
+einfach; wenn man die größte tägliche, der Bewegung der
+Maſſen “ angehörige, Verzögeruug angegeben oder aus
+Erfahrung erkannt hat. Bey dieſer größten Verzöge-
+e - - An NI
+rung würde man (7) sin Aw = ( ) haben.
+Hr. Breguet, mein College bey der königl. Aka-
+demie der Wiſſenſchaften und beym Längen - Bitreau, hat
+auf die oben aufgeſtellten Grundſätze ein halb Sekun-
+den-Pendel verfertigt, davon die erſten Verſuche höchſt
+genügend ausgefallen ſind. Die Platinkügelchen haben
+gegen 4 Millimeter im Halbmeſſer. In ihrer anfäng-
+lichen Stellung ſind ihre rückſichtlichen Entfernungen von
+der Pendel - Achſe und von der Aufhängungs Achſe
+34 und 36 Millimeter, und eine Bewegung von einem
+Viertelskreis von der anfänglichen Stellung an, bewirkt
+eine Verzögerung von beynahe 1o Sekunden in 24 Stun-
+den. Indem man alſo in ſeiner anfänglichen Stellung
+das Pendel beyläufig rechtgeſtellt hat mittelſt der großen
+Linſe, ſo daß es zwiſchen 0 – 1o fallende Zahlen von
+Sekunden vorrückt, ſo iſt man verſichert, das Pendel ge-
+mau recht ſtellen zu können dadurch, daß man die bey-
+den vereinten Kugeln einen kleinern Winkel als den rech-
+ten beſchreiben läßt. Dieſe Winkelbewegung wird mit er-
+ſtaunlicher Leichtigkeit bewirkt ohne Anhaltung des Pen-
+dels, welches ſehr wichtig iſt. Ich will ſogleich eine
+genauere Rechnung von den Erfolgen der Erfahrung
+ablegen.
+Beyſpiel von der numeriſchen Anwendung
+der Formeln. -
+Durch die Verfertigung des halb Sekunden - Pen-
+dels von Hrn. Bregi et, deren ich oben erwähnte, hat
+jn m-,9665 Kilogr.; e = 3425 Met; # =9°3“
+jet.; dieſe Entfernungen e und F ſind vom Mittelpunkt
+der Patinkugeln gerechnet und man wird in Betracht
+der Kleinheit dieſer Kugen nur einen wohl ſehr leicht
+zu vernachläſſigenden Irrtum in der Beſtimmung dieſer -
+Art begehen, wenn man ihre ganze Maſſe in ihren
+Mittelpunkten vereinigt annimmt. Folglich findet man,
+nachdem das Pendel in eine horizontale (?) Lage und ins
+Gleichgewicht auf der horizontalen Nººſſerſchneide gebracht
+worden iſt, b= 0223 Met. Da jede Schwingung von
+der Dauer einer halben Sekunde iſt, ſo hat man für
+die Breite von Paris A – Sºns =ºss Met.
+und n = 2 ><36403" = 172800 Schwingungen. Wenn
+man endlich ein Größtes der täglichen Verzögerung von 10“
+oder von 20 Schwingungen will, ſo hat man N = 20.
+Setzt man daher in die Ä (5)-An- N = 20“
+2 4C >< 2
+2><o248.62822– ooooo57515 Met. ;
+1728oo
+dieſer Werth wird nun in die zwevte Gleichung (4)
+aeſetzt, wobey nach obiger Bemerkung der Satz (Glied)
+FAA vernachläſſigt wird, und man hat
+O,223 >< 99665>< o,0coo57515
+(0,03425)*
+Hat man das Gewicht der Kugel“, ſo findet man
+- - - - – ( kº Yi
+ſeinen Durchmeſſer d durch die Formel D = (#)
+wo e der Raum der Kugel iſt, deren Durchmeſſer =
+und p die ſpecifiſche Schwere der Materie bedeutet. Es
+iſt log G- ) = o,09367, und für Platin, P-29999
+Or
+daher D = 0,0079603 Meter..
+Es bleibt noch übrig, die Winkel A - zu berechnen.
+- - A "N!. «:- es:...
+Es iſt nach Gleichung (7), sin. A« z= (Ä) ; die Ein-
+heit worauf Anbezogen wird, iſt die halbe Sefunde, wel-
+ches die Reihe der Werthe von sin. A w von Sekunde d"
+Sekunde giebt VGT; VG2, VC3: . V. Ä
+täglichen Veränderungen von 1“, 2“,3“ bis 19“ ſº
+die dieſen Sinußen entſprechenden Winkel berechnet."
+in folgenden Täfelchen enthalten. -
+ſo hat man AA -
+–1
+- I
+– 0,00052836 Kilogr.
+-
+Tägliche Winfel Täglich º
+Veränderung. Aw Veränderung: o -7
+TS... o. o/ 5“. - - 45". OO
+j Ä 26/ 6“ . . . 5Ä. 46"
+2“ . . . 26°. 34% 7“ ... | 56°. 47“
+3“... 33". 18 8“ . . . 639. 26/
+4“. - - 39°. 14 9“ . . . 71°. 34“
+5“ - - - 45°. OO" Io““. * 90°. 00“
+-“ - T
+“N 11 „Il T E. - * n
+- Die den N = °/ N = 3 N = 1, zugehörige
+Winkel haben immer die rückſichtlichen Werthe o", 45.
+gºº. Noch mehr, wenn «irgend ein Bruch <! iſt ſº
+ſind die dem = 3 a zugehörigen Winkel Ergänzun-
+gen des einen oder des andern.
+Alſo beſchränkt ſich die Berechnung der Zahl
+– rückſichtlich, je nach
+dem K gerade oder ungerade iſt; nachdem die Tafel nach
+der Folge von Zeit - Sekunden berechnet worden, und K
+die Zahl der ganzen Sekunden, für welche Aw= 90° iſt.
+Anmerkung. Im Jahr 1790 ſchlug ich der Aka-
+demie d., Wiſſ, ein Mittel vor, die Länge des Pendels
+zu beſtimmen, wenn man ein zuſammengeſetztes Pendel
+auf zwey oder drey an dieſen Körper angebrachte Achſen
+ſchwingen laſſe. (Man ſehe meine eben angeführten
+Leçons de Mécanique Art. 1107 u. ſ. w.) Es ſcheint,
+man hat oder will in England von dieſem Mittel Ge-
+brauch machen: Die Gleichung (1) und (2) dieſer An-
+der
+K
+Winkel auf – I oder

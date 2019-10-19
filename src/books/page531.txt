@@ -1,0 +1,123 @@
+943
+944
+koſtbar ſind, und die denjenigen zum Wegweiſer dienen
+können, die Herz genug haben werden, ſich in dieſes La-
+byrinth, nur vom Calcul allein geführt, zu wagen.
+H. Prof. Bidone hat im 4ten Bande der Acad. d.
+Wiſſenſ zu Turin, die Beſchreibung eines neuen Com-
+paſſes gegeben, in dem die Magnetnadel außer ihrer Ro-
+tationbewegung um ihr Centrum auch noch die der
+Translation annehmen kann. Der Verfaſſer bedient ſich
+dieſer Dispoſition, um durch viele Erfahrungen das
+Geſetz der magnetiſchen Anziehung in umgekehrten Ver-
+hältniß der Quadraten der Diſtanzen zu beſtätigen. Die
+Art zu erperimentiren und der Calcul, jenes Geſetz dar-
+aus abzuleiten, ſind anßerordentlich leicht und einfach-
+Ju folgenden Bande gibt der nämliche Verfaſſer eine
+neue Erklärung von den Sprüngen, welche die Steine
+und Kanonenkugeln machen, wenn ſie ſchief über die
+Oberfläche des Waſſers geworfen werden. Er glaubt,
+daß der Druck der Luft, welche hinter dieſen Körpern folgt,
+die Vertiefung erſetzt, welche ſie früher ins Waſſer ge-
+macht haben, verbunden mit der Direction der refractir-
+ten Bewegung der nämlichen Körper im Waſſer, daß
+dieſes alſo hinreichend ſey, den Sprung zu erklären,
+ohne zur Elaſticität des Waſſers ſeine Zuflucht zu neh-
+men, oder zu irgend einer andern Modification der Be-
+wegung in dem Augenblicke, daß der Stoß des Körpers
+im Waſſer vergeht. Im nämlichen 5ten Theil der
+Turiner Acad. befindet ſich eine wichtige Abh. des
+Hrn Prof. Plana, über verſchiedene Wahrſcheinlich-
+keitsaufgaben. Laplace hatte ſchon die Auflöſung des
+größten Theils dieſer Probleme gegeben, aber die von
+ihm beobachtete Methode iſt vielleicht weniger lichtvoll
+und weniger einfach als die, deren ſich Hr Plana be-
+dient. Eine andere Abh. in eben denſelben Bande be-
+findlich hat zum Gegenſtand die Bewegung eines Luft-
+ſtrahls und die Bewegung der Wellen. Er gibt die
+Integrirung einer neuen Claſſe von Gleichungen von par-
+tiellen Differenzen, und unter dieſen findet ſich auch jene
+begriffen, der Bewegung der Wellen, die durch einen
+in einen See geworfenen Körper verurſacht wird. Er
+beweißt, daß die Schnelligkeit mit welcher ſich die Wel-
+len verbreiten, gleichförmig iſt, die Art und Weiſe, wo-
+durch ſie hervorgebracht worden, inag auch ſeyn,
+welche ſie nur immer will, und welches auch immer die
+Schnelligkeit der ſich in Bewegung beſindlichen Molec-u
+len ſeyn möge. Im 1oten Bande des von der Polytech-
+niſchen Schule zu Paris herausgegebenen Journals hat
+der nämliche Hr Prof. Plana eine Abh. über die Os-
+cillation elaſtiſcher Tafeln bekannt gemacht, und er gibt
+daſelbſt unter endlicher Form das Integral der Gleichung
+der 4ten Ordnung - von welcher das Geſetz dieſer Betve-
+gung abhängt. Der Vf. betrachtet auch den Fall, in
+welchem man die ſchwingende Tafel als ſchwer annehmen
+wollte. -
+Ritter Foſſombroni in einem Verſuche über die Be-
+wegung der Thiere und über die Transporte, welche dem
+22ten Bande der ital. Societät eingerückt ſind, hat ge-
+wußt, dieſe Materie völlig neu zu machen,
+ſie ſchon von ſehr vielen alten und neuen Schriftſtellern
+abgehandelt worden iſt. Er gibt zuerſt die Gleichungen
+der trummen Linie von dopyelter Beugung, die vom
+ohnerachtet
+Centro der Schwere des Menſchen oder jedes andern
+Thieres beſchrieben wird, welches geht, indem es Laſt
+trägt oder ſchleppt. Dieſe Gleichungen, da ſie die Varia-
+bilität der Muskularkraft enthalten, ſind ihrer Natur
+nach nicht integrabel, aber der Vf, zieht mit vielen
+Scharfſinn verſchiedene wichtige und fonderbare Folgerun-
+gen daraus. So, um hier nur ein ganz kleines Bey-
+ſpiel zu geben, indem er von der doppelten Curvaur
+abſtrahirt, und die krumme Linie nur in der Vertical -
+Ebene betrachtet, ſo findet er, daß ſie, wenn die Mus-
+kelkraft Null iſt, identiſch wird mit jener, welche Pro-
+jectile in widerſtehenden Mitteln beſchreiben. In der
+nämlichen Vorausſetzung der krummen Linie in einer
+verticalen Ebene ergiebt ſich zufolge ſeiner Analyſis ge-
+gen die Meynung des Deparcieux, daß ein ohne
+Schwere, aber mit Muskelkraft begabtes T hier in der
+That ziehen und fortſchreiten könnte. Endlich den
+Fall geſetzt, daß das Thier gehe, ohne irgend eine Laſt
+zu ziehen, ſo findet er im Fall der krummen Linie mit
+einfacher Beugung, daß dieſe vom Centro gravitatis be-
+ſchrieben, ganz verſchieden ſey von der Parabel, die eh-
+mals Lambert annahm, denn nachher, viele andere neue
+Schriftſteller folgten. Von hier übergehind auf die
+Transporte bedient ſich Hr Foſſombroni der Betrach-
+tung jener dritten Art des Gleichgewichtes, vorgeſtellt
+durch die Gleichung der Momente von endlichen Diffe-
+renzen, welche er erfand und 1796 in ſeiner vortrefflichen
+oben angeführten Abh, delle velocita virtuali heraus-
+Er corrigirt bey dieſer Gelegenheit zwey ungenaue For-
+meln, die Hr Bezaut in ſeiner Mechanik angab, ſich be-
+ziehend auf die Kräfte eines Thieres, welches ſich bewegt,
+indem es eine Laſt über einer beliebigen Ebene zieht,
+mit Rückſicht auf Reibung und Cohäſion. Dieſe Abh.
+wird mit einigen allgemeinen Betrachtungen geſchloſſen
+über den Vorzug der Straßen, mehr oder weniger ge-
+neigten, in Ruckſicht der Art und Weiſe wie die Thiere
+zum Transporte angewendet werden können. Dieſer Ar-
+beit des Ritter Foſſombroni folgt eine andere su la
+misura delle forzemuscolari, welche in 13t. Bande
+der nämlichen Societät abgedruckt iſt. -
+Der hydrauliſche Widder, oder Stoßhe-
+ber, den Montgolfier gegen das Ende des vorigen
+Jahrhunderts erfand, eröffnet den Phyſikern und Geo-
+metern ein neues Feld, wo ſie durch Erfahrung und
+durch den Calcul neue nnd wichtige Geſetze der Bewe-
+gung des Waſſers in Röhren aufſpüren können. Ver-
+ſchiedene dieſer Maſchinen, auferbaut entweder zum Ge-
+brauchder Gebäude, oder auch als bloßer Gegenſtand des
+Studiums, da ſie die Bequemlichkeit darboten, vermit-
+teſt ihrer die beſondern Wirkungen genauer unterſuchen
+zu können, vergrößerten bey einem jeden, der ſie ſah,
+den Wunſch, eine vollſtändige geometriſche und phyſiſche
+Erklärung derſelben haben zu können; und wirklich
+machte die königliche Acad. d. Wiſſenſ in Berlin dieſes
+für das Jahr 1810 zum Gegenſtand einer Preisaufgabe.
+Ermuntert durch dieſe öffentliche Einladung unternahm
+der Hr Prof. Brun a cci eine lange Reihe von Ver-
+ſuchen und Nachforſchungen, dir er 181o und in der Fol-
+ge 1813 unter dem Titel Trattato dell' Ariete idrau-
+lico heraus gab. Im erſten Theil legt der Verf die

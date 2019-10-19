@@ -8,23 +8,19 @@ import func
 
 bookmanager = manager.CManager()
 
+'''
 language = {'ä': 'a', 'ö':'o', 'ü':'u', 'Ä':'A', 'Ö':'O', 'Ü':'U', 'è':'e', 'é':'e'}
 
-sInput = ""
-while sInput != "q" :
-    sInput = input("Strings: ")
-    sSearch = input("Search: ")
-    for char in sSearch:
-        if char in language:
-            sSearch= sSearch.replace(char, language[char])
+f = open("test.txt")
+sInput = f.read();
+f.close()
 
-    for strs, num in func.extractWords(sInput).items():
-        '''
-        for char in strs:
-            if char in language:
-                strs = strs.replace(char, language[char])
-        '''
-        print (strs, sSearch, fuzz.partial_ratio(strs.lower(), sSearch.lower()))
+for strs, num in func.extractWords(sInput).items():
+#    for char in strs:
+#        if char in language:
+#            strs = strs.replace(char, language[char])
+    print (strs)
+#   print (strs, sSearch, fuzz.partial_ratio(strs.lower(), sSearch.lower()))
 
 '''
 with open("zotero.json") as read_file:
@@ -47,7 +43,6 @@ for key in results:
     print (bookmanager.getBook(key[1]).getPreview(searchOpts.word))
     print ("relevance: ", key[0], ", Num Pages: ", bookmanager.getBook(key[1]).numPages)
 
-    for page, matches in bookmanager.getBook(key).getPages(searchOpts.word, fuzzy).items(): 
+    for page, matches in bookmanager.getBook(key[1]).getPages(searchOpts.word, fuzzy).items(): 
         print (page, matches, end=", ")
     print()
-'''

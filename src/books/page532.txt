@@ -1,0 +1,127 @@
+945 -*
+vorzüglichſten Phänomene dar, welche der Erklärung und
+dem Calcul der Maſchine zur Grundlage dienen; ſie be-
+ſtehen vorzüglich in dem Strahl von verſchiedenem Um-
+fang, den das Waſſer beym Ausſtrömen aus einem Re-
+cipienten durch eine lange Röhre macht, wenn die äu-
+ßere Mündung derſelben geöffnet, oder wenn ſchon ge-
+öffnet, zum Theil plötzlich verſchloſſen wird. Wird nach-
+her auf einmal das äußerſte Ende der Röhre ganz
+verſchloſſen, wenn die Herausfließung ſchon ſtatt findet,
+ſo erfolgt alsdann das von den Hrn Profeſſoren Pino
+und Racagni bereits bemerkte Phänomen als Hauptur-
+ſache der bewnndernswürdigen Wirkungen des hydrauli-
+ſchen Widders; nehmlich dieſe; das auf ſolche Weiſe zu-
+rückgehaltene Waſſer ſtößt überall und kräftig, nicht an-
+ders als ein veſter Körper, an die Wände der Röhre.
+Ritter Brunacci erklärt Theil für Theil dieſe ver-
+ſchiedenen Phänomene, und zeigt ihren reſpectiven Ein-
+fluß, den ſie auf das Spiel der Maſchine haben, von
+welcher er auf ſolche Weiſe eine hinreichende phyſiſche
+Erklärung gibt. Im zweyten Theile zeigt er nun die
+analytiſche Auflöſung der verſchiedenen Aufgaben zu de-
+nen die geometriſche Theorie der angeführten Maſchine
+Gelegenheit gibt. Endlich im letzten Theile vergleicht
+er die Reſultate des Calculs mit jenen der Erfahrungen
+und findet zwiſchen beyden eine ſehr lobeuswürdige“
+bereinſtimmung; und wenn je zuweilen dieſes nicht der
+Fall ſeyn ſollte, daß beyde ſich ſo innig entſprächen ſº
+ſchreibt Ritter Brunacci dieſes phyſiſchen, von Verſchie“
+denen bemerkten Urſachen zu, und läßt uns ſehen,
+daß ſie ihrer Natur nach auf keine Weiſe dem
+Calcul und einem genauen Maaße unterworfen wer*
+den können.
+Im 2ten Band der ital Geſellſchaft der Wiſſenſ-
+findet ſich eine Abh. des Hrn Venturoli, Prof. auf der
+Acad. zu Bologna : sull' efflusso pei tubi addizionali,
+von welcher wir hier eine kurze Nachricht mittheilen wºl-
+len. Die Vermehrung der Tragweite, die man ſo be
+ſchaffenen Röhren verdankt, iſt vor allen andern zuerſt
+vom berühmten Poleni in ſeinem Buche De Caſtellº
+beobachtet worden. Verſchiedene andere Verſuch-Anſteller
+haben dieſes Phänomen nicht allein beſtättigt, ſondern
+auch daß genaue Maaß in den verſchiedenen Umſtänden
+der additionellen Röhre gefunden; übrig war nur noch,
+die phyſiſche Erklärung davon zu geben. Hr Prof. Ven-
+turi in Modena, glaubt ſie in dem gefunden zu haben,
+was er Seiten-Verbindung der Bewegung in Flüſſigen
+(communicazione laterale del moto nei fluidi) nennt,
+und hat zu dieſem Behuf eine Reihe ſchöner und wich-
+tiger Verſuche angeſtellt, welche den vortheilhaften Be-
+griff rechtfertigen, den man von den Italiänern in die-
+ſem Zweige der Wiſſenſchaften hat. Allein die Art, wie
+Hr Venturi dieſes Phänomen erklärt, iſt ſo, daß es ſel-
+biges von andern Erſcheinungen abhangen läßt, die nicht
+minder ſonderbar ſind, und die nachher ihrer ſeits eine
+neue Erklärung nöthig haben. Hr Prof. Venturoli, als er
+das Syſtem des Gefäßes und der Röhre aufmerkſam
+betrachtete, zog aus den allgemeinen Formen des Waſſer-
+drucks in Bewegung, ein ſehr einfaches Reſultat, welches
+die oben angezeigten Erſcheinungen in das hellſte Licht
+ſetzt. Dieſer Arbeit folgte eine andere des nämlichen
+Iſis 188 Heft 6. - -
+Dºm-
+E-
+946
+Verfaſſers, publicirt 1807, bey Gelegenheit einer Prä-
+mie, welche die ital Societät über Widerſtand der Rei-
+bung bekannt gemacht hatte, welche den Lauf des Waſſers
+durch lange Röhren hemmt. Prof. Venturoli nimmt
+die zuerſt von Coulomb an die Hand gegebene, und
+nachher vom Hrn Prony auf den Calcul zurückgeführte
+Hypotheſe an; daß die analytiſche Ausdrückung dieſes
+Widerſtandes aus zwey Terminis beſtehe, von denen
+der eine dem Quadrate, der andere aber der einfachen
+Potenzder Geſchwindigkeit proportional ſey.
+Den Fußſtapfen des Hrn Prony folgend, conſtruirt
+er neuerdings die Fundamentalgleichung der Aufgabe,
+und findet, daß Hr Prony einen Terminum ausgelaſſen,
+der doch ſehr in Rechnung gebracht zu werden verdiente,
+weil ſonſt in einigen Fällen die Gleichung abſurd ſeyn
+würde. Außer der mittleren Geſchwindigkeit enthält der
+Widerſtand noch ein anderes Element, und dieſes iſt das
+Verhältniß der Grundfläche des Abſchnittes der Röhre
+zu ihren Perimeter; ein Verhältniß, welchem man den
+Nahmen eines radii medii beyzulegen pflegt. Prony
+hatte den Widerſtand der Reibung dem radio medio
+reciproc angenommen; aber Venturoli bemerkt, daß, unn
+eine größere Uebereinſtimmung zwiſchen dem Calcul und
+der Beobachtung zu erhalten, man den medium radium
+mit verſchiedenen Erponenten in den 2 Terminis des
+Widerſtandes einführen müſſe. Und durch eine ſolche
+Modification wird die angenommene Hypotheſe der Na-
+tur viel angemeſſener. Was nun den Lauf durch lange
+Röhren anbetrifft, ſo gilt hier im Allgemeinen, einige
+Veränderungen ausgenommen, das, was vom Lauf des
+Waſſers in Rinnſälen gilt, ſo wie ſolches der Verf. nicht
+nicht ohne Grund angenommen hat. Die empiriſchen
+Regeln, welche Caſtelli und Guglielmini für die Meſ-
+ſung fließender Waſſer angegeben, ſind aus dieſer allge-
+meinen Theorie mit vielem Scharfſinn entlehnet. Es iſt
+alſo auf ſolche Weiſe erwieſen, daß, weit entfernt, man
+könne ſich ohne Unterſchied der einen oder der andern be-
+dienen, im Gegentheil die Fälle einander enegegengeſetzt
+ſind, in denen ſie anwendbar ſind; ſintemal die des Ca-
+ftelli einen langſamen Lauf des Fluſſes, aber jene des
+Guglielmini einen ſchnellen zum Voraus ſetzt. Im 14t.
+Band der ital. Societät hat Prof. Venturoi zum Be-
+huf einer der gewöhnlichſten Hydrometriſchen Arbeiten
+eine Abhandlung über das zuſammengeſetzte hydrometri-
+ſche Pendel abdrucken laſſen, in welcher er zeigt, daß
+wenn man ſtatt des Fadens mit der Kugel, ſich einfa-
+chen cylindriſchen Stabes bedient man dieſes Inſtrument
+von den Inconvenienzen befreien kann - die es in ſeiner
+erſten Conſtruction nicht allein unnützlich ſondern auch
+trügeriſch machen. Hr Prof. Bonati zu Ferrara war der
+erſte, der den Hydrometern davon Nachricht ertheilte,
+und ihm ſind ſie auch die Erfindung des hydrometriſchen
+Stabes ſchuldig. Zuletzt wollen wir noch ſagen, daß Hr
+Prof. Venturoli ein ſehr vortreffliches hydrauliſches
+Lehrbuch herausgegeben, wo in gehöriger Ordnung die
+die bisher von ihm in verſchiedenen Zeiten herausgegebe-
+ne Sachen geſammelt und ausgelegt ſind.
+Aſt r on ouni e.
+Im Anfang des 19ten Jahrhunderts und zwar grade
+am erſten Tage des Beº 1802 machte der berühmte
+O
+
