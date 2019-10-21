@@ -21,18 +21,31 @@ class CMetadata:
             return "no title"
 
     def getDate(self):
-        date = ""
-        try:
-            date = self.metadata["data"]["date"]
-        except:
-            return "not date"
+        sDate = ""
 
-        match = re.search(".*\\d{3}.*", date)
+        try:
+            sDate = self.metadata["data"]["date"]
+        except:
+            return -1
+
+        match = re.search(".*\\d{3}.*", sDate)
         if match and match.group().isdigit() == True: 
             return int(match.group())
-        match = re.search(".*\\d{4}.*", date)
+        match = re.search(".*\\d{4}.*", sDate)
         if match and match.group().isdigit() == True:
             return int(match.group())
+
+        return -1
+
+    def getCollections(self):
+        collections = []
+
+        try:
+            collections = self.metadata["data"]["collections"]
+        except:
+            return []
+
+        return collections
 
 
         

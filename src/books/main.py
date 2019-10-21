@@ -8,9 +8,10 @@ import func
 
 bookmanager = manager.CManager()
 
-'''
-language = {'ä': 'a', 'ö':'o', 'ü':'u', 'Ä':'A', 'Ö':'O', 'Ü':'U', 'è':'e', 'é':'e'}
 
+''' language = {'ä': 'a', 'ö':'o', 'ü':'u', 'Ä':'A', 'Ö':'O', 'Ü':'U', 'è':'e', 'é':'e'}'''
+
+'''
 f = open("test.txt")
 sInput = f.read();
 f.close()
@@ -23,6 +24,8 @@ for strs, num in func.extractWords(sInput).items():
 #   print (strs, sSearch, fuzz.partial_ratio(strs.lower(), sSearch.lower()))
 
 '''
+
+
 with open("zotero.json") as read_file:
     data = json.load(read_file)
 
@@ -33,7 +36,8 @@ bookmanager.initialize()
 word = input("Search for: ")
 fuzzy = int(input("Fuzzyness: "))
 
-searchOpts = searchOptions.CSearchOptions(word.lower(), fuzzy, False, True)
+cols = ["RFWJC42V", "XCFFDRQC", "RBB8DW5B", "WIXP3DS3"]
+searchOpts = searchOptions.CSearchOptions(word.lower(), fuzzy, False, True, "", 0, 2018,cols)
 search = search.CSearch(searchOpts, 0)
 bookmanager.addSearch(search)
 

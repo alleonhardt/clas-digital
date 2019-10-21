@@ -29,8 +29,7 @@ class CSearch:
         if self.searchOpts.onlyOcr == False:
             self.authorSearch(mapBooks)
 
-
-        return self.searchResults   #return results
+        return {k:self.searchResults[k] for k in self.searchResults if self.checkSearchOptions(mapBooks[k]) == True}
 
 
     #Finds only full matches (O(1))
@@ -72,6 +71,25 @@ class CSearch:
                 results1[key] += relevance*(ratio/100)
             else:
                 results1[key] = relevance
+
+    def checkSearchOptions(self, book):
+
+        metadata = book.metadata
+        #Check author
+        if self.searchOpts.author != "" and self.searchOpts.author != metadata.getAuthor():
+            return False
+
+        #Check date
+        if metadata.getDate() < self.searchOpts.dFrom or metadata.getDate() > self.searchOpts.dTo:
+            return False
+
+        exists = False
+        for col in metadata.getCollections():
+            if col in self.searchOpts.collections:
+                exists = True
+        
+        return exists 
+            
         
 
 
