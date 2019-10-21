@@ -5,6 +5,8 @@ import manager
 import search
 import searchOptions
 import func
+import time
+from colorama import Fore
 
 bookmanager = manager.CManager()
 
@@ -26,27 +28,33 @@ for strs, num in func.extractWords(sInput).items():
 '''
 
 
-with open("zotero.json") as read_file:
+with open("../../bin/zotero.json") as read_file:
     data = json.load(read_file)
 
 
 bookmanager.updateZotero(data)
 bookmanager.initialize()
 
-word = input("Search for: ")
-fuzzy = int(input("Fuzzyness: "))
+word = ""
+counter =0
+while word != ":q":
+    word = input("Search for: ")
+    fuzzy = int(input("Fuzzyness: "))
 
-cols = ["RFWJC42V", "XCFFDRQC", "RBB8DW5B", "WIXP3DS3"]
-searchOpts = searchOptions.CSearchOptions(word.lower(), fuzzy, False, True, "", 0, 2018,cols)
-search = search.CSearch(searchOpts, 0)
-bookmanager.addSearch(search)
+    cols = ["RFWJC42V", "XCFFDRQC", "RBB8DW5B", "WIXP3DS3"]
+    searchOpts = searchOptions.CSearchOptions(word.lower(), fuzzy, False, True, "", 0, 2018,cols)
+    mySearch = search.CSearch(searchOpts, counter)
+    bookmanager.addSearch(mySearch)
+    counter+=1
 
-results = bookmanager.search(0)
-for key in results:
-    print (key[1], bookmanager.getBook(key[1]).metadata.getAuthor(), ", ", bookmanager.getBook(key[1]).metadata.getTitle(), ", ", bookmanager.getBook(key[1]).metadata.getDate())
-    print (bookmanager.getBook(key[1]).getPreview(searchOpts.word))
-    print ("relevance: ", key[0], ", Num Pages: ", bookmanager.getBook(key[1]).numPages)
+    start = time.time()
+    results = bookmanager.search(0)
+    '''
+    for key in results:
+        print (key[1], bookmanager.getBook(key[1]).metadata.getAuthor(), ", ", bookmanager.getBook(key[1]).metadata.getTitle(), ", ", bookmanager.getBook(key[1]).metadata.getDate())
+        print (Fore.GREEN + bookmanager.getBook(key[1]).getPreview(searchOpts.word))
+        print (Fore.BLUE + "Relevance: ", key[0], Fore.RESET)
+    '''
+    end = time.time()
+    print (Fore.RED, len(results), " in ", end-start, " secs.", Fore.RESET)
 
-    for page, matches in bookmanager.getBook(key[1]).getPages(searchOpts.word, fuzzy).items(): 
-        print (page, matches, end=", ")
-    print()

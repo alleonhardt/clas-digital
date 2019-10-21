@@ -100,7 +100,6 @@ class CBook:
 
         #Open file (saved map of words/pages)
         read = open(self.path+"/pages_new.txt")
-        print ("loading pages...")
 
         #Initialize variables
         firstline = read.readline()
