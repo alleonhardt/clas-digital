@@ -62,6 +62,13 @@ server {
 	location /login {
         	proxy_pass         http://127.0.0.1:9000;
 	}	
+
+	location /search {
+        	proxy_pass         http://127.0.0.1:9000;
+        	proxy_cache_key $uri;
+		proxy_cache_valid 200 302 100m;
+	}
+
 	location /authenticate {
         	proxy_pass         http://127.0.0.1:9000;
 	}

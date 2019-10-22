@@ -1,9 +1,10 @@
 #include <iostream>
+#include <streambuf>
 #define CPPHTTPLIB_THREAD_POOL_COUNT 8
 #include "httplib.h"
 #include "login/user_system.hpp"
 #include "util/URLParser.hpp"
-
+#include "zotero/zotero.hpp"
 
 #include <signal.h>
 
@@ -23,6 +24,38 @@ int main()
 {
 	//Register for sigterm as it is send by systemd to stop the service.
 	signal(SIGTERM, sig_handler);
+
+	auto zoteroPillars = Zotero::GetPillars();
+	nlohmann::json metaData;
+	std::ifstream meta("bin/zotero.json",std::ios::in);
+	if(!meta)
+	{
+		for(auto &it : zoteroPillars)
+		{
+			auto entryjs = nlohmann::json::parse(Zotero::SendRequest(Zotero::Request::GetAllItemsFromCollection(it["key"])));
+			for(auto &it : entryjs)
+				metaData.push_back(it);
+		}
+		std::ofstream o("bin/zotero.json",std::ios::out);
+		o<<metaData;
+		o.close();
+	}
+	else
+	{
+		meta>>metaData;
+	}
+	meta.close();
+
+	std::ifstream srchFile("web/Search.html",std::ios::in);
+	std::string fileSearchHtml;
+	if(!srchFile)
+		std::cout<<"Major error could not find Search.html"<<std::endl;
+	else
+	{
+		fileSearchHtml = std::string((std::istreambuf_iterator<char>(srchFile)), std::istreambuf_iterator<char>());
+	}
+	srchFile.close();
+
 
 	srv.Get("/api",[](const Request &req, Response &resp) {
 			std::cout<<"Request to: "<<req.path<<std::endl;
@@ -49,6 +82,14 @@ int main()
 			{
 			resp.set_content("<html><head></head><body><h1>Access Denied 403</body></html>","text/html");
 			}
+			});
+	srv.Get("/search",[&](const Request &req, Response &resp) {
+			std::cout<<"Request to search to : "<<req.uri<<std::endl;
+			std::string app = fileSearchHtml;
+			app+="<script>let ServerDataObj = {pillars:";
+			app+=zoteroPillars.dump();
+			app+="};</script>";
+			resp.set_content(app.c_str(),"text/html");
 			});
 	srv.Get("/authenticate",[](const Request &req, Response &resp) {
 			
@@ -81,3 +122,4 @@ int main()
 	srv.listen("localhost", 9000);
 	return 0;
 }
+
