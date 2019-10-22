@@ -9,10 +9,13 @@ set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -Wpedantic -std=c++1z")
 find_package(Threads REQUIRED)
 
 set(SRC_FILES src/main.cpp)
+AUX_SOURCE_DIRECTORY(src/books/ SRC_FILES_BOOKS)
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_HOME_DIRECTORY}/bin)
 add_executable(clas-digital.o ${SRC_FILES})
+add_executable(books.o ${SRC_FILES_BOOKS})
 target_link_libraries(clas-digital.o stdc++fs ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(books.o stdc++fs ${CMAKE_THREAD_LIBS_INIT})
 
 
 install(FILES src/clas-digital.service DESTINATION /etc/systemd/system)

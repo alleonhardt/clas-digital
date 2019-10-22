@@ -57,10 +57,13 @@ server {
 	}
 	
     	location /api {
-        	proxy_buffering     off;
         	proxy_redirect      off;
         	proxy_pass         http://127.0.0.1:9000;
 	} 
+	
+	location /restricted/ {
+        	proxy_pass         http://127.0.0.1:9000;
+	}
 
 	# pass PHP scripts to FastCGI server
 	#

@@ -7,3 +7,6 @@ WantedBy=multi-user.target
 [Service]
 Type=simple
 ExecStart=/etc/clas-digital/clas-digital.o
+RemainAfterExit=no
+Restart=on-failure
+RestartSec=5s
