@@ -41,7 +41,7 @@ server {
 	root /etc/clas-digital/web;
 
 	# Add index.php to the list if you are using PHP
-	index guest_index.html;
+	index Search.html;
 
 	ssl on;
         ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
@@ -58,7 +58,10 @@ server {
 	location /private/ {
         	auth_request         /authenticate;
 	}
-	
+
+	location /login {
+        	proxy_pass         http://127.0.0.1:9000;
+	}	
 	location /authenticate {
         	proxy_pass         http://127.0.0.1:9000;
 	}
