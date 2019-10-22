@@ -1,0 +1,9 @@
+[Unit]
+Description=Proxy server to handle api requests
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=/etc/clas-digital/clas-digital.o

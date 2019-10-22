@@ -13,3 +13,9 @@ set(SRC_FILES src/main.cpp)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_HOME_DIRECTORY}/bin)
 add_executable(clas-digital.o ${SRC_FILES})
 target_link_libraries(clas-digital.o stdc++fs ${CMAKE_THREAD_LIBS_INIT})
+
+
+install(FILES src/clas-digital.service DESTINATION /etc/systemd/system)
+install(FILES src/default DESTINATION /etc/nginx/sites-available)
+install(PROGRAMS bin/clas-digital.o DESTINATION /etc/clas-digital)
+install(DIRECTORY web DESTINATION /etc/clas-digital)
