@@ -49,19 +49,26 @@ server {
         ssl_certificate     /etc/clas-digital/bin/cert.pem;
         ssl_certificate_key /etc/clas-digital/bin/key.pem;
 	server_name _;
+	
+    	location /api {
+        	proxy_pass         http://127.0.0.1:9000;
+	} 
 
-	location = / {
+		
+	location /private/ {
+        	auth_request         /authenticate;
+	}
+	
+	location /authenticate {
+        	proxy_pass         http://127.0.0.1:9000;
+	}
+
+	location / {
 		# First attempt to serve request as file, then
 		# as directory, then fall back to displaying a 404.
 		try_files $uri $uri/ =404;
 	}
 	
-    	location /api {
-        	proxy_buffering     off;
-        	proxy_redirect      off;
-        	proxy_pass         http://127.0.0.1:9000;
-	} 
-
 	# pass PHP scripts to FastCGI server
 	#
 	#location ~ \.php$ {
