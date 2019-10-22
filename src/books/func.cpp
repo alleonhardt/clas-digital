@@ -237,13 +237,26 @@ void transform(std::string& str)
 * @param[in] sWords string of which map shall be created 
 * @param[out] mapWords map to which new words will be added
 */
-void extractWordsFromString(std::string sWords, std::map<std::string, int>& mapWords)
+std::map<std::string, int> extractWordsFromString(std::string& sBuffer)
 {
-    std::vector<std::string> vStrs;
-    split(sWords, " ", vStrs);
+    //Replace all \n and ; with " "
+    std::replace(sBuffer.begin(), sBuffer.end(), "\n", " ");
+    std::replace(sBuffer.begin(), sBuffer.end(), ";", " ");
 
-    for(unsigned int i=0; i<vStrs.size(); i++)
+    std::vector<std::string> vStrs = split2(sWords, " ", vStrs);
+    std::map<std::string, int> mapWords;
+
+    for(unsigned int i=0; i<vStrs.size();)
     {
+        if (vStrs[i].length <= 2)
+            continue;
+
+        if (i+1 != vStrs.size() && vStrs[i].back() == "-" && isWord(vStrs[i+1].c_str()) == true) {
+            vStrs[i].pop_back();
+            vStrs[i+1].insert(0, vStrs[i]);
+            continue;
+        }
+
         transform(vStrs[i]);
         if(isWord(vStrs[i].c_str()) == true)
         {
@@ -253,35 +266,6 @@ void extractWordsFromString(std::string sWords, std::map<std::string, int>& mapW
     }
 }
 
-/**
-* @param[in] sWords string of which map shall be created 
-* @param[out] mapWords map to which new words will be added
-*/
-void extractWordsFromString(std::string sWords, std::unordered_map<std::string, std::vector<size_t>>& mapWords, size_t pageNum)
-{
-    std::vector<std::string> vStrs;
-    split(sWords, " ", vStrs);
-
-    for(unsigned int i=0; i<vStrs.size(); i++)
-    {
-        transform(vStrs[i]);
-        if(isWord(vStrs[i].c_str()) == true)
-        {
-            convertToLower(vStrs[i]);
-            if(mapWords.count(vStrs[i]) > 0)
-            {
-                auto it=std::find(mapWords[vStrs[i]].begin(), mapWords[vStrs[i]].end(), pageNum);
-                if (it != mapWords[vStrs[i]].end())
-                    continue;
-
-                mapWords[vStrs[i]].push_back(pageNum);
-            }
-
-            else
-                mapWords[vStrs[i]] = {pageNum};
-        }
-    }
-}
 
 /**
 * @brief check whether string indicates, that next page is reached
@@ -309,41 +293,5 @@ bool checkPage(std::string &buffer)
    }
    return false;
 }
-
-/**
-* @param[in] sPathToOcr Path to ocr of a book
-* @param[out] mapWords map to which new words will be added
-*/
-void extractPages(std::string sPathToOcr, std::unordered_map<std::string, std::vector<size_t>>& mapWords)
-{
-    //Read ocr
-    std::ifstream read(sPathToOcr, std::ios::in);
-
-    //Check, whether ocr could be loaded
-    if(!read)
-        return;
-
-    size_t pageNum = 0;
-    //Parse through file line by line
-    while(!read.eof())
-    {
-        //Create string for current line
-        std::string sBuffer;
-        getline(read, sBuffer);
-
-        //Check whether bufffer is empty
-        if(sBuffer.length()<=1)
-            continue;
-
-        if(checkPage(sBuffer) == true)
-            pageNum++;
-        
-        //Create words from current line
-        extractWordsFromString(sBuffer, mapWords, pageNum);
-     }
-
-     alx::cout.write("succsess.\n");
-}
-
 
 } //Close namespace 

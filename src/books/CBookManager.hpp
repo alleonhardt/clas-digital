@@ -24,8 +24,8 @@ private:
 
     //Map of all books
     std::map<std::string, CBook> m_mapBooks;
-    std::unordered_map<std::string, std::map<std::string, CBook*>> m_mapWords;
-    std::unordered_map<std::string, std::map<std::string, CBook*>> m_mapWordsTitle;
+    std::unordered_map<std::string, std::map<std::string, double>> m_mapWords;
+    std::unordered_map<std::string, std::map<std::string, double>> m_mapWordsTitle;
 
     std::map<unsigned long long, CSearch*> m_mapSearchs;
 
@@ -62,7 +62,7 @@ public:
     * @brief search function calling fitting function from search class
     * @return list of all found books
     */
-    std::list<CBook*>* search(unsigned long long id);
+    std::list<std::string>* search(unsigned long long id);
 
     std::list<std::string>* getSuggestions(std::string sInput);
 
@@ -70,24 +70,7 @@ public:
     * @brief convert to list
     * @return list of searchresulst
     */
-    std::list<CBook*>* convertToList(std::map<std::string, CBook*>* mapBooks, std::map<std::string, double>& matches);
-
-    /**
-    * @brief sort list of found books by number of matches in each book
-    * @param[in] listSR (list of search results)
-    * @param[in] sInput (input string of user)
-    * @param[in] fuzzyness (set fuzzyness)
-    * @return sorted list of search results
-    */
-    std::list<CBook*>* sortByMatches(std::list<CBook*>* listSR, std::string sInput, int fuzzyness, CSearch* search);
-
-    /**
-    * @brief Convert to list, without sortig (only, when normal search is selected) 
-    * @param[in] mapBooks map of books that have been found to contains the searched word
-    * @return list of searchresults
-    */
-    std::list<CBook*>* convertToList(std::map<std::string, CBook*>* mapBooks);
-
+    std::list<std::string>* convertToList(std::map<std::string, CBook*>* mapBooks, std::map<std::string, double>& matches);
 
     /**
     * @brief create map of all words (key) and books in which the word occurs (value)
@@ -103,12 +86,6 @@ public:
     * @brief add a new search
     */
     void addSearch(CSearch* search);
-
-    /**
-    * @brief get progress of given search
-    * @return float indicating progress
-    */
-    bool getProgress(unsigned long long id, std::string& status, float& progress);
 
     /**
     * @brief delete given search and erase from map

@@ -64,12 +64,12 @@ void CSearch::setWord(std::string sWord) {
 * @brief calls spezific search function, searches, and creates map of  matches. Removes all 
 * books that do not match with search options.
 */
-std::map<std::string, CBook*>* CSearch::search(std::unordered_map<std::string, std::map<std::string, CBook*>>& mWs, std::unordered_map<std::string, std::map<std::string, CBook*>>& mWsTitle)
+std::map<std::string, double>* CSearch::search(std::unordered_map<std::string, std::map<std::string, double>>& mWs, std::unordered_map<std::string, std::map<std::string, double>>& mWsTitle, std::unordered_map<std::string, CBook>& mapBooks)
 {
     alx::cout.write("Searching for ", m_sWord, "\n");
 
     //Create empty map of searchResults
-    std::map<std::string, CBook*>* mapSearchresults = new std::map<std::string, CBook*>;
+    std::map<std::string, CBook*>* mapSearchresults = new std::map<std::string, double>;
 
     //Normal search (full-match)
     if (m_sOpts->getFuzzyness() == 0)
@@ -86,13 +86,16 @@ std::map<std::string, CBook*>* CSearch::search(std::unordered_map<std::string, s
     {
         //Search in ocr and/ or in title
         if(m_sOpts->getOnlyTitle() == false)
-            fuzzySearch(mWs, mapSearchresults);
+            fuzzySearch(mWs, mapSearchresults, mapBooks);
         if(m_sOpts->getOnlyOcr() == false)
-            fuzzySearch(mWsTitle, mapSearchresults);
+            fuzzySearch(mWsTitle, mapSearchresults, mapBooks);
     }
 
+    //Check for author
+    checkAuthor(mapSearchresults, mapBooks);
+
     //Check search-options and remove books from search results, that don't match
-    removeBooks(mapSearchresults, matches);
+    removeBooks(mapSearchresults, mapBooks);
 
     return mapSearchresults;
 }
@@ -102,8 +105,8 @@ std::map<std::string, CBook*>* CSearch::search(std::unordered_map<std::string, s
 * @param[in] mapWords map of all words with a list of books in which this word accures
 * @param[in, out] mapSR searchresults
 */
-void CSearch::normalSearch(std::unordered_map<std::string, std::map<std::string, CBook*>>& mapWords, 
-                                                    std::map<std::string, CBook*>* mapSR)
+void CSearch::normalSearch(std::unordered_map<std::string, std::map<std::string, double>>& mapWords, 
+                                                    std::map<std::string, double>* mapSR)
 {
     if(mapWords.count(m_sWord) > 0) {
         std::map<std::string, CBook*> searchResults = mapWords.at(m_sWord);
@@ -117,21 +120,21 @@ void CSearch::normalSearch(std::unordered_map<std::string, std::map<std::string,
 * @param[in] mapWords map of all words with a list of books in which this word accures
 * @param[in, out] mapSR searchresults
 */
-void CSearch::fuzzySearch(std::unordered_map<std::string, std::map<std::string, CBook*>>& mapWords, 
-                          std::map<std::string, CBook*>* mapSR)
+void CSearch::fuzzySearch(std::unordered_map<std::string, std::map<std::string, double>>& mapWords, 
+            std::map<std::string, double>* mapSR, std::unordered_map<std::string, CBook>& mapBooks)
 {
     for(auto it= mapWords.begin(); it!=mapWords.end(); it++)
     {
         double value = fuzzy::fuzzy_cmp(it->first, m_sWord)
         else if(value <= 0.2)
-            myInsert(mapSR, it->second, it->first);
+            myInsert(mapSR, it->second, it->first, mapBooks);
     }
 }
 
 /**
 * @brief check whether searched word matches with author of a book.
 */
-std::map<std::string, CBook*>* CSearch::checkAuthor(std::map<std::string, CBook>& mapBooks)
+std::map<std::string, double>* CSearch::checkAuthor(std::map<std::string, CBook>& mapBooks)
 {
     //Creating empty map of books in which author occures
     std::map<std::string, CBook*>* mapSR = new std::map<std::string, CBook*>;
@@ -147,15 +150,11 @@ std::map<std::string, CBook*>* CSearch::checkAuthor(std::map<std::string, CBook>
 
         //Search author: full-match 
         if(fuzzyness == 0 && func::compare(it->second.getAuthor(), m_sWord) == true)
-            mapSR->insert(std::pair<std::string, CBook*>(it->first, &it->second));
-
-        //Search author: contains-match
-        else if(fuzzyness == 1 && it->second.getAuthor().find(m_sWord) != std::string::npos)
-            mapSR->insert(std::pair<std::string, CBook*>(it->first, &it->second));
+            mapSR->insert(std::pair<std::string, double>(it->first, 0));
 
         //Search author: fuzzy-match
-        else if(fuzzyness == 2 && fuzzy::fuzzy_cmp(it->second.getAuthor(), m_sWord) <= 0.2)
-            mapSR->insert(std::pair<std::string, CBook*>(it->first, &it->second));
+        else if(fuzzyness == 1 && fuzzy::fuzzy_cmp(it->second.getAuthor(), m_sWord) <= 0.2)
+            mapSR->insert(std::pair<std::string, double>(it->first, 0));
     }
 
     return mapSR;
@@ -166,15 +165,12 @@ std::map<std::string, CBook*>* CSearch::checkAuthor(std::map<std::string, CBook>
 * @brief remove all books that don't agree with searchOptions.
 * @param[in, out] mapSR map of search results
 */
-void CSearch::removeBooks(std::map<std::string, CBook*>* mapSR)
+void CSearch::removeBooks(std::unordered_map<std::string, double>* mapSR, std::unordered_map<std::string, CBook>& mapBooks)
 {
-    //Update status
-    m_sStatus = "Checking searchoptions: ";
-
     unsigned int counter = 0;
     for(auto it=mapSR->begin(); it!=mapSR->end();)
     {
-        if(checkSearchOptions(it->second) == false)
+        if(checkSearchOptions(mapBooks(it->first)) == false)
             mapSR->erase(it++);
         else
             ++it;
@@ -189,23 +185,23 @@ void CSearch::removeBooks(std::map<std::string, CBook*>* mapSR)
 * @param[in] book to be checked
 * return Boolean
 */
-bool CSearch::checkSearchOptions(CBook* book)
+bool CSearch::checkSearchOptions(CBook& book)
 {
     //*** check author ***//
     if(m_sOpts->getLastName().length() > 0)
     {
-        if(book->getAuthor() != m_sOpts->getLastName())
+        if(book.getAuthor() != m_sOpts->getLastName())
             return false;
     }
 
     //*** check date ***//
-    int date = book->getDate();
+    int date = book.getDate();
     if(date == -1 || date < m_sOpts->getFrom() || date > m_sOpts->getTo())
         return false;
          
     //*** check pillars ***//
     for(auto const &collection : m_sOpts->getCollections()) {
-        if(func::in(collection, book->getCollections()) == true)
+        if(func::in(collection, book.getMetadata()->getMetadata().getCollections()) == true)
             return true;
     }
     return false;
@@ -218,17 +214,16 @@ bool CSearch::checkSearchOptions(CBook* book)
 * @param[out] matches
 * @param[in] value
 */
-void CSearch::myInsert(std::map<std::string, CBook*>* mapSR, std::map<std::string, CBook*>& found, std::string sMatch)
+void CSearch::myInsert(std::unordered_map<std::string, double>* mapSR, std::unordered_map<std::string, double>& found, std::string sMatch, std::unordered_map<std::string, CBook>& mapBooks)
 {
-    for(auto it=found.begin(); it!=found.end(); it++)
-    {
-        mapSR->insert(std::pair<std::string, CBook*>(it->first, it->second));
-        if(m_sOpts->getFuzzyness() == 1)
-            it->second->getMapContains()[m_sWord].push_back(sMatch);
+    for(auto it=found.begin(); it!=found.end(); it++) {
+        //neccessary???
+        if(mapSR->count(it-first) > 0)
+            (*mapSR)[it->first] += it->second;
         else
-            it->second->getMapFuzzy()[m_sWord].push_back(sMatch);
+           (*mapSR)[it->first] = it->second; 
+        mapBooks[it->first]->getMapFuzzy()[m_sWord].push_back(sMatch);
     }
-        
 }
            
 

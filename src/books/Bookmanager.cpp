@@ -87,7 +87,7 @@ void CBookManager::addBook(std::string sKey) {
 std::list<CBook*>* CBookManager::search(unsigned long long id)
 {
     //Create empty map of results and matches
-    std::map<std::string, CBook*>* results1 = new std::map<std::string, CBook*>;
+    std::map<std::string, double>* results1 = new std::map<std::string, CBook*>;
 
     //Check whether search exists
     if(m_mapSearchs.count(id) == 0)
@@ -96,45 +96,16 @@ std::list<CBook*>* CBookManager::search(unsigned long long id)
     //Select search
     CSearch* search = m_mapSearchs[id];
 
-    int fuzzyness = search->getFuzzyness();
-
     results1 = search->search(m_mapWords, m_mapWordsTitle);
     alx::cout.write("num results: ", results1->size(), "\n");
-
-    //Searching Author
-    std::map<std::string, CBook*>* results2 = search->checkAuthor(m_mapBooks);
-    results1->insert(results2->begin(), results2->end());
-    delete results2;
 
     //Delete search
     deleteSearch(id);
 
     //Sort results results
-    return sortByMatches(results, sInput, , search);
+    return convertToList;
 }
 
-
-/**
-* @brief sort list of found books by number of matches in each book
-* @param[in] listSR (list of search results)
-* @param[in] sInput (input string of user)
-* @param[in] fuzzyness (set fuzzyness)
-* @return sorted list of search results
-*/
-std::list<CBook*>* CBookManager::sortByMatches(std::list<CBook*>* listSR, std::string sInput, int fuzzy, CSearch* search)
-{
-    std::map<std::string, double> matches;
-
-
-    for(auto it=MapSR->begin(); it!=listSR->end(); it++) {
-        matches[it->first] = it->second->getMatches(sInput, fuzzy)*(-1);
-    }
-
-    //Delete search
-    deleteSearch(search->getID());
-    
-    return convertToList(mapSR, matches);
-}
 
 
 /**
@@ -143,13 +114,13 @@ std::list<CBook*>* CBookManager::sortByMatches(std::list<CBook*>* listSR, std::s
 * @param[in, out] matches Map of books and there match with the searched word
 * @return list of searchresulst
 */
-std::list<CBook*>* CBookManager::convertToList(std::map<std::string, CBook*>* mapSR, std::map<std::string, double>& matches)
+std::list<std::string>* CBookManager::convertToList(std::map<std::string, double>* mapSR)
 {
     std::list<CBook*>* listBooks = new std::list<CBook*>;
 
     //Change identical entrys
     double counter;
-    for(auto it=matches.begin(); it!= matches.end(); it++) { it->second+=counter; counter+=0.000001; }
+    for(auto it=mapSR.begin(); it!= mapSR.end(); it++) { it->second+=counter; counter+=0.000001; }
 
 	// Declaring the type of Predicate that accepts 2 pairs and return a bool
 	typedef std::function<bool(std::pair<std::string, double>, std::pair<std::string, double>)> Comp;
@@ -165,7 +136,7 @@ std::list<CBook*>* CBookManager::convertToList(std::map<std::string, CBook*>* ma
 	std::set<std::pair<std::string, double>, Comp> sorted(matches.begin(), matches.end(), compFunctor);
 
     for(std::pair<std::string, double> element : sorted)
-        listBooks->push_back(mapSR->at(element.first)); 
+        listBooks->push_back(element.first); 
 
     delete mapSR;
     return listBooks;
@@ -187,7 +158,9 @@ void CBookManager::createMapWords()
 
         //Iterate over all words in this book. Check whether word already exists in list off all words.
         for(auto yt : it->second.getMapWordsPages())
-            m_mapWords[yt.first][it->first] = &it->second;
+            double relavance = 
+
+            m_mapWords[yt.first][it->first] = static_cast<double>(&it->second->getMapRelevance[yt.first])/&it->second->getNumPages();
     }
 } 
 
@@ -206,7 +179,7 @@ void CBookManager::createMapWordsTitle()
 
         //Iterate over all words in this book. Check whether word already exists in list off all words.
         for(auto yt=mapWords.begin(); yt!=mapWords.end(); yt++)
-            m_mapWordsTitle[yt->first][it->first] = &it->second;
+            m_mapWordsTitle[yt->first][it->first] = 0;
     }
 }
 
@@ -216,20 +189,6 @@ void CBookManager::createMapWordsTitle()
 void CBookManager::addSearch(CSearch* search) {
     std::unique_lock lck(m_searchLock);
     m_mapSearchs[search->getID()] = search;
-}
-
-/**
-* @brief get progress of given search
-*/
-bool CBookManager::getProgress(unsigned long long id, std::string& status, float& progress) {
-    std::shared_lock lck(m_searchLock);
-    if(m_mapSearchs.count(id) > 0)
-    {
-        m_mapSearchs[id]->getProgress(status, progress);
-        return true;
-    }
-    else
-        return false;
 }
 
 
