@@ -5,8 +5,10 @@
 	position: sticky;
 	padding: 0;
 	margin: 0;
-	background-color: #333;
+	background-color: #F8F6F5;
+	color: black;
 	overflow: hidden;
+	border-bottom: 1px solid black;
 }
 
 .classifiedContent {
@@ -15,7 +17,7 @@
 /* Style the links inside the navigation bar */
 .topnav a,.topnav .topnav-right a{
 	float: left;
-	color: #f2f2f2;
+	color: black;
 	text-align: center;
 	padding: 1em 1em;
 	text-decoration: none;
@@ -25,13 +27,13 @@
 /* Change the color of links on hover */
 .topnav a:hover {
 	transition: all 0.4s ease;
-	background-color: #ddd;
+	background-color: #48A9DA;
 	color: black;
 }
 
 /* Add a color to the active/current link */
 .topnav a.active {
-	background-color: #c66900;
+	background-color: #00618F;
 	color: white;
 }
 
@@ -48,7 +50,7 @@
 
 .topnav-right span {
 	box-sizing: border-box;
-	color: #f2f2f2;
+	color: black;
 	font-size: 1.2em;
 	text-align: center;
 	height: 100%;
