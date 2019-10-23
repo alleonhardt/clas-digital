@@ -1,11 +1,10 @@
-#include <iostream> #include <fstream>
+#include <iostream> 
+#include <fstream>
 #include <map>
 #include <list>
 #include <string>
-#include <regex>
 #include "func.hpp"
 #include "CMetadata.hpp"
-#include "src/console/console.hpp"
 
 #pragma once 
 
@@ -18,7 +17,7 @@ private:
     bool m_bOcr;                                        //Book has ocr path
 
     //Metadata
-    CMetadata m_Metadata;                               //Json with all metadata 
+    CMetadata m_metadata;                               //Json with all metadata 
     std::string m_sAuthor;
     int m_date;
 
@@ -30,7 +29,7 @@ private:
 
     //map of relavance
     std::unordered_map<std::string, int> m_mapRelevance;
-    int num_Pages;
+    int m_numPages;
 
 
 public:
@@ -69,6 +68,11 @@ public:
     bool getOcr();
 
     /**
+    * @return number of pages
+    */
+    int getNumPages();
+
+    /**
     * @return info.json of book
     */
     CMetadata& getMetadata();
@@ -92,6 +96,7 @@ public:
     std::unordered_map<std::string, std::vector<size_t>>&    getMapWordsPages();
     std::unordered_map<std::string, std::list<std::string>>& getMapFuzzy();
     std::unordered_map<std::string, int>&                    getMapRelevance();
+
  
     // **** SETTER **** //
     
@@ -177,5 +182,5 @@ public:
     */
     std::string getPreviewMatch(std::string sWord, size_t page);
 
-    void shortenPreview(size_t pos, std::string& finalResult, size_t len_match);
+    void shortenPreview(std::string& finalResult);
 };

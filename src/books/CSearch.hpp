@@ -6,14 +6,12 @@
 #include "CSearchOptions.hpp"
 #include "func.hpp"
 #include "fuzzy.hpp"
-#include "src/console/console.hpp"
 
 #pragma once 
 
 class CSearch
 {
 private:
-    unsigned long long m_ID;
     std::string m_sWord;
     CSearchOptions* m_sOpts;
 
@@ -22,27 +20,23 @@ public:
     /**
     * @brief constructor
     */
-    CSearch(CSearchOptions* searchOpts, unsigned long long sID);
+    CSearch(CSearchOptions* searchOpts);
 
     // *** GETTER *** //
 
-    /**
-    * @return id of search
-    */
-    unsigned long long getID();
 
     /**
     * @return searchOptions
     */
     CSearchOptions* getSearchOptions();
 
-
-    // *** GETTER (from searchoptions) *** //
-
     /**
-    * @return searched word from searchOptions
+    * @return searched word
     */
     std::string getSearchedWord();
+
+
+    // *** GETTER (from searchoptions) *** //
 
     /** 
     * @return fuzzynes
@@ -53,6 +47,11 @@ public:
     * @return onlyTitle
     */
     int getOnlyTitle();
+
+    /** 
+    * @return onlyOcr
+    */
+    int getOnlyOcr();
     
     // *** SETTER *** //
 
@@ -66,7 +65,10 @@ public:
     * @brief calls spezific search function, searches, and creates map of  matches. Removes all 
     * books that do not match with search options.
     */
-    std::map<std::string, double>* search(std::unordered_map<std::string, std::map<std::string, double>>& mWs, std::unordered_map<std::string, std::map<std::string, double>>& mWsTitle, std::unordered_map<std::string, CBook>& mapBooks);
+    std::map<std::string, double>* search(
+                std::unordered_map<std::string, std::map<std::string, double>>& mWs, 
+                std::unordered_map<std::string, std::map<std::string, double>>& mWsTitle, 
+                std::unordered_map<std::string, CBook*>& mapBooks);
 
     /**
     * @brief search full-match
@@ -82,25 +84,25 @@ public:
     * @param[in, out] mapSR searchresults
     */
     void fuzzySearch(std::unordered_map<std::string, std::map<std::string, double>>& mapWords, 
-              std::map<std::string, double>* mapSR, std::unordered_map<std::string, CBook>& mapBooks);
+              std::map<std::string, double>* mapSR, std::unordered_map<std::string, CBook*>& mapBooks);
 
     /**
     * @brief check whether searched word matches with author of a book.
     */
-    void checkAuthor(std::unordered_map<std::string, double>& mapSR, std::map<std::string, double>& mapBooks);
+    void checkAuthor(std::map<std::string, double>* mapSR, std::unordered_map<std::string, CBook*>& mapBooks);
 
     /**
     * @brief remove all books that do not match with searchoptions
     * @param[in, out] mapSR map of search results
     */
-    void removeBooks(std::unordered_map<std::string, double>* mapSR, std::unordered_map<std::string, CBook>& mapBooks);
+    void removeBooks(std::map<std::string, double>* mapSR, std::unordered_map<std::string, CBook*>& mapBooks);
 
     /**
     * @brief check whether book-metadata matches with searchoptions
     * @param[in] book to be checked
     * return Boolean
     */
-    bool checkSearchOptions(CBook& book);
+    bool checkSearchOptions(CBook* book);
 
     /*
     * @brief inserts searchResults into map of searchresults and assigns value of match
@@ -109,7 +111,7 @@ public:
     * @param[out] matches
     * @param[in] value
     */
-    void myInsert(std::map<std::string, double>* mapSR, std::map<std::string, double>& found, std::string sMatch, std::unordered_map<std::string, CBook>& mapBooks);
+    void myInsert(std::map<std::string, double>* mapSR, std::map<std::string, double>& found, std::string sMatch, std::unordered_map<std::string, CBook*>& mapBooks, double value);
 
     /**
     * @brief delete searchOptions

@@ -8,8 +8,6 @@
 #include <list>
 #include <locale>
 #include <regex>
-#include "json.hpp"
-#include "src/console/console.hpp"
 
 namespace func 
 {
