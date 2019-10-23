@@ -1,0 +1,64 @@
+.topnav {
+	top:0;
+	left:0;
+	width: 100vw;
+	position: sticky;
+	padding: 0;
+	margin: 0;
+	background-color: #F8F6F5;
+	color: black;
+	overflow: hidden;
+	border-bottom: 1px solid black;
+}
+
+.classifiedContent {
+    display: none;
+}
+/* Style the links inside the navigation bar */
+.topnav a,.topnav .topnav-right a{
+	float: left;
+	color: black;
+	text-align: center;
+	padding: 1em 1em;
+	text-decoration: none;
+	font-size: 1em;
+}
+
+/* Change the color of links on hover */
+.topnav a:hover {
+	transition: all 0.4s ease;
+	background-color: #48A9DA;
+	color: black;
+}
+
+/* Add a color to the active/current link */
+.topnav a.active {
+	background-color: #00618F;
+	color: white;
+}
+
+/* Right-aligned section inside the top navigation */
+.topnav-right {
+	float: right;
+}
+
+.topnav-right button{
+	box-sizing: border-box;
+	padding: 0.4em 0.8em;
+	margin: 0.5em 0.8em;
+}
+
+.topnav-right span {
+	box-sizing: border-box;
+	color: black;
+	font-size: 1.2em;
+	text-align: center;
+	height: 100%;
+}
+
+.topnav-right form {
+	box-sizing: border-box;
+	vertical-align: center;
+	padding: 0.4em 0.8em;
+	margin: auto;
+}

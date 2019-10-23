@@ -18,6 +18,8 @@
 
 # Default server configuration
 #
+proxy_cache_path  /etc/nginx/cache  levels=1:2    keys_zone=STATIC:10m
+    inactive=24h  max_size=1g;
 server {
 	listen 1222 ssl default_server;
 	listen [::]:1222 ssl default_server;
@@ -41,7 +43,7 @@ server {
 	root /etc/clas-digital/web;
 
 	# Add index.php to the list if you are using PHP
-	index guest_index.html;
+	index Search.html;
 
 	ssl on;
         ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
@@ -51,16 +53,46 @@ server {
 	server_name _;
 	
     	location /api {
-        	proxy_pass         http://127.0.0.1:9000;
+        	proxy_pass         http://localhost:9000;
 	} 
+
+	location /userlist {
+        	proxy_pass         http://localhost:9000;
+	}
 
 		
 	location /private/ {
         	auth_request         /authenticate;
 	}
-	
+
+	location /login {
+        	proxy_pass         http://localhost:9000;
+	}	
+
+	location /search {
+        	proxy_pass         http://localhost:9000;
+        	proxy_cache_key $uri$is_args$args;
+		proxy_buffering        on;
+            	proxy_cache            STATIC;
+            	proxy_cache_valid      200  1d;
+            	proxy_cache_use_stale  error timeout invalid_header updating
+                                   http_500 http_502 http_503 http_504;
+	}
+
 	location /authenticate {
-        	proxy_pass         http://127.0.0.1:9000;
+		internal;
+        	proxy_pass         http://localhost:9000;
+	}
+	
+	location = / {
+        	proxy_pass         http://localhost:9000/search;
+		proxy_redirect 	http://localhost:9000/ http://localhost:9000/search;
+		proxy_cache_key $uri$is_args$args;
+		proxy_buffering        on;
+            	proxy_cache            STATIC;
+            	proxy_cache_valid      200  1d;
+            	proxy_cache_use_stale  error timeout invalid_header updating
+                                   http_500 http_502 http_503 http_504;
 	}
 
 	location / {
