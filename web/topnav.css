@@ -1,9 +1,8 @@
 .topnav {
 	top:0;
-	z-index: 1;
 	left:0;
 	width: 100vw;
-	position: fixed;
+	position: sticky;
 	background-color: #333;
 	overflow: hidden;
 }
