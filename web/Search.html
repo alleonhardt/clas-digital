@@ -599,7 +599,7 @@ function ResetToDefault()
 	}
 }
 
-window.addEventListener("load",User.initialise,false);
+       window.addEventListener("load",function(){User.initialise('searchlink');},false);
 		</script>
 		<style>
 
@@ -616,6 +616,15 @@ window.addEventListener("load",User.initialise,false);
 	<script>
 		function ExecuteInitialise()
 		{
+		let inp = document.getElementById("SpecialSID");
+		inp.focus();
+		inp.addEventListener("keypress",function(event){
+			if(event.key == "Enter")
+			{
+				document.getElementById("srchButton").click();
+			}
+		});
+
 			if(ServerDataObj===undefined)
 			{
 				console.log("Cant find server data!");
