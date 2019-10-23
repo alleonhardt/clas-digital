@@ -11,13 +11,6 @@
 <style>
 
 
-/*SEARCH HIT LIST STYLE END*/
-
-/*Hides the content that the user cannot access!*/
-.classifiedContent {
-    display: None;
-}
-
 .smallerButton {
 	padding: 0.35em 0.35em;
 	font-size: 0.85em;
@@ -70,7 +63,7 @@ let UserList = [];
 function OnUserList()
 {
     let xhr = new XMLHttpRequest();
-    let requ = "/userList";
+    let requ = "/userlist";
     xhr.open("GET",requ,true);
     xhr.onload = function() {
 
@@ -163,7 +156,7 @@ function CreateNewUser()
     }
 
     let xhr = new XMLHttpRequest();
-	let requ = "/changeUserTable";
+	let requ = "/userlist";
   xhr.open("POST",requ,true);
   xhr.onload = function() {
   if(xhr.status==200)
@@ -186,7 +179,7 @@ function DeleteUser(elem)
     if(confirm("Do you really want to delete user "+elem.from_who))
     {
         let xhr = new XMLHttpRequest();
-        let requ = "/changeUserTable";
+        let requ = "/userlist";
         xhr.open("POST",requ,true);
         xhr.onload = function(){
             if(xhr.status==200)
@@ -202,7 +195,7 @@ function SaveUserList()
 {
   StateBanner.ChangeBanner("",StateBannerType.release);
   let xhr = new XMLHttpRequest();
-  let requ = "/changeUserTable";
+  let requ = "/userlist";
   xhr.open("POST",requ,true);
   
   let sendReq = "";
@@ -222,7 +215,7 @@ function UpdateValues(elem)
     UserList[elem.from_who] = (UserList[elem.from_who]&(~(1<<elem.which_attr)))|(elem.checked<<elem.which_attr);
 }
 
-window.addEventListener("load",function(){User.initialise("administrationlink");},false);
+window.addEventListener("load",function(){User.initialise("administrationlink");OnUserList();},false);
 </script>
 <link href="/topnav.css" rel="stylesheet" type="text/css">
   </head>

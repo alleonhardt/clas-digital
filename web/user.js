@@ -7,7 +7,7 @@ class User {
   		var expireTime = time - 10;
   		now.setTime(expireTime);
   		document.cookie = 'SESSID=;expires='+now.toGMTString()+';';
-		window.location = window.location;
+		window.location = "/";
 	}
 
 	static initialise(linkforactive) {

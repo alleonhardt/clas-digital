@@ -41,13 +41,14 @@ void do_login(const Request& req, Response &resp)
 
 
 
-void do_search(const Request& req, Response &resp, const std::string &fileSearchHtml)
+void do_search(const Request& req, Response &resp, const std::string &fileSearchHtml, const nlohmann::json zoteroPillars)
 {
+    //Is this a search query or just a request for the search main page?
     if(req.has_param("q"))
     {
 	try
 	{
-	    //This is a search query!
+	    //It is a search query!
 	    std::string query = req.get_param_value("q",0);
 	    int fuzz = std::stoi(req.get_param_value("fuzzyness",0));
 	    bool auth_only = req.get_param_value("title_only",0)=="true";
@@ -104,6 +105,22 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
     }
 }
 
+std::shared_ptr<User> GetUserFromCookie(const Request &req)
+{
+    const char *ptr = get_header_value(req.headers,"Cookie");
+    if(!ptr) return nullptr;
+    std::string x = ptr;
+    auto pos = x.find("SESSID=");
+    auto pos2 = x.find(";",pos);
+    std::string cookie = "";
+    if(pos2==std::string::npos)
+	cookie = x.substr(pos+7);
+    else
+	cookie = x.substr(pos+7,pos2);
+
+    return UserHandler::GetUserTable().GetUserBySessid(cookie);
+}
+
 void do_authentification(const Request& req, Response &resp)
 {
 
@@ -114,22 +131,62 @@ void do_authentification(const Request& req, Response &resp)
 	accreq = 2;
 
     resp.status = 403;
-    const char *ptr = get_header_value(req.headers,"Cookie");
-    if(!ptr) return;
-    std::string x = ptr;
-    auto pos = x.find("SESSID=");
-    auto pos2 = x.find(";",pos);
-    std::string cookie = "";
-    if(pos2==std::string::npos)
-	cookie = x.substr(pos+7);
-    else
-	cookie = x.substr(pos+7,pos2);
-    std::cout<<"Cookie found: "<<cookie<<std::endl;
 
-    auto &usrtable = UserHandler::GetUserTable();
-    auto usr = usrtable.GetUserBySessid(cookie);
-    if(usr && ((usr->GetAccessRights()&accreq)==accreq))
+    if(User::AccessCheck(GetUserFromCookie(req),accreq))
 	resp.status = 200;
+}
+
+void do_senduserlist(const Request &req, Response &resp)
+{
+    //Check if the user has admin access
+    if(!User::AccessCheck(GetUserFromCookie(req),AccessRights::USR_ADMIN))	
+    {
+	resp.status = 403;
+	return;
+    }
+    resp.set_content(std::move(UserHandler::GetUserTable().toJSON()),"application/json");
+}
+
+void do_usertableupdate(const Request &req, Response &resp)
+{
+	//Check if the user has admin access
+	if(!User::AccessCheck(GetUserFromCookie(req),AccessRights::USR_ADMIN))	
+	{
+	    resp.status = 403;
+	    return;
+	}
+
+	try
+	{
+		//Try to parse the command list from the body received by zotero
+		nlohmann::json js = nlohmann::json::parse(req.body);
+
+		//Do the updates accordingly
+		for(auto &it : js)
+		{
+			if(it["action"]=="DELETE")
+			{
+				//Remove the user if the action is delete if one of the necessary variables does not exist then throw an error and return an error not found
+				UserHandler::GetUserTable().RemoveUser(it["email"]);
+			}
+			else if(it["action"]=="CREATE")
+			{
+				//Create the user with the specified email password and access
+				UserHandler::GetUserTable().AddUser(it["email"],it["password"],it["access"]);
+			}
+			else if(it["action"]=="CHANGEACCESS")
+			{
+				//Create the user with the given access rights
+				UserHandler::GetUserTable().SetAccessRights(it["email"],it["access"]);
+			}
+		}
+		resp.status = 200;
+	}
+	catch(...)
+	{
+		resp.status = 400;
+	}
+
 }
 
 
@@ -139,7 +196,17 @@ int main()
     signal(SIGTERM, sig_handler);
 
     //Load all pillars
-    auto zoteroPillars = Zotero::GetPillars();
+    nlohmann::json zoteroPillars;
+    try
+    {
+	zoteroPillars = Zotero::GetPillars();
+    }
+    catch(...)
+    {
+	std::cout<<"Careful! You are running in offline mode now! Using last stable pillars for startup."<<std::endl;
+	zoteroPillars = nlohmann::json::parse("[{\"key\":\"XCFFDRQC\",\"name\":\"Forschung CLAS\"},{\"key\":\"RFWJC42V\",\"name\":\"Geschichte des Tierwissens\"}]");
+	std::cout<<"Offline pillars used: "<<zoteroPillars.dump()<<std::endl;
+    }
     nlohmann::json metaData;
     //If there are already metadata dont pull them again
     std::ifstream meta("bin/zotero.json",std::ios::in);
@@ -178,10 +245,12 @@ int main()
 
 
 
-    srv.Post("/login",&login);
-    srv.Get("/search",[&](const Request &req, Response &resp) { do_search(req,resp,fileSearchHtml);});
+    srv.Post("/login",&do_login);
+    srv.Get("/search",[&](const Request &req, Response &resp) { do_search(req,resp,fileSearchHtml,zoteroPillars);});
 
     srv.Get("/authenticate",&do_authentification);
+    srv.Get("/userlist",&do_senduserlist);
+    srv.Post("/userlist",&do_usertableupdate);
     std::cout<<"C++ Api server startup successfull!"<<std::endl;
     srv.listen("localhost", 9000);
     return 0;
