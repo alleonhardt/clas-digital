@@ -449,12 +449,18 @@ function openSearchOpts(name)
 	let close = document.getElementById("CloseSModal");
 	close.onclick = function() {
 		advancedOpts.style.display = "none";
+		let inp = document.getElementById("SpecialSID");
+		inp.focus();
+
 	}
 
 	//If the user clicked outside of the modal banner close the window as well
 	window.onclick = function(event) {
 		if (event.target == advancedOpts) {
 			advancedOpts.style.display = "none";
+			let inp = document.getElementById("SpecialSID");
+			inp.focus();
+
 		}
 	} 
 }
@@ -819,7 +825,7 @@ function ApplySearchData()
 		else
 			search_parameters.pillars.push(pill[i].checked);
 	}
-	document.getElementById("ModalBanner").style.display = "none";
+	document.getElementById("CloseSModal").click();
 	console.log(search_parameters);
 }
 
