@@ -42,6 +42,9 @@ class User {
 			ServerDataObj.user.access = parseInt(cookie.substr(pos2+2,cookie.indexOf(":::")));
 		}
 
+		let specval = document.getElementById("tpnav");
+		specval.innerHTML = "<a href='/home'>Home</a><a class='active' href='/search'>Search</a><a class='classifiedContent' href='/administration' data-acc=4>Administration</a><a class='classifiedContent' href='/uploadbook' data-acc=2>Upload Books</a><a class='classifiedContent' href='/managebooks' data-acc=2>Manage Books</a><div class='topnav-right' id='loggedintopnav'><span id='LoggedInAs'>Logged in</span><button id='logoutBut' class='btn btn-outline-info' onclick='User.DoLogout()'>Logout</button></div>";
+
 		if(ServerDataObj==undefined)
 			alert("Site internal error");
 		else if(ServerDataObj.user == undefined)
@@ -54,6 +57,7 @@ class User {
 			document.getElementById("LoggedInAs").innerHTML = "Logged in as <strong>"+ServerDataObj.user.email+"</strong>";
 
 			let list = document.getElementsByClassName("classifiedContent");
+
 			//Unlocks all the content that the user can access!
 			for(var i=0; i < list.length; i++)
 			{

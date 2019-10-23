@@ -639,17 +639,8 @@ window.addEventListener("load",User.initialise,false);
 	</head>
 	<body style='width: 100%; height: 100%;' onload="ExecuteInitialise()">
 		<!-- The navigation bar config -->
-		<div class="topnav">
-			<a href="/home">Home</a>
-			<a class="active" href="/search">Search</a>
-			<a class="classifiedContent" href="/administration" data-acc=4>Administration</a>
-			<a class="classifiedContent" href="/uploadbook" data-acc=2>Upload Books</a>
-			<a class="classifiedContent" href="/managebooks" data-acc=2>Manage Books</a>
-			<div class="topnav-right" id='loggedintopnav'>
-				<span id="LoggedInAs">Logged in</span>
-				<button id="logoutBut" class="btn btn-outline-info" onclick='User.DoLogout()'>Logout</button>
-			</div>
-		</div>
+		<div id='tpnav' class="topnav"></div>
+
 		<div id="StateBanner"></div><div id="ModalBanner" class="modal">
 			<div class="modal-content">
 				<span id="CloseSModal" class="close">&times;</span>
