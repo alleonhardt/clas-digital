@@ -8,7 +8,7 @@
 		<!--<link rel="stylesheet" href="style.css">-->
 		<title>Search - clas digital</title>
 
-		<style src="web/topnav.css"></style>
+		<link href="topnav.css" rel="stylesheet" type="text/css">
 		<style>
 
 
@@ -73,24 +73,6 @@ mark {
 	box-shadow: 0px 3px 0px #0000FF;
 }
 
-/*Styling the search bar*/
-.form-wrapper-2 {
-	display: inline-block;
-	width: 100%;
-	padding-bottom: 2px;
-	background: #555;
-}
-
-.form-wrapper-2 input {
-	width: 70%;
-	height: 40px;
-	outline: none;
-	padding: 10px 5px;
-	float: left;
-	font: bold 15px 'Raleway', sans-serif;
-	border: 0;
-	background: #ffffff;
-}
 
 .btclass2 {
 	background: white;
@@ -101,35 +83,6 @@ mark {
 	border-bottom: 3px solid green;
 }
 
-.form-wrapper-2 .btclass2:hover {
-	background: #333333;
-}
-
-.form-wrapper-2 .srchBtrn {
-	overflow: visible;
-	position: relative;
-	float: left;
-	border: 0;
-	padding: 0;
-	cursor: pointer;
-	height: 40px;
-	width: 20%;
-	font: bold 15px/40px 'Raleway', sans-serif;
-	color: #fff;
-	text-transform: uppercase;
-	background: #D88F3C;
-}
-
-.form-wrapper-2 .srchBtrn:hover{
-	background: #FA9918;
-}
-.form-wrapper-2 .srchBtrn:active,
-.form-wrapper-2 .srchBtrn:focus{
-	background: #c42f2f;
-}
-/*SEARCHBAR STYLE END ----------------------------------*/
-
-/*MODAL ADVANCED SEARCHBOX BEGIN ------------------------*/
 .slider { 
 	display: inline-block;
 	margin-right: 30px;
@@ -201,51 +154,6 @@ mark {
 	overflow-wrap: anywhere;
 }
 
-#realHeader {
-	list-style-type: none;
-}
-
-#realHeader a:hover{
-	background: #9a9a9a;
-	transform: scale(1.08);
-}
-
-#realHeader a input {
-	margin-top: 0.5rem;
-	margin-right: 1rem;
-	margin-left: 0.5rem;
-	display: inline-block;
-}
-#realHeader a span {
-	float: right;
-	display: inline-block;
-	margin-right: 0.5rem;
-	font-size: large;
-	color: white;
-}
-
-#realHeader a{
-	padding: 0;
-	margin: 0;
-	background: #9a9a9a;
-	font-size: large;
-	color: white;
-	transform: scale(1.08);
-}
-
-#realHeader a strong {
-	margin-left: 30%;
-}
-
-#realHeader a img {
-	height: 100%;
-	display:inline-block;
-	width: 2rem;
-}
-#realHeader a img:hover {
-	background-color: #c66900;
-	transition: all 0.4s ease;
-}
 
 .linkedClass {
 	margin-right: .5em;
@@ -298,119 +206,10 @@ mark {
 }
 
 		</style>
-
+		<script src="user.js"></script>
 		<script>
 			let search_parameters = {};
 let default_search_parameters = {};
-//Handles all the User related stuff
-class User {
-	//Static because it does not matter which user asks to end his session
-	static DoLogout() {
-		//Just tell the server to log the current user out, then reload the page
-		 var now = new Date();
-  		var time = now.getTime();
-  		var expireTime = time - 10;
-  		now.setTime(expireTime);
-  		document.cookie = 'SESSID=;expires='+now.toGMTString()+';';
-		window.location = window.location;
-	}
-
-	static initialise() {
-		let inp = document.getElementById("SpecialSID");
-		inp.focus();
-		inp.addEventListener("keypress",function(event){
-			if(event.key == "Enter")
-			{
-				document.getElementById("srchButton").click();
-			}
-		});
-		//inp.addEventListener("input",function(event){
-		//	document.getElementById("srchButton").click();
-		//});
-
-		let vars = document.cookie;
-		console.log("Document cookie: "+ document.cookie);
-		let pos = vars.indexOf("SESSID=");
-		if(pos!=-1)
-		{
-			let numpos = vars.indexOf(";",pos+7);
-			let cookie = "";
-			if(numpos==-1)
-				cookie = vars.substr(pos+7);
-			else
-				cookie = vars.substr(pos+7,numpos);
-
-			console.log(cookie);
-			let pos2 = cookie.indexOf("::");
-			ServerDataObj.user = {};
-			ServerDataObj.user.email = cookie.substr(0,pos2);
-			ServerDataObj.user.access = parseInt(cookie.substr(pos2+2,cookie.indexOf(":::")));
-		}
-
-		if(ServerDataObj==undefined)
-			alert("Site internal error");
-		else if(ServerDataObj.user == undefined)
-		{
-				let x = document.getElementById("loggedintopnav");
-				x.innerHTML = '<form id ="LoginForm" class="form-inline my-2 my-lg-0" action="/login" method="post"><input id="EmailType" class="form-control mr-sm-2" type="email" name="email" placeholder="Email" aria-label="Email" required><input id="PasswordType" class="from-control mr-sm-2" type="password" name="password" placeholder="Password" aria-label="Password" required><input class="btn btn-outline-success my-2 my-sm-0" type="submit" value="Log In"/></form>';
-		}
-		else
-		{
-			document.getElementById("LoggedInAs").innerHTML = "Logged in as <strong>"+ServerDataObj.user.email+"</strong>";
-
-			let list = document.getElementsByClassName("classifiedContent");
-			//Unlocks all the content that the user can access!
-			for(var i=0; i < list.length; i++)
-			{
-				let y = list[i].dataset.acc;
-				if((ServerDataObj.user.access&y)!=0)
-				{
-					list[i].style.display="block";
-				}
-			}
-		}
-	}
-}
-
-//Create an enum to identify the valid types of State Banner changes
-var StateBannerType = {"success":1,"danger":2,"warning":3,"info":4,"release":5};
-Object.freeze(StateBannerType);
-
-//Shows a banner at the top of the screen, used to inform the user of errors and success
-class StateBanner {
-	static ChangeBanner(msg, type)
-	{
-		//Show the new banner message
-		let alt = document.getElementById("StateBanner");
-		let newHTML = "<strong>";
-		newHTML+= msg;
-		newHTML+="</strong>";
-		alt.innerHTML = newHTML;
-
-		//Decide what kind of layout the banner should show
-		if(type===StateBannerType.success)
-		{
-			alt.setAttribute("class","alert alert-success");
-		}
-		else if(type===StateBannerType.danger)
-		{
-			alt.setAttribute("class","alert alert-danger"); 
-		}
-		else if(type===StateBannerType.warning)
-		{
-			alt.setAttribute("class","alert alert-warning"); 
-		}
-		else if(type===StateBannerType.info)
-		{
-			alt.setAttribute("class","alert alert-info"); 
-		}
-		else if(type==StateBannerType.release)
-		{
-			alt.setAttribute("class","None");
-			alt.innerHTML = "";
-		}
-	}
-}
 
 function getSliderValue(x)
 {
@@ -803,74 +602,6 @@ function ResetToDefault()
 window.addEventListener("load",User.initialise,false);
 		</script>
 		<style>
-
- /* Customize the label (the container) */
-.container {
-  display: block;
-  position: relative;
-  padding-left: 35px;
-  margin-bottom: 12px;
-  cursor: pointer;
-  font-size: 22px;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-
-/* Hide the browser's default checkbox */
-.container input {
-  position: absolute;
-  opacity: 0;
-  cursor: pointer;
-  height: 0;
-  width: 0;
-}
-
-/* Create a custom checkbox */
-.checkmark {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 1.5rem;
-  width: 1.5rem;
-  background-color: grey;
-}
-
-/* On mouse-over, add a grey background color */
-.container:hover input ~ .checkmark {
-  background-color: #ccc;
-}
-
-/* When the checkbox is checked, add a blue background */
-.container input:checked ~ .checkmark {
-  background-color: #2196F3;
-}
-
-/* Create the checkmark/indicator (hidden when not checked) */
-.checkmark:after {
-  content: "";
-  position: absolute;
-  display: none;
-}
-
-/* Show the checkmark when checked */
-.container input:checked ~ .checkmark:after {
-  display: block;
-}
-
-/* Style the checkmark/indicator */
-.container .checkmark:after {
-  left: 0.5rem;
-  top: 0.15rem;
-  width: 0.5rem;
-  height: 1rem;
-  border: solid white;
-  border-width: 0 3px 3px 0;
-  -webkit-transform: rotate(45deg);
-  -ms-transform: rotate(45deg);
-  transform: rotate(45deg);
-} 
 
 .upSaule {
 	margin-left: 1rem;
