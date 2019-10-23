@@ -137,41 +137,7 @@ std::string returnToLower(std::string &str)
     return str2;
 }
 
-/**
-* @brief checks whether a string is a word
-* @param[in] chWord string to be checked
-* @return boolean for words/ no word
-*/
-bool isWord(const char* chWord) 
-{
-    //Variables 
-    size_t count_err = 0;
-    size_t count_len = 0;
-    size_t max = strlen(chWord);
-    int length;
-    wchar_t dest;
 
-    //Set locale
-    std::locale loc("de_DE.utf8");
-    std::setlocale(LC_ALL, "de_DE.utf8");
-
-    mbtowc (NULL, NULL, 0); 
-
-    //Calculate number of non-letter
-    while (max>0) {
-        length = mbtowc(&dest, chWord, max);
-        if(length<1) break;
-        if(isalpha(dest, loc) == false) count_err++;
-        count_len++;
-        chWord+=length; max-=length;
-    }
-
-    //Calculate whether more the 30% of characters are non-letters (return false)
-    if(static_cast<double>(count_err)/static_cast<double>(count_len) <= 0.3)
-        return true;
-
-    return false;
-}
 
 /**
 * @brief split a string at given delimiter. Store strings in array.
@@ -233,55 +199,85 @@ void transform(std::string& str)
 }
 
 /**
+* @brief checks whether a string is a word
+* @param[in] chWord string to be checked
+* @return boolean for words/ no word
+*/
+bool isWord(const char* chWord) 
+{
+    //Variables 
+    size_t count_err = 0;
+    size_t count_len = 0;
+    size_t max = strlen(chWord);
+    int length;
+    wchar_t dest;
+
+    if (max <= 2)
+        return false;
+
+    //Set locale
+    std::locale loc("de_DE.utf8");
+    std::setlocale(LC_ALL, "de_DE.utf8");
+
+    mbtowc (NULL, NULL, 0); 
+
+    //Calculate number of non-letter
+    while (max>0) {
+        length = mbtowc(&dest, chWord, max);
+        if(length<1) break;
+        if(isalpha(dest, loc) == false) count_err++;
+        count_len++;
+        chWord+=length; max-=length;
+    }
+
+    //Calculate whether more the 30% of characters are non-letters (return false)
+    if(static_cast<double>(count_err)/static_cast<double>(count_len) <= 0.3)
+        return true;
+
+    return false;
+}
+
+/**
 * @brief extract words from a string into a map (drop all sequences which  aren't a word).
 * @param[in] sWords string of which map shall be created 
 * @param[out] mapWords map to which new words will be added
 */
-void extractWordsFromString(std::string sWords, std::map<std::string, int>& mapWords)
+std::map<std::string, int> extractWordsFromString(std::string& sBuffer)
 {
-    std::vector<std::string> vStrs;
-    split(sWords, " ", vStrs);
+    //Replace all \n and ; with " "
+    std::replace(sBuffer.begin(), sBuffer.end(), '\n', ' ');
+    std::replace(sBuffer.begin(), sBuffer.end(), ';', ' ');
+    std::replace(sBuffer.begin(), sBuffer.end(), ',', ' ');
 
-    for(unsigned int i=0; i<vStrs.size(); i++)
+    std::vector<std::string> vStrs = split2(sBuffer, " ");
+    std::map<std::string, int> mapWords;
+
+    for(unsigned int i=0; i<vStrs.size();i++)
     {
+        if (vStrs[i].length() <= 2)
+            continue;
+
+        if (i+1 != vStrs.size() && vStrs[i].back() == '-' && isWord(vStrs[i+1].c_str()) == true) {
+            vStrs[i].pop_back();
+            vStrs[i+1].insert(0, vStrs[i]);
+            continue;
+        }
+
         transform(vStrs[i]);
         if(isWord(vStrs[i].c_str()) == true)
         {
+            vStrs[i].erase(std::remove(vStrs[i].begin(), vStrs[i].end(), '-'), vStrs[i].end());
+            vStrs[i].erase(std::remove(vStrs[i].begin(), vStrs[i].end(), '.'), vStrs[i].end());
             convertToLower(vStrs[i]);
-            mapWords[vStrs[i]] = 0;
+
+            mapWords[vStrs[i]] += 1;
         }
+
     }
+
+    return mapWords;
 }
 
-/**
-* @param[in] sWords string of which map shall be created 
-* @param[out] mapWords map to which new words will be added
-*/
-void extractWordsFromString(std::string sWords, std::unordered_map<std::string, std::vector<size_t>>& mapWords, size_t pageNum)
-{
-    std::vector<std::string> vStrs;
-    split(sWords, " ", vStrs);
-
-    for(unsigned int i=0; i<vStrs.size(); i++)
-    {
-        transform(vStrs[i]);
-        if(isWord(vStrs[i].c_str()) == true)
-        {
-            convertToLower(vStrs[i]);
-            if(mapWords.count(vStrs[i]) > 0)
-            {
-                auto it=std::find(mapWords[vStrs[i]].begin(), mapWords[vStrs[i]].end(), pageNum);
-                if (it != mapWords[vStrs[i]].end())
-                    continue;
-
-                mapWords[vStrs[i]].push_back(pageNum);
-            }
-
-            else
-                mapWords[vStrs[i]] = {pageNum};
-        }
-    }
-}
 
 /**
 * @brief check whether string indicates, that next page is reached
@@ -309,41 +305,5 @@ bool checkPage(std::string &buffer)
    }
    return false;
 }
-
-/**
-* @param[in] sPathToOcr Path to ocr of a book
-* @param[out] mapWords map to which new words will be added
-*/
-void extractPages(std::string sPathToOcr, std::unordered_map<std::string, std::vector<size_t>>& mapWords)
-{
-    //Read ocr
-    std::ifstream read(sPathToOcr, std::ios::in);
-
-    //Check, whether ocr could be loaded
-    if(!read)
-        return;
-
-    size_t pageNum = 0;
-    //Parse through file line by line
-    while(!read.eof())
-    {
-        //Create string for current line
-        std::string sBuffer;
-        getline(read, sBuffer);
-
-        //Check whether bufffer is empty
-        if(sBuffer.length()<=1)
-            continue;
-
-        if(checkPage(sBuffer) == true)
-            pageNum++;
-        
-        //Create words from current line
-        extractWordsFromString(sBuffer, mapWords, pageNum);
-     }
-
-     alx::cout.write("succsess.\n");
-}
-
 
 } //Close namespace 

@@ -17,7 +17,7 @@ namespace fuzzy
     * @parameter const char* (target word)
     * @return int (levenshtein distance)
     **/
-    size_t levenshteinDistance(const wchar_t* chS, const wchar* chT);
+    size_t levenshteinDistance(const char* chS, const char* chT);
             
 
     /**

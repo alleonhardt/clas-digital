@@ -8,8 +8,6 @@
 #include <list>
 #include <locale>
 #include <regex>
-#include "json.hpp"
-#include "src/console/console.hpp"
 
 namespace func 
 {
@@ -80,12 +78,6 @@ namespace func
     */
     std::string returnToLower(std::string &str);
 
-    /** 
-    * @brief function checks whether character is a letter with de and fr local
-    * @param[in] s char to be checked
-    */
-    bool isLetter(const char s);
-
     /**
     * @brief checks whether a string is a word
     * @param[in] chWord string to be checked
@@ -116,13 +108,7 @@ namespace func
     * @param[in] sWords string of which map shall be created 
     * @param[out] mapWords map to which new words will be added
     */
-    void extractWordsFromString(std::string sWords, std::map<std::string, int>& mapWords);
-
-    /**
-    * @param[in] sWords string of which map shall be created 
-    * @param[out] mapWords map to which new words will be added
-    */
-    void extractWordsFromString(std::string sWords, std::unordered_map<std::string, std::vector<size_t>>& mapWords, size_t pageNum);
+    std::map<std::string, int> extractWordsFromString(std::string& sWords);
 
     /**
     * @brief check whether string indicates, that next page is reached
@@ -130,12 +116,6 @@ namespace func
     * @return 
     */
     bool checkPage(std::string &buffer);
-
-    /**
-    * @param[in] sPathToOcr Path to ocr of a book
-    * @param[out] mapWords map to which new words will be added
-    */
-    void extractPages(std::string sPathToOcr, std::unordered_map<std::string, std::vector<size_t>>& mapWords);
 }
 
 

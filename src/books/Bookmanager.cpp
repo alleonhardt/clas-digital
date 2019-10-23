@@ -3,7 +3,7 @@
 /**
 * @return map of all book
 */
-std::map<std::string, CBook>& CBookManager::getMapOfBooks() {
+std::unordered_map<std::string, CBook*>& CBookManager::getMapOfBooks() {
     return m_mapBooks;
 }
 
@@ -21,7 +21,7 @@ bool CBookManager::initialize()
     //Check whether files where found
     if(!dir_allItems)
     {
-        alx::cout.write(alx::console::red_black, "No books found.\n");
+        std::cout << "No books found.\n";
         return false;
     }
 
@@ -31,14 +31,14 @@ bool CBookManager::initialize()
         if(m_mapBooks.count(e_allItems->d_name) > 0)
             addBook(e_allItems->d_name);
         else
-            alx::cout.write(alx::console::red_black, (const char*)e_allItems->d_name, " found which isn't in map!\n");
+            std::cout << (const char*)e_allItems->d_name << " found which isn't in map!\n";
     }
 
     //Create map of all words + and of all words in all titles
     createMapWords();
-    alx::cout.write("Map Words: ", (int)m_mapWords.size(), "\n");
+    std::cout << "Map Words: " << (int)m_mapWords.size() << "\n";
     createMapWordsTitle();
-    alx::cout.write("Map Titles: ", (int)m_mapWordsTitle.size(), "\n");
+    std::cout << "Map Titles: " << (int)m_mapWordsTitle.size() << "\n";
 
     return true;
 }
@@ -54,12 +54,12 @@ void CBookManager::updateZotero(nlohmann::json j_items)
     {
         //If book already exists, simply change metadata of book
         if(m_mapBooks.count(it["key"]) > 0)
-            m_mapBooks[it["key"]].getMetadata().setMetadata(it);
+            m_mapBooks[it["key"]]->getMetadata().setMetadata(it);
 
         //If it does not exits, create new book and add to map of all books
         else
         {
-            CBook book(it);
+            CBook* book = new CBook(it);
             m_mapBooks[it["key"]] = book;
         }
     }
@@ -74,8 +74,8 @@ void CBookManager::addBook(std::string sKey) {
     if(!std::experimental::filesystem::exists("web/books/" + sKey))
         return;
 
-    m_mapBooks[sKey].setPath("web/books/" + sKey);
-    m_mapBooks[sKey].createMapWords();
+    m_mapBooks[sKey]->setPath("web/books/" + sKey);
+    m_mapBooks[sKey]->createMapWords();
 }
     
 
@@ -84,57 +84,19 @@ void CBookManager::addBook(std::string sKey) {
 * @param[in] searchOPts 
 * @return list of all found books
 */
-std::list<CBook*>* CBookManager::search(unsigned long long id)
+std::list<std::string>* CBookManager::search(CSearchOptions* searchOpts)
 {
-    //Create empty map of results and matches
-    std::map<std::string, CBook*>* results1 = new std::map<std::string, CBook*>;
-
-    //Check whether search exists
-    if(m_mapSearchs.count(id) == 0)
-        return new std::list<CBook*>;
-
     //Select search
-    CSearch* search = m_mapSearchs[id];
+    CSearch search(searchOpts);
 
-    int fuzzyness = search->getFuzzyness();
-
-    results1 = search->search(m_mapWords, m_mapWordsTitle);
-    alx::cout.write("num results: ", results1->size(), "\n");
-
-    //Searching Author
-    std::map<std::string, CBook*>* results2 = search->checkAuthor(m_mapBooks);
-    results1->insert(results2->begin(), results2->end());
-    delete results2;
-
-    //Delete search
-    deleteSearch(id);
+    //Search
+    std::map<std::string, double>* results = search.search(m_mapWords, m_mapWordsTitle, m_mapBooks);
+    std::cout << "Results: " << results->size() << "\n";
 
     //Sort results results
-    return sortByMatches(results, sInput, , search);
+    return convertToList(results);
 }
 
-
-/**
-* @brief sort list of found books by number of matches in each book
-* @param[in] listSR (list of search results)
-* @param[in] sInput (input string of user)
-* @param[in] fuzzyness (set fuzzyness)
-* @return sorted list of search results
-*/
-std::list<CBook*>* CBookManager::sortByMatches(std::list<CBook*>* listSR, std::string sInput, int fuzzy, CSearch* search)
-{
-    std::map<std::string, double> matches;
-
-
-    for(auto it=MapSR->begin(); it!=listSR->end(); it++) {
-        matches[it->first] = it->second->getMatches(sInput, fuzzy)*(-1);
-    }
-
-    //Delete search
-    deleteSearch(search->getID());
-    
-    return convertToList(mapSR, matches);
-}
 
 
 /**
@@ -143,13 +105,13 @@ std::list<CBook*>* CBookManager::sortByMatches(std::list<CBook*>* listSR, std::s
 * @param[in, out] matches Map of books and there match with the searched word
 * @return list of searchresulst
 */
-std::list<CBook*>* CBookManager::convertToList(std::map<std::string, CBook*>* mapSR, std::map<std::string, double>& matches)
+std::list<std::string>* CBookManager::convertToList(std::map<std::string, double>* mapSR)
 {
-    std::list<CBook*>* listBooks = new std::list<CBook*>;
+    std::list<std::string>* listBooks = new std::list<std::string>;
 
     //Change identical entrys
     double counter;
-    for(auto it=matches.begin(); it!= matches.end(); it++) { it->second+=counter; counter+=0.000001; }
+    for(auto it=mapSR->begin(); it!= mapSR->end(); it++) { it->second+=counter; counter+=0.000001; }
 
 	// Declaring the type of Predicate that accepts 2 pairs and return a bool
 	typedef std::function<bool(std::pair<std::string, double>, std::pair<std::string, double>)> Comp;
@@ -162,10 +124,10 @@ std::list<CBook*>* CBookManager::convertToList(std::map<std::string, CBook*>* ma
 			};
 
 	// Declaring a set that will store the pairs using above comparision logic
-	std::set<std::pair<std::string, double>, Comp> sorted(matches.begin(), matches.end(), compFunctor);
+	std::set<std::pair<std::string, double>, Comp> sorted(mapSR->begin(), mapSR->end(), compFunctor);
 
     for(std::pair<std::string, double> element : sorted)
-        listBooks->push_back(mapSR->at(element.first)); 
+        listBooks->push_back(element.first); 
 
     delete mapSR;
     return listBooks;
@@ -182,12 +144,12 @@ void CBookManager::createMapWords()
     for(auto it=m_mapBooks.begin(); it!=m_mapBooks.end(); it++)
     {
         //Check whether book has ocr
-        if(it->second.getOcr() == false)
+        if(it->second->getOcr() == false)
             continue;
 
         //Iterate over all words in this book. Check whether word already exists in list off all words.
-        for(auto yt : it->second.getMapWordsPages())
-            m_mapWords[yt.first][it->first] = &it->second;
+        for(auto yt : it->second->getMapWordsPages())
+            m_mapWords[yt.first][it->first] = static_cast<double>(it->second->getMapRelevance()[yt.first])/it->second->getNumPages();
     }
 } 
 
@@ -201,55 +163,12 @@ void CBookManager::createMapWordsTitle()
     for(auto it=m_mapBooks.begin(); it!=m_mapBooks.end(); it++)
     {
         //Get map of words of current book)
-        std::map<std::string, int> mapWords; 
-        func::extractWordsFromString(it->second.getTitle(), mapWords);
+        std::string sTitle = it->second->getMetadata().getTitle();
+        std::map<std::string, int> mapWords = func::extractWordsFromString(sTitle);
 
         //Iterate over all words in this book. Check whether word already exists in list off all words.
         for(auto yt=mapWords.begin(); yt!=mapWords.end(); yt++)
-            m_mapWordsTitle[yt->first][it->first] = &it->second;
-    }
-}
-
-/**
-* @brief add a new search
-*/
-void CBookManager::addSearch(CSearch* search) {
-    std::unique_lock lck(m_searchLock);
-    m_mapSearchs[search->getID()] = search;
-}
-
-/**
-* @brief get progress of given search
-*/
-bool CBookManager::getProgress(unsigned long long id, std::string& status, float& progress) {
-    std::shared_lock lck(m_searchLock);
-    if(m_mapSearchs.count(id) > 0)
-    {
-        m_mapSearchs[id]->getProgress(status, progress);
-        return true;
-    }
-    else
-        return false;
-}
-
-
-/**
-* @brief delete given search and erase from map
-*/
-void CBookManager::deleteSearch(unsigned long long id) 
-{
-    std::unique_lock lck(m_searchLock);
-
-    //Iterate over all 
-    for(auto it=m_mapSearchs.begin(); it!=m_mapSearchs.end(); it++)
-    {
-        //If matches, then delete searchOptions, search, and erase object
-        if(it->first == id) {
-            it->second->deleteSearchOptions();
-            delete it->second;
-            m_mapSearchs.erase(it);
-            break;
-        }
+            m_mapWordsTitle[yt->first][it->first] = 0;
     }
 }
 
