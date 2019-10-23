@@ -253,13 +253,13 @@ void CBook::loadPages()
 /**
 * @brief getPages calls the matching getPages... function according to fuzzyness
 */
-std::map<int, std::vector<std::string>>* CBook::getPages(std::string sInput, int fuzzyness)
+std::map<int, std::vector<std::string>>* CBook::getPages(std::string sInput, bool fuzzyness)
 {
     std::vector<std::string> vWords;
     func::convertToLower(sInput);
     func::split(sInput, "+", vWords);
 
-    if(fuzzyness == 0)
+    if(fuzzyness == false)
         return getPages(vWords, &CBook::findPagesFull);
     else
         return getPages(vWords, &CBook::findPagesFuzzy);
@@ -329,14 +329,14 @@ void CBook::removePages(std::map<int, std::vector<std::string>>* results1, std::
 }
 
 
-int CBook::getMatches(std::string sInput, int fuzzyness) 
+int CBook::getMatches(std::string sInput, bool fuzzyness) 
 {
-    if(fuzzyness == 0)
+    if(fuzzyness == false)
         return m_mapWordsPages[sInput].size();
 
     int matches=0;
 
-    if(fuzzyness==2)
+    if(fuzzyness==true)
     {
         for(std::string sMatch : m_mapFuzzy[sInput])
             matches += m_mapWordsPages[sMatch].size();
@@ -397,7 +397,6 @@ std::string CBook::getPreview(std::string sWord)
 /**
 * @brief find page with best match. Deliver page and match
 * @param[in] sWord (searched word)
-* @param[in] fuzzyness
 * @param[in, out] sMatch (found match)
 * @return Page on which the match was found.
 */
@@ -409,13 +408,10 @@ size_t CBook::getBestMatch(std::string sWord, std::string& sMatch)
         return m_mapWordsPages[sWord].front();
     }
 
-    std::cout << "1\n";
     std::cout << m_mapFuzzy.size() << std::endl;
     //Try Fuzzy match
     if(m_mapWordsPages.count(m_mapFuzzy[sWord].front()) > 0) {
-        std::cout << "2\n";
         sMatch = m_mapFuzzy[sWord].front();
-        std::cout << "3\n";
         return m_mapWordsPages[sMatch].front();
     }
 

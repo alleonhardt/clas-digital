@@ -120,14 +120,16 @@ std::list<std::string>* CBookManager::convertToList(std::map<std::string, double
 	Comp compFunctor =
 			[](std::pair<std::string, double> elem1, std::pair<std::string, double> elem2)
 			{
-				return elem1.second < elem2.second;
+				return elem1.second > elem2.second;
 			};
 
 	// Declaring a set that will store the pairs using above comparision logic
 	std::set<std::pair<std::string, double>, Comp> sorted(mapSR->begin(), mapSR->end(), compFunctor);
 
-    for(std::pair<std::string, double> element : sorted)
+    for(std::pair<std::string, double> element : sorted) {
+        std::cout << element.first << ": " << element.second << "\n";
         listBooks->push_back(element.first); 
+    }
 
     delete mapSR;
     return listBooks;

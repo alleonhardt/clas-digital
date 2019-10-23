@@ -8,7 +8,7 @@
 int main()
 {
     CBookManager manager;
-
+    
     /*
     std::ifstream read("src/books/text.txt");
     if(!read)
@@ -47,7 +47,8 @@ int main()
         std::cout << "Fuzzyness: ";
         std::string sFuzzy;
         getline(std::cin, sFuzzy);
-        int fuzzy = std::stoi(sFuzzy);
+        bool fuzzy;
+        std::istringstream("true") >> std::boolalpha >> fuzzy;
 
         CSearchOptions* searchOpts = new CSearchOptions(sInput, fuzzy, {"RFWJC42V", "XCFFDRQC", "RBB8DW5B", "WIXP3DS3"}, false, true, "", 0 , 2019, 1, true);
 

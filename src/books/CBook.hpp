@@ -125,7 +125,7 @@ public:
     /**
     * @brief getPages calls the matching getPages... function according to fuzzyness
     */
-    std::map<int, std::vector<std::string>>* getPages(std::string sInput, int fuzzyness);
+    std::map<int, std::vector<std::string>>* getPages(std::string sInput, bool fuzzyness);
 
     std::map<int, std::vector<std::string>>* getPages(std::vector<std::string>& vWords, std::map<int, std::vector<std::string>>* (CBook::*find)(std::string, std::unordered_map<std::string, std::vector<size_t>>&));
 
@@ -153,14 +153,13 @@ public:
     void removePages(std::map<int, std::vector<std::string>>* mapPages, std::map<int, std::vector<std::string>>* results2);
 
 
-    int getMatches(std::string sInput, int fuzzyness);
+    int getMatches(std::string sInput, bool fuzzyness);
 
     // ***** GET PREVIEW - functions ***** //
 
     /**
     * @brief get a preview of the page where the searched word has been found
     * @param sWord (searched word)
-    * @param fuzzyness
     * @return Preview
     */
     std::string getPreview(std::string sWord);
@@ -168,7 +167,6 @@ public:
     /**
     * @brief find page with best match. Deliver page and match
     * @param[in] sWord (searched word)
-    * @param[in] fuzzyness
     * @param[in, out] sMatch (found match)
     * @return Page on which the match was found.
     */

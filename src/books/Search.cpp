@@ -28,7 +28,7 @@ std::string CSearch::getSearchedWord() {
 /** 
 * @return fuzzynes
 */
-int CSearch::getFuzzyness() {
+bool CSearch::getFuzzyness() {
     return m_sOpts->getFuzzyness();
 }
 
@@ -68,7 +68,7 @@ std::map<std::string, double>* CSearch::search(
     std::map<std::string, double>* mapSearchresults = new std::map<std::string, double>;
 
     //Normal search (full-match)
-    if (getFuzzyness() == 0)
+    if (getFuzzyness() == false)
     {
         //Search in ocr and/ or in title
         if(getOnlyTitle() == false)
@@ -122,10 +122,8 @@ void CSearch::fuzzySearch(std::unordered_map<std::string, std::map<std::string, 
     for(auto it= mapWords.begin(); it!=mapWords.end(); it++)
     {
         double value = fuzzy::fuzzy_cmp(it->first, m_sWord);
-        if(value <= 0.2) {
-            std::cout << it->first << ", " << value << "\n";
+        if(value <= 0.2) 
             myInsert(mapSR, it->second, it->first, mapBooks, value);
-        }
     }
 }
 
@@ -141,11 +139,11 @@ void CSearch::checkAuthor(std::map<std::string, double>* mapSR, std::unordered_m
             continue;
 
         //Search author: full-match 
-        if(getFuzzyness() == 0 && func::compare(it->second->getAuthor(), m_sWord) == true)
+        if(getFuzzyness() == false && func::compare(it->second->getAuthor(), m_sWord) == true)
             mapSR->insert(std::pair<std::string, double>(it->first, 0));
 
         //Search author: fuzzy-match
-        else if(getFuzzyness() == 1 && fuzzy::fuzzy_cmp(it->second->getAuthor(), m_sWord) <= 0.2)
+        else if(getFuzzyness() == true && fuzzy::fuzzy_cmp(it->second->getAuthor(), m_sWord) <= 0.2)
             mapSR->insert(std::pair<std::string, double>(it->first, 0));
     }
 }

@@ -59,6 +59,12 @@ double fuzzy_cmp(std::string sWord1, std::string sWord2)
     if(func::compare(sWord1.c_str(), sWord2.c_str()) == true)
         return 0;
 
+    if(func::containsBegin(sWord2.c_str(), sWord1.c_str()) == true)
+        return 0.1;
+
+    if(func::contains(sWord1.c_str(), sWord2.c_str()) == true)
+        return 0.19;
+
     //Calculate Levinstein distance
     double len1 = sWord1.length();
     double len2 = sWord2.length();
@@ -69,9 +75,7 @@ double fuzzy_cmp(std::string sWord1, std::string sWord2)
     else if(len1<len2 && len1/len2 <= 0.75)
         return 1; 
 
-    if(func::contains(sWord2.c_str(), sWord1.c_str()) == true)
-        return 0.1;
-    
+        
     //Calculate levenshtein distance
     size_t ldIterative = levenshteinDistance(sWord1.c_str(), sWord2.c_str());
 

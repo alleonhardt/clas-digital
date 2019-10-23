@@ -41,7 +41,7 @@ public:
     /** 
     * @return fuzzynes
     */
-    int getFuzzyness();
+    bool getFuzzyness();
 
     /** 
     * @return onlyTitle
