@@ -22,13 +22,14 @@ private:
     int m_date;
 
     //Map of matches
-    std::unordered_map<std::string, std::list<std::string>> m_mapFuzzy;
+    std::unordered_map<std::string, std::list<std::pair<std::string, double>>> m_mapFuzzy;
 
     //Map of words_pages
     std::unordered_map<std::string, std::vector<size_t>> m_mapWordsPages;
 
     //map of relavance
     std::unordered_map<std::string, int> m_mapRelevance;
+    std::unordered_map<std::string, size_t> m_mapPreview;
     int m_numPages;
 
 
@@ -93,9 +94,9 @@ public:
     bool getPublic();
 
 
-    std::unordered_map<std::string, std::vector<size_t>>&    getMapWordsPages();
-    std::unordered_map<std::string, std::list<std::string>>& getMapFuzzy();
-    std::unordered_map<std::string, int>&                    getMapRelevance();
+    std::unordered_map<std::string, std::vector<size_t>>&   getMapWordsPages();
+    std::unordered_map<std::string, std::list<std::pair<std::string, double>>>& getMapFuzzy();
+    std::unordered_map<std::string, int>&                   getMapRelevance();
 
  
     // **** SETTER **** //
@@ -111,6 +112,7 @@ public:
     void createMapWords();
 
     void createPages();
+    void createMapPreview();
 
     /**
     * @brief safe map of all words and pages on which word occures to disc
@@ -164,21 +166,13 @@ public:
     */
     std::string getPreview(std::string sWord);
 
-    /**
-    * @brief find page with best match. Deliver page and match
-    * @param[in] sWord (searched word)
-    * @param[in, out] sMatch (found match)
-    * @return Page on which the match was found.
-    */
-    size_t getBestMatch(std::string sWord, std::string &sMatch);
-
     /*
     * @brief Find preview with matched word (best match), and page on which the match was found.
     * @param[in] sWord (best Match)
     * @param[in] page (page on which match was found)
     * @return preview for this book
     */
-    std::string getPreviewMatch(std::string sWord, size_t page);
+    size_t getPreviewPosition(std::string sWord);
 
     void shortenPreview(std::string& finalResult);
 };

@@ -157,7 +157,7 @@ void CSearch::removeBooks(std::map<std::string, double>* mapSR, std::unordered_m
 {
     for(auto it=mapSR->begin(); it!=mapSR->end();)
     {
-        if(checkSearchOptions(mapBooks[it->first]) == false)
+        if(it->second < 0.0001 || checkSearchOptions(mapBooks[it->first]) == false)
             mapSR->erase(it++);
         else
             ++it;
@@ -200,8 +200,16 @@ bool CSearch::checkSearchOptions(CBook* book)
 void CSearch::myInsert(std::map<std::string, double>* mapSR, std::map<std::string, double>& found, std::string sMatch, std::unordered_map<std::string, CBook*>& mapBooks, double value)
 {
     for(auto it=found.begin(); it!=found.end(); it++) {
-        (*mapSR)[it->first] += it->second*(1-value);
-        mapBooks[it->first]->getMapFuzzy()[m_sWord].push_back(sMatch);
+        if(value > 0.18) value = 0.2;
+        (*mapSR)[it->first] += it->second*(1-value*5);
+
+        //Add match to map
+        if (mapBooks[it->first]->getMapFuzzy()[m_sWord].size() == 0)
+            mapBooks[it->first]->getMapFuzzy()[m_sWord].push_back({sMatch, value});
+        else if (mapBooks[it->first]->getMapFuzzy()[m_sWord].front().second > value)
+            mapBooks[it->first]->getMapFuzzy()[m_sWord].push_front({sMatch, value});
+        else
+            mapBooks[it->first]->getMapFuzzy()[m_sWord].push_back({sMatch, value});
     }
 }
            

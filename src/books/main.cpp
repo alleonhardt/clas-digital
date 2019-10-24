@@ -48,7 +48,10 @@ int main()
         std::string sFuzzy;
         getline(std::cin, sFuzzy);
         bool fuzzy;
-        std::istringstream("true") >> std::boolalpha >> fuzzy;
+        if(sFuzzy == "true")
+            fuzzy = true;
+        else
+            fuzzy = false;
 
         CSearchOptions* searchOpts = new CSearchOptions(sInput, fuzzy, {"RFWJC42V", "XCFFDRQC", "RBB8DW5B", "WIXP3DS3"}, false, true, "", 0 , 2019, 1, true);
 
