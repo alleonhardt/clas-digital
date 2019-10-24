@@ -18,6 +18,11 @@ size_t levenshteinDistance(const char* chS, const char* chT)
 
     std::memset(d, 0, sizeof(size_t) * len_S * len_T);
 
+    for(size_t j=0; j<len_T; j++)
+        d[j] = j;
+    for(size_t i=0; i<len_S; i++)
+        d[i*len_T] = i;
+
     for(size_t j=1, jm=0; j<len_T; j++, jm++)
     {
         for(size_t i=1, im=0; i<len_S; i++, im++)
