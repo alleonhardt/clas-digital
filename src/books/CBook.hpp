@@ -106,10 +106,13 @@ public:
     */
     void setPath(std::string sPath);
     
+
+    // **** CREATE BOOK AND MAPS (PAGES, RELEVANCE, PREVIEW) **** // 
+
     /**
     * @brief Create a map of all word of this book
     */
-    void createMapWords();
+    void createBook(std::string sPath);
 
     void createPages();
     void createMapPreview();
@@ -123,6 +126,9 @@ public:
     * @brief load words and pages on which word occures into map
     */
     void loadPages();
+
+
+    // **** GET PAGES FUNCTIONS **** //
 
     /**
     * @brief getPages calls the matching getPages... function according to fuzzyness
@@ -155,7 +161,6 @@ public:
     void removePages(std::map<int, std::vector<std::string>>* mapPages, std::map<int, std::vector<std::string>>* results2);
 
 
-    int getMatches(std::string sInput, bool fuzzyness);
 
     // ***** GET PREVIEW - functions ***** //
 

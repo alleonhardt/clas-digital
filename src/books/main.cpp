@@ -8,17 +8,6 @@
 int main()
 {
     CBookManager manager;
-    
-    /*
-    std::ifstream read("src/books/text.txt");
-    if(!read)
-        std::cout << "file not found.\n";
-
-    std::string sPage((std::istreambuf_iterator<char>(read)), std::istreambuf_iterator<char>());
-    for (auto it : func::extractWordsFromString(sPage))
-        std::cout << it.first << ", ";
-    std::cout << "\n";
-    */
 
     std::ifstream read("bin/zotero.json");
     nlohmann::json jItems;
