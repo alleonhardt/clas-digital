@@ -53,14 +53,6 @@ size_t levenshteinDistance(const char* chS, const char* chT)
 */
 double fuzzy_cmp(std::string sWord1, std::string sWord2)
 {
-    
-    /*
-    //Check whether length of words are to far appart.
-    int diff = sWord1.length()-sWord2.length();
-    if(std::abs(diff) > 3)
-        return 1;
-    */
-
     if(func::compare(sWord1.c_str(), sWord2.c_str()) == true)
         return 0;
 
@@ -84,7 +76,7 @@ double fuzzy_cmp(std::string sWord1, std::string sWord2)
     size_t ldIterative = levenshteinDistance(sWord1.c_str(), sWord2.c_str());
 
     //Calculate score
-    return static_cast<double>(ldIterative)/ sWord2.length();
+    return static_cast<double>(ldIterative)/ len2;
 }
 
 } //Close namespace

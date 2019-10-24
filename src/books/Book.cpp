@@ -98,7 +98,7 @@ void CBook::createPages()
         if(func::checkPage(sLine) == true) {
             for(auto it : func::extractWordsFromString(sBuffer)) {
                 m_mapWordsPages[it.first].push_back(pageCounter);
-                m_mapRelevance[it.first] += it.second;
+                m_mapRelevance[it.first] += it.second*(it.second+1) / 2;
             } 
             pageCounter++;
 

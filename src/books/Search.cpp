@@ -200,7 +200,6 @@ bool CSearch::checkSearchOptions(CBook* book)
 void CSearch::myInsert(std::map<std::string, double>* mapSR, std::map<std::string, double>& found, std::string sMatch, std::unordered_map<std::string, CBook*>& mapBooks, double value)
 {
     for(auto it=found.begin(); it!=found.end(); it++) {
-        if(value > 0.18) value = 0.2;
         (*mapSR)[it->first] += it->second*(1-value*5);
 
         //Add match to map
