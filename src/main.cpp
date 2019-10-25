@@ -5,7 +5,7 @@
 #include "login/user_system.hpp"
 #include "util/URLParser.hpp"
 #include "zotero/zotero.hpp"
-
+#include "books/CBookManager.hpp"
 #include <signal.h>
 
 using namespace httplib;
@@ -39,9 +39,29 @@ void do_login(const Request& req, Response &resp)
     }
 }
 
+void own_split(const std::string &pill, char c, std::vector<std::string> &vec)
+{	    auto start = 0;
+	    std::string tmp;
+	    while(true)
+	    {
+		auto pos = pill.find(c,start);
+		if(pos==std::string::npos)
+		{
+		    tmp = pill.substr(start);
+		}
+		else
+		{
+		    tmp = pill.substr(start,pos);
+		}
+		if(tmp!="")
+		    vec.push_back(std::move(tmp));
+		if(pos==std::string::npos)
+		    break;
+		start = pos+1;
+	    }
+}
 
-
-void do_search(const Request& req, Response &resp, const std::string &fileSearchHtml, const nlohmann::json zoteroPillars)
+void do_search(const Request& req, Response &resp, const std::string &fileSearchHtml, const nlohmann::json &zoteroPillars, CBookManager &manager)
 {
     //Is this a search query or just a request for the search main page?
     if(req.has_param("q"))
@@ -58,33 +78,52 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
 	    int pubbef = std::stoi(req.get_param_value("publicatedbefore"));
 	    bool sortway = req.get_param_value("sortway",0) == "sortbyrelevance";
 	    std::string pill = req.get_param_value("pillars",0);
+	    int page = std::stoi(req.get_param_value("page"));
+	    
 	    std::vector<std::string> pillars;
-	    auto start = 0;
-	    while(true)
-	    {
-		auto pos = pill.find(",",start);
-		std::string tmp;
-		if(pos==std::string::npos)
-		{
-		    tmp = pill.substr(start);
-		}
-		else
-		{
-		    tmp = pill.substr(start,pos);
-		}
-		if(tmp!="")
-		    pillars.push_back(std::move(tmp));
-		if(pos==std::string::npos)
-		    break;
-		start = pos+1;
-	    }
+	    
+	    
+	    own_split(pill,',',pillars);
 
 	    std::cout<<"Receveived search request!"<<std::endl;
-	    std::cout<<"Query: "<<query<<"; fuzz: "<<fuzz<<"; author only: "<<auth_only<<"; ocr only: "<<ocr_only<<"; author: "<<author<<"; publicated after: "<<pubafter<<"; publicated before: "<<pubbef<<"; sorting by relevance: "<<sortway<<"; searched pillars: "<<pill<<"; vector pillar size: "<<pillars.size()<<std::endl;
+	    std::cout<<"Query: "<<query<<"; fuzz: "<<fuzz<<"; title only: "<<auth_only<<"; ocr only: "<<ocr_only<<"; author: "<<author<<"; publicated after: "<<pubafter<<"; publicated before: "<<pubbef<<"; sorting by relevance: "<<sortway<<"; searched pillars: "<<pill<<"; vector pillar size: "<<pillars.size()<<std::endl;
 
+
+	    CSearchOptions options(query,fuzz,pillars,auth_only,ocr_only,author,pubafter,pubbef,true,sortway);
+	    std::cout<<"Starting search!"<<std::endl;
+	    auto bklst = manager.search(&options);
+	    std::cout<<"Finished searching constructing response json"<<std::endl;
+	    nlohmann::json js;
+
+	    auto &map = manager.getMapOfBooks();
+	    auto iter = bklst->begin();
+	    if(bklst->size()<(static_cast<unsigned int>(page-1)*10))
+		throw 0;
+	    std::advance(iter,(page-1)*10);
+	    int counter = 0;
+	    for(;iter!=bklst->end();++iter)
+	    {
+		auto &it = map.at(*iter);
+		nlohmann::json entry;
+		entry["scanId"] = it->getKey();
+		entry["copyright"] = !it->getPublic();
+		entry["hasocr"] = it->getOcr();
+		entry["description"] = it->getMetadata().getShow();
+		entry["bibliography"] = it->getMetadata().getMetadata("bib");
+		entry["preview"] = it->getPreview(query);
+		js["books"].push_back(std::move(entry));
+		if(++counter==10)
+		    break;
+	    } 
+	    
+	    js["max_results"] = bklst->size();
+	    js["page"] = page;
+	    std::cout<<"Finished constructing json response. Constructing html response!"<<std::endl;
 	    std::string app = fileSearchHtml;
 	    app+="<script>let ServerDataObj = {pillars:";
 	    app+=zoteroPillars.dump();
+	    app+=", search:";
+	    app+=js.dump();
 	    app+="};</script>";
 	    resp.set_content(app.c_str(),"text/html");
 	}
@@ -194,6 +233,7 @@ int main()
 {
     //Register for sigterm as it is send by systemd to stop the service.
     signal(SIGTERM, sig_handler);
+    CBookManager manager;
 
     //Load all pillars
     nlohmann::json zoteroPillars;
@@ -230,6 +270,16 @@ int main()
 	meta>>metaData;
     }
     meta.close();
+    std::cout<<"Start CBookmanager::UpdateZotero()"<<std::endl;
+    manager.updateZotero(metaData);
+    std::cout<<"Finished CBookmanager::UpdateZotero()"<<std::endl;
+
+    if(manager.initialize())
+	std::cout<<"CBookmanager::initialize() finished and successfull!"<<std::endl;
+    else
+    {	std::cout<<"ERROR in CBookmanager::initialize()"<<std::endl; return 0;}
+
+
 
     //Load the only dynamic page in the server the search.html
     std::ifstream srchFile("web/Search.html",std::ios::in);
@@ -246,7 +296,7 @@ int main()
 
 
     srv.Post("/login",&do_login);
-    srv.Get("/search",[&](const Request &req, Response &resp) { do_search(req,resp,fileSearchHtml,zoteroPillars);});
+    srv.Get("/search",[&](const Request &req, Response &resp) { do_search(req,resp,fileSearchHtml,zoteroPillars,manager);});
 
     srv.Get("/authenticate",&do_authentification);
     srv.Get("/userlist",&do_senduserlist);
