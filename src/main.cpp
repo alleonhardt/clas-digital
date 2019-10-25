@@ -26,7 +26,7 @@ void get_metadata(const Request &req, Response &resp, CBookManager &manager)
     try
     {
 	std::string scanId = req.get_param_value("scanId");
-	resp.set_content(manager.getMapOfBooks().at(scanId).getMetadata().getMetadata().dump(),"application/json");
+	resp.set_content(manager.getMapOfBooks().at(scanId)->getMetadata().getMetadata().dump(),"application/json");
     }
     catch(...)
     {
