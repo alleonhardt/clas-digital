@@ -7,6 +7,7 @@
 #include "zotero/zotero.hpp"
 #include "books/CBookManager.hpp"
 #include <signal.h>
+#include <chrono>
 
 using namespace httplib;
 
@@ -17,6 +18,20 @@ void sig_handler(int)
 {
     //Just stop the server when systemd wants to exit us.
     srv.stop();
+}
+
+
+void get_metadata(const Request &req, Response &resp, CBookManager &manager)
+{
+    try
+    {
+	std::string scanId = req.get_param_value("scanId");
+	resp.set_content(manager.getMapOfBooks().at(scanId)->getMetadata().getMetadata().dump(),"application/json");
+    }
+    catch(...)
+    {
+	resp.set_content("{}","application/json");
+    }
 }
 
 void do_login(const Request& req, Response &resp)
@@ -41,24 +56,74 @@ void do_login(const Request& req, Response &resp)
 
 void own_split(const std::string &pill, char c, std::vector<std::string> &vec)
 {	    auto start = 0;
-	    std::string tmp;
-	    while(true)
+    std::string tmp;
+    while(true)
+    {
+	auto pos = pill.find(c,start);
+	if(pos==std::string::npos)
+	{
+	    tmp = pill.substr(start);
+	}
+	else
+	{
+	    tmp = pill.substr(start,pos);
+	}
+	if(tmp!="")
+	    vec.push_back(std::move(tmp));
+	if(pos==std::string::npos)
+	    break;
+	start = pos+1;
+    }
+}
+
+void do_searchinbook(const Request& req, Response &resp, CBookManager &manager)
+{
+    try
+    {
+	std::string scanId = req.get_param_value("scanId");
+	std::string query = req.get_param_value("query");
+	int Fuzzyness = std::stoi(req.get_param_value("fuzzyness"));
+
+	std::unique_ptr<std::map<int,std::vector<std::string>>> mapPtr;
+
+	auto book = manager.getMapOfBooks().at(scanId);
+	nlohmann::json js;
+	js["is_fuzzy"] = true;
+	
+	if(Fuzzyness==0) {js["is_fuzzy"] = false;}
+
+
+
+	func::convertToLower(query);
+	query = func::convertStr(query);
+	mapPtr = std::unique_ptr<std::map<int,std::vector<std::string>>>(book->getPages(std::move(query),Fuzzyness!=0));
+
+	auto glambda = [](std::string const &str, std::string const &from,std::string const &to) -> std::string {return std::regex_replace(str,std::regex(from),to);};
+	std::cout<<"Got "<<mapPtr->size()<<" search results found!"<<std::endl;
+	for(auto const &it : *mapPtr)
+	{
+	    if(Fuzzyness==0)
 	    {
-		auto pos = pill.find(c,start);
-		if(pos==std::string::npos)
-		{
-		    tmp = pill.substr(start);
-		}
-		else
-		{
-		    tmp = pill.substr(start,pos);
-		}
-		if(tmp!="")
-		    vec.push_back(std::move(tmp));
-		if(pos==std::string::npos)
-		    break;
-		start = pos+1;
+		int k = it.first;
+		js["books"].push_back(k);
 	    }
+	    else
+	    {
+		for(auto const &inner : it.second)
+		{
+		    nlohmann::json entry;
+		    entry["page"] = it.first;
+		    entry["word"] = glambda(inner,"\"","\\\"");
+		    js["books"].push_back(std::move(entry));	
+		}
+	    }
+	}
+	resp.set_content(js.dump(),"application/json");
+    }
+    catch(...)
+    {
+	resp.set_content("{}","application/json");
+    }
 }
 
 void do_search(const Request& req, Response &resp, const std::string &fileSearchHtml, const nlohmann::json &zoteroPillars, CBookManager &manager)
@@ -70,7 +135,7 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
 	{
 	    //It is a search query!
 	    std::string query = req.get_param_value("q",0);
-	    int fuzz = std::stoi(req.get_param_value("fuzzyness",0));
+	    bool fuzz = std::stoi(req.get_param_value("fuzzyness",0))!=0;
 	    bool auth_only = req.get_param_value("title_only",0)=="true";
 	    bool ocr_only = req.get_param_value("ocr_only",0) == "true";
 	    std::string author = req.get_param_value("author",0);
@@ -79,10 +144,10 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
 	    bool sortway = req.get_param_value("sortway",0) == "sortbyrelevance";
 	    std::string pill = req.get_param_value("pillars",0);
 	    int page = std::stoi(req.get_param_value("page"));
-	    
+
 	    std::vector<std::string> pillars;
-	    
-	    
+
+
 	    own_split(pill,',',pillars);
 
 	    std::cout<<"Receveived search request!"<<std::endl;
@@ -91,10 +156,12 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
 
 	    CSearchOptions options(query,fuzz,pillars,auth_only,ocr_only,author,pubafter,pubbef,true,sortway);
 	    std::cout<<"Starting search!"<<std::endl;
+
 	    auto bklst = manager.search(&options);
 	    std::cout<<"Finished searching constructing response json"<<std::endl;
 	    nlohmann::json js;
 
+	    auto start = std::chrono::system_clock::now();
 	    auto &map = manager.getMapOfBooks();
 	    auto iter = bklst->begin();
 	    if(bklst->size()<(static_cast<unsigned int>(page-1)*10))
@@ -110,14 +177,16 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
 		entry["hasocr"] = it->getOcr();
 		entry["description"] = it->getMetadata().getShow();
 		entry["bibliography"] = it->getMetadata().getMetadata("bib");
-		entry["preview"] = it->getPreview(query);
+		entry["preview"] = it->getPreview(options.getSearchedWord());
 		js["books"].push_back(std::move(entry));
 		if(++counter==10)
 		    break;
 	    } 
-	    
+
 	    js["max_results"] = bklst->size();
 	    js["page"] = page;
+	    std::chrono::duration<double> elapsed_seconds = std::chrono::system_clock::now()-start;
+	    js["time"] = elapsed_seconds.count();
 	    std::cout<<"Finished constructing json response. Constructing html response!"<<std::endl;
 	    std::string app = fileSearchHtml;
 	    app+="<script>let ServerDataObj = {pillars:";
@@ -188,43 +257,43 @@ void do_senduserlist(const Request &req, Response &resp)
 
 void do_usertableupdate(const Request &req, Response &resp)
 {
-	//Check if the user has admin access
-	if(!User::AccessCheck(GetUserFromCookie(req),AccessRights::USR_ADMIN))	
-	{
-	    resp.status = 403;
-	    return;
-	}
+    //Check if the user has admin access
+    if(!User::AccessCheck(GetUserFromCookie(req),AccessRights::USR_ADMIN))	
+    {
+	resp.status = 403;
+	return;
+    }
 
-	try
-	{
-		//Try to parse the command list from the body received by zotero
-		nlohmann::json js = nlohmann::json::parse(req.body);
+    try
+    {
+	//Try to parse the command list from the body received by zotero
+	nlohmann::json js = nlohmann::json::parse(req.body);
 
-		//Do the updates accordingly
-		for(auto &it : js)
-		{
-			if(it["action"]=="DELETE")
-			{
-				//Remove the user if the action is delete if one of the necessary variables does not exist then throw an error and return an error not found
-				UserHandler::GetUserTable().RemoveUser(it["email"]);
-			}
-			else if(it["action"]=="CREATE")
-			{
-				//Create the user with the specified email password and access
-				UserHandler::GetUserTable().AddUser(it["email"],it["password"],it["access"]);
-			}
-			else if(it["action"]=="CHANGEACCESS")
-			{
-				//Create the user with the given access rights
-				UserHandler::GetUserTable().SetAccessRights(it["email"],it["access"]);
-			}
-		}
-		resp.status = 200;
-	}
-	catch(...)
+	//Do the updates accordingly
+	for(auto &it : js)
 	{
-		resp.status = 400;
+	    if(it["action"]=="DELETE")
+	    {
+		//Remove the user if the action is delete if one of the necessary variables does not exist then throw an error and return an error not found
+		UserHandler::GetUserTable().RemoveUser(it["email"]);
+	    }
+	    else if(it["action"]=="CREATE")
+	    {
+		//Create the user with the specified email password and access
+		UserHandler::GetUserTable().AddUser(it["email"],it["password"],it["access"]);
+	    }
+	    else if(it["action"]=="CHANGEACCESS")
+	    {
+		//Create the user with the given access rights
+		UserHandler::GetUserTable().SetAccessRights(it["email"],it["access"]);
+	    }
 	}
+	resp.status = 200;
+    }
+    catch(...)
+    {
+	resp.status = 400;
+    }
 
 }
 
@@ -297,7 +366,9 @@ int main()
 
     srv.Post("/login",&do_login);
     srv.Get("/search",[&](const Request &req, Response &resp) { do_search(req,resp,fileSearchHtml,zoteroPillars,manager);});
+    srv.Get("/searchinbook",[&](const Request &req, Response &resp) { do_searchinbook(req,resp,manager);});
 
+    srv.Get("/getmetadata", [&](const Request &req, Response &resp) { get_metadata(req,resp,manager);});
     srv.Get("/authenticate",&do_authentification);
     srv.Get("/userlist",&do_senduserlist);
     srv.Post("/userlist",&do_usertableupdate);
