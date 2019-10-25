@@ -99,6 +99,7 @@ void do_searchinbook(const Request& req, Response &resp, CBookManager &manager)
 	mapPtr = std::unique_ptr<std::map<int,std::vector<std::string>>>(book->getPages(std::move(query),Fuzzyness));
 
 	auto glambda = [](std::string const &str, std::string const &from,std::string const &to) -> std::string {return std::regex_replace(str,std::regex(from),to);};
+	std::cout<<"Got "<<mapPtr->size()<<" search results found!"<<std::endl;
 	for(auto const &it : *mapPtr)
 	{
 	    if(Fuzzyness==0)
