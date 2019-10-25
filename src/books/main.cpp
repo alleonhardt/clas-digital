@@ -44,6 +44,8 @@ int main()
 
         CSearchOptions* searchOpts = new CSearchOptions(sInput, fuzzy, {"RFWJC42V", "XCFFDRQC", "RBB8DW5B", "WIXP3DS3"}, false, true, "", 0 , 2019, 1, true);
 
+        sInput = searchOpts->getSearchedWord();
+
         std::cout << "\nSearching for " << sInput << "... \n";
 
         std::list<std::string>* searchResults = manager.search(searchOpts);
@@ -52,7 +54,7 @@ int main()
         {
             CBook* book = manager.getMapOfBooks()[(*it)];
             std::cout << "\033[1;32m" << book->getKey() << ": " << book->getMetadata().getShow() << "\n";
-            std::cout << "\033[1;31m" << book->getPreview(sInput) << "\n";
+            std::cout << "\033[1;31m" << book->getPreview(sInput)<< "\n";
 
             // *** Print Pages *** //
             std::cout << "\033[1;33m Pages: ";

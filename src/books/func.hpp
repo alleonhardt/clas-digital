@@ -8,6 +8,7 @@
 #include <list>
 #include <locale>
 #include <regex>
+#include <codecvt>
 
 namespace func 
 {
@@ -77,6 +78,8 @@ namespace func
     * @param[in] str
     */
     std::string returnToLower(std::string &str);
+
+    std::string convertStr(std::string &str);
 
     /**
     * @brief checks whether a string is a word
