@@ -425,7 +425,7 @@ function doAdditionalSearch() {
 function GetOCRTxt() {
 				return new Promise(function(resolve,reject){
 			    let parsedUrlParams = parseURLParams(window.location.href);
-				Server.Get("/getBookRessources?book="+parsedUrlParams['scanId']+"&ressource=ocr.txt",function(content) {
+				Server.Get("/books/"+parsedUrlParams['scanId']+"/ocr.txt",function(content) {
 			    
 			      //let doc2 = document.createElement("div");
 			      //let doc = document.createElement("p");
@@ -552,7 +552,7 @@ function init() {
 	let scanId = parsedUrlParams['scanId'];
 	let waitforocr = GetOCRTxt();
 	
-	Server.Get("/getBookRessources?book=" + scanId+"&ressource=readerInfo.json", function(content) {
+	Server.Get("/books/" + scanId+"/readerInfo.json", function(content) {
 		let scanInfo = JSON.parse(content);
 		
 		scanInfo.pages.sort(function(a, b) {

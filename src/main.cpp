@@ -7,6 +7,7 @@
 #include "zotero/zotero.hpp"
 #include "books/CBookManager.hpp"
 #include <signal.h>
+#include <chrono>
 
 using namespace httplib;
 
@@ -91,10 +92,12 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
 
 	    CSearchOptions options(query,fuzz,pillars,auth_only,ocr_only,author,pubafter,pubbef,true,sortway);
 	    std::cout<<"Starting search!"<<std::endl;
+
 	    auto bklst = manager.search(&options);
 	    std::cout<<"Finished searching constructing response json"<<std::endl;
 	    nlohmann::json js;
 
+	    auto start = std::chrono::system_clock::now();
 	    auto &map = manager.getMapOfBooks();
 	    auto iter = bklst->begin();
 	    if(bklst->size()<(static_cast<unsigned int>(page-1)*10))
@@ -118,6 +121,8 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
 	    
 	    js["max_results"] = bklst->size();
 	    js["page"] = page;
+	    std::chrono::duration<double> elapsed_seconds = std::chrono::system_clock::now()-start;
+	    js["time"] = elapsed_seconds.count();
 	    std::cout<<"Finished constructing json response. Constructing html response!"<<std::endl;
 	    std::string app = fileSearchHtml;
 	    app+="<script>let ServerDataObj = {pillars:";
