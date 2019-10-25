@@ -44,6 +44,30 @@ size_t levenshteinDistance(const char* chS, const char* chT)
 }
 
 
+double fast_search(const char* chS, const char* chIn)
+{
+    double score = 0;
+    bool r = true;
+    if(strlen(chS) >  strlen(chIn)) return 1;
+    if(strlen(chS) != strlen(chIn)) score = 0.1;
+
+    for(size_t i=0; i<strlen(chIn); i++) {
+        r = true;
+        for(size_t j=0; j<strlen(chS); j++) {
+            if(chIn[i+j] != chS[j]) {
+                r = false;
+                break;
+            }
+        }
+        if(i==0 && r == true) return score;
+        else if (r==true) return 0.19;
+    }
+
+    return 1;
+}
+
+
+
 /**
 * @brief compare to words with fuzzy search and case insensetive, AND modify id
 * @parameter sWord1 (searched word)
@@ -53,23 +77,18 @@ size_t levenshteinDistance(const char* chS, const char* chT)
 */
 double fuzzy_cmp(std::string sWord1, std::string sWord2)
 {
-    if(func::compare(sWord1.c_str(), sWord2.c_str()) == true)
-        return 0;
+    //Fast search (full match: 0, beginswith: 0.1, contains: 0.19)
+    double fast = fast_search(sWord2.c_str(), sWord1.c_str());
+    if(fast < 1) return fast;
 
-    if(func::containsBegin(sWord2.c_str(), sWord1.c_str()) == true)
-        return 0.1;
-
-    if(func::contains(sWord1.c_str(), sWord2.c_str()) == true)
-        return 0.19;
-
-    //Calculate Levinstein distance
+    //Check lengths
     double len1 = sWord1.length();
     double len2 = sWord2.length();
 
     //Check whether length of words are to far appart.
-    if(len1>len2 && len2/len1 <= 0.75)
+    if(len1>len2 && len2/len1 < 0.8)      
         return 1;
-    else if(len1<len2 && len1/len2 <= 0.75)
+    else if(len1/len2 < 0.8) 
         return 1; 
 
     //Calculate levenshtein distance

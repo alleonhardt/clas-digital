@@ -42,6 +42,7 @@ bool compare(const char* chT1, const char* chT2)
     return true;
 }
 
+
 /**
 * @brief takes to strings, converts to lower and calls compare (const char*, const char*)
 * @param[in] str1 first string to compare

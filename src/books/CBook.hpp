@@ -135,19 +135,11 @@ public:
     */
     std::map<int, std::vector<std::string>>* getPages(std::string sInput, bool fuzzyness);
 
-    std::map<int, std::vector<std::string>>* getPages(std::vector<std::string>& vWords, std::map<int, std::vector<std::string>>* (CBook::*find)(std::string, std::unordered_map<std::string, std::vector<size_t>>&));
-
     /**
     * @brief Create map of pages and found words for i-word (full-search).
     * @return map of all pages on which word was found.
     */
-    std::map<int, std::vector<std::string>>* findPagesFull(std::string sWord, std::unordered_map<std::string, std::vector<size_t>>& mapWordsPages);
-
-    /**
-    * @brief Create map of pages and found words for i-word (Contains).
-    * @return map of all pages on which word was found.
-    */
-    std::map<int, std::vector<std::string>>* findPagesContains(std::string sWord, std::unordered_map<std::string, std::vector<size_t>>& mapWordsPages);
+    std::map<int, std::vector<std::string>>* findPages(std::string sWord, bool fuzzyness);
 
     /** 
     * @brief Create map of pages and found words for i-word (fuzzy).

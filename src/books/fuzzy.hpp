@@ -19,6 +19,7 @@ namespace fuzzy
     **/
     size_t levenshteinDistance(const char* chS, const char* chT);
             
+    double fast_search(const char* chS, const char* chT);
 
     /**
     * @brief compare to words with fuzzy search and case insensetive, AND modify id

@@ -209,24 +209,15 @@ std::map<int, std::vector<std::string>>* CBook::getPages(std::string sInput, boo
     func::convertToLower(sInput);
     func::split(sInput, "+", vWords);
 
-    if(fuzzyness == false)
-        return getPages(vWords, &CBook::findPagesFull);
-    else
-        return getPages(vWords, &CBook::findPagesFuzzy);
-}
-
-std::map<int, std::vector<std::string>>* CBook::getPages(std::vector<std::string>& vWords, std::map<int, std::vector<std::string>>* (CBook::*find)(std::string, std::unordered_map<std::string, std::vector<size_t>>&))
-{
     //Create map of pages and found words for first word
-    std::map<int, std::vector<std::string>>* mapPages = (this->*find)(vWords[0], m_mapWordsPages);
+    std::map<int, std::vector<std::string>>* mapPages = findPages(vWords[0], fuzzyness);
 
-    for(size_t i=1; i<vWords.size(); i++)
-    {
-        std::map<int, std::vector<std::string>>* mapPages2 = (this->*find)(vWords[i], m_mapWordsPages);
+    for(size_t i=1; i<vWords.size(); i++) {
+
+        std::map<int, std::vector<std::string>>* mapPages2 = findPages(vWords[i], fuzzyness);
 
         //Remove all elements from mapPages, which do not exist in results2. 
         removePages(mapPages, mapPages2);
-
         delete mapPages2;
     }
 
@@ -235,30 +226,28 @@ std::map<int, std::vector<std::string>>* CBook::getPages(std::vector<std::string
 
 
 //Create map of pages and found words for i-word (full-search)
-std::map<int, std::vector<std::string>>* CBook::findPagesFull(std::string sWord, std::unordered_map<std::string, std::vector<size_t>>& mapWordsPages)
+std::map<int, std::vector<std::string>>* CBook::findPages(std::string sWord, bool fuzzyness)
 {
     //Create empty list of pages
     std::map<int, std::vector<std::string>>* mapPages = new std::map<int, std::vector<std::string>>;
 
-    for(auto page : mapWordsPages[sWord])
-        (*mapPages)[page] = {};
+    //Fuzzyness = false
+    if (fuzzyness == false) {
+        for(auto page : m_mapWordsPages[sWord])
+            (*mapPages)[page] = {};
+    }
+
+    //Fuzzyness = true
+    else {
+        for(auto elem : m_mapFuzzy[sWord]) {
+            for(auto page : m_mapWordsPages[elem.first]) 
+                (*mapPages)[page] = {elem.first};
+        }
+    }
 
     return mapPages;
 }
 
-
-//Create map of pages and found words for i-word (fuzzy-search)
-std::map<int, std::vector<std::string>>* CBook::findPagesFuzzy(std::string sWord, std::unordered_map<std::string, std::vector<size_t>>& mapWordsPages)
-{
-    std::map<int, std::vector<std::string>>* mapPages = new std::map<int, std::vector<std::string>>;
-
-    for(auto elem : m_mapFuzzy[sWord]) {
-        for(auto page : mapWordsPages[elem.first]) 
-            (*mapPages)[page] = {elem.first};
-    }
-
-    return mapPages;
-}       
 
 /**
 * @brief Remove all elements from mapPages, which do not exist in results2. 
