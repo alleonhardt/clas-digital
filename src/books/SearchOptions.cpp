@@ -29,7 +29,7 @@ CSearchOptions::CSearchOptions(std::string chSearchedWord, bool fuzzyness, std::
 {
     func::convertToLower(chSearchedWord);
 	func::convertToLower(slastName);
-	m_chSearchedWord.assign(chSearchedWord);
+	m_chSearchedWord = func::convertStr(chSearchedWord);
     m_fuzzyness = fuzzyness;
     m_sCollections = sCollections;
     m_onlyTitle = onlyTitle;

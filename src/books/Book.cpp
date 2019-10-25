@@ -79,6 +79,7 @@ void CBook::createBook(std::string sPath)
 
     else
         loadPages();
+
     m_bOcr = true;
 }
 
@@ -136,8 +137,9 @@ void CBook::safePages()
 
     for(auto it : m_mapWordsPages)
     {
-        std::string sBuffer;
-        sBuffer += it.first + ";";
+        std::string sWord = it.first;
+        std::string sBuffer = func::convertStr(sWord);
+        sBuffer += ";";
         for(size_t page : it.second) {
             sBuffer += std::to_string(page) + ",";
         }
