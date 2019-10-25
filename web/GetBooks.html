@@ -607,7 +607,7 @@ function init() {
 
 	parsedUrlParams["query"] = decodeURIComponent(parsedUrlParams["query"]);
 		
-	Server.Get("/searchInBook?scanId=" + scanId + "&query=" + encodeURIComponent(parsedUrlParams["query"])+"&fuzzyness="+encodeURIComponent(parsedUrlParams["fuzzyness"]), function(content) {
+	Server.Get("/searchinbook?scanId=" + scanId + "&query=" + encodeURIComponent(parsedUrlParams["query"])+"&fuzzyness="+encodeURIComponent(parsedUrlParams["fuzzyness"]), function(content) {
 		let searchResults = JSON.parse(content);
 		// temporary needed
 		searchResults.pages = searchResults.books;
