@@ -265,6 +265,7 @@ padding-right: 0;
 
 </style>
 <script>
+let gpagesList = [];
 class Server {
 	static Get(filename, okCallback, errorCallback) {
 		let sendRequest = new XMLHttpRequest();
@@ -474,8 +475,29 @@ function UpdateOCRTxt(x,res)
 	x = x.replace(RegSrch,'</p><p data-page="$1" class="ocrpage" ondblclick="SwitchToPage(this);">\n----- $1 ');
   	x+="</p>";
 	
-	document.getElementById("OCRBuffer").innerHTML = x;
-	
+	document.getElementById("OCRBuffer").innerHTML = "<div style='position: sticky;top:0;background: white;height:1rem;border-bottom: 1px solid grey;'><a onclick='GoToLastHit();return true;' style='color:blue;font-size:small;float:left;margin:auto 1rem;cursor:pointer;'>Last Hit</a><a onclick='GoToNextHit();return true;' style='cursor:pointer;color:blue;font-size:small;float:right;margin:auto 1rem;'>Next Hit</a></div>";
+	document.getElementById("OCRBuffer").innerHTML += x;
+
+	document.getElementById("olol").onscroll = function() {
+		let allPages = document.getElementsByClassName("ocrpage");
+		let visiblePages = new Array();
+		for(let i = 0; i < allPages.length; i++) {
+			if(isElementInViewport(allPages[i])) {
+			{
+				console.log("all good mate!"+window.location.hash);
+				if(window.location.hash!=("#page"+allPages[i].dataset.page))
+				{
+					allPages[i].ondblclick();
+					window.setTimeout(function ()
+    					{
+						allPages[i].focus();
+    					}, 50);
+				}
+				return true;
+			}
+		}
+	}
+	}
 	let lst = document.getElementsByClassName("ocrpage");
 	for(var i = 0; i < lst.length; i++)
 	{
@@ -483,6 +505,14 @@ function UpdateOCRTxt(x,res)
 		//lst[i].innerHTML = "";
 	}
 	res(10);
+}
+
+function GoToLastHit()
+{
+}
+
+function GoToNextHit()
+{
 }
 
 function SwitchToPage(x)
@@ -632,6 +662,7 @@ function init() {
 		  let resultLinks = "";
 		  for(let i = 0; i < pagesList.length; i++) {
 		  resultLinks = resultLinks + " " + "<a onclick='window.location.replace(\"#page"+pagesList[i]+"\");ShowOCR(this);return true;'>" + pagesList[i] + "</a>";
+			  gpagesList.push(pagesList[i]);
 			for(let y = 0; y < HighlightList.length; y++)
 			{
 				//TODO: Search Dieter with full search and get the results to be highlighted....
