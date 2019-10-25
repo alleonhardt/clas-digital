@@ -6,7 +6,7 @@
 CSearchOptions::CSearchOptions()
 {
     m_chSearchedWord="";
-    m_fuzzyness = 0;
+    m_fuzzyness = false;
     m_onlyTitle = false;
     m_From = 0;
     m_To = 2018;
@@ -25,7 +25,7 @@ CSearchOptions::CSearchOptions()
 * @param[in] from date from which books shall be searched
 * @param[in] to date to which books shall be searched
 **/
-CSearchOptions::CSearchOptions(std::string chSearchedWord, int fuzzyness, std::vector<std::string> sCollections, bool onlyTitle, bool onlyOCR, std::string slastName, int from, int to, bool full, bool filterResults)
+CSearchOptions::CSearchOptions(std::string chSearchedWord, bool fuzzyness, std::vector<std::string> sCollections, bool onlyTitle, bool onlyOCR, std::string slastName, int from, int to, bool full, bool filterResults)
 {
     func::convertToLower(chSearchedWord);
 	func::convertToLower(slastName);
@@ -54,7 +54,7 @@ std::string CSearchOptions::getSearchedWord() const {
 /**
 * @return selected fuzzyness
 **/
-int CSearchOptions::getFuzzyness() const {
+bool CSearchOptions::getFuzzyness() const {
     return m_fuzzyness;
 }
 

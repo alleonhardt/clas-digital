@@ -9,17 +9,6 @@ int main()
 {
     CBookManager manager;
 
-    /*
-    std::ifstream read("src/books/text.txt");
-    if(!read)
-        std::cout << "file not found.\n";
-
-    std::string sPage((std::istreambuf_iterator<char>(read)), std::istreambuf_iterator<char>());
-    for (auto it : func::extractWordsFromString(sPage))
-        std::cout << it.first << ", ";
-    std::cout << "\n";
-    */
-
     std::ifstream read("bin/zotero.json");
     nlohmann::json jItems;
     read >> jItems;
@@ -47,7 +36,11 @@ int main()
         std::cout << "Fuzzyness: ";
         std::string sFuzzy;
         getline(std::cin, sFuzzy);
-        int fuzzy = std::stoi(sFuzzy);
+        bool fuzzy;
+        if(sFuzzy == "true")
+            fuzzy = true;
+        else
+            fuzzy = false;
 
         CSearchOptions* searchOpts = new CSearchOptions(sInput, fuzzy, {"RFWJC42V", "XCFFDRQC", "RBB8DW5B", "WIXP3DS3"}, false, true, "", 0 , 2019, 1, true);
 

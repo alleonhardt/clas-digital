@@ -20,25 +20,19 @@ bool CBookManager::initialize()
 
     //Check whether files where found
     if(!dir_allItems)
-    {
-        std::cout << "No books found.\n";
         return false;
-    }
 
     //Go though all books and create book
-    while((e_allItems = readdir(dir_allItems)) != NULL)
-    {
+    while((e_allItems = readdir(dir_allItems)) != NULL) {
         if(m_mapBooks.count(e_allItems->d_name) > 0)
             addBook(e_allItems->d_name);
-        else
-            std::cout << (const char*)e_allItems->d_name << " found which isn't in map!\n";
     }
 
     //Create map of all words + and of all words in all titles
     createMapWords();
-    std::cout << "Map Words: " << (int)m_mapWords.size() << "\n";
     createMapWordsTitle();
-    std::cout << "Map Titles: " << (int)m_mapWordsTitle.size() << "\n";
+    std::cout << "Map words: " << m_mapWords.size() << "\n";
+    std::cout << "Map title: " << m_mapWordsTitle.size() << "\n";
 
     return true;
 }
@@ -58,10 +52,7 @@ void CBookManager::updateZotero(nlohmann::json j_items)
 
         //If it does not exits, create new book and add to map of all books
         else
-        {
-            CBook* book = new CBook(it);
-            m_mapBooks[it["key"]] = book;
-        }
+            m_mapBooks[it["key"]] = new CBook(it);
     }
 }
 
@@ -74,8 +65,7 @@ void CBookManager::addBook(std::string sKey) {
     if(!std::experimental::filesystem::exists("web/books/" + sKey))
         return;
 
-    m_mapBooks[sKey]->setPath("web/books/" + sKey);
-    m_mapBooks[sKey]->createMapWords();
+    m_mapBooks[sKey]->createBook("web/books/" + sKey);
 }
     
 
@@ -107,12 +97,6 @@ std::list<std::string>* CBookManager::search(CSearchOptions* searchOpts)
 */
 std::list<std::string>* CBookManager::convertToList(std::map<std::string, double>* mapSR)
 {
-    std::list<std::string>* listBooks = new std::list<std::string>;
-
-    //Change identical entrys
-    double counter;
-    for(auto it=mapSR->begin(); it!= mapSR->end(); it++) { it->second+=counter; counter+=0.000001; }
-
 	// Declaring the type of Predicate that accepts 2 pairs and return a bool
 	typedef std::function<bool(std::pair<std::string, double>, std::pair<std::string, double>)> Comp;
  
@@ -120,14 +104,19 @@ std::list<std::string>* CBookManager::convertToList(std::map<std::string, double
 	Comp compFunctor =
 			[](std::pair<std::string, double> elem1, std::pair<std::string, double> elem2)
 			{
-				return elem1.second < elem2.second;
+                if (elem1.second == elem2.second) elem1.second+=0.0001;
+				return elem1.second > elem2.second;
 			};
 
-	// Declaring a set that will store the pairs using above comparision logic
+    //Sort by defined sort logic
 	std::set<std::pair<std::string, double>, Comp> sorted(mapSR->begin(), mapSR->end(), compFunctor);
 
-    for(std::pair<std::string, double> element : sorted)
+    //Convert to list
+    std::list<std::string>* listBooks = new std::list<std::string>;
+    for(std::pair<std::string, double> element : sorted) {
+        std::cout << element.first << ": " << element.second << "\n";
         listBooks->push_back(element.first); 
+    }
 
     delete mapSR;
     return listBooks;

@@ -22,13 +22,14 @@ private:
     int m_date;
 
     //Map of matches
-    std::unordered_map<std::string, std::list<std::string>> m_mapFuzzy;
+    std::unordered_map<std::string, std::list<std::pair<std::string, double>>> m_mapFuzzy;
 
     //Map of words_pages
     std::unordered_map<std::string, std::vector<size_t>> m_mapWordsPages;
 
     //map of relavance
     std::unordered_map<std::string, int> m_mapRelevance;
+    std::unordered_map<std::string, size_t> m_mapPreview;
     int m_numPages;
 
 
@@ -93,9 +94,9 @@ public:
     bool getPublic();
 
 
-    std::unordered_map<std::string, std::vector<size_t>>&    getMapWordsPages();
-    std::unordered_map<std::string, std::list<std::string>>& getMapFuzzy();
-    std::unordered_map<std::string, int>&                    getMapRelevance();
+    std::unordered_map<std::string, std::vector<size_t>>&   getMapWordsPages();
+    std::unordered_map<std::string, std::list<std::pair<std::string, double>>>& getMapFuzzy();
+    std::unordered_map<std::string, int>&                   getMapRelevance();
 
  
     // **** SETTER **** //
@@ -105,12 +106,16 @@ public:
     */
     void setPath(std::string sPath);
     
+
+    // **** CREATE BOOK AND MAPS (PAGES, RELEVANCE, PREVIEW) **** // 
+
     /**
     * @brief Create a map of all word of this book
     */
-    void createMapWords();
+    void createBook(std::string sPath);
 
     void createPages();
+    void createMapPreview();
 
     /**
     * @brief safe map of all words and pages on which word occures to disc
@@ -122,10 +127,13 @@ public:
     */
     void loadPages();
 
+
+    // **** GET PAGES FUNCTIONS **** //
+
     /**
     * @brief getPages calls the matching getPages... function according to fuzzyness
     */
-    std::map<int, std::vector<std::string>>* getPages(std::string sInput, int fuzzyness);
+    std::map<int, std::vector<std::string>>* getPages(std::string sInput, bool fuzzyness);
 
     std::map<int, std::vector<std::string>>* getPages(std::vector<std::string>& vWords, std::map<int, std::vector<std::string>>* (CBook::*find)(std::string, std::unordered_map<std::string, std::vector<size_t>>&));
 
@@ -153,26 +161,15 @@ public:
     void removePages(std::map<int, std::vector<std::string>>* mapPages, std::map<int, std::vector<std::string>>* results2);
 
 
-    int getMatches(std::string sInput, int fuzzyness);
 
     // ***** GET PREVIEW - functions ***** //
 
     /**
     * @brief get a preview of the page where the searched word has been found
     * @param sWord (searched word)
-    * @param fuzzyness
     * @return Preview
     */
     std::string getPreview(std::string sWord);
-
-    /**
-    * @brief find page with best match. Deliver page and match
-    * @param[in] sWord (searched word)
-    * @param[in] fuzzyness
-    * @param[in, out] sMatch (found match)
-    * @return Page on which the match was found.
-    */
-    size_t getBestMatch(std::string sWord, std::string &sMatch);
 
     /*
     * @brief Find preview with matched word (best match), and page on which the match was found.
@@ -180,7 +177,7 @@ public:
     * @param[in] page (page on which match was found)
     * @return preview for this book
     */
-    std::string getPreviewMatch(std::string sWord, size_t page);
+    size_t getPreviewPosition(std::string sWord);
 
     void shortenPreview(std::string& finalResult);
 };
