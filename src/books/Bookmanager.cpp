@@ -13,20 +13,27 @@ std::unordered_map<std::string, CBook*>& CBookManager::getMapOfBooks() {
 */
 bool CBookManager::initialize()
 {
+    std::cout << "Starting initualizeing..." << std::endl;
+
     //Load directory of all books 
     DIR *dir_allItems;
     struct dirent* e_allItems;
     dir_allItems = opendir("web/books");
 
+    std::cout << "reached this" << std::endl;
+
     //Check whether files where found
     if(!dir_allItems)
         return false;
-
+    
+    std::cout << "extracting books." << std::endl;
     //Go though all books and create book
     while((e_allItems = readdir(dir_allItems)) != NULL) {
         if(m_mapBooks.count(e_allItems->d_name) > 0)
             addBook(e_allItems->d_name);
     }
+
+    std::cout << "Createing map of books." << std::endl;
 
     //Create map of all words + and of all words in all titles
     createMapWords();
@@ -62,6 +69,7 @@ void CBookManager::updateZotero(nlohmann::json j_items)
 */
 void CBookManager::addBook(std::string sKey) {
 
+    std::cout << "Adding book " << sKey << std::endl;
     if(!std::experimental::filesystem::exists("web/books/" + sKey))
         return;
 
