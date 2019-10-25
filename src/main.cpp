@@ -79,6 +79,9 @@ void do_searchinbook(const Request& req, Response &resp, CBookManager &manager)
 	if(Fuzzyness==0) {js["is_fuzzy"] = false;}
 
 
+
+	func::convertToLower(query);
+	query = func::convertStr(query);
 	mapPtr = std::unique_ptr<std::map<int,std::vector<std::string>>>(book->getPages(std::move(query),Fuzzyness));
 
 	auto glambda = [](std::string const &str, std::string const &from,std::string const &to) -> std::string {return std::regex_replace(str,std::regex(from),to);};
@@ -159,7 +162,7 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
 		entry["hasocr"] = it->getOcr();
 		entry["description"] = it->getMetadata().getShow();
 		entry["bibliography"] = it->getMetadata().getMetadata("bib");
-		entry["preview"] = it->getPreview(query);
+		entry["preview"] = it->getPreview(options.getSearchedWord());
 		js["books"].push_back(std::move(entry));
 		if(++counter==10)
 		    break;
