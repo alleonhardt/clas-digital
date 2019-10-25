@@ -333,7 +333,7 @@ function ShowSelectedValues(obj)
 			{
 				inner = "<div class='some_grid_class'><a href='/GetBooks.html";
 			}
-			inner+= "?query="+lastInput;
+			inner+= "?query="+document.getElementById("SpecialSID").value;
 			inner+="&scanId="+json.books[i].scanId;
 			inner+="&fuzzyness="+document.getElementById("FuzzyID").value; 
 			inner+="' style='display: inline-grid;grid-column-start:1;grid-column-end:2;'><h4 style='text-align: left;float:left;'>";
@@ -553,8 +553,20 @@ function ResetToDefault()
 
        window.addEventListener("load",function(){User.initialise('searchlink');ShowLinks();},false);
 
+function getParameterByName(name, url) {
+//COPYRIGHT TO https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
+	if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, '\\$&');
+    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
+
 function ShowLinks()
 {
+    document.getElementById("SpecialSID").value = getParameterByName('q');
     let obj = document.getElementById("SearchHitList");
     obj.drawablejson = ServerDataObj.search;
     obj.drawablejson.show_from = 0;
