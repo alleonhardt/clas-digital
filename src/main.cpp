@@ -20,6 +20,20 @@ void sig_handler(int)
     srv.stop();
 }
 
+
+void get_metadata(const Request &req, Response &resp, CBookManager &manager)
+{
+    try
+    {
+	std::string scanId = req.get_param_value("scanId");
+	resp.set_content(manager.getMapOfBooks().at(scanId).getMetadata().getMetadata().dump(),"application/json");
+    }
+    catch(...)
+    {
+	resp.set_content("{}","application/json");
+    }
+}
+
 void do_login(const Request& req, Response &resp)
 {
     URLParser parser(req.body);
@@ -120,7 +134,7 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
 	{
 	    //It is a search query!
 	    std::string query = req.get_param_value("q",0);
-	    int fuzz = std::stoi(req.get_param_value("fuzzyness",0));
+	    bool fuzz = std::stoi(req.get_param_value("fuzzyness",0))!=0;
 	    bool auth_only = req.get_param_value("title_only",0)=="true";
 	    bool ocr_only = req.get_param_value("ocr_only",0) == "true";
 	    std::string author = req.get_param_value("author",0);
@@ -353,6 +367,7 @@ int main()
     srv.Get("/search",[&](const Request &req, Response &resp) { do_search(req,resp,fileSearchHtml,zoteroPillars,manager);});
     srv.Get("/searchinbook",[&](const Request &req, Response &resp) { do_searchinbook(req,resp,manager);});
 
+    srv.Get("/getmetadata", [&](const Request &req, Response &resp) { get_metadata(req,resp,manager);});
     srv.Get("/authenticate",&do_authentification);
     srv.Get("/userlist",&do_senduserlist);
     srv.Post("/userlist",&do_usertableupdate);

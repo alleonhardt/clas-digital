@@ -207,10 +207,8 @@ function getSliderValue(x)
 {
 	if(x==0)
 		return "Show only exact matches               ";
-	else if(x==1)
-		return "Show all matches that contain the word";
 	else
-		return "Try fuzzy matching                    ";
+		return "Do approximate matching		      ";
 
 }
 
@@ -623,7 +621,7 @@ function ShowLinks()
 				<div class="slidecontainer">
 					<p class="slider">Fuzzyness: </p>
 					<p id="SliderNum" class="sliderNum"></p>
-					<input oninput="document.getElementById('SliderNum').innerHTML=getSliderValue(this.value);" id="FuzzyID" style="float:right;"type="range" min="0" max="2" value="0" class="slider" id="myRange"></div>
+					<input oninput="document.getElementById('SliderNum').innerHTML=getSliderValue(this.value);" id="FuzzyID" style="float:right;"type="range" min="0" max="1" value="0" class="slider" id="myRange"></div>
 				<div class="checker">
 					<p class="slider">Search only in Titel</p>
 					<label class="checkbox-inline"><input id="SearchInTitle" type="checkbox" value=""></label>

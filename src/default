@@ -72,6 +72,9 @@ server {
 	location /searchinbook {
         	proxy_pass         http://localhost:9000;
 	}
+	location /getmetadata {
+        	proxy_pass         http://localhost:9000;
+	}
 
 	location /search {
         	proxy_pass         http://localhost:9000;

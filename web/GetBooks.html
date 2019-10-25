@@ -576,8 +576,7 @@ function init() {
 			anchorNode.id = "uniquePageNode"+scanInfo.pages[i].pageNumber;
 			document.querySelector(".reader").appendChild(anchorNode);			
 			document.querySelector(".reader").appendChild(pageNode);
-			pageNode.scanFilePath = "/getBookRessources?book="+scanId+ "&ressource=" + scanInfo.pages[i].file.substr(scanInfo.pages[i].file.search("page"));
-			//	scanInfo.pages[i].file.replace("/books/","/getBookRessource?book=").replace("/page","&res=page");
+			pageNode.scanFilePath = "/books/"+scanId+ "/" + scanInfo.pages[i].file.substr(scanInfo.pages[i].file.search("page"));
 			pageNode.info = i;
 		}
 
@@ -590,7 +589,7 @@ function init() {
 	});
 
 	document.getElementsByClassName("reader")[0].addEventListener("scroll", updateAfterScroll, false);
-		Server.Get("/getBookMetadata?scanId=" + scanId, function(content) {
+		Server.Get("/getmetadata?scanId=" + scanId, function(content) {
 		metadata = JSON.parse(content);
 	  	document.getElementById("scanBibInfo").innerHTML = metadata.bib;
 		if(metadata.data.creators[0].lastName === undefined)
