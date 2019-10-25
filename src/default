@@ -71,12 +71,12 @@ server {
 
 	location /search {
         	proxy_pass         http://localhost:9000;
-        	proxy_cache_key $uri$is_args$args;
-		proxy_buffering        on;
-            	proxy_cache            STATIC;
-            	proxy_cache_valid      200  1d;
-            	proxy_cache_use_stale  error timeout invalid_header updating
-                                   http_500 http_502 http_503 http_504;
+ #       	proxy_cache_key $uri$is_args$args;
+#		proxy_buffering        on;
+#            	proxy_cache            STATIC;
+#            	proxy_cache_valid      200  1d;
+#            	proxy_cache_use_stale  error timeout invalid_header updating
+#                                   http_500 http_502 http_503 http_504;
 	}
 
 	location /authenticate {
@@ -87,12 +87,12 @@ server {
 	location = / {
         	proxy_pass         http://localhost:9000/search;
 		proxy_redirect 	http://localhost:9000/ http://localhost:9000/search;
-		proxy_cache_key $uri$is_args$args;
-		proxy_buffering        on;
-            	proxy_cache            STATIC;
-            	proxy_cache_valid      200  1d;
-            	proxy_cache_use_stale  error timeout invalid_header updating
-                                   http_500 http_502 http_503 http_504;
+#		proxy_cache_key $uri$is_args$args;
+#		proxy_buffering        on;
+#            	proxy_cache            STATIC;
+#            	proxy_cache_valid      200  1d;
+#            	proxy_cache_use_stale  error timeout invalid_header updating
+#                                   http_500 http_502 http_503 http_504;
 	}
 
 	location / {
