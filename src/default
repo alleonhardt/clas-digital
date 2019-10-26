@@ -84,6 +84,12 @@ server {
 	location /getmetadata {
         	proxy_pass         http://localhost:9000;
 	}
+	
+	location /information/ {
+	    disable_symlinks off;
+	    index index.html index.de.html;
+	    try_files $uri $uri/ =404;
+	}
 
 	location /search {
         	proxy_pass         http://localhost:9000;
