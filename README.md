@@ -1,6 +1,8 @@
 # clas-digital
 C++ implementation of a ancient literature database
 
+map liste mit buechern sortieren
+
 # Installation
 Warning executing "sudo make install" overrides your current nginx settings, creates a new folder in /etc/clas-digital and registers /etc/clas-digital/clas-digital.o as service with the name clas-digital. Only proceed when you know what you are doing!
 ~~~~
