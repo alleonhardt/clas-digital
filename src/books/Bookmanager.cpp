@@ -137,8 +137,8 @@ std::list<std::string>* CBookManager::convertToList(std::map<std::string, double
 			{
 			    auto &bk1 = m_mapBooks[elem1.first];
 			    auto &bk2 = m_mapBooks[elem2.first];
-			    std::string s1= bk1->getMetadata().getShow();
-			    std::string s2= bk2->getMetadata().getShow();
+			    std::string s1= bk1->getAuthor();
+			    std::string s2= bk2->getAuthor();
 			    if(s1==s2)
 				return elem1.first < elem2.first;
 			    return s1 < s2;
