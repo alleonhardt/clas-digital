@@ -104,8 +104,10 @@ std::map<std::string, double>* CSearch::search(
 void CSearch::normalSearch(std::unordered_map<std::string, std::map<std::string, double>>& mapWords, 
                                                     std::map<std::string, double>* mapSR)
 {
+    std::cout << "Searching for " << m_sWord << "\n";
     if(mapWords.count(m_sWord) > 0) {
         std::map<std::string, double> searchResults = mapWords.at(m_sWord);
+        std::cout << "Results: " << searchResults.size() << "\n";
         mapSR->insert(searchResults.begin(), searchResults.end());
     }
 }
