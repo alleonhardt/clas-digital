@@ -75,6 +75,10 @@ server {
         	auth_request         /authenticate;
 	}
 
+	location /createbibliography {
+        	proxy_pass         http://localhost:9000;
+	}
+
 	location /login {
         	proxy_pass         http://localhost:9000;
 	}	
