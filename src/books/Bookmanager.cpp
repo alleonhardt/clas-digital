@@ -20,8 +20,6 @@ bool CBookManager::initialize()
     struct dirent* e_allItems;
     dir_allItems = opendir("web/books");
 
-    std::cout << "reached this" << std::endl;
-
     //Check whether files where found
     if(!dir_allItems)
         return false;
