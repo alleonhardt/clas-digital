@@ -300,12 +300,13 @@ function ApplyFilterOptions()
 function OpenFilter()
 {
 	let retval = document.getElementById('filterselect').value;
+	let lnk = window.location.search.replace("page="+getParameterByName('page'),"page=1");
 	let val = getParameterByName('f_sort');
 	if(val==null)
-	    window.location = window.location + "&f_sort="+retval;
+	    window.location = lnk + "&f_sort="+retval;
 	else
 	{
-	    window.location = window.location.search.replace("f_sort="+val,"f_sort="+retval);
+	    window.location = lnk.replace("f_sort="+val,"f_sort="+retval);
 	}
 }
 
