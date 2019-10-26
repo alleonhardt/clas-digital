@@ -226,9 +226,6 @@ bool isWord(const char* chWord)
     int length;
     wchar_t dest;
 
-    if (max <= 2 && max > 20)
-        return false;
-
     //Set locale
     std::locale loc("de_DE.utf8");
     std::setlocale(LC_ALL, "de_DE.utf8");
@@ -278,7 +275,7 @@ std::map<std::string, int> extractWordsFromString(std::string& sBuffer)
         }
 
         transform(vStrs[i]);
-        if(isWord(vStrs[i].c_str()) == true)
+        if(vStrs[i].length() >= 2 && vStrs[i].length() <= 25 && isWord(vStrs[i].c_str()) == true)
         {
             vStrs[i].erase(std::remove(vStrs[i].begin(), vStrs[i].end(), '-'), vStrs[i].end());
             vStrs[i].erase(std::remove(vStrs[i].begin(), vStrs[i].end(), '.'), vStrs[i].end());

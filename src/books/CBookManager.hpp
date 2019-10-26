@@ -64,7 +64,7 @@ public:
     * @brief convert to list
     * @return list of searchresulst
     */
-    std::list<std::string>* convertToList(std::map<std::string, double>* mapResults);
+    std::list<std::string>* convertToList(std::map<std::string, double>* mapResults, int sorting);
 
     /**
     * @brief create map of all words (key) and books in which the word occurs (value)

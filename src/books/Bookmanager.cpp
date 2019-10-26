@@ -96,7 +96,7 @@ std::list<std::string>* CBookManager::search(CSearchOptions* searchOpts)
     std::map<std::string, double>* results = search.search(m_mapWords, m_mapWordsTitle, m_mapBooks);
 
     //Sort results results
-    return convertToList(results);
+    return convertToList(results, 2);
 }
 
 
@@ -107,17 +107,33 @@ std::list<std::string>* CBookManager::search(CSearchOptions* searchOpts)
 * @param[in, out] matches Map of books and there match with the searched word
 * @return list of searchresulst
 */
-std::list<std::string>* CBookManager::convertToList(std::map<std::string, double>* mapSR)
+std::list<std::string>* CBookManager::convertToList(std::map<std::string, double>* mapSR, int sorting)
 {
 	// Declaring the type of Predicate that accepts 2 pairs and return a bool
 	typedef std::function<bool(std::pair<std::string, double>, std::pair<std::string, double>)> Comp;
  
 	// Defining a lambda function to compare two pairs. It will compare two pairs using second field
-	Comp compFunctor =
-			[](std::pair<std::string, double> elem1, std::pair<std::string, double> elem2)
+	Comp compFunctor;
+    if (sorting == 0)
+        compFunctor =
+			[](auto elem1, auto elem2)
 			{
                 if (elem1.second == elem2.second) elem1.second+=0.0001;
 				return elem1.second > elem2.second;
+			};
+    else if (sorting == 1)
+        compFunctor =
+            [this](auto elem1, auto elem2)
+			{
+                int date1=m_mapBooks[elem1.first]->getDate(), date2=m_mapBooks[elem2.first]->getDate();
+                if (date1 == date2) date1+=0.0001;
+				return date1 < date2;
+			};
+    else
+        compFunctor =
+            [this](auto elem1, auto elem2)
+			{
+				return m_mapBooks[elem1.first]->getMetadata().getShow() < m_mapBooks[elem2.first]->getMetadata().getShow();
 			};
 
     //Sort by defined sort logic
