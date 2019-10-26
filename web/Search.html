@@ -23,6 +23,12 @@ mark {
 	margin-right: 11%;
 }
 
+.linkcontainer {
+    margin: auto;
+    width: 80%;
+    padding-bottom: 1.5rem;
+}
+
 .some_grid_class {
 	display: grid;
 	margin-top: 3rem;
@@ -33,9 +39,9 @@ mark {
 .button_box_top {
 	text-align: center;
 	width: 100%;
+	margin: auto;
 	margin-top: 10%;
 	padding-top: 20px;
-	margin-left: 0;
 	padding-bottom: 4rem;
 	background: white;
 	overflow: visible;
@@ -337,7 +343,7 @@ function ShowSelectedValues(obj)
 			obj.appendChild(newList);
 	}
 	
-    let val = "<hr>";
+    let val = "<hr><div class='linkcontainer'>";
     let counter = 1;
     for(let i = 0; i < json.max_results; i+=10)
     {
@@ -350,6 +356,7 @@ function ShowSelectedValues(obj)
 	    val+="<a style='margin-right: 1rem;' href='"+lnk+"'>"+counter+"</a>";
 	counter++;
     }
+    val+="</div>";
     obj.innerHTML+=val;
 }
 
@@ -667,6 +674,5 @@ function ShowLinks()
 				<!--</div>-->
 			<div id="ResultBanner"></div>
 			<div id="SearchHitList" start="0" class="list-type2"></div>
-			<div id="LinkList" class="divlisttype"></div>
 		</div>
 	</body>

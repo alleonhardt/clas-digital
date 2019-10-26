@@ -8,6 +8,7 @@
 #include "books/CBookManager.hpp"
 #include <signal.h>
 #include <chrono>
+#include <exception>
 
 using namespace httplib;
 
@@ -122,8 +123,9 @@ void do_searchinbook(const Request& req, Response &resp, CBookManager &manager)
 	}
 	resp.set_content(js.dump(),"application/json");
     }
-    catch(...)
+    catch(std::exception &e)
     {
+	std::cout<<"Caught exception in search in book: "<<e.what()<<std::endl;
 	resp.set_content("{}","application/json");
     }
 }
@@ -199,8 +201,9 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
 	    app+="};</script>";
 	    resp.set_content(app.c_str(),"text/html");
 	}
-	catch(...)
+	catch(std::exception &e)
 	{
+	    std::cout<<"Caught exception in search all books: "<<e.what()<<std::endl;
 	    resp.set_content("<html><head></head><body><h1>Corrupted search request!</h1></body></html>","text/html");
 	    return;
 	}
