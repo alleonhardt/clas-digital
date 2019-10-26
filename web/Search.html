@@ -295,9 +295,11 @@ function OpenFilter()
 
 function ShowSelectedValues(obj)
 {
-	let json = obj.drawablejson;
 	obj.innerHTML = "";
+	let json = obj.drawablejson;
 	  document.getElementById("ResultBanner").innerHTML =  "<div style='margin-top: 2rem;margin-bottom:0;'><select onchange='OpenFilter(this);return true;' class='specialultbut' onclick='return true;' style='background:white;margin-right: 0.5rem;border: 0;'><option value='sortrelevance'>Sort by relevance</option><option value='sortalphabetically'>Sort alphabetically</option><option value='sortchronologically'>Sort chronologically</option></select><button class='specialultbut' style='background:white;border: 0;' onclick='CreateBibliography();return true;'>Create Bibliography</button></div><hr style='padding: 0;'><span style='color: grey;'>"+json.max_results+" Ergebnisse gefunden in "+json.time+"s</span>";
+	if(json.max_results==0)
+	    return;
 	obj.start = json.show_from;
 	
 	let bookvalues=[];
@@ -560,11 +562,15 @@ function ShowLinks()
 	document.getElementById("PublicatedBefore").value = search_parameters.pub_before = parseInt(getParameterByName('publicatedbefore'));
 	
 
+	
 	document.getElementById("SpecialSID").value = getParameterByName('q');
 	let obj = document.getElementById("SearchHitList");
 	obj.drawablejson = ServerDataObj.search;
-	obj.drawablejson.show_from = 0;
-	obj.drawablejson.show_to = Math.min(obj.drawablejson.books.length,10);
+	if(ServerDataObj.search.max_results!=0)
+	{
+	    obj.drawablejson.show_from = 0;
+	    obj.drawablejson.show_to = Math.min(obj.drawablejson.books.length,10);
+	}
 	ShowSelectedValues(obj);
 }
 		</script>

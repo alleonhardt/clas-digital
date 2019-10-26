@@ -145,7 +145,8 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
 	    int pubbef = std::stoi(req.get_param_value("publicatedbefore"));
 	    std::string pill = req.get_param_value("pillars",0);
 	    int page = std::stoi(req.get_param_value("page"));
-	    auto sort = req.get_param_value("f_sort");
+	    std::string sort;
+	    try{sort = req.get_param_value("f_sort",0);}catch(...){};
 
 	    std::vector<std::string> pillars;
 
