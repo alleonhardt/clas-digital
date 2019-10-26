@@ -140,7 +140,7 @@ std::list<std::string>* CBookManager::convertToList(std::map<std::string, double
 			    std::string s1= bk1->getMetadata().getShow();
 			    std::string s2= bk2->getMetadata().getShow();
 			    if(s1==s2)
-				return bk1->getMetadata().getMetadata()["bib"] < bk2->getMetadata().getMetadata()["bib"];
+				return elem1.first < elem2.first;
 			    return s1 < s2;
 			};
 
