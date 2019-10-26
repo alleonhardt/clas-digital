@@ -37,6 +37,12 @@ bool CBookManager::initialize()
 
     //Create map of all words + and of all words in all titles
     createMapWords();
+    std::map<int, int> mapNumbers;
+    for(auto it : m_mapWords)
+        mapNumbers[it.first.length()] += 1;
+    for(auto it : mapNumbers)
+        std::cout << it.first << " : " << it.second << std::endl;
+
     createMapWordsTitle();
     std::cout << "\n";
     std::cout << "Map words: " << m_mapWords.size() << "\n";
