@@ -207,9 +207,10 @@ std::string CMetadata::getShow()
     // *** Add Author *** //
     std::string sResult = getAuthor();
 
-    if(getDate() != -1)
-        sResult += ", " + std::to_string(getDate());
+    if(sResult == "") sResult = "No Author";
 
+    if(getDate() != -1) 
+        sResult += ", " + std::to_string(getDate());
     sResult += ".";
 
     return sResult;
