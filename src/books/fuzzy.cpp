@@ -44,12 +44,16 @@ size_t levenshteinDistance(const char* chS, const char* chT)
 }
 
 
-double fast_search(const char* chS, const char* chIn)
+double fast_search(const char* chS, const char* chIn, size_t lenS, size_t lenIn)
 {
     double score = 0;
     bool r = true;
-    if(strlen(chS) >  strlen(chIn)) return 1;
-    if(strlen(chS) != strlen(chIn)) score = 0.1;
+    if(lenS > lenIn) return 1;
+    if(lenS != lenIn) {
+        score = (static_cast<double>(lenIn) / lenS)/15; 
+        if(score > 0.19) score = 0.19;
+        else if(score < 0.05) score = 0.05;
+    }
 
     for(size_t i=0; i<strlen(chIn); i++) {
         r = true;
@@ -77,13 +81,14 @@ double fast_search(const char* chS, const char* chIn)
 */
 double fuzzy_cmp(std::string sWord1, std::string sWord2)
 {
-    //Fast search (full match: 0, beginswith: 0.1, contains: 0.19)
-    double fast = fast_search(sWord2.c_str(), sWord1.c_str());
-    if(fast < 1) return fast;
-
     //Check lengths
     double len1 = sWord1.length();
     double len2 = sWord2.length();
+
+    //Fast search (full match: 0, beginswith: 0.1, contains: 0.19)
+    double fast = fast_search(sWord2.c_str(), sWord1.c_str(), len2, len1); 
+    if(fast < 1) return fast;
+
 
     //Check whether length of words are to far appart.
     if(len1>len2 && len2/len1 < 0.8)      

@@ -268,17 +268,13 @@ std::map<std::string, int> extractWordsFromString(std::string& sBuffer)
         if (vStrs[i].length() <= 2)
             continue;
 
-        if (i+1 != vStrs.size() && vStrs[i].back() == '-' && isWord(vStrs[i+1].c_str()) == true) {
-            vStrs[i].pop_back();
-            vStrs[i+1].insert(0, vStrs[i]);
-            continue;
-        }
-
         transform(vStrs[i]);
         if(vStrs[i].length() >= 2 && vStrs[i].length() <= 25 && isWord(vStrs[i].c_str()) == true)
         {
             vStrs[i].erase(std::remove(vStrs[i].begin(), vStrs[i].end(), '-'), vStrs[i].end());
             vStrs[i].erase(std::remove(vStrs[i].begin(), vStrs[i].end(), '.'), vStrs[i].end());
+            sBuffer.erase(std::remove(sBuffer.begin(), sBuffer.end(), '-'), sBuffer.end());
+            sBuffer.erase(std::remove(sBuffer.begin(), sBuffer.end(), '.'), sBuffer.end());
             convertToLower(vStrs[i]);
 
             mapWords[vStrs[i]] += 1;

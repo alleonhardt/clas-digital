@@ -285,18 +285,20 @@ std::string CBook::getPreview(std::string sWord)
     std::string sMatch = "";
     if(m_mapWordsPages.count(sWord) > 0)
         sMatch = sWord;
-     else
+    else {
         sMatch = m_mapFuzzy[sWord].front().first;
-     size_t page = std::get<0>(m_mapWordsPages[sMatch])[0];
+        std::cout << sMatch << ", " << m_mapFuzzy[sWord].front().second << std::endl;
+    }
+
+    size_t page = std::get<0>(m_mapWordsPages[sMatch])[0];
+
+    if(page == 1000000)
+        return "No Preview";
 
     //Read ocr
     std::ifstream read(m_sPath + "/page" + std::to_string(page+1) + ".txt", std::ios::in);
     std::string sPage((std::istreambuf_iterator<char>(read)), std::istreambuf_iterator<char>());
 
-    if(std::get<2>(m_mapWordsPages[sMatch]) == 1000000) {
-        std::cout << "False Value!\n";
-        return "No Preview";
-    }
 
     int pos = std::get<2>(m_mapWordsPages[sMatch]);
     int front = 0;
@@ -325,20 +327,22 @@ std::string CBook::getPreview(std::string sWord)
 */
 size_t CBook::getPreviewPosition(std::string sWord)
 {
-    size_t page = std::get<0>(m_mapWordsPages[sWord]).front();
+    std::vector<size_t> pages = std::get<0>(m_mapWordsPages[sWord]);
+    for(size_t i=0; i<pages.size(); i++) 
+    {
+        //Read ocr and kontent
+        std::ifstream read(m_sPath + "/page" + std::to_string(pages[i]+1) + ".txt", std::ios::in);
+        std::string sPage((std::istreambuf_iterator<char>(read)), std::istreambuf_iterator<char>());
 
-    //Read ocr and kontent
-    std::ifstream read(m_sPath + "/page" + std::to_string(page+1) + ".txt", std::ios::in);
-    std::string sPage((std::istreambuf_iterator<char>(read)), std::istreambuf_iterator<char>());
+        //Find match
+        size_t pos = sPage.find(sWord);
 
-    //Find match
-    size_t pos = sPage.find(sWord);
-
-    //Return "error" if not found
-    if (pos == std::string::npos)
-        return 1000000;
+        //Return "error" if not found
+        if (pos != std::string::npos)
+            return pos;
+    }
     
-    return pos;
+    return 1000000;
 }
 
 
