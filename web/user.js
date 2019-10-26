@@ -38,7 +38,7 @@ class User {
 		}
 
 		let specval = document.getElementById("tpnav");
-		specval.innerHTML = "<a id='homelink' href='/information/'>Home</a><a id='searchlink' href='/search'>Search</a><a id='administrationlink' class='classifiedContent' href='/private/admin/Administration.html' data-acc=4>Administration</a><a id='uploadbooklink' class='classifiedContent' href='/private/write/UploadBook.html' data-acc=2>Upload Books</a><a id='managebookslink' class='classifiedContent' href='/private/write/ManageBooks.html' data-acc=2>Manage Books</a><div class='topnav-right' id='loggedintopnav'><span id='LoggedInAs'>Logged in</span><button id='logoutBut' class='btn btn-outline-info' onclick='User.DoLogout()'>Logout</button></div>";
+		specval.innerHTML = "<a id='homelink' href='/information/'>Information</a><a id='searchlink' href='/search'>Search</a><a id='administrationlink' class='classifiedContent' href='/private/admin/Administration.html' data-acc=4>Administration</a><a id='uploadbooklink' class='classifiedContent' href='/private/write/UploadBook.html' data-acc=2>Upload Books</a><a id='managebookslink' class='classifiedContent' href='/private/write/ManageBooks.html' data-acc=2>Manage Books</a><div class='topnav-right' id='loggedintopnav'><span id='LoggedInAs'>Logged in</span><button id='logoutBut' class='btn btn-outline-info' onclick='User.DoLogout()'>Logout</button></div>";
 
 		console.log("Link: " + linkforactive);
 		document.getElementById(linkforactive).classList.add("active");
