@@ -18,7 +18,7 @@ private:
     bool m_onlyOCR;                             //Search only in ocr 
     bool m_onlyTitle;                           //Search only in the title not in the text
     bool m_fullAccess;                          //Read access for all books
-    bool m_filterResults;                       //Filter results by number of matches
+    size_t m_filterResults;                       //Filter results by number of matches
 
 public:
 
@@ -40,7 +40,7 @@ public:
     * @param[in] full does user have full access to ocr file?
     * @param[in] filterResults results will be filtered by number of matches in book
     **/
-    CSearchOptions(std::string chSearchedWord, bool fuzzyness, std::vector<std::string> sCollections, bool onlyTitle, bool onlyOCR, std::string slastName, int from, int to, bool full, bool filterResults);
+    CSearchOptions(std::string chSearchedWord, bool fuzzyness, std::vector<std::string> sCollections, bool onlyTitle, bool onlyOCR, std::string slastName, int from, int to, bool full, size_t filterResults);
     
 	//Getter
 
@@ -92,7 +92,7 @@ public:
     /**
     * @return return whether results shall be filtered or not
     */
-    bool getFilterResults() const;
+    size_t getFilterResults() const;
 
     /**
     * @param[in] searchedWord new searched word

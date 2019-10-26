@@ -37,12 +37,6 @@ bool CBookManager::initialize()
 
     //Create map of all words + and of all words in all titles
     createMapWords();
-    std::map<int, int> mapNumbers;
-    for(auto it : m_mapWords)
-        mapNumbers[it.first.length()] += 1;
-    for(auto it : mapNumbers)
-        std::cout << it.first << " : " << it.second << std::endl;
-
     createMapWordsTitle();
     std::cout << "\n";
     std::cout << "Map words: " << m_mapWords.size() << "\n";
@@ -96,7 +90,7 @@ std::list<std::string>* CBookManager::search(CSearchOptions* searchOpts)
     std::map<std::string, double>* results = search.search(m_mapWords, m_mapWordsTitle, m_mapBooks);
 
     //Sort results results
-    return convertToList(results, 2);
+    return convertToList(results, searchOpts->getFilterResults());
 }
 
 
@@ -109,6 +103,13 @@ std::list<std::string>* CBookManager::search(CSearchOptions* searchOpts)
 */
 std::list<std::string>* CBookManager::convertToList(std::map<std::string, double>* mapSR, int sorting)
 {
+    std::list<std::string>* listBooks = new std::list<std::string>;
+    if(mapSR->size() == 0) return listBooks;
+    else if(mapSR->size() == 1) {
+        listBooks->push_back(mapSR->begin()->first);
+        return listBooks;
+    }
+
 	// Declaring the type of Predicate that accepts 2 pairs and return a bool
 	typedef std::function<bool(std::pair<std::string, double>, std::pair<std::string, double>)> Comp;
  
@@ -140,7 +141,6 @@ std::list<std::string>* CBookManager::convertToList(std::map<std::string, double
 	std::set<std::pair<std::string, double>, Comp> sorted(mapSR->begin(), mapSR->end(), compFunctor);
 
     //Convert to list
-    std::list<std::string>* listBooks = new std::list<std::string>;
     for(std::pair<std::string, double> element : sorted)
         listBooks->push_back(element.first); 
 
