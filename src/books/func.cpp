@@ -226,7 +226,7 @@ bool isWord(const char* chWord)
     int length;
     wchar_t dest;
 
-    if (max <= 2)
+    if (max <= 2 && max > 20)
         return false;
 
     //Set locale

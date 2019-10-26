@@ -37,7 +37,14 @@ bool CBookManager::initialize()
 
     //Create map of all words + and of all words in all titles
     createMapWords();
+    std::map<int, int> mapNumbers;
+    for(auto it : m_mapWords)
+        mapNumbers[it.first.length()] += 1;
+    for(auto it : mapNumbers)
+        std::cout << it.first << " : " << it.second << std::endl;
+
     createMapWordsTitle();
+    std::cout << "\n";
     std::cout << "Map words: " << m_mapWords.size() << "\n";
     std::cout << "Map title: " << m_mapWordsTitle.size() << "\n";
 
@@ -87,7 +94,6 @@ std::list<std::string>* CBookManager::search(CSearchOptions* searchOpts)
 
     //Search
     std::map<std::string, double>* results = search.search(m_mapWords, m_mapWordsTitle, m_mapBooks);
-    std::cout << "Results: " << results->size() << "\n";
 
     //Sort results results
     return convertToList(results);
@@ -119,10 +125,8 @@ std::list<std::string>* CBookManager::convertToList(std::map<std::string, double
 
     //Convert to list
     std::list<std::string>* listBooks = new std::list<std::string>;
-    for(std::pair<std::string, double> element : sorted) {
-        std::cout << element.first << ": " << element.second << "\n";
+    for(std::pair<std::string, double> element : sorted)
         listBooks->push_back(element.first); 
-    }
 
     delete mapSR;
     return listBooks;
@@ -159,11 +163,12 @@ void CBookManager::createMapWordsTitle()
     {
         //Get map of words of current book)
         std::string sTitle = it->second->getMetadata().getTitle();
+        sTitle=func::convertStr(sTitle);
         std::map<std::string, int> mapWords = func::extractWordsFromString(sTitle);
 
         //Iterate over all words in this book. Check whether word already exists in list off all words.
         for(auto yt=mapWords.begin(); yt!=mapWords.end(); yt++)
-            m_mapWordsTitle[yt->first][it->first] = 0;
+            m_mapWordsTitle[yt->first][it->first] = 0.1;
     }
 }
 
