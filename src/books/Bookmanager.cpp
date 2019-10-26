@@ -135,7 +135,13 @@ std::list<std::string>* CBookManager::convertToList(std::map<std::string, double
         compFunctor =
             [this](const auto &elem1,const auto &elem2)
 			{
-				return m_mapBooks[elem1.first]->getMetadata().getShow() < m_mapBooks[elem2.first]->getMetadata().getShow();
+			    auto &bk1 = m_mapBooks[elem1.first];
+			    auto &bk2 = m_mapBooks[elem2.first];
+			    std::string s1= bk1->getMetadata().getShow();
+			    std::string s2= bk2->getMetadata().getShow();
+			    if(s1==s2)
+				return bk1->getMetadata().getMetadata()["bib"] < bk2->getMetadata().getMetadata()["bib"];
+			    return s1 < s2;
 			};
 
     DBG_INF();
