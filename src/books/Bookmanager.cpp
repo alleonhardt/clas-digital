@@ -1,4 +1,5 @@
 #include "CBookManager.hpp"
+#include "debug/debug.hpp"
 
 /**
 * @return map of all book
@@ -103,12 +104,14 @@ std::list<std::string>* CBookManager::search(CSearchOptions* searchOpts)
 */
 std::list<std::string>* CBookManager::convertToList(std::map<std::string, double>* mapSR, int sorting)
 {
+    DBG_INF();
     std::list<std::string>* listBooks = new std::list<std::string>;
     if(mapSR->size() == 0) return listBooks;
     else if(mapSR->size() == 1) {
         listBooks->push_back(mapSR->begin()->first);
         return listBooks;
     }
+    DBG_INF();
 
 	// Declaring the type of Predicate that accepts 2 pairs and return a bool
 	typedef std::function<bool(std::pair<std::string, double>, std::pair<std::string, double>)> Comp;
@@ -137,12 +140,14 @@ std::list<std::string>* CBookManager::convertToList(std::map<std::string, double
 				return m_mapBooks[elem1.first]->getMetadata().getShow() < m_mapBooks[elem2.first]->getMetadata().getShow();
 			};
 
+    DBG_INF();
     //Sort by defined sort logic
 	std::set<std::pair<std::string, double>, Comp> sorted(mapSR->begin(), mapSR->end(), compFunctor);
 
     //Convert to list
     for(std::pair<std::string, double> element : sorted)
         listBooks->push_back(element.first); 
+    DBG_INF();
 
     delete mapSR;
     return listBooks;

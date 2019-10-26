@@ -192,8 +192,11 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
 	    int pubbef = std::stoi(req.get_param_value("publicatedbefore"));
 	    std::string pill = req.get_param_value("pillars",0);
 	    int page = std::stoi(req.get_param_value("page"));
-	    std::string sort;
-	    try{sort = req.get_param_value("f_sort",0);}catch(...){};
+	    int sort = -1;
+	    try{
+		sort = std::stoi(req.get_param_value("f_sort",0));
+	    }catch(...){};
+	    if(sort == -1) sort = 0;
 
 	    std::vector<std::string> pillars;
 
@@ -201,10 +204,10 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
 	    own_split(pill,',',pillars);
 
 	    std::cout<<"Receveived search request!"<<std::endl;
-	    std::cout<<"Query: "<<query<<"; fuzz: "<<fuzz<<"; title only: "<<auth_only<<"; ocr only: "<<ocr_only<<"; author: "<<author<<"; publicated after: "<<pubafter<<"; publicated before: "<<pubbef<<"; searched pillars: "<<pill<<"; vector pillar size: "<<pillars.size()<<std::endl;
+	    std::cout<<"Query: "<<query<<"; fuzz: "<<fuzz<<"; title only: "<<auth_only<<"; ocr only: "<<ocr_only<<"; author: "<<author<<"; publicated after: "<<pubafter<<"; publicated before: "<<pubbef<<"; searched pillars: "<<pill<<"; vector pillar size: "<<pillars.size()<<"; sorting with value: "<<sort<<std::endl;
 
 
-	    CSearchOptions options(query,fuzz,pillars,auth_only,ocr_only,author,pubafter,pubbef,true,true);
+	    CSearchOptions options(query,fuzz,pillars,auth_only,ocr_only,author,pubafter,pubbef,true,sort);
 	    std::cout<<"Starting search!"<<std::endl;
 
 	    auto start = std::chrono::system_clock::now();

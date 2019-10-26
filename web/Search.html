@@ -289,12 +289,13 @@ function ApplyFilterOptions()
 
 function OpenFilter()
 {
+	let retval = document.getElementById('filterselect').value;
 	let val = getParameterByName('f_sort');
 	if(val==null)
-	    window.location = window.location + "&f_sort="+this.value;
+	    window.location = window.location + "&f_sort="+retval;
 	else
 	{
-	    window.location = window.location.search.replace("f_sort="+val,"f_sort="+this.value);
+	    window.location = window.location.search.replace("f_sort="+val,"f_sort="+retval);
 	}
 }
 
@@ -303,7 +304,7 @@ function ShowSelectedValues(obj)
 {
 	obj.innerHTML = "";
 	let json = obj.drawablejson;
-	  document.getElementById("ResultBanner").innerHTML =  "<div style='margin-top: 2rem;margin-bottom:0;'><select onchange='OpenFilter(this);return true;' class='specialultbut' onclick='return true;' style='background:white;margin-right: 0.5rem;border: 0;'><option value='sortrelevance'>Sort by relevance</option><option value='sortalphabetically'>Sort alphabetically</option><option value='sortchronologically'>Sort chronologically</option></select><button class='specialultbut' style='background:white;border: 0;' onclick='CreateBibliography();return true;'>Create Bibliography</button></div><hr style='padding: 0;'><span style='color: grey;'>"+json.max_results+" Ergebnisse gefunden in "+json.time+"s</span>";
+	  document.getElementById("ResultBanner").innerHTML =  "<div style='margin-top: 2rem;margin-bottom:0;'><select id='filterselect' onchange='OpenFilter(this);return true;' class='specialultbut' onclick='return true;' style='background:white;margin-right: 0.5rem;border: 0;'><option value='0'>Sort by relevance</option><option value='1'>Sort alphabetically</option><option value='2'>Sort chronologically</option></select><button class='specialultbut' style='background:white;border: 0;' onclick='CreateBibliography();return true;'>Create Bibliography</button></div><hr style='padding: 0;'><span style='color: grey;'>"+json.max_results+" Ergebnisse gefunden in "+json.time+"s</span>";
 	if(json.max_results==0)
 	    return;
 	obj.start = json.show_from;
@@ -566,7 +567,7 @@ function ShowLinks()
 	document.getElementById("SearchInTitle").checked = getParameterByName('title_only')=='true';
 	document.getElementById("SearchForAuthor").value =  getParameterByName('author');
 	document.getElementById("PublicatedAfter").value = parseInt(getParameterByName('publicatedafter'));
-	document.getElementById("PublicatedBefore").value = search_parameters.pub_before = parseInt(getParameterByName('publicatedbefore'));
+	document.getElementById("PublicatedBefore").value = parseInt(getParameterByName('publicatedbefore'));
 	
 
 	
@@ -579,6 +580,7 @@ function ShowLinks()
 	    obj.drawablejson.show_to = Math.min(obj.drawablejson.books.length,10);
 	}
 	ShowSelectedValues(obj);
+	if(getParameterByName('f_sort')!=null) document.getElementById("filterselect").value = getParameterByName('f_sort');
 }
 		</script>
 		<style>
