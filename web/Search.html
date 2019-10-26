@@ -314,7 +314,7 @@ function ShowSelectedValues(obj)
 {
 	obj.innerHTML = "";
 	let json = obj.drawablejson;
-	  document.getElementById("ResultBanner").innerHTML =  "<div style='margin-top: 2rem;margin-bottom:0;'><select id='filterselect' onchange='OpenFilter(this);return true;' class='specialultbut' onclick='return true;' style='background:white;margin-right: 0.5rem;border: 0;'><option value='0'>Sort by relevance</option><option value='1'>Sort alphabetically</option><option value='2'>Sort chronologically</option></select><button class='specialultbut' style='background:white;border: 0;' onclick='CreateBibliography();return true;'>Create Bibliography</button></div><hr style='padding: 0;'><span style='color: grey;'>"+json.max_results+" Ergebnisse gefunden in "+json.time+"s</span>";
+	  document.getElementById("ResultBanner").innerHTML =  "<div style='margin-top: 2rem;margin-bottom:0;'><select id='filterselect' onchange='OpenFilter(this);return true;' class='specialultbut' onclick='return true;' style='background:white;margin-right: 0.5rem;border: 0;'><option value='0'>Sort by relevance</option><option value='2'>Sort alphabetically</option><option value='1'>Sort chronologically</option></select><button class='specialultbut' style='background:white;border: 0;' onclick='CreateBibliography();return true;'>Create Bibliography</button></div><hr style='padding: 0;'><span style='color: grey;'>"+json.max_results+" Ergebnisse gefunden in "+json.time+"s</span>";
 	if(json.max_results==0)
 	    return;
 	obj.start = json.show_from;
@@ -359,8 +359,10 @@ function ShowSelectedValues(obj)
     for(let i = 0; i < json.max_results; i+=10)
     {
 	let lnk = window.location.search;
-	lnk = lnk.substr(0,lnk.lastIndexOf('=')+1);
-	lnk+=counter;
+	let rep = getParameterByName('page');
+	rep = 'page='+rep;
+
+	let newlnk=window.location.search.replace(rep,"page="+counter);
 	if(json.page==counter)
 	    val+="<a style='margin-right: 1rem;' disabled>"+counter+"</a>";
 	  else
