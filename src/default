@@ -53,6 +53,7 @@ server {
 
 	# Add index.php to the list if you are using PHP
 	index Search.html;
+	error_page 502 web/custom_error502.html;
 
 	ssl on;
         ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
