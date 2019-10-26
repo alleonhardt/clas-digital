@@ -118,24 +118,30 @@ std::list<std::string>* CBookManager::convertToList(std::map<std::string, double
 	Comp compFunctor;
     if (sorting == 0)
         compFunctor =
-			[](auto elem1, auto elem2)
+			[](const auto &a,const auto &b)
 			{
-                if (elem1.second == elem2.second) elem1.second+=0.0001;
-				return elem1.second > elem2.second;
+			if(a.second == b.second)    return a.first < b.first;
+			return a.second < b.second;
 			};
     else if (sorting == 1)
         compFunctor =
-            [this](auto elem1, auto elem2)
+            [this](const auto &elem1,const auto &elem2)
 			{
                 int date1=m_mapBooks[elem1.first]->getDate(), date2=m_mapBooks[elem2.first]->getDate();
-                if (date1 == date2) date1+=0.0001;
-				return date1 < date2;
+			    if(date1==date2) return elem1.first < elem2.first;
+			    return date1 < date2;
 			};
     else
         compFunctor =
-            [this](auto elem1, auto elem2)
+            [this](const auto &elem1,const auto &elem2)
 			{
-				return m_mapBooks[elem1.first]->getMetadata().getShow() < m_mapBooks[elem2.first]->getMetadata().getShow();
+			    auto &bk1 = m_mapBooks[elem1.first];
+			    auto &bk2 = m_mapBooks[elem2.first];
+			    std::string s1= bk1->getMetadata().getShow();
+			    std::string s2= bk2->getMetadata().getShow();
+			    if(s1==s2)
+				return elem1.first < elem2.first;
+			    return s1 < s2;
 			};
 
     DBG_INF();
