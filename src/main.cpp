@@ -143,9 +143,9 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
 	    std::string author = req.get_param_value("author",0);
 	    int pubafter = std::stoi(req.get_param_value("publicatedafter"));
 	    int pubbef = std::stoi(req.get_param_value("publicatedbefore"));
-	    bool sortway = req.get_param_value("sortway",0) == "sortbyrelevance";
 	    std::string pill = req.get_param_value("pillars",0);
 	    int page = std::stoi(req.get_param_value("page"));
+	    auto sort = req.get_param_value("f_sort");
 
 	    std::vector<std::string> pillars;
 
@@ -153,17 +153,17 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
 	    own_split(pill,',',pillars);
 
 	    std::cout<<"Receveived search request!"<<std::endl;
-	    std::cout<<"Query: "<<query<<"; fuzz: "<<fuzz<<"; title only: "<<auth_only<<"; ocr only: "<<ocr_only<<"; author: "<<author<<"; publicated after: "<<pubafter<<"; publicated before: "<<pubbef<<"; sorting by relevance: "<<sortway<<"; searched pillars: "<<pill<<"; vector pillar size: "<<pillars.size()<<std::endl;
+	    std::cout<<"Query: "<<query<<"; fuzz: "<<fuzz<<"; title only: "<<auth_only<<"; ocr only: "<<ocr_only<<"; author: "<<author<<"; publicated after: "<<pubafter<<"; publicated before: "<<pubbef<<"; searched pillars: "<<pill<<"; vector pillar size: "<<pillars.size()<<std::endl;
 
 
-	    CSearchOptions options(query,fuzz,pillars,auth_only,ocr_only,author,pubafter,pubbef,true,sortway);
+	    CSearchOptions options(query,fuzz,pillars,auth_only,ocr_only,author,pubafter,pubbef,true,true);
 	    std::cout<<"Starting search!"<<std::endl;
 
+	    auto start = std::chrono::system_clock::now();
 	    auto bklst = manager.search(&options);
 	    std::cout<<"Finished searching constructing response json"<<std::endl;
 	    nlohmann::json js;
 
-	    auto start = std::chrono::system_clock::now();
 	    auto &map = manager.getMapOfBooks();
 	    auto iter = bklst->begin();
 	    if(bklst->size()<(static_cast<unsigned int>(page-1)*10))

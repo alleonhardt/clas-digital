@@ -283,35 +283,21 @@ function ApplyFilterOptions()
 
 function OpenFilter()
 {
-	console.log("Called open filter!");
-	document.getElementById("ShowOnlyTextsWithOCR").checked = filterOpts["ShowOnlyTextsWithOCR"];
-	//Get the modal banner which contains all the advanced options
-	let advancedOpts = document.getElementById("FilterModal");
-	//Tell the modal banner it should display itself right now
-	advancedOpts.style.display = "block";
-
-	//Prepare the close button, on close click it will hide the modal banner
-	let close = document.getElementById("CloseFModal");
-	close.onclick = function() {
-		advancedOpts.style.display = "none";
-	}
-
-	//If the user clicked outside of the modal banner close the window as well
-	window.onclick = function(event) {
-		if (event.target == advancedOpts) {
-			advancedOpts.style.display = "none";
-		}
+	let val = getParameterByName('f_sort');
+	if(val==null)
+	    window.location = window.location + "&f_sort="+this.value;
+	else
+	{
+	    window.location = window.location.search.replace("f_sort="+val,"f_sort="+this.value);
 	}
 }
+
 
 function ShowSelectedValues(obj)
 {
 	let json = obj.drawablejson;
 	obj.innerHTML = "";
-					 document.getElementById("ResultBanner").innerHTML =  "<div style='margin-top: 2rem;margin-bottom:0;'><button class='specialultbut' onclick='OpenFilter();return true;' style='background:white;margin-right: 0.5rem;border: 0;'>Filter Results</button><button class='specialultbut' style='background:white;border: 0;' onclick='CreateBibliography();return true;'>Create Bibliography</button></div><hr style='padding: 0;'><span style='color: grey;'>"+json.max_results+" Ergebnisse gefunden in "+json.time+"s</span>";
-	//"<h1 class='headerStyle'>Search Results for: \""+lastInput+"\", "+json.books.length+" matches<a class='citationButton' onclick='OpenFilter();return true;'>Filter results</a><a class='buttontwo citationButton' style='margin-left: 1rem' onclick='CreateBibliography();return true;'>Create Bibliography</a></h1>";
-	//json.show_from = 0;
-	//json.show_to = Math.min(10,json.books.length);
+	  document.getElementById("ResultBanner").innerHTML =  "<div style='margin-top: 2rem;margin-bottom:0;'><select onchange='OpenFilter(this);return true;' class='specialultbut' onclick='return true;' style='background:white;margin-right: 0.5rem;border: 0;'><option value='sortrelevance'>Sort by relevance</option><option value='sortalphabetically'>Sort alphabetically</option><option value='sortchronologically'>Sort chronologically</option></select><button class='specialultbut' style='background:white;border: 0;' onclick='CreateBibliography();return true;'>Create Bibliography</button></div><hr style='padding: 0;'><span style='color: grey;'>"+json.max_results+" Ergebnisse gefunden in "+json.time+"s</span>";
 	obj.start = json.show_from;
 	
 	let bookvalues=[];
@@ -428,7 +414,6 @@ function sendToPage(name)
 		requ += "&author="+document.getElementById("SearchForAuthor").value;
 	requ += "&publicatedafter="+document.getElementById("PublicatedAfter").value;
 	requ +=  "&publicatedbefore="+ document.getElementById("PublicatedBefore").value;
-	requ+="&sortway="+document.getElementById("sortway").value;
 	let myList = document.getElementsByClassName("upSaule");
 	
 	requ+="&pillars=";
@@ -505,7 +490,6 @@ function LoadSearchData(sp)
 	document.getElementById("SearchForAuthor").value = sp.author_name;
 	document.getElementById("PublicatedAfter").value = sp.pub_after;
 	document.getElementById("PublicatedBefore").value = sp.pub_before;
-	document.getElementById("sortway").value = sp.sortway;
 	
 	document.getElementById('SliderNum').innerHTML = getSliderValue(sp.fuzzyness);
 	let pill = document.getElementsByClassName("upSaule");
@@ -527,7 +511,6 @@ function ApplySearchData()
 	search_parameters.author_name = document.getElementById("SearchForAuthor").value;
 	search_parameters.pub_after = document.getElementById("PublicatedAfter").value;
 	search_parameters.pub_before = document.getElementById("PublicatedBefore").value;
-	search_parameters.sortway = document.getElementById("sortway").value;
 	let pill = document.getElementsByClassName("upSaule");
 	search_parameters.pillars = null;
 	for(let i = 0; i < pill.length; i++)
@@ -566,12 +549,23 @@ function getParameterByName(name, url) {
 
 function ShowLinks()
 {
-    document.getElementById("SpecialSID").value = getParameterByName('q');
-    let obj = document.getElementById("SearchHitList");
-    obj.drawablejson = ServerDataObj.search;
-    obj.drawablejson.show_from = 0;
-    obj.drawablejson.show_to = Math.min(obj.drawablejson.books.length,10);
-    ShowSelectedValues(obj);
+
+	if(getParameterByName('ocr_only')==null)
+	    return;
+	document.getElementById("SearchInOCR").checked = getParameterByName('ocr_only')=='true';
+	document.getElementById("FuzzyID").value = parseInt(getParameterByName('fuzzyness'));
+	document.getElementById("SearchInTitle").checked = getParameterByName('title_only')=='true';
+	document.getElementById("SearchForAuthor").value =  getParameterByName('author');
+	document.getElementById("PublicatedAfter").value = parseInt(getParameterByName('publicatedafter'));
+	document.getElementById("PublicatedBefore").value = search_parameters.pub_before = parseInt(getParameterByName('publicatedbefore'));
+	
+
+	document.getElementById("SpecialSID").value = getParameterByName('q');
+	let obj = document.getElementById("SearchHitList");
+	obj.drawablejson = ServerDataObj.search;
+	obj.drawablejson.show_from = 0;
+	obj.drawablejson.show_to = Math.min(obj.drawablejson.books.length,10);
+	ShowSelectedValues(obj);
 }
 		</script>
 		<style>
@@ -651,35 +645,13 @@ function ShowLinks()
 					<input id="PublicatedAfter" type="number" step="1" min="0" value="0">
 					<p class="slider"> until </p>
 					<input id="PublicatedBefore" type="number" step="1" min="1" value="2018">
-				</div>
-				<select id='sortway' style='margin-bottom: 1rem;'>
-					<option value="sortbyrevelance">Sort hits by relevance</option>
-					<option value="sortbyalphabeticalaz" selected>Sort hits alphabetically ascending</option>
-					<option value="sortbyalphabeticalza">Sort hits alphabetically descending</option>
-
-				</select>
-				
+				</div>			
 				<div>
 					<button class='btn btn-outline-success my2 my-sm-0 inlineButton' onclick="ApplySearchData();">Apply</button>
 					<button class='btn btn-outline-info my2 my-sm-0 inlineButton' onclick="ResetToDefault();">Reset to default</button>
 				</div>
 			</div>
 		</div>
-
-		<div id="FilterModal" class="modal">
-			<div class="modal-content">
-				<span id="CloseFModal" class="close">&times;</span>
-				<p>This is the new filter option</p>
-	<label class="container">
-		Show only books with OCR
-		<input id="ShowOnlyTextsWithOCR" type="checkbox">
-  <span class="checkmark"></span>
-</label>	
-<button class='btn btn-outline-success my2 my-sm-0' style='width: 10%' onclick="document.getElementById('FilterModal').style.display='none';ApplyFilterOptions();return true;">Apply</button>
-			
-			</div>
-		</div>
-
 
 		<div id="searchboxid" class="button_box_top">
 				<!--<div class="form-wrapper-2 cf"> -->
