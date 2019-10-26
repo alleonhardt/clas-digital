@@ -177,7 +177,7 @@ std::vector<std::string> split2(std::string str, std::string delimiter)
     return vStr;
 }
 
-std::string convertStr(std::string &str)
+std::string convertStr(std::string& str)
 {
     std::map<wchar_t, wchar_t> rep = {{L'ä','a'},{L'ö','o'},{L'ü','u'},{L'ö','o'},{L'é','e'},{L'è','e'},{L'á','a'},{L'ê','e'},{L'â','a'}};
     

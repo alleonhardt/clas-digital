@@ -25,11 +25,8 @@ private:
     std::unordered_map<std::string, std::list<std::pair<std::string, double>>> m_mapFuzzy;
 
     //Map of words_pages
-    std::unordered_map<std::string, std::vector<size_t>> m_mapWordsPages;
+    std::unordered_map<std::string, std::tuple<std::vector<size_t>, int, size_t>> m_mapWordsPages;
 
-    //map of relavance
-    std::unordered_map<std::string, int> m_mapRelevance;
-    std::unordered_map<std::string, size_t> m_mapPreview;
     int m_numPages;
 
 
@@ -94,9 +91,8 @@ public:
     bool getPublic();
 
 
-    std::unordered_map<std::string, std::vector<size_t>>&   getMapWordsPages();
+    std::unordered_map<std::string, std::tuple<std::vector<size_t>, int, size_t>>&   getMapWordsPages();
     std::unordered_map<std::string, std::list<std::pair<std::string, double>>>& getMapFuzzy();
-    std::unordered_map<std::string, int>&                   getMapRelevance();
 
  
     // **** SETTER **** //
@@ -141,16 +137,10 @@ public:
     */
     std::map<int, std::vector<std::string>>* findPages(std::string sWord, bool fuzzyness);
 
-    /** 
-    * @brief Create map of pages and found words for i-word (fuzzy).
-    * @return map of all pages on which word was found.
-    */
-    std::map<int, std::vector<std::string>>* findPagesFuzzy(std::string sWord, std::unordered_map<std::string, std::vector<size_t>>& mapWordsPages);
-
     /**
     * @brief Remove all elements from mapPages, which do not exist in results2. 
     */
-    void removePages(std::map<int, std::vector<std::string>>* mapPages, std::map<int, std::vector<std::string>>* results2);
+    void removePages(std::map<int, std::vector<std::string>>* results1, std::map<int, std::vector<std::string>>* results2);
 
 
 

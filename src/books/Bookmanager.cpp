@@ -68,8 +68,6 @@ void CBookManager::updateZotero(nlohmann::json j_items)
 * @param[in] sKey key to book
 */
 void CBookManager::addBook(std::string sKey) {
-
-    std::cout << "Adding book " << sKey << std::endl;
     if(!std::experimental::filesystem::exists("web/books/" + sKey))
         return;
 
@@ -146,7 +144,7 @@ void CBookManager::createMapWords()
 
         //Iterate over all words in this book. Check whether word already exists in list off all words.
         for(auto yt : it->second->getMapWordsPages())
-            m_mapWords[yt.first][it->first] = static_cast<double>(it->second->getMapRelevance()[yt.first])/it->second->getNumPages();
+            m_mapWords[yt.first][it->first] = static_cast<double>(std::get<1>(it->second->getMapWordsPages()[yt.first]))/it->second->getNumPages();
     }
 } 
 
