@@ -45,7 +45,7 @@ class User {
 		if(this.ServerDataObj.user == undefined)
 		{
 				let x = document.getElementById("loggedintopnav");
-				x.innerHTML = '<form id ="LoginForm" class="form-inline my-2 my-lg-0" action="/login" method="post"><input id="EmailType" class="form-control mr-sm-2" type="email" name="email" placeholder="Email" aria-label="Email" required><input id="PasswordType" class="from-control mr-sm-2" type="password" name="password" placeholder="Password" aria-label="Password" required><input class="btn btn-outline-success my-2 my-sm-0" type="submit" value="Log In"/></form>';
+				x.innerHTML = '<form id ="LoginForm" class="form-inline my-2 my-lg-0" action="/login" method="post"><input id="EmailType" class="form-control mr-sm-2" type="email" name="email" placeholder="Email" aria-label="Email" required><input id="PasswordType" class="form-control mr-sm-2" type="password" name="password" placeholder="Password" aria-label="Password" required><input class="btn btn-outline-success my-2 my-sm-0" type="submit" value="Log In"/></form>';
 		}
 		else
 		{
