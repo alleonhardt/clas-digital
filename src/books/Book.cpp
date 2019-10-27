@@ -15,6 +15,7 @@ CBook::CBook(nlohmann::json jMetadata) : m_metadata(jMetadata)
     //Metadata
     m_sAuthor = m_metadata.getAuthor();
     func::convertToLower(m_sAuthor);
+    if(m_sAuthor.size() == 0) m_sAuthor = "no author";
     m_date    = m_metadata.getDate();
 }
 

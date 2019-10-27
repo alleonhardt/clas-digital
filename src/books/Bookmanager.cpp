@@ -120,8 +120,8 @@ std::list<std::string>* CBookManager::convertToList(std::map<std::string, double
         compFunctor =
 			[](const auto &a,const auto &b)
 			{
-			if(a.second == b.second)    return a.first < b.first;
-			return a.second < b.second;
+			if(a.second == b.second)    return a.first > b.first;
+			return a.second > b.second;
 			};
     else if (sorting == 1)
         compFunctor =
