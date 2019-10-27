@@ -252,6 +252,8 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
 	catch(std::exception &e)
 	{
 	    std::cout<<"Caught exception in search all books: "<<e.what()<<std::endl;
+	    resp.status = 400;
+	    // Custom message might not be needed if "400 Bad Request" can be returned and front-end webserver can do the rest?
 	    resp.set_content("<html><head></head><body><h1>Corrupted search request!</h1></body></html>","text/html");
 	    return;
 	}
