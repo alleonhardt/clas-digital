@@ -32,9 +32,14 @@ mark {
 }
 
 .linkcontainer:hover{
-    word-break: break-word;
+    overflow-wrap: break-word;
     overflow: visible;
 }
+
+.prev_next{
+    margin-bottom: 2%;
+}
+
 
 .some_grid_class {
 	display: grid;
@@ -389,6 +394,24 @@ function ShowSelectedValues(obj)
     }
     val+="</div>";
     obj.innerHTML+=val;
+
+    let next_prev = "<div class='prev_next'>";
+    let rep = getParameterByName('page');
+    rep = 'page='+rep;
+    let next_page=json.page+1;
+    let prev_page=json.page-1;
+
+    if(prev_page<1) 
+       prev_page=1;
+    if(next_page>json.max_results/10) 
+        next_page=json.max_results/10+1;
+
+    let prevlnk=window.location.search.replace(rep,"page="+prev_page);
+    next_prev+="<a style='margin-right: 2rem;' href='"+prevlnk+"'>"+"prev"+"</a>";
+    let nextlnk=window.location.search.replace(rep,"page="+next_page);
+    next_prev+="<a style='margin-right: 2rem;' href='"+nextlnk+"'>"+"next"+"</a>";
+    next_prev+="</div>";
+    obj.innerHTML+=next_prev;
 }
 
 
