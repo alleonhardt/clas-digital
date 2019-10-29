@@ -32,7 +32,7 @@ mark {
 }
 
 .linkcontainer:hover{
-    word-wrap: break-word;
+    word-break: break-word;
     overflow: visible;
 }
 
@@ -41,7 +41,13 @@ mark {
 	margin-top: 3rem;
 	grid-column-gap: 0;
 	grid-template-columns: 90% 10%;
+
 }
+
+.metadata{
+    width: 85%;
+}
+
 /*Keeping the search box in the middle in the top of the screen*/
 .button_box_top {
 	text-align: center;
@@ -344,7 +350,7 @@ function ShowSelectedValues(obj)
 			if(!json.books[i].hasocr || (json.books[i].hasocr == undefined))
 			{
 
-				inner = "<div class='some_grid_class'><a";
+				inner = "<div class='some_grid_class'><a '";
 			}
 			else
 			{
@@ -356,7 +362,7 @@ function ShowSelectedValues(obj)
 			inner+="' style='display: inline-grid;grid-column-start:1;grid-column-end:2;'><h4 style='text-align: left;float:left;'>";
 			
 			inner+=json.books[i].description+"</h4></a>   "+"<input onclick='this.was_clicked=1;return true;' class='booklistinp' style='width:1rem;height:1rem;display: inline-grid;grid-column-start:2;grid-column-end:3' data-scanid='"+json.books[i].scanId+"' type='checkbox' unchecked></div>";
-			inner+="<div onclick='callMetadata(this);' data-scanid='"+json.books[i].scanId+"' style='text-align: left;color: green;font-size: small;margin-top: -0.5rem; cursor: pointer;'>";
+			inner+="<div class='metadata' onclick='callMetadata(this);' data-scanid='"+json.books[i].scanId+"' style='text-align: left;color: green;font-size: small;margin-top: -0.5rem; cursor: pointer;'>";
 			inner+=json.books[i].bibliography;
 			inner+="</div><p style='text-align: left;' id='";
 			inner+=json.books[i].scanId;
