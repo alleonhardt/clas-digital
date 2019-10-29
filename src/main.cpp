@@ -39,24 +39,24 @@ void do_createbiblio(const Request &req,Response &resp,CBookManager &manager)
 	size_t x_last = 0;
 	for(;;)
 	{
-		x_new = inBookView.find(",",x_last);
-		std::string key;
-		if(x_new == std::string::npos)
-			key = inBookView.substr(x_last);
-		else
-			key = inBookView.substr(x_last,x_new-x_last);
+	    x_new = inBookView.find(",",x_last);
+	    std::string key;
+	    if(x_new == std::string::npos)
+		key = inBookView.substr(x_last);
+	    else
+		key = inBookView.substr(x_last,x_new-x_last);
 
-		try
-		{
-			auto &book = mapBooks[key];
-			retval+= "<p>";
-			retval+= book->getMetadata().getMetadata()["citation"];
-			retval+="</p>";
-		}
-		catch(...) {}
+	    try
+	    {
+		auto &book = mapBooks[key];
+		retval+= "<p>";
+		retval+= book->getMetadata().getMetadata()["citation"];
+		retval+="</p>";
+	    }
+	    catch(...) {}
 
-		if(x_new==std::string::npos) break;
-		x_last = x_new+1;
+	    if(x_new==std::string::npos) break;
+	    x_last = x_new+1;
 	}
 	retval+="</body></html>";
 	resp.set_content(retval.c_str(),"text/html");
@@ -135,7 +135,7 @@ void do_searchinbook(const Request& req, Response &resp, CBookManager &manager)
 	auto book = manager.getMapOfBooks().at(scanId);
 	nlohmann::json js;
 	js["is_fuzzy"] = true;
-	
+
 	if(Fuzzyness==0) {js["is_fuzzy"] = false;}
 
 
@@ -218,28 +218,36 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
 	    auto &map = manager.getMapOfBooks();
 	    auto iter = bklst->begin();
 	    if(bklst->size()<(static_cast<unsigned int>(page-1)*10))
-		throw 0;
-	    std::advance(iter,(page-1)*10);
-	    int counter = 0;
-	    for(;iter!=bklst->end();++iter)
 	    {
-		auto &it = map.at(*iter);
-		nlohmann::json entry;
-		entry["scanId"] = it->getKey();
-		entry["copyright"] = !it->getPublic();
-		entry["hasocr"] = it->getOcr();
-		entry["description"] = it->getMetadata().getShow();
-		entry["bibliography"] = it->getMetadata().getMetadata("bib");
-		entry["preview"] = it->getPreview(options.getSearchedWord());
-		js["books"].push_back(std::move(entry));
-		if(++counter==10)
-		    break;
-	    } 
+		js["max_results"] = 0;
+		js["page"] = page;
+		js["time"] = 0;
+	    }
+	    else
+	    {
 
-	    js["max_results"] = bklst->size();
-	    js["page"] = page;
-	    std::chrono::duration<double> elapsed_seconds = std::chrono::system_clock::now()-start;
-	    js["time"] = elapsed_seconds.count();
+		std::advance(iter,(page-1)*10);
+		int counter = 0;
+		for(;iter!=bklst->end();++iter)
+		{
+		    auto &it = map.at(*iter);
+		    nlohmann::json entry;
+		    entry["scanId"] = it->getKey();
+		    entry["copyright"] = !it->getPublic();
+		    entry["hasocr"] = it->getOcr();
+		    entry["description"] = it->getMetadata().getShow();
+		    entry["bibliography"] = it->getMetadata().getMetadata("bib");
+		    entry["preview"] = it->getPreview(options.getSearchedWord());
+		    js["books"].push_back(std::move(entry));
+		    if(++counter==10)
+			break;
+		} 
+
+		js["max_results"] = bklst->size();
+		js["page"] = page;
+		std::chrono::duration<double> elapsed_seconds = std::chrono::system_clock::now()-start;
+		js["time"] = elapsed_seconds.count();
+	    }
 	    std::cout<<"Finished constructing json response. Constructing html response!"<<std::endl;
 	    std::string app = fileSearchHtml;
 	    app+="<script>let ServerDataObj = {pillars:";
