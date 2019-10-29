@@ -653,12 +653,30 @@ function ShowLinks()
 		{
 		let inp = document.getElementById("SpecialSID");
 		inp.focus();
-		inp.addEventListener("keypress",function(event){
-			if(event.key == "Enter")
+		inp.addEventListener("keydown",function(event){
+
+            if(event.key == "Enter")
 			{
 				document.getElementById("srchButton").click();
 			}
-		});
+
+            let curPage = parseInt(getParameterByName('page'));  
+            let nextPage=curPage;
+            if(event.key == ">") 
+            {
+                nextPage = curPage+1;
+                window.location=window.location.search.replace('page='+curPage, 'page='+nextPage);
+            }
+            if(event.key == "<")
+            {
+                nextPage = curPage-1;
+                if(nextPage < 1)
+                    nextPage = 1;
+                window.location=window.location.search.replace('page='+curPage, 'page='+nextPage);
+            }
+
+            
+		}, true);
 
 			if(ServerDataObj===undefined)
 			{
