@@ -385,7 +385,11 @@ function ShowSelectedValues(obj)
 	let rep = getParameterByName('page');
 	rep = 'page='+rep;
 
-	let newlnk=window.location.search.replace(rep,"page="+counter);
+	let newlnk='';
+	if(getParameterByName('page')==null)
+	    newlnk = window.location.search+"&page="+counter;
+	else
+	    newlnk=window.location.search.replace(rep,"page="+counter);
 	if(json.page==counter)
 	    val+="<a style='margin-right: 1rem;' disabled>"+counter+"</a>";
 	  else
@@ -406,9 +410,20 @@ function ShowSelectedValues(obj)
     if(next_page>json.max_results/10) 
         next_page=json.max_results/10+1;
 
-    let prevlnk=window.location.search.replace(rep,"page="+prev_page);
+    let prevlnk = '';
+    let nextlnk = '';
+    if(getParameterByName('page')==null)
+    {
+	prevlnk = window.location.search + "&page="+prev_page;
+	nextlnk = window.location.search + "&page="+next_page;
+    }
+    else
+    {
+	prevlnk=window.location.search.replace(rep,"page="+prev_page);
+	nextlnk=window.location.search.replace(rep,"page="+next_page);
+    }
+
     next_prev+="<a style='margin-right: 2rem;' href='"+prevlnk+"'>"+"prev"+"</a>";
-    let nextlnk=window.location.search.replace(rep,"page="+next_page);
     next_prev+="<a style='margin-right: 2rem;' href='"+nextlnk+"'>"+"next"+"</a>";
     next_prev+="</div>";
     obj.innerHTML+=next_prev;
