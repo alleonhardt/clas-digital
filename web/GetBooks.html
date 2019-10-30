@@ -235,6 +235,11 @@ padding-bottom: 0.8rem;
 padding-right: 0;
 }
 
+.pagelayout {
+    font-weight: bold;
+    float: left;
+}
+
 .page:first-child {
 	padding-top: 1rem;
 }
@@ -477,9 +482,9 @@ async function deleteAll()
 
 function UpdateOCRTxt(x,res)
 {
-	  let RegSrch = /-----\s(\d+)\s/g;
+	  let RegSrch = /-----\s(\d+)\s.\s(\d+)\s-----/g;
 	x = '<p data-page="1" class="ocrpage">' + x;
-	x = x.replace(RegSrch,'</p><p data-page="$1" id="uniqueocrpage$1" class="ocrpage" ondblclick="SwitchToPage(this);">\n----- $1 ');
+    x = x.replace(RegSrch,'</p><p data-page="$1" id="uniqueocrpage$1" class="ocrpage" ondblclick="SwitchToPage(this);"><span class="pagelayout"> Page $1 / $2 </span><br>');
   	x+="</p>";
 	
 	document.getElementById("OCRBuffer").innerHTML = x;
