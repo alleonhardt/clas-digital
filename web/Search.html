@@ -27,14 +27,32 @@ mark {
     margin: auto;
     width: 80%;
     padding-bottom: 1.5rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
+
+.linkcontainer:hover{
+    overflow-wrap: break-word;
+    overflow: visible;
+}
+
+.prev_next{
+    margin-bottom: 2%;
+}
+
 
 .some_grid_class {
 	display: grid;
 	margin-top: 3rem;
 	grid-column-gap: 0;
 	grid-template-columns: 90% 10%;
+
 }
+
+.metadata{
+    width: 85%;
+}
+
 /*Keeping the search box in the middle in the top of the screen*/
 .button_box_top {
 	text-align: center;
@@ -310,6 +328,10 @@ function OpenFilter()
 	}
 }
 
+function callMetadata(x)
+{
+    window.location = "/ShowMetadata.html?scanId="+x.dataset.scanid;
+}
 
 function ShowSelectedValues(obj)
 {
@@ -333,7 +355,7 @@ function ShowSelectedValues(obj)
 			if(!json.books[i].hasocr || (json.books[i].hasocr == undefined))
 			{
 
-				inner = "<div class='some_grid_class'><a href='/ShowMetadata.html";
+				inner = "<div class='some_grid_class'><a '";
 			}
 			else
 			{
@@ -345,7 +367,7 @@ function ShowSelectedValues(obj)
 			inner+="' style='display: inline-grid;grid-column-start:1;grid-column-end:2;'><h4 style='text-align: left;float:left;'>";
 			
 			inner+=json.books[i].description+"</h4></a>   "+"<input onclick='this.was_clicked=1;return true;' class='booklistinp' style='width:1rem;height:1rem;display: inline-grid;grid-column-start:2;grid-column-end:3' data-scanid='"+json.books[i].scanId+"' type='checkbox' unchecked></div>";
-			inner+="<div style='text-align: left;color: green;font-size: small;margin-top: -0.5rem;'>";
+			inner+="<div class='metadata' onclick='callMetadata(this);' data-scanid='"+json.books[i].scanId+"' style='text-align: left;color: green;font-size: small;margin-top: -0.5rem; cursor: pointer;'>";
 			inner+=json.books[i].bibliography;
 			inner+="</div><p style='text-align: left;' id='";
 			inner+=json.books[i].scanId;
@@ -372,6 +394,24 @@ function ShowSelectedValues(obj)
     }
     val+="</div>";
     obj.innerHTML+=val;
+
+    let next_prev = "<div class='prev_next'>";
+    let rep = getParameterByName('page');
+    rep = 'page='+rep;
+    let next_page=json.page+1;
+    let prev_page=json.page-1;
+
+    if(prev_page<1) 
+       prev_page=1;
+    if(next_page>json.max_results/10) 
+        next_page=json.max_results/10+1;
+
+    let prevlnk=window.location.search.replace(rep,"page="+prev_page);
+    next_prev+="<a style='margin-right: 2rem;' href='"+prevlnk+"'>"+"prev"+"</a>";
+    let nextlnk=window.location.search.replace(rep,"page="+next_page);
+    next_prev+="<a style='margin-right: 2rem;' href='"+nextlnk+"'>"+"next"+"</a>";
+    next_prev+="</div>";
+    obj.innerHTML+=next_prev;
 }
 
 
@@ -613,12 +653,30 @@ function ShowLinks()
 		{
 		let inp = document.getElementById("SpecialSID");
 		inp.focus();
-		inp.addEventListener("keypress",function(event){
-			if(event.key == "Enter")
+		inp.addEventListener("keydown",function(event){
+
+            if(event.key == "Enter")
 			{
 				document.getElementById("srchButton").click();
 			}
-		});
+
+            let curPage = parseInt(getParameterByName('page'));  
+            let nextPage=curPage;
+            if(event.key == ">") 
+            {
+                nextPage = curPage+1;
+                window.location=window.location.search.replace('page='+curPage, 'page='+nextPage);
+            }
+            if(event.key == "<")
+            {
+                nextPage = curPage-1;
+                if(nextPage < 1)
+                    nextPage = 1;
+                window.location=window.location.search.replace('page='+curPage, 'page='+nextPage);
+            }
+
+            
+		}, true);
 
 			if(ServerDataObj===undefined)
 			{
