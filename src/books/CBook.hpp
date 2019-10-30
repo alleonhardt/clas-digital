@@ -159,6 +159,9 @@ public:
     */
     std::string getPreview(std::string sWord);
 
+    std::string getPreviewText(std::string& sWord, size_t& pos);
+    std::string getPreviewTitle(std::string& sWord, size_t& pos);
+
     /*
     * @brief Find preview with matched word (best match), and page on which the match was found.
     * @param[in] sWord (best Match)
