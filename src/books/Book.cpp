@@ -77,14 +77,14 @@ void CBook::createBook(std::string sPath)
     if(!readOcr)
         return;
 
-    //std::ifstream readWords(m_sPath + "/pages_new.txt");
-    //if(!readWords || readWords.peek() == std::ifstream::traits_type::eof() ) {
+    std::ifstream readWords(m_sPath + "/pages_new.txt");
+    if(!readWords || readWords.peek() == std::ifstream::traits_type::eof() ) {
         createPages();
         createMapPreview();
         safePages();
-    //}
+    }
 
-    //else
+    else
         loadPages();
 
     m_bOcr = true;
