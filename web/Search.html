@@ -713,6 +713,12 @@ function ShowLinks()
             if(event.key == ">") 
             {
                 nextPage = curPage+1;
+                if(getParameterByName('q') != null && getParameterByName('page') == null) {
+                    newUrl = window.location.search;
+                    newUrl+='&page=2';
+                    window.location=newUrl;
+                }
+
                 window.location=window.location.search.replace('page='+curPage, 'page='+nextPage);
             }
             if(event.key == "<")
