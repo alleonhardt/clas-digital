@@ -4,6 +4,7 @@
 #include <list>
 #include <string>
 #include "func.hpp"
+#include "fuzzy.hpp"
 #include "CMetadata.hpp"
 
 #pragma once 
