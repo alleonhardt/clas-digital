@@ -423,8 +423,8 @@ function ShowSelectedValues(obj)
 	nextlnk=window.location.search.replace(rep,"page="+next_page);
     }
 
-    next_prev+="<a style='margin-right: 2rem;' href='"+prevlnk+"'>"+"prev"+"</a>";
-    next_prev+="<a style='margin-right: 2rem;' href='"+nextlnk+"'>"+"next"+"</a>";
+    next_prev+="<a style='margin-right: 2rem; padding: 1.5em; margin:0em' href='"+prevlnk+"'>"+"prev"+"</a>";
+    next_prev+="<a style='margin-right: 2rem; padding: 1.5em; margin:0em' href='"+nextlnk+"'>"+"next"+"</a>";
     next_prev+="</div>";
     obj.innerHTML+=next_prev;
 }
