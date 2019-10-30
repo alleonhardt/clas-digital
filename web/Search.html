@@ -287,44 +287,22 @@ let jsonObj = {}
 let lastInput ="";
 let filterOpts = {};
 let gCurrentSearchId = -1;
-function ApplyFilterOptions()
-{
-	filterOpts["ShowOnlyTextsWithOCR"] = document.getElementById("ShowOnlyTextsWithOCR").checked;
-	let x = filterOpts["ShowOnlyTextsWithOCR"];
 
-	let newjson = {};
-	newjson.show_from = 0;
-	
-	for(var i = 0; i < jsonObj.books.length; i++)
-	{
-		if(x && (!jsonObj.books[i].hasocr||(jsonObj.books[i].hasocr == undefined)))
-		{
-		}
-		else
-		{
-			if(newjson.books==undefined)
-				newjson.books = [jsonObj.books[i]];
-			else
-				newjson.books.push(jsonObj.books[i]);
-		}
+function OpenFilter(x)
+{
+	let retval = x.value;
+	let lnk = window.location.search;
+	if(getParameterByName('page')!=null)
+	{	
+	    lnk = window.location.search.replace("page="+getParameterByName('page'),"page=1");
 	}
-	
-	newjson.show_to = Math.min(10,newjson.books.length);
-	let obj = document.getElementById("SearchHitList");
-	obj.drawablejson = newjson;
-	ShowSelectedValues(obj);
-}
 
-function OpenFilter()
-{
-	let retval = document.getElementById('filterselect').value;
-	let lnk = window.location.search.replace("page="+getParameterByName('page'),"page=1");
-	let val = getParameterByName('f_sort');
+	let val = getParameterByName(x.id);
 	if(val==null)
-	    window.location = lnk + "&f_sort="+retval;
+	    window.location = lnk + "&"+x.id+"="+retval;
 	else
 	{
-	    window.location = lnk.replace("f_sort="+val,"f_sort="+retval);
+	    window.location = lnk.replace(x.id+"="+val,x.id+"="+retval);
 	}
 }
 
@@ -337,7 +315,7 @@ function ShowSelectedValues(obj)
 {
 	obj.innerHTML = "";
 	let json = obj.drawablejson;
-	  document.getElementById("ResultBanner").innerHTML =  "<div style='margin-top: 2rem;margin-bottom:0;'><select id='filterselect' onchange='OpenFilter(this);return true;' class='specialultbut' onclick='return true;' style='background:white;margin-right: 0.5rem;border: 0;'><option value='0'>Sort by relevance</option><option value='2'>Sort alphabetically</option><option value='1'>Sort chronologically</option></select><button class='specialultbut' style='background:white;border: 0;' onclick='CreateBibliography();return true;'>Create Bibliography</button></div><hr style='padding: 0;'><span style='color: grey;'>"+json.max_results+" Ergebnisse gefunden in "+json.time+"s</span>";
+    document.getElementById("ResultBanner").innerHTML =  "<div style='margin-top: 2rem;margin-bottom:0;'><select id='maxresultsperpage' onchange='OpenFilter(this);return true;' class='specialultbut' style='background:white;margin-right:0.5rem;border:0;'><option value='10'>Show 10 results per page</option><option value='20'>Show 20 results per page</option><option value='50'>Show 50 results per page</option><option value='1000000'>Show all results per page</option></select><select id='f_sort' onchange='OpenFilter(this);return true;' class='specialultbut' onclick='return true;' style='background:white;margin-right: 0.5rem;border: 0;'><option value='0'>Sort by relevance</option><option value='2'>Sort alphabetically</option><option value='1'>Sort chronologically</option></select><button class='specialultbut' style='background:white;border: 0;' onclick='CreateBibliography();return true;'>Create Bibliography</button></div><hr style='padding: 0;'><span style='color: grey;'>"+json.max_results+" Ergebnisse gefunden in "+json.time+"s</span>";
 	if(json.max_results==0)
 	    return;
 	obj.start = json.show_from;
@@ -379,7 +357,10 @@ function ShowSelectedValues(obj)
 	
     let val = "<hr><div class='linkcontainer'>";
     let counter = 1;
-    for(let i = 0; i < json.max_results; i+=10)
+    let resultsperpage = 10;
+    if(getParameterByName('maxresultsperpage')!=null)
+	resultsperpage = parseInt(getParameterByName('maxresultsperpage'));
+    for(let i = 0; i < json.max_results; i+=resultsperpage)
     {
 	let lnk = window.location.search;
 	let rep = getParameterByName('page');
@@ -407,8 +388,8 @@ function ShowSelectedValues(obj)
 
     if(prev_page<1) 
        prev_page=1;
-    if(next_page>json.max_results/10) 
-        next_page=json.max_results/10+1;
+    if(next_page>json.max_results/resultsperpage) 
+        next_page=json.page;
 
     let prevlnk = '';
     let nextlnk = '';
@@ -427,41 +408,6 @@ function ShowSelectedValues(obj)
     next_prev+="<a style='margin-right: 2rem; padding: 1.5em; margin:0em' href='"+nextlnk+"'>"+"next"+"</a>";
     next_prev+="</div>";
     obj.innerHTML+=next_prev;
-}
-
-
-function SelectSmallSlice()
-{
-	let obj = document.getElementById("SearchHitList");
-	obj.drawablejson.show_from = 0;
-	obj.drawablejson.show_to = Math.min(obj.drawablejson.books.length,10);
-	ShowSelectedValues(document.getElementById("SearchHitList"));
-
-}
-
-function SelectAllSlice()
-{
-	let obj = document.getElementById("SearchHitList");
-	obj.drawablejson.show_from = 0;
-	obj.drawablejson.show_to = obj.drawablejson.books.length;
-	ShowSelectedValues(document.getElementById("SearchHitList"));
-}
-
-function SelectNextSlice(up)
-{
-	let obj = document.getElementById("SearchHitList");
-	if(up)
-	{
-		obj.drawablejson.show_from = Math.min(obj.drawablejson.show_from+10,obj.drawablejson.books.length-1);
-		obj.drawablejson.show_to=Math.min(obj.drawablejson.show_from+10,obj.drawablejson.books.length);
-		ShowSelectedValues(document.getElementById("SearchHitList"));
-	}
-	else
-	{
-		obj.drawablejson.show_from = Math.max(obj.drawablejson.show_from-10,0);
-		obj.drawablejson.show_to=Math.min(obj.drawablejson.show_from+10,obj.drawablejson.books.length);
-		ShowSelectedValues(document.getElementById("SearchHitList"));
-	}
 }
 
 
@@ -637,7 +583,6 @@ function getParameterByName(name, url) {
 
 function ShowLinks()
 {
-
 	if(getParameterByName('ocr_only')!=null) document.getElementById("SearchInOCR").checked = getParameterByName('ocr_only')=='true';
 
 	if(getParameterByName('fuzzyness')!=null) document.getElementById("FuzzyID").value = parseInt(getParameterByName('fuzzyness'));
@@ -673,13 +618,17 @@ function ShowLinks()
 	console.log(ServerDataObj);
 	let obj = document.getElementById("SearchHitList");
 	obj.drawablejson = ServerDataObj.search;
+	let maxResult = 10;
+	if(getParameterByName('maxresultsperpage')!=null)
+	    maxResult = parseInt(getParameterByName('maxresultsperpage'));
 	if(ServerDataObj.search.max_results!=0)
 	{
 	    obj.drawablejson.show_from = 0;
-	    obj.drawablejson.show_to = Math.min(obj.drawablejson.books.length,10);
+	    obj.drawablejson.show_to = Math.min(obj.drawablejson.books.length,maxResult);
 	}
 	ShowSelectedValues(obj);
 	if(getParameterByName('f_sort')!=null) document.getElementById("filterselect").value = getParameterByName('f_sort');
+	if(getParameterByName('maxresultsperpage')!=null) document.getElementById("maxresultsperpage").value = getParameterByName('maxresultsperpage');
 	ApplySearchData();
 	default_search_parameters = JSON.parse(JSON.stringify(search_parameters));
 }

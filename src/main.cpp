@@ -191,6 +191,8 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
 	    int pubbef = 2019;
 	    std::vector<std::string> pillars;
 	    std::string debugpill;
+	    int resultsperpage = 10;
+
 	    for(auto &it : zoteroPillars)
 	    {
 		debugpill+=it["key"];
@@ -218,11 +220,11 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
 	    try{pubbef = std::stoi(req.get_param_value("publicatedbefore"));}catch(...){};
 	    try{page = std::stoi(req.get_param_value("page"));}catch(...){};
 	    try{sort = std::stoi(req.get_param_value("f_sort",0));}catch(...){};
-
+	    try{resultsperpage = std::stoi(req.get_param_value("maxresultsperpage",0));}catch(...){};
 
 
 	    std::cout<<"Receveived search request!"<<std::endl;
-	    std::cout<<"Query: "<<query<<"; fuzz: "<<fuzz<<"; title only: "<<auth_only<<"; ocr only: "<<ocr_only<<"; author: "<<author<<"; publicated after: "<<pubafter<<"; publicated before: "<<pubbef<<"; searched pillars: "<<debugpill<<"; vector pillar size: "<<pillars.size()<<"; sorting with value: "<<sort<<std::endl;
+	    std::cout<<"Query: "<<query<<"; fuzz: "<<fuzz<<"; title only: "<<auth_only<<"; ocr only: "<<ocr_only<<"; author: "<<author<<"; publicated after: "<<pubafter<<"; publicated before: "<<pubbef<<"; searched pillars: "<<debugpill<<"; vector pillar size: "<<pillars.size()<<"; sorting with value: "<<sort<<" and max results per page: "<<resultsperpage<<std::endl;
 
 
 	    CSearchOptions options(query,fuzz,pillars,auth_only,ocr_only,author,pubafter,pubbef,true,sort);
@@ -235,7 +237,7 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
 
 	    auto &map = manager.getMapOfBooks();
 	    auto iter = bklst->begin();
-	    if(bklst->size()<(static_cast<unsigned int>(page-1)*10))
+	    if(bklst->size()<(static_cast<unsigned int>(page-1)*resultsperpage))
 	    {
 		js["max_results"] = 0;
 		js["page"] = page;
@@ -244,7 +246,7 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
 	    else
 	    {
 
-		std::advance(iter,(page-1)*10);
+		std::advance(iter,(page-1)*resultsperpage);
 		int counter = 0;
 		for(;iter!=bklst->end();++iter)
 		{
@@ -257,7 +259,7 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
 		    entry["bibliography"] = it->getMetadata().getMetadata("bib");
 		    entry["preview"] = it->getPreview(options.getSearchedWord());
 		    js["books"].push_back(std::move(entry));
-		    if(++counter==10)
+		    if(++counter==resultsperpage)
 			break;
 		} 
 
