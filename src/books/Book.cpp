@@ -243,24 +243,25 @@ std::map<int, std::vector<std::string>>* CBook::findPages(std::string sWord, boo
     }
 
     //Fuzzyness = true
-    else {
-        //try map of fuzzy matches
+    else
+    {
+        //1. try map of fuzzy matches
         if(m_mapFuzzy.count(sWord) > 0) {
             for(auto elem : m_mapFuzzy[sWord]) {
-                for(auto page : std::get<0>(m_mapWordsPages[elem.first])) 
+                for(auto page : std::get<0>(m_mapWordsPages[elem.first]))
                     (*mapPages)[page].push_back(elem.first);
             }
         }
-        //Iterate over list of words
+
+        //2. Iterate over list of words
         else {
             for(auto it : m_mapWordsPages) {
                 if(fuzzy::fuzzy_cmp(it.first, sWord) <= 0.2) {
-                    for(auto page : std::get<0>(it.second)) {
+                    for(auto page : std::get<0>(it.second))
                         (*mapPages)[page].push_back(it.first);
-                    }
                 }
             }
-       }
+        }
     }
 
     return mapPages;
