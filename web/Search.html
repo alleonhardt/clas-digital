@@ -662,7 +662,10 @@ function ShowLinks()
             if(event.key == ">") 
             {
                 nextPage = curPage+1;
-                window.location=window.location.search.replace('page='+curPage, 'page='+nextPage);
+                if(getParameterByName('q')!=null && getParameterByName('page')==null)
+                    window.location=window.location.search+'&page=2';
+                else
+                    window.location=window.location.search.replace('page='+curPage, 'page='+nextPage);
             }
             if(event.key == "<")
             {
