@@ -182,29 +182,47 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
     {
 	try
 	{
-	    //It is a search query!
-	    std::string query = req.get_param_value("q",0);
-	    bool fuzz = std::stoi(req.get_param_value("fuzzyness",0))!=0;
-	    bool auth_only = req.get_param_value("title_only",0)=="true";
-	    bool ocr_only = req.get_param_value("ocr_only",0) == "true";
-	    std::string author = req.get_param_value("author",0);
-	    int pubafter = std::stoi(req.get_param_value("publicatedafter"));
-	    int pubbef = std::stoi(req.get_param_value("publicatedbefore"));
-	    std::string pill = req.get_param_value("pillars",0);
-	    int page = std::stoi(req.get_param_value("page"));
-	    int sort = -1;
-	    try{
-		sort = std::stoi(req.get_param_value("f_sort",0));
-	    }catch(...){};
-	    if(sort == -1) sort = 0;
-
+	    std::string query;
+	    bool fuzz = false;
+	    bool auth_only = false;
+	    bool ocr_only = false;
+	    std::string author = "";
+	    int pubafter = 0;
+	    int pubbef = 2019;
 	    std::vector<std::string> pillars;
+	    std::string debugpill;
+	    for(auto &it : zoteroPillars)
+	    {
+		debugpill+=it["key"];
+		debugpill+=";";
+		pillars.push_back(it["key"]);
+	    }
+	    int page = 1;
+	    int sort = 0;
 
 
-	    own_split(pill,',',pillars);
+	    //This is the only required parameter
+	    query = req.get_param_value("q",0);
+	    if(req.has_param("fuzzyness")) fuzz = std::stoi(req.get_param_value("fuzzyness",0))!=0;
+	    if(req.has_param("title_only")) auth_only = req.get_param_value("title_only",0)=="true";
+	    if(req.has_param("ocr_only")) ocr_only = req.get_param_value("ocr_only",0) == "true";
+	    if(req.has_param("author")) author = req.get_param_value("author",0);
+	    if(req.has_param("pillars"))
+	    {
+		pillars.clear();
+		debugpill = req.get_param_value("pillars",0);
+		own_split(debugpill,',',pillars);
+	    }
+
+	    try{pubafter = std::stoi(req.get_param_value("publicatedafter"));}catch(...){};
+	    try{pubbef = std::stoi(req.get_param_value("publicatedbefore"));}catch(...){};
+	    try{page = std::stoi(req.get_param_value("page"));}catch(...){};
+	    try{sort = std::stoi(req.get_param_value("f_sort",0));}catch(...){};
+
+
 
 	    std::cout<<"Receveived search request!"<<std::endl;
-	    std::cout<<"Query: "<<query<<"; fuzz: "<<fuzz<<"; title only: "<<auth_only<<"; ocr only: "<<ocr_only<<"; author: "<<author<<"; publicated after: "<<pubafter<<"; publicated before: "<<pubbef<<"; searched pillars: "<<pill<<"; vector pillar size: "<<pillars.size()<<"; sorting with value: "<<sort<<std::endl;
+	    std::cout<<"Query: "<<query<<"; fuzz: "<<fuzz<<"; title only: "<<auth_only<<"; ocr only: "<<ocr_only<<"; author: "<<author<<"; publicated after: "<<pubafter<<"; publicated before: "<<pubbef<<"; searched pillars: "<<debugpill<<"; vector pillar size: "<<pillars.size()<<"; sorting with value: "<<sort<<std::endl;
 
 
 	    CSearchOptions options(query,fuzz,pillars,auth_only,ocr_only,author,pubafter,pubbef,true,sort);

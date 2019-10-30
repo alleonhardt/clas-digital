@@ -468,19 +468,22 @@ function sendToPage(name)
 	console.log(requ);
 
 	//Create the json file with the advanced search options
-	requ += "&fuzzyness="+document.getElementById("FuzzyID").value;
-	requ += "&title_only="+document.getElementById("SearchInTitle").checked;
-	requ += "&ocr_only="+document.getElementById("SearchInOCR").checked;
-	if(document.getElementById("SearchForAuthor").value == "")
-		requ += "&author=";
-	else
+	if(document.getElementById("FuzzyID").value=="1")
+	    requ += "&fuzzyness=1";
+	if(document.getElementById("SearchInTitle").checked)
+	    requ += "&title_only=true";
+	if(document.getElementById("SearchInOCR").checked)
+	    requ += "&ocr_only=true";
+	if(document.getElementById("SearchForAuthor").value != "")
 		requ += "&author="+document.getElementById("SearchForAuthor").value;
-	requ += "&publicatedafter="+document.getElementById("PublicatedAfter").value;
-	requ +=  "&publicatedbefore="+ document.getElementById("PublicatedBefore").value;
+	if(document.getElementById("PublicatedAfter").value != 0)
+	    requ += "&publicatedafter="+document.getElementById("PublicatedAfter").value;
+	if(document.getElementById("PublicatedBefore").value != 2019)
+	    requ +=  "&publicatedbefore="+ document.getElementById("PublicatedBefore").value;
 	let myList = document.getElementsByClassName("upSaule");
 	
-	requ+="&pillars=";
 	let val = "";
+	let allPillars = true;
 	for(i = 0; i < myList.length; i++)
 	{
 		if(myList[i].checked)
@@ -490,9 +493,16 @@ function sendToPage(name)
 	 
 			val+=myList[i].dataset.key;
 		}
+		else
+		{
+		    allPillars=false;
+		}
 	}
-	val+="&page=1";
-	requ+=val;	
+	if(!allPillars)
+	{
+	  requ+="&pillars=";
+	  requ+=val;
+	}
 
        	window.location = requ;
 }
@@ -597,7 +607,7 @@ function ResetToDefault()
 	}
 }
 
-       window.addEventListener("load",function(){User.initialise('searchlink');ShowLinks();},false);
+       window.addEventListener("load",function(){User.initialise('searchlink');ExecuteInitialise();ShowLinks();},false);
 
 function getParameterByName(name, url) {
 //COPYRIGHT TO https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
@@ -613,18 +623,34 @@ function getParameterByName(name, url) {
 function ShowLinks()
 {
 
-	if(getParameterByName('ocr_only')==null)
-	    return;
-	document.getElementById("SearchInOCR").checked = getParameterByName('ocr_only')=='true';
-	document.getElementById("FuzzyID").value = parseInt(getParameterByName('fuzzyness'));
-	document.getElementById("SearchInTitle").checked = getParameterByName('title_only')=='true';
-	document.getElementById("SearchForAuthor").value =  getParameterByName('author');
-	document.getElementById("PublicatedAfter").value = parseInt(getParameterByName('publicatedafter'));
-	document.getElementById("PublicatedBefore").value = parseInt(getParameterByName('publicatedbefore'));
+	if(getParameterByName('ocr_only')!=null) document.getElementById("SearchInOCR").checked = getParameterByName('ocr_only')=='true';
+
+	if(getParameterByName('fuzzyness')!=null) document.getElementById("FuzzyID").value = parseInt(getParameterByName('fuzzyness'));
+
+	if(getParameterByName('title_only')!=null) document.getElementById("SearchInTitle").checked = getParameterByName('title_only')=='true';
+
+	if(getParameterByName('author')!=null) document.getElementById("SearchForAuthor").value =  getParameterByName('author');
+
+	  if(getParameterByName('publicatedafter')!=null) document.getElementById("PublicatedAfter").value = parseInt(getParameterByName('publicatedafter'));
+
+	  if(getParameterByName('publicatedbefore')!=null) document.getElementById("PublicatedBefore").value = parseInt(getParameterByName('publicatedbefore'));
 	
+	if(getParameterByName('pillars')!=null)
+	{
+	  let spec = getParameterByName('pillars');
+	  let res = spec.split(",");
+	  for(let i = 0; i < res.length; i++)
+	  {
+	    let chck = document.getElementById("uniqueSaule"+res[i]);
+	    if(chck!=null)
+		chck.checked = true;
+	  }
+
+	}
 
 	
 	document.getElementById("SpecialSID").value = getParameterByName('q');
+	console.log(ServerDataObj);
 	let obj = document.getElementById("SearchHitList");
 	obj.drawablejson = ServerDataObj.search;
 	if(ServerDataObj.search.max_results!=0)
@@ -634,6 +660,8 @@ function ShowLinks()
 	}
 	ShowSelectedValues(obj);
 	if(getParameterByName('f_sort')!=null) document.getElementById("filterselect").value = getParameterByName('f_sort');
+	ApplySearchData();
+	default_search_parameters = JSON.parse(JSON.stringify(search_parameters));
 }
 		</script>
 		<style>
@@ -689,17 +717,15 @@ function ShowLinks()
 					let x = document.getElementById("ordered_pillars");
 					for(let i = 0; i < ServerDataObj.pillars.length; i++)
 					{
-						x.innerHTML += "<li data-key='"+ServerDataObj.pillars[i].key+"'>"+ServerDataObj.pillars[i].name+"<input type='checkbox' data-key='"+ServerDataObj.pillars[i].key+"' class='upSaule' checked></li>";
+						x.innerHTML += "<li data-key='"+ServerDataObj.pillars[i].key+"'>"+ServerDataObj.pillars[i].name+"<input type='checkbox' data-key='"+ServerDataObj.pillars[i].key+"' class='upSaule' id='uniqueSaule"+ServerDataObj.pillars[i].key+"' checked></li>";
 					}
 				console.log("Server data found!");
 				}
 			}
-			ApplySearchData();
-			default_search_parameters = JSON.parse(JSON.stringify(search_parameters));
-		}
+	}
 	</script>
 	</head>
-	<body style='width: 100%; height: 100%;' onload="ExecuteInitialise()">
+	<body style='width: 100%; height: 100%;'>
 		<!-- The navigation bar config --> <div id='tpnav' class="topnav"></div>
 
 		<div id="StateBanner"></div><div id="ModalBanner" class="modal">
@@ -729,7 +755,7 @@ function ShowLinks()
 					<p class="slider">Search only in books publicated from</p>
 					<input id="PublicatedAfter" type="number" step="1" min="0" value="0">
 					<p class="slider"> until </p>
-					<input id="PublicatedBefore" type="number" step="1" min="1" value="2018">
+					<input id="PublicatedBefore" type="number" step="1" min="1" value="2019">
 				</div>			
 				<div>
 					<button class='btn btn-outline-success my2 my-sm-0 inlineButton' onclick="ApplySearchData();">Apply</button>
