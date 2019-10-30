@@ -660,7 +660,12 @@ function ShowLinks()
 	    if(chck!=null)
 		chck.checked = true;
 	  }
-
+	}
+	else
+	{
+	    let myList = document.getElementsByClassName("upSaule");
+	    for(let i = 0; i < myList.length; i++)
+		myList[i].checked = true;
 	}
 
 	
@@ -732,7 +737,7 @@ function ShowLinks()
 					let x = document.getElementById("ordered_pillars");
 					for(let i = 0; i < ServerDataObj.pillars.length; i++)
 					{
-						x.innerHTML += "<li data-key='"+ServerDataObj.pillars[i].key+"'>"+ServerDataObj.pillars[i].name+"<input type='checkbox' data-key='"+ServerDataObj.pillars[i].key+"' class='upSaule' id='uniqueSaule"+ServerDataObj.pillars[i].key+"' checked></li>";
+						x.innerHTML += "<li data-key='"+ServerDataObj.pillars[i].key+"'>"+ServerDataObj.pillars[i].name+"<input type='checkbox' data-key='"+ServerDataObj.pillars[i].key+"' class='upSaule' id='uniqueSaule"+ServerDataObj.pillars[i].key+"'></li>";
 					}
 				console.log("Server data found!");
 				}
