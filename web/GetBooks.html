@@ -324,6 +324,7 @@ class PageLoader {
 		pageNode.classList.remove("placeholder");
 		let img = document.createElement("img");
 		img.src = pageNode.scanFilePath;
+		img.id = "uniqueImageId"+(pageNode.info+1);
 		img.classList = "findImg";
 		img.page = pageNode.info;
 		img.onload = function() {
@@ -363,7 +364,7 @@ function getVisiblePagesOCR()
 	let visiblePages = new Array();
 	for(let i = 0; i < allPages.length; i++) {
 		if(isElementInViewport(allPages[i])) {
-		    if(document.getElementById("olol").scrollTop<((allPages[i].offsetTop+allPages[i].scrollHeight-300)))
+		    if(document.getElementById("olol").scrollTop<((allPages[i].offsetTop+allPages[i].clientHeight-300)))
 			{
 			    visiblePages.push(allPages[i]);
 			}
@@ -494,12 +495,14 @@ function UpdateOCRTxt(x,res)
 
 function SwitchToPage(x)
 {
-    let val = document.getElementById("uniquePageNode"+x.dataset.page);
+    let val = document.getElementById("uniqueDivId"+x.dataset.page);
     let vspg = getVisiblePages();
     if(vspg.indexOf(val)==-1)
     {
-										   val.scrollIntoView();
-    //window.location.replace("#page"+x.dataset.page);
+	if(val != null)
+	    val.scrollIntoView();
+	else
+	    document.getElementById("uniquePageNode"+x.dataset.page).scrollIntoView();
     if(window.history.replaceState)
     {
 	let newurl = window.location.search;
@@ -567,6 +570,7 @@ function getParameterByName(name, url) {
 
 
 function init() {
+	    document.getElementById("query").innerHTML = getParameterByName('query');
 	    document.getElementById("srchbox").addEventListener("keypress",function(event){
 			if(event.key == "Enter")
 			{
@@ -625,6 +629,7 @@ function init() {
 			pageNode.width_x = scanInfo.pages[i].width;
 			pageNode.height_y = scanInfo.pages[i].height;
 			pageNode.pageNumber = scanInfo.pages[i].pageNumber;
+			pageNode.id = "uniqueDivId"+scanInfo.pages[i].pageNumber;
 		    pageNode.ondblclick = function(){
 						console.log(this.pageNumber);
 		    let page = document.getElementById("uniqueocrpage"+this.pageNumber);
@@ -662,6 +667,7 @@ function init() {
 	document.getElementsByClassName("reader")[0].addEventListener("scroll", updateAfterScroll, false);
 		Server.Get("/getmetadata?scanId=" + scanId, function(content) {
 		metadata = JSON.parse(content);
+		    document.getElementById("biblio").innerHTML = metadata.bib;
 		if(metadata.data.creators[0].lastName === undefined)
 			document.title = metadata.data.creators[0].name+" - clas digital";
 		else
@@ -699,7 +705,7 @@ function init() {
 
 		  let resultLinks = "";
 		  for(let i = 0; i < pagesList.length; i++) {
-		  resultLinks = resultLinks + " " + "<a class='coollnklist' onclick='window.location.replace(\"#page"+pagesList[i]+"\");return true;'>" + pagesList[i] + "</a>";
+		  resultLinks = resultLinks + " " + "<a class='coollnklist' onclick='document.getElementById(\"uniqueocrpage"+pagesList[i]+"\").scrollIntoView();window.location.replace(\"#page"+pagesList[i]+"\");changecolor(this);return true;'>" + pagesList[i] + "</a>";
 			for(let y = 0; y < HighlightList.length; y++)
 			{
 				//TODO: Search Dieter with full search and get the results to be highlighted....
@@ -725,7 +731,7 @@ function init() {
 			  }
 			  else
 			  {
-			  	resultLinks.innerHTML = resultLinks.innerHTML + " " + "<a class='coollnklist' onclick='window.location.replace(\"#page"+searchResults.pages[i].page+"\");return true;'>" + searchResults.pages[i].page + " ("
+										   resultLinks.innerHTML = resultLinks.innerHTML + " " + "<a class='coollnklist' onclick='document.getElementById(\"uniqueocrpage"+searchResults.pages[i].page+"\").scrollIntoView();window.location.replace(\"#page"+searchResults.pages[i].page+"\");changecolor(this);return true;'>" + searchResults.pages[i].page + " ("
 				  + "<span id='pageHitList"+searchResults.pages[i].page +"'>"					 
 				  + searchResults.pages[i].word + "</span>)</a>";
 			  }
@@ -761,10 +767,9 @@ window.addEventListener("load", init, false);
 
 .optioncont {
     display: block;
-    margin-top: 1rem;
-    margin-right: 17px;
+    margin: 0;
     padding: 1rem;
-    background-color: grey;
+    background-color: white;
 }
 
 .SpecialOCR {
@@ -830,17 +835,65 @@ window.addEventListener("load", init, false);
 }
 
 .linkliststyler {
-    overflow: hidden;
-    height: 1.5rem;
+    margin: auto;
+    width: 80%;
+    height: 1rem;
+    background-color: white;
+    padding-bottom: 2rem;
+}
+
+a:visited {
+    color: purple;
+}
+
+a:active {
+    color: red;
 }
 
 </style>
+<script>
+let insideWindow = false;
+function changecolor(x)
+{
+    x.style.color = "#800080";
+    reset(document.getElementById("SearchOpts"));
+}
+function shownone(x)
+{
+    insideWindow = false;
+    window.setTimeout(function(){if(!insideWindow){reset(x);}},500);
+}
+
+function reset(x)
+{
+    document.getElementById("linklst").style.height = "1.5rem";
+    console.log("Hello World!");
+    x.style.height = "";
+    x.scrollTop = 0;
+    document.getElementById("biblio").style.display = "none";
+    document.getElementById("searchboxstuff").style.display = "none";
+}
+
+function showall(x)
+{
+    //document.getElementById("linklst").style.height = "60%";
+    insideWindow = true;
+    if(x.style.height != "80vh")
+    {
+	x.style.height = "80vh";
+	console.log("Hello World!");
+	x.style.overflow = "auto";
+	document.getElementById("biblio").style.display = "block";
+	document.getElementById("searchboxstuff").style.display = "block";
+    }
+}
+</script>
 </head>
 <body>
 
 	<div class="pageContainer">
-	    <div style='display: inline-grid; grid-column: 2 /span 1;overflow:hidden;height:100vh;'> 
-	    <div id="SearchOpts" class="optioncont" style='top: 0;background-color: white;'><span style='margin-right: 1rem;'>Search for:</span><input id='srchbox' type='text' placeholder="Next search..."><hr><span id='linklst' class='linkliststyler'></span>
+	    <div style='display: inline-grid; grid-column: 2 /span 1;height:98vh;'> 
+		<div id="SearchOpts" class="optioncont" onmouseout='shownone(this);' onmouseover='showall(this);' style='top: 0;background-color: white;overflow:auto;'><div id="biblio" style='color: green;display:none;'></div><div id="searchboxstuff" style="display:none;"><hr><span style='margin-right: 1rem;'>Search again for:</span><input id='srchbox' type='text' placeholder="Next search..."><hr></div><div>Ihr Suchbegriff '<mark id='query'></mark>'wurde auf folgenden Seiten gefunden: </div><div id='linklst' class='linkliststyler'></div>
 	    </div>
 
 	    <div id="olol" class="SpecialOCR">
