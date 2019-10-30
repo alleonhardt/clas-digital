@@ -7,6 +7,15 @@
 
 int main()
 {
+    /*
+    std::ifstream read("web/books/XUA36SSS/ocr.txt");
+    std::string str((std::istreambuf_iterator<char>(read)), std::istreambuf_iterator<char>());
+
+    std::ofstream write("test.txt");
+    for(auto it : func::extractWordsFromString(str))
+        write << it.first << "\n";
+
+    */
     CBookManager manager;
 
     std::ifstream read("bin/zotero.json");
