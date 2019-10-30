@@ -29,6 +29,15 @@ std::string CBook::getOcrPath() {
     return sPath;
 }
 
+std::string CBook::getShow() {
+
+    std::string str = m_metadata.getShow();
+    if(m_bOcr == true)
+        return str;
+    str+="<span style='color:orange;font-size:80%'> Book is not yet scanned, sorry for that.</span>";
+    return str;
+}
+
 bool CBook::getOcr() { return m_bOcr;}
 int CBook::getNumPages() { return m_numPages; }
 CMetadata& CBook::getMetadata() { return m_metadata; } 
@@ -274,37 +283,51 @@ void CBook::removePages(std::map<int, std::vector<std::string>>* results1, std::
 */
 std::string CBook::getPreview(std::string sWord)
 {
-    //*** Read ocr ***//
-
-    //Check, whether ocr could be loaded, or search is correct
-    if(!m_bOcr)
-        return "<span style='color:orange;'> Book is not yet scanned, sorry for that.</span>";
-
     //*** Get page and match ***//
 
-    //get match and page
+    //get match
     std::string sMatch = "";
     if(m_mapWordsPages.count(sWord) > 0)
+        sMatch = sWord;
+    else if (m_mapFuzzy.count(sWord) == 0)
         sMatch = sWord;
     else {
         sMatch = m_mapFuzzy[sWord].front().first;
         std::cout << sMatch << ", " << m_mapFuzzy[sWord].front().second << std::endl;
     }
 
-    size_t page = std::get<0>(m_mapWordsPages[sMatch])[0];
+    //*** Get source string and position ***//
+    std::string sSource;
+    size_t pos;
+    if(m_bOcr == true) 
+    {
+        size_t page = std::get<0>(m_mapWordsPages[sMatch])[0];
 
-    if(page == 1000000)
-        return "No Preview";
+        if(page == 1000000)
+            return "No Preview";
 
-    //Read ocr
-    std::ifstream read(m_sPath + "/page" + std::to_string(page+1) + ".txt", std::ios::in);
-    std::string sPage((std::istreambuf_iterator<char>(read)), std::istreambuf_iterator<char>());
+        //Read ocr
+        std::ifstream read(m_sPath + "/page" + std::to_string(page+1) + ".txt", std::ios::in);
+        std::string str((std::istreambuf_iterator<char>(read)), std::istreambuf_iterator<char>());
+        sSource=str;
+        pos = std::get<2>(m_mapWordsPages[sMatch]);
+    }
+    else
+    {
+        sSource = m_metadata.getTitle();
+        func::convertToLower(sSource);
+        pos = sSource.find(sWord);
+        if(pos == std::string::npos)
+            return "No Preview: " + sSource;
+    }
 
 
-    int pos = std::get<2>(m_mapWordsPages[sMatch]);
-    int front = 0;
-    if(pos - front > 75) front = pos - 75;
-    std::string finalResult = sPage.substr(front, 150);
+    //*** Generate substring and add highlighting ***//
+    size_t front = 0;
+    size_t len = 150;
+    if(pos > 75) front = pos - 75;
+    if(front+len >= sSource.length()) len = sSource.length()-front;
+    std::string finalResult = sSource.substr(front, len);
     if (pos > 75) pos = 75;
     finalResult.insert(pos+sMatch.length(), "</mark>");
     finalResult.insert(pos, "<mark>");

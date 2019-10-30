@@ -253,7 +253,7 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
 		    entry["scanId"] = it->getKey();
 		    entry["copyright"] = !it->getPublic();
 		    entry["hasocr"] = it->getOcr();
-		    entry["description"] = it->getMetadata().getShow();
+		    entry["description"] = it->getShow();
 		    entry["bibliography"] = it->getMetadata().getMetadata("bib");
 		    entry["preview"] = it->getPreview(options.getSearchedWord());
 		    js["books"].push_back(std::move(entry));

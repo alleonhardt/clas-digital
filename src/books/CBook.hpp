@@ -90,6 +90,11 @@ public:
     */
     bool getPublic();
 
+    /**
+    * @brief return getShow(author, date) from CMetadata but add "book not yet scanned", when bOCR=false
+    */
+    std::string getShow();
+
 
     std::unordered_map<std::string, std::tuple<std::vector<size_t>, int, size_t>>&   getMapWordsPages();
     std::unordered_map<std::string, std::list<std::pair<std::string, double>>>& getMapFuzzy();
