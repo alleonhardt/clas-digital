@@ -324,7 +324,6 @@ bool CBook::onSamePage(std::vector<std::string> sWords, bool fuzzyness)
 // **** GET PREVIEW FUNCTIONS **** //
 std::string CBook::getPreview(std::string sWord)
 {
-    std::cout << "Get preview...\n";
     std::vector<std::string> searchedWords = func::split2(sWord, "+");
     std::string prev = getOnePreview(searchedWords[0]);
     std::cout << "First prev\n";
@@ -341,7 +340,6 @@ std::string CBook::getPreview(std::string sWord)
 */
 std::string CBook::getOnePreview(std::string sWord)
 {
-    std::cout << "Searching for " << sWord << ". In: " << m_sKey << "\n";
     std::string sSource;
     size_t pos;
 
@@ -402,14 +400,22 @@ std::string CBook::getPreviewText(std::string& sWord, size_t& pos)
 std::string CBook::getPreviewTitle(std::string& sWord, size_t& pos)
 {
     // *** Get Source string *** //
-    std::string sTitle = m_metadata.getTitle();
+    std::string sTitle = m_metadata.getTitle() + " ";
     func::convertToLower(sTitle);
 
     // *** Find Pos *** //
     pos = sTitle.find(sWord);
     if(pos == std::string::npos || sTitle == "" || pos > sTitle.length())
+    {
+        for(auto it : func::split2(sTitle, " ")) {
+            if(fuzzy::fuzzy_cmp(func::convertStr(it), sWord) < 0.2) {
+                pos=sTitle.find(it);
+                if(pos != std::string::npos && sTitle != "" && pos <= sTitle.length())
+                    return sTitle;
+            }
+        }
         return "";
-
+    }
     return sTitle;
 }
 
