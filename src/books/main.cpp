@@ -1,5 +1,6 @@
 #include <iostream>
 #include <list>
+#include <ctime>
 #include "json.hpp"
 #include "CBookManager.hpp"
 #include "CBook.hpp"
@@ -38,9 +39,36 @@ int main()
         std::string sInput;
         getline(std::cin, sInput);
         func::convertToLower(sInput);
+        sInput = func::convertStr(sInput);
 
         if(sInput == "q")
             return 0;
+
+
+        struct timespec start, finish;
+        double elapsed;
+        clock_gettime(CLOCK_MONOTONIC, &start);
+        std::list<std::string>* l_sugg = manager.getSuggestions_fast(sInput);
+        clock_gettime(CLOCK_MONOTONIC, &finish);
+        elapsed = (finish.tv_sec - start.tv_sec);
+        elapsed += (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
+        std::cout << "Results in: " << elapsed << std::endl;
+        for(auto it=l_sugg->begin(); it!=l_sugg->end();it++)
+            std::cout << (*it) << std::endl;
+        delete l_sugg;
+        std::cout << std::endl;
+        
+        clock_gettime(CLOCK_MONOTONIC, &start);
+        l_sugg = manager.getSuggestions_acc(sInput);
+        clock_gettime(CLOCK_MONOTONIC, &finish);
+        elapsed = (finish.tv_sec - start.tv_sec);
+        elapsed += (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
+        std::cout << "Results in: " << elapsed << std::endl;
+        for(auto it=l_sugg->begin(); it!=l_sugg->end();it++)
+            std::cout << (*it) << std::endl;
+        delete l_sugg;
+
+        /*
 
         std::cout << "Fuzzyness: ";
         std::string sFuzzy;
@@ -94,6 +122,7 @@ int main()
             counter++;
         }
         std::cout << "Results found: " << (int)counter << "\n";
+        */
    }
 }
      

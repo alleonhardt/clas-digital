@@ -40,6 +40,8 @@ bool CBookManager::initialize()
     std::cout << "\n";
     std::cout << "Map words: " << m_mapWords.size() << "\n";
     std::cout << "Map title: " << m_mapWordsTitle.size() << "\n";
+    createListWords();
+    std::cout << "Set words: " << m_listWords.size() << "\n";
 
     return true;
 }
@@ -102,14 +104,12 @@ std::list<std::string>* CBookManager::search(CSearchOptions* searchOpts)
 */
 std::list<std::string>* CBookManager::convertToList(std::map<std::string, double>* mapSR, int sorting)
 {
-    DBG_INF();
     std::list<std::string>* listBooks = new std::list<std::string>;
     if(mapSR->size() == 0) return listBooks;
     else if(mapSR->size() == 1) {
         listBooks->push_back(mapSR->begin()->first);
         return listBooks;
     }
-    DBG_INF();
 
 	// Declaring the type of Predicate that accepts 2 pairs and return a bool
 	typedef std::function<bool(std::pair<std::string, double>, std::pair<std::string, double>)> Comp;
@@ -144,14 +144,12 @@ std::list<std::string>* CBookManager::convertToList(std::map<std::string, double
 			    return s1 < s2;
 			};
 
-    DBG_INF();
     //Sort by defined sort logic
 	std::set<std::pair<std::string, double>, Comp> sorted(mapSR->begin(), mapSR->end(), compFunctor);
 
     //Convert to list
     for(std::pair<std::string, double> element : sorted)
         listBooks->push_back(element.first); 
-    DBG_INF();
 
     delete mapSR;
     return listBooks;
@@ -197,3 +195,74 @@ void CBookManager::createMapWordsTitle()
     }
 }
 
+/**
+* @brief create list of all words and relevance, ordered by relevance
+*/
+void CBookManager::createListWords()
+{
+    std::map<std::string, size_t> mapWords;
+    for(auto it = m_mapWords.begin(); it!=m_mapWords.end(); it++) {
+        mapWords[it->first] = it->second.size();
+    }
+
+	typedef std::function<bool(std::pair<std::string, double>, std::pair<std::string, double>)> Comp;
+
+    Comp compFunctor = 
+        [](const auto &a, const auto &b)
+        {
+            if(a.second == b.second) return a.first > b.first;
+            return a.second > b.second;
+        };
+
+    std::set<std::pair<std::string, size_t>, Comp> sorted(mapWords.begin(), mapWords.end(), compFunctor);
+
+    for(auto elem : sorted)
+        m_listWords.push_back({elem.first, elem.second});
+}
+
+/**
+* @brief return a list of 10 words, fitting search Word, sorted by in how many books they apear
+*/
+std::list<std::string>* CBookManager::getSuggestions_fast(std::string sWord)
+{
+    std::list<std::string>* listSuggestions = new std::list<std::string>;
+    size_t counter=0;
+    for(auto it=m_listWords.begin(); it!=m_listWords.end() && counter < 10; it++) {
+        if(fuzzy::fuzzy_cmp(it->first, sWord) <= 0.2) {
+            listSuggestions->push_back(it->first);
+            counter++;
+        }
+    }
+    return listSuggestions;
+}
+
+/**
+* @brief return a list of 10 words, fitting search Word, sorted by in how many books they apear
+*/
+std::list<std::string>* CBookManager::getSuggestions_acc(std::string sWord)
+{
+    std::map<std::string, double>* listSuggestions = new std::map<std::string, double>;
+
+    for(auto it=m_listWords.begin(); it!=m_listWords.end(); it++) {
+        double val = fuzzy::fuzzy_cmp(it->first, sWord);
+        if(val <= 0.2) {
+            double rel = (1-val)*it->second;
+            if(listSuggestions->size() < 10) 
+                (*listSuggestions)[it->first] = rel;
+            else
+            {
+                for(auto yt=listSuggestions->begin(); yt!=listSuggestions->end(); yt++) {
+                    if(yt->second < rel) {
+                        (*listSuggestions)[it->first] = rel;
+                        listSuggestions->erase(yt);
+                        break;
+                     }
+                }
+            }
+        }
+    }
+    return convertToList(listSuggestions, 0);
+}
+            
+             
+    

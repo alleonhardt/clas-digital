@@ -25,6 +25,8 @@ private:
     std::unordered_map<std::string, std::map<std::string, double>> m_mapWords;
     std::unordered_map<std::string, std::map<std::string, double>> m_mapWordsTitle;
 
+    std::list<std::pair<std::string, size_t>> m_listWords;
+
     std::shared_mutex m_searchLock;
 
 public:
@@ -75,6 +77,18 @@ public:
     * @brief create map of all words (key) and book-titles in which the word occurs (value)
     */
     void createMapWordsTitle();
+
+    /**
+    * @brief create list of all words and relevance, ordered by relevance
+    */
+    void createListWords();
+
+    /**
+    * @brief return a list of 10 words, fitting search Word, sorted by in how many books they apear
+    */
+    std::list<std::string>* getSuggestions_fast(std::string sWord);
+
+    std::list<std::string>* getSuggestions_acc(std::string sWord);
 
 }; 
 
