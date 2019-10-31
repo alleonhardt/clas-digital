@@ -28,11 +28,12 @@ CSearchOptions::CSearchOptions()
 CSearchOptions::CSearchOptions(std::string chSearchedWord, bool fuzzyness, std::vector<std::string> sCollections, bool onlyTitle, bool onlyOCR, std::string slastName, int from, int to, bool full, size_t filterResults)
 {
     func::convertToLower(chSearchedWord);
-	func::convertToLower(slastName);
+    std::replace(chSearchedWord.begin(), chSearchedWord.end(), ' ', '+');
 	m_chSearchedWord = func::convertStr(chSearchedWord);
     m_fuzzyness = fuzzyness;
     m_sCollections = sCollections;
     m_onlyTitle = onlyTitle;
+	func::convertToLower(slastName);
     m_slastName.assign(slastName); 
     m_From = from;
     m_To = to;
