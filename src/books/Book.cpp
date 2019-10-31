@@ -288,6 +288,16 @@ void CBook::removePages(std::map<int, std::vector<std::string>>* results1, std::
 
 
 // **** GET PREVIEW FUNCTIONS **** //
+std::string CBook::getPreview(std::string sWord)
+{
+    std::cout << "Get preview...\n";
+    std::vector<std::string> searchedWords = func::split2(sWord, "+");
+    std::string prev = getOnePreview(searchedWords[0]);
+    std::cout << "First prev\n";
+    if(searchedWords.size() > 1)
+        prev += "\n" + getOnePreview(searchedWords[1]);
+    return prev;
+}
 
 /**
 * @brief get a preview of the page where the searched word has been found
@@ -295,8 +305,9 @@ void CBook::removePages(std::map<int, std::vector<std::string>>* results1, std::
 * @param fuzzyness
 * @return Preview
 */
-std::string CBook::getPreview(std::string sWord)
+std::string CBook::getOnePreview(std::string sWord)
 {
+    std::cout << "Searching for " << sWord << ". In: " << m_sKey << "\n";
     std::string sSource;
     size_t pos;
 

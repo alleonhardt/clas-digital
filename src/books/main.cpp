@@ -45,6 +45,7 @@ int main()
             return 0;
 
 
+        /*
         struct timespec start, finish;
         double elapsed;
         clock_gettime(CLOCK_MONOTONIC, &start);
@@ -67,8 +68,7 @@ int main()
         for(auto it=l_sugg->begin(); it!=l_sugg->end();it++)
             std::cout << (*it) << std::endl;
         delete l_sugg;
-
-        /*
+        */
 
         std::cout << "Fuzzyness: ";
         std::string sFuzzy;
@@ -122,7 +122,6 @@ int main()
             counter++;
         }
         std::cout << "Results found: " << (int)counter << "\n";
-        */
    }
 }
      
