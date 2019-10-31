@@ -298,16 +298,19 @@ bool CBook::onSamePage(std::vector<std::string> sWords, bool fuzzyness)
             pages1.insert(pages1.begin(), pages.begin(), pages.end());
         }
     }
+    if(pages1.size() == 0) return false;
+
     std::vector<size_t> pages2;
     if(fuzzyness == false)
-        pages2 = std::get<0>(m_mapWordsPages[sWords[0]]);
+        pages2 = std::get<0>(m_mapWordsPages[sWords[1]]);
     else 
     {
-        for(auto elem : m_mapFuzzy[sWords[0]]) {
-            std::vector<size_t> pages = std::get<0>(m_mapWordsPages[sWords[0]]);
+        for(auto elem : m_mapFuzzy[sWords[1]]) {
+            std::vector<size_t> pages = std::get<0>(m_mapWordsPages[sWords[1]]);
             pages2.insert(pages2.begin(), pages.begin(), pages.end());
         }
     }
+    if(pages2.size() == 0) return false;
 
     for(size_t i=0; i<pages1.size(); i++) {
         if(std::find(pages2.begin(), pages2.end(), pages1[i]) != pages2.end())
