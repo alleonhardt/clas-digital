@@ -48,7 +48,7 @@ int main()
         struct timespec start, finish;
         double elapsed;
         clock_gettime(CLOCK_MONOTONIC, &start);
-        std::list<std::string>* l_sugg = manager.getSuggestions_fast(sInput);
+        std::list<std::string>* l_sugg = manager.getSuggestions_acc(sInput);
         clock_gettime(CLOCK_MONOTONIC, &finish);
         elapsed = (finish.tv_sec - start.tv_sec);
         elapsed += (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
@@ -59,7 +59,7 @@ int main()
         std::cout << std::endl;
         
         clock_gettime(CLOCK_MONOTONIC, &start);
-        l_sugg = manager.getSuggestions_acc(sInput);
+        l_sugg = manager.getSuggestions_acc2(sInput, false, true);
         clock_gettime(CLOCK_MONOTONIC, &finish);
         elapsed = (finish.tv_sec - start.tv_sec);
         elapsed += (finish.tv_nsec - start.tv_nsec) / 1000000000.0;

@@ -264,5 +264,66 @@ std::list<std::string>* CBookManager::getSuggestions_acc(std::string sWord)
     return convertToList(listSuggestions, 0);
 }
             
-             
+/**
+* @brief return a list of 10 words, fitting search Word, sorted by in how many books they apear
+*/
+std::list<std::string>* CBookManager::getSuggestions_acc2(std::string sWord, bool t, bool o)
+{
+    std::map<std::string, double>* listSuggestions = new std::map<std::string, double>;
+
+    if(t == false)
+    {
+        for(auto it=m_mapWords.begin(); it!=m_mapWords.end(); it++) {
+            double val = fuzzy::fuzzy_cmp(it->first, sWord);
+            if(val <= 0.2) {
+                double rel = (1-val)*it->second.size();
+                if(listSuggestions->size() < 10) 
+                    (*listSuggestions)[it->first] = rel;
+                else
+                {
+                    for(auto yt=listSuggestions->begin(); yt!=listSuggestions->end(); yt++) {
+                        if(yt->second < rel) {
+                            (*listSuggestions)[it->first] = rel;
+                            listSuggestions->erase(yt);
+                            break;
+                         }
+                    }
+                }
+            }
+        }
+    }
+
+    std::map<std::string, double>* listSuggestions2 = new std::map<std::string, double>;
+    if(o==false)
+    {
+        for(auto it=m_mapWordsTitle.begin(); it!=m_mapWordsTitle.end(); it++) {
+            double val = fuzzy::fuzzy_cmp(it->first, sWord);
+            if(val <= 0.2) {
+                double rel = (1-val)*it->second.size();
+                if(listSuggestions2->size() < 10) 
+                    (*listSuggestions2)[it->first] = rel;
+                else
+                {
+                    for(auto yt=listSuggestions2->begin(); yt!=listSuggestions2->end(); yt++) {
+                        if(yt->second < rel) {
+                            (*listSuggestions2)[it->first] = rel;
+                            listSuggestions2->erase(yt);
+                            break;
+                         }
+                    }
+                }
+            }
+        }
+    }
+
+    listSuggestions->insert(listSuggestions2->begin(), listSuggestions2->end());
+    delete listSuggestions2;
+    std::list<std::string>* results = convertToList(listSuggestions, 0);
+    if(results->size() > 10) {
+        auto it = results->begin();
+        for(size_t i=0;i<results->size()-9;i++, it++);
+        results->erase(it, results->end());
+    }
+    return results;
+}            
     
