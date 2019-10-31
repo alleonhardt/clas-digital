@@ -98,7 +98,7 @@ std::list<std::string>* CBookManager::search(CSearchOptions* searchOpts)
         results = search.search(m_mapWords, m_mapWordsTitle, m_mapBooks);
 
         for(auto it=results->begin(); it!=results->end(); ++it) {
-            if(m_mapBooks[it->first]->getPages(searchOpts->getSearchedWord(), searchOpts->getFuzzyness())->size() == 0)
+            if(m_mapBooks[it->first]->onSamePage(searchedWords, searchOpts->getFuzzyness()) == false)
                 results->erase(it);
         }
     }

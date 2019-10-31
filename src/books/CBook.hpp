@@ -148,6 +148,7 @@ public:
     */
     void removePages(std::map<int, std::vector<std::string>>* results1, std::map<int, std::vector<std::string>>* results2);
 
+    bool onSamePage(std::vector<std::string> sWords, bool fuzzyness);
 
 
     // ***** GET PREVIEW - functions ***** //

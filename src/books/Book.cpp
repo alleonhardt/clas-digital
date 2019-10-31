@@ -286,6 +286,37 @@ void CBook::removePages(std::map<int, std::vector<std::string>>* results1, std::
     }
 }
 
+bool CBook::onSamePage(std::vector<std::string> sWords, bool fuzzyness)
+{
+    std::vector<size_t> pages1;
+    if(fuzzyness == false)
+        pages1 = std::get<0>(m_mapWordsPages[sWords[0]]);
+    else 
+    {
+        for(auto elem : m_mapFuzzy[sWords[0]]) {
+            std::vector<size_t> pages = std::get<0>(m_mapWordsPages[sWords[0]]);
+            pages1.insert(pages1.begin(), pages.begin(), pages.end());
+        }
+    }
+    std::vector<size_t> pages2;
+    if(fuzzyness == false)
+        pages2 = std::get<0>(m_mapWordsPages[sWords[0]]);
+    else 
+    {
+        for(auto elem : m_mapFuzzy[sWords[0]]) {
+            std::vector<size_t> pages = std::get<0>(m_mapWordsPages[sWords[0]]);
+            pages2.insert(pages2.begin(), pages.begin(), pages.end());
+        }
+    }
+
+    for(size_t i=0; i<pages1.size(); i++) {
+        if(std::find(pages2.begin(), pages2.end(), pages1[i]) != pages2.end())
+            return true;
+    }
+    
+    return false;
+}
+
 
 // **** GET PREVIEW FUNCTIONS **** //
 std::string CBook::getPreview(std::string sWord)
