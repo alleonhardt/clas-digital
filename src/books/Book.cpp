@@ -214,9 +214,7 @@ std::map<int, std::vector<std::string>>* CBook::getPages(std::string sInput, boo
     if(m_bOcr == false)
         return mapPages;
 
-    std::vector<std::string> vWords;
-    func::convertToLower(sInput);
-    func::split(sInput, "+", vWords);
+    std::vector<std::string> vWords = func::split2(func::returnToLower(sInput), "+");
 
     //Create map of pages and found words for first word
     mapPages = findPages(vWords[0], fuzzyness);
