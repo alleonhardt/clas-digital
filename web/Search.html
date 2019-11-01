@@ -425,7 +425,7 @@ function sendToPage(name)
 	let inputObj = document.getElementById(name);
 	let input = inputObj.value;
 	//Form the request for the server
-	let requ = "/search?q="+encodeURIComponent(input);
+	let requ = "/search?q="+encodeURIComponent(input).replace(/%20/g, "+");
 	console.log(requ);
 
 	//Create the json file with the advanced search options
