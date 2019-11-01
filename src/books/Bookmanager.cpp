@@ -164,7 +164,6 @@ std::list<std::string>* CBookManager::convertToList(std::map<std::string, double
     for(std::pair<std::string, double> element : sorted)
         listBooks->push_back(element.first); 
 
-    delete mapSR;
     return listBooks;
 }
 

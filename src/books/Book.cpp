@@ -289,9 +289,9 @@ void CBook::removePages(std::map<int, std::vector<std::string>>* results1, std::
 bool CBook::onSamePage(std::vector<std::string> sWords, bool fuzzyness)
 {
     std::vector<size_t> pages1;
-    if(fuzzyness == false)
+    if(fuzzyness == false && m_mapWordsPages.count(sWords[0]) > 0)
         pages1 = std::get<0>(m_mapWordsPages[sWords[0]]);
-    else 
+    else if (m_mapFuzzy.count(sWords[0]) > 0)
     {
         for(auto elem : m_mapFuzzy[sWords[0]]) {
             std::vector<size_t> pages = std::get<0>(m_mapWordsPages[sWords[0]]);
@@ -301,9 +301,9 @@ bool CBook::onSamePage(std::vector<std::string> sWords, bool fuzzyness)
     if(pages1.size() == 0) return false;
 
     std::vector<size_t> pages2;
-    if(fuzzyness == false)
+    if(fuzzyness == false && m_mapWordsPages.count(sWords[1]) > 0)
         pages2 = std::get<0>(m_mapWordsPages[sWords[1]]);
-    else 
+    else if(m_mapFuzzy.count(sWords[1]) > 0)
     {
         for(auto elem : m_mapFuzzy[sWords[1]]) {
             std::vector<size_t> pages = std::get<0>(m_mapWordsPages[sWords[1]]);
@@ -326,7 +326,6 @@ std::string CBook::getPreview(std::string sWord)
 {
     std::vector<std::string> searchedWords = func::split2(sWord, "+");
     std::string prev = getOnePreview(searchedWords[0]);
-    std::cout << "First prev\n";
     if(searchedWords.size() > 1)
         prev += "\n" + getOnePreview(searchedWords[1]);
     return prev;
@@ -376,13 +375,13 @@ std::string CBook::getOnePreview(std::string sWord)
 
 std::string CBook::getPreviewText(std::string& sWord, size_t& pos)
 {
-    //*** Get page and match ***//
-
-    //get match
-    if(m_mapWordsPages.count(sWord) == 0)
+    // *** get match *** //
+    if(m_mapWordsPages.count(sWord) == 0 && m_mapFuzzy.count(sWord) > 0) 
         sWord = m_mapFuzzy[sWord].front().first;
+    else if(m_mapWordsPages.count(sWord) == 0)
+        return "";
 
-    //get Page
+    // *** Get Page *** //
     size_t page = std::get<0>(m_mapWordsPages[sWord])[0];
     if(page == 1000000)
         return "";

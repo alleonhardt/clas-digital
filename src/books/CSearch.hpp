@@ -22,6 +22,7 @@ public:
     * @brief constructor
     */
     CSearch(CSearchOptions* searchOpts);
+    ~CSearch();
 
     // *** GETTER *** //
 

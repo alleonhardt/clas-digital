@@ -79,7 +79,7 @@ int main()
         else
             fuzzy = false;
 
-        CSearchOptions* searchOpts = new CSearchOptions(sInput, fuzzy, {"RFWJC42V", "XCFFDRQC", "RBB8DW5B", "WIXP3DS3"}, false, false, "", 0 , 2019, 1, 2);
+        CSearchOptions* searchOpts = new CSearchOptions(sInput, fuzzy, {"RFWJC42V", "XCFFDRQC", "RBB8DW5B", "WIXP3DS3"}, false, true, "", 0 , 2019, 1, 2);
 
         sInput = searchOpts->getSearchedWord();
 
@@ -91,6 +91,7 @@ int main()
         {
             CBook* book = manager.getMapOfBooks()[(*it)];
             std::cout << "\033[1;32m" << book->getKey() << ": " << book->getShow() << "\n";
+            std::cout << "Preview: " << std::endl;
             std::cout << "\033[1;31m" << book->getPreview(sInput)<< "\n";
 
             // *** Print Pages *** //

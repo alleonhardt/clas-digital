@@ -9,6 +9,10 @@ CSearch::CSearch(CSearchOptions* searchOpts) {
     m_mapSR = new std::map<std::string, double>;
 }
 
+CSearch::~CSearch() {
+    delete m_mapSR;
+}
+
 // *** GETTER *** //
 
 
@@ -201,9 +205,7 @@ void CSearch::myInsert(std::map<std::string, double>& found, std::string sMatch,
         (*m_mapSR)[it->first] += it->second*(1-value*5);
 
         //Add match to map
-        if (mapBooks[it->first]->getMapFuzzy()[m_sWord].size() == 0)
-            mapBooks[it->first]->getMapFuzzy()[m_sWord].push_back({sMatch, value});
-        else if (mapBooks[it->first]->getMapFuzzy()[m_sWord].front().second > value)
+        if (mapBooks[it->first]->getMapFuzzy()[m_sWord].front().second > value)
             mapBooks[it->first]->getMapFuzzy()[m_sWord].push_front({sMatch, value});
         else
             mapBooks[it->first]->getMapFuzzy()[m_sWord].push_back({sMatch, value});
@@ -217,3 +219,5 @@ void CSearch::myInsert(std::map<std::string, double>& found, std::string sMatch,
 void CSearch::deleteSearchOptions() {
     delete m_sOpts;
 }
+
+
