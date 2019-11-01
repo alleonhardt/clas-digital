@@ -86,19 +86,19 @@ std::list<std::string>* CBookManager::search(CSearchOptions* searchOpts)
 {
     std::vector<std::string> searchedWords = func::split2(searchOpts->getSearchedWord(), "+");
 
-    //Select search
+    //Start first search
     CSearch search(searchOpts);
     search.setWord(searchedWords[0]);
-
-    //Search
     std::map<std::string, double>* results = search.search(m_mapWords, m_mapWordsTitle, m_mapBooks);
 
     if(searchedWords.size() > 1) {
-        search.setWord(searchedWords[1]);
-        results = search.search(m_mapWords, m_mapWordsTitle, m_mapBooks);
-
+        CSearch search2(searchOpts);
+        search2.setWord(searchedWords[1]);
+        std::map<std::string, double>* results2 = search2.search(m_mapWords, m_mapWordsTitle, m_mapBooks);
         for(auto it=results->begin(); it!=results->end(); ++it) {
-            if(m_mapBooks[it->first]->onSamePage(searchedWords, searchOpts->getFuzzyness()) == false)
+            if(results2->count(it->first) == 0)
+                results->erase(it);
+            else if(m_mapBooks[it->first]->onSamePage(searchedWords, searchOpts->getFuzzyness()) == false)
                 results->erase(it);
         }
     }

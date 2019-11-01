@@ -210,12 +210,16 @@ void CBook::loadPages()
 */
 std::map<int, std::vector<std::string>>* CBook::getPages(std::string sInput, bool fuzzyness)
 {
+    std::map<int, std::vector<std::string>>* mapPages = new std::map<int, std::vector<std::string>>;
+    if(m_bOcr == false)
+        return mapPages;
+
     std::vector<std::string> vWords;
     func::convertToLower(sInput);
     func::split(sInput, "+", vWords);
 
     //Create map of pages and found words for first word
-    std::map<int, std::vector<std::string>>* mapPages = findPages(vWords[0], fuzzyness);
+    mapPages = findPages(vWords[0], fuzzyness);
 
     for(size_t i=1; i<vWords.size(); i++) {
 
@@ -237,7 +241,7 @@ std::map<int, std::vector<std::string>>* CBook::findPages(std::string sWord, boo
     std::map<int, std::vector<std::string>>* mapPages = new std::map<int, std::vector<std::string>>;
 
     //Fuzzyness = false
-    if (fuzzyness == false) {
+    if (fuzzyness == false && m_mapWordsPages.count(sWord) > 0) {
         for(auto page : std::get<0>(m_mapWordsPages[sWord]))
             (*mapPages)[page] = {};
     }
@@ -248,7 +252,7 @@ std::map<int, std::vector<std::string>>* CBook::findPages(std::string sWord, boo
         //1. try map of fuzzy matches
         if(m_mapFuzzy.count(sWord) > 0) {
             for(auto elem : m_mapFuzzy[sWord]) {
-                for(auto page : std::get<0>(m_mapWordsPages[elem.first]))
+                for(auto page : std::get<0>(m_mapWordsPages.at(elem.first)))
                     (*mapPages)[page].push_back(elem.first);
             }
         }
@@ -294,7 +298,7 @@ bool CBook::onSamePage(std::vector<std::string> sWords, bool fuzzyness)
     else if (m_mapFuzzy.count(sWords[0]) > 0)
     {
         for(auto elem : m_mapFuzzy[sWords[0]]) {
-            std::vector<size_t> pages = std::get<0>(m_mapWordsPages[sWords[0]]);
+            std::vector<size_t> pages = std::get<0>(m_mapWordsPages.at(elem.first));
             pages1.insert(pages1.begin(), pages.begin(), pages.end());
         }
     }
@@ -306,7 +310,7 @@ bool CBook::onSamePage(std::vector<std::string> sWords, bool fuzzyness)
     else if(m_mapFuzzy.count(sWords[1]) > 0)
     {
         for(auto elem : m_mapFuzzy[sWords[1]]) {
-            std::vector<size_t> pages = std::get<0>(m_mapWordsPages[sWords[1]]);
+            std::vector<size_t> pages = std::get<0>(m_mapWordsPages.at(elem.first));
             pages2.insert(pages2.begin(), pages.begin(), pages.end());
         }
     }
@@ -367,8 +371,8 @@ std::string CBook::getOnePreview(std::string sWord)
     shortenPreview(finalResult);
 
     //*** Append [...] front and back *** //
-    finalResult.insert(0, "[...] ");
-    finalResult.append(" [...]");
+    finalResult.insert(0, " \u2026"); 
+    finalResult.append(" \u2026");
 
     return finalResult;
 }
@@ -398,6 +402,7 @@ std::string CBook::getPreviewText(std::string& sWord, size_t& pos)
 
 std::string CBook::getPreviewTitle(std::string& sWord, size_t& pos)
 {
+    std::cout << "preview In Title?\n";
     // *** Get Source string *** //
     std::string sTitle = m_metadata.getTitle() + " ";
     func::convertToLower(sTitle);
