@@ -326,10 +326,22 @@ bool CBook::onSamePage(std::vector<std::string> sWords, bool fuzzyness)
 // **** GET PREVIEW FUNCTIONS **** //
 std::string CBook::getPreview(std::string sWord)
 {
+    // *** Get First preview *** //
     std::vector<std::string> searchedWords = func::split2(sWord, "+");
     std::string prev = getOnePreview(searchedWords[0]);
-    if(searchedWords.size() > 1)
-        prev += "\n" + getOnePreview(searchedWords[1]);
+
+    // *** Get second Preview (if second word) *** //
+    if(searchedWords.size() > 1) {
+
+        //Try finding second word in current preview
+        size_t pos = prev.find(searchedWords[1]);
+        if(pos!=std::string::npos) {
+            prev.insert(pos+searchedWords[1].length(), "</mark>");
+            prev.insert(pos, "<mark>");
+        } 
+        else
+            prev += "\n" + getOnePreview(searchedWords[1]);
+    }
     return prev;
 }
 
@@ -400,7 +412,6 @@ std::string CBook::getPreviewText(std::string& sWord, size_t& pos)
 
 std::string CBook::getPreviewTitle(std::string& sWord, size_t& pos)
 {
-    std::cout << "preview In Title?\n";
     // *** Get Source string *** //
     std::string sTitle = m_metadata.getTitle() + " ";
     func::convertToLower(sTitle);

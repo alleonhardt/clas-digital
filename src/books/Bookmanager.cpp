@@ -37,11 +37,8 @@ bool CBookManager::initialize()
     //Create map of all words + and of all words in all titles
     createMapWords();
     createMapWordsTitle();
-    std::cout << "\n";
     std::cout << "Map words: " << m_mapWords.size() << "\n";
     std::cout << "Map title: " << m_mapWordsTitle.size() << "\n";
-    createListWords();
-    std::cout << "Set words: " << m_listWords.size() << "\n";
 
     return true;
 }
@@ -207,135 +204,61 @@ void CBookManager::createMapWordsTitle()
     }
 }
 
-/**
-* @brief create list of all words and relevance, ordered by relevance
-*/
-void CBookManager::createListWords()
-{
-    std::map<std::string, size_t> mapWords;
-    for(auto it = m_mapWords.begin(); it!=m_mapWords.end(); it++) {
-        mapWords[it->first] = it->second.size();
-    }
 
-	typedef std::function<bool(std::pair<std::string, double>, std::pair<std::string, double>)> Comp;
-
-    Comp compFunctor = 
-        [](const auto &a, const auto &b)
-        {
-            if(a.second == b.second) return a.first > b.first;
-            return a.second > b.second;
-        };
-
-    std::set<std::pair<std::string, size_t>, Comp> sorted(mapWords.begin(), mapWords.end(), compFunctor);
-
-    for(auto elem : sorted)
-        m_listWords.push_back({elem.first, elem.second});
-}
-
+            
 /**
 * @brief return a list of 10 words, fitting search Word, sorted by in how many books they apear
 */
-std::list<std::string>* CBookManager::getSuggestions_fast(std::string sWord)
+std::list<std::string>* CBookManager::getSuggestions_acc(std::string sWord, bool t, bool o)
 {
-    std::list<std::string>* listSuggestions = new std::list<std::string>;
-    size_t counter=0;
-    for(auto it=m_listWords.begin(); it!=m_listWords.end() && counter < 10; it++) {
-        if(fuzzy::fuzzy_cmp(it->first, sWord) <= 0.2) {
-            listSuggestions->push_back(it->first);
-            counter++;
-        }
+    std::map<std::string, double>* sugg_1 = new std::map<std::string, double>;
+    std::map<std::string, double>* sugg_2 = new std::map<std::string, double>;
+    
+    //Get suggestions out of map of words
+    if(t==false)
+        sugg_1 = getSuggestions_acc(sWord, m_mapWords);
+
+    //get suggestion out of map of title
+    if(o==false) 
+        sugg_2 = getSuggestions_acc(sWord, m_mapWordsTitle);
+
+    if(t==true) sugg_1 = sugg_2;
+    else if(t==false && o==false) sugg_1->insert(sugg_2->begin(), sugg_2->end());
+
+    std::list<std::string>* results = convertToList(sugg_1, 0);
+    if(results->size() > 10) {
+        auto it = results->begin();
+        for(size_t i=0;i<results->size()-9;i++, it++);
+        results->erase(it, results->end());
     }
-    return listSuggestions;
-}
 
-/**
-* @brief return a list of 10 words, fitting search Word, sorted by in how many books they apear
-*/
-std::list<std::string>* CBookManager::getSuggestions_acc(std::string sWord)
+    //delete maps and return results
+    delete sugg_1;
+    delete sugg_2;
+    return results;
+}            
+
+
+std::map<std::string, double>* CBookManager::getSuggestions_acc(std::string sWord, MAPWORDS& mapWords)
 {
-    std::map<std::string, double>* listSuggestions = new std::map<std::string, double>;
-
-    for(auto it=m_listWords.begin(); it!=m_listWords.end(); it++) {
+    std::map<std::string, double>* suggs = new std::map<std::string, double>;
+    for(auto it=mapWords.begin(); it!=mapWords.end(); it++) {
         double val = fuzzy::fuzzy_cmp(it->first, sWord);
         if(val <= 0.2) {
-            double rel = (1-val)*it->second;
-            if(listSuggestions->size() < 10) 
-                (*listSuggestions)[it->first] = rel;
+            double rel = (1-val)*it->second.size();
+            if(suggs->size() < 10) 
+                (*suggs)[it->first] = rel;
             else
             {
-                for(auto yt=listSuggestions->begin(); yt!=listSuggestions->end(); yt++) {
+                for(auto yt=suggs->begin(); yt!=suggs->end(); yt++) {
                     if(yt->second < rel) {
-                        (*listSuggestions)[it->first] = rel;
-                        listSuggestions->erase(yt);
+                        (*suggs)[it->first] = rel;
+                        suggs->erase(yt);
                         break;
                      }
                 }
             }
         }
     }
-    return convertToList(listSuggestions, 0);
+    return suggs;
 }
-            
-/**
-* @brief return a list of 10 words, fitting search Word, sorted by in how many books they apear
-*/
-std::list<std::string>* CBookManager::getSuggestions_acc2(std::string sWord, bool t, bool o)
-{
-    std::map<std::string, double>* listSuggestions = new std::map<std::string, double>;
-
-    if(t == false)
-    {
-        for(auto it=m_mapWords.begin(); it!=m_mapWords.end(); it++) {
-            double val = fuzzy::fuzzy_cmp(it->first, sWord);
-            if(val <= 0.2) {
-                double rel = (1-val)*it->second.size();
-                if(listSuggestions->size() < 10) 
-                    (*listSuggestions)[it->first] = rel;
-                else
-                {
-                    for(auto yt=listSuggestions->begin(); yt!=listSuggestions->end(); yt++) {
-                        if(yt->second < rel) {
-                            (*listSuggestions)[it->first] = rel;
-                            listSuggestions->erase(yt);
-                            break;
-                         }
-                    }
-                }
-            }
-        }
-    }
-
-    std::map<std::string, double>* listSuggestions2 = new std::map<std::string, double>;
-    if(o==false)
-    {
-        for(auto it=m_mapWordsTitle.begin(); it!=m_mapWordsTitle.end(); it++) {
-            double val = fuzzy::fuzzy_cmp(it->first, sWord);
-            if(val <= 0.2) {
-                double rel = (1-val)*it->second.size();
-                if(listSuggestions2->size() < 10) 
-                    (*listSuggestions2)[it->first] = rel;
-                else
-                {
-                    for(auto yt=listSuggestions2->begin(); yt!=listSuggestions2->end(); yt++) {
-                        if(yt->second < rel) {
-                            (*listSuggestions2)[it->first] = rel;
-                            listSuggestions2->erase(yt);
-                            break;
-                         }
-                    }
-                }
-            }
-        }
-    }
-
-    listSuggestions->insert(listSuggestions2->begin(), listSuggestions2->end());
-    delete listSuggestions2;
-    std::list<std::string>* results = convertToList(listSuggestions, 0);
-    if(results->size() > 10) {
-        auto it = results->begin();
-        for(size_t i=0;i<results->size()-9;i++, it++);
-        results->erase(it, results->end());
-    }
-    return results;
-}            
-    

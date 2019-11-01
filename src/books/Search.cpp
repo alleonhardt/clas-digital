@@ -64,10 +64,7 @@ void CSearch::setWord(std::string sWord) {
 * @brief calls spezific search function, searches, and creates map of  matches. Removes all 
 * books that do not match with search options.
 */
-std::map<std::string, double>* CSearch::search(
-        std::unordered_map<std::string, std::map<std::string, double>>& mWs, 
-        std::unordered_map<std::string, std::map<std::string, double>>& mWsTitle, 
-        std::unordered_map<std::string, CBook*>& mapBooks)
+std::map<std::string, double>* CSearch::search(MAPWORDS& mWs, MAPWORDS& mWsTitle, std::unordered_map<std::string, CBook*>& mapBooks)
 {
     //Normal search (full-match)
     if (getFuzzyness() == false)
@@ -103,7 +100,7 @@ std::map<std::string, double>* CSearch::search(
 * @param[in] mapWords map of all words with a list of books in which this word accures
 * @param[in, out] mapSR searchresults
 */
-void CSearch::normalSearch(std::unordered_map<std::string, std::map<std::string, double>>& mapWords)
+void CSearch::normalSearch(MAPWORDS& mapWords)
 {
     std::cout << "Searching for " << m_sWord << "\n";
     if(mapWords.count(m_sWord) > 0) {
@@ -118,8 +115,7 @@ void CSearch::normalSearch(std::unordered_map<std::string, std::map<std::string,
 * @param[in] mapWords map of all words with a list of books in which this word accures
 * @param[in, out] mapSR searchresults
 */
-void CSearch::fuzzySearch(std::unordered_map<std::string, std::map<std::string, double>>& mapWords, 
-                                std::unordered_map<std::string, CBook*>& mapBooks)
+void CSearch::fuzzySearch(MAPWORDS& mapWords, std::unordered_map<std::string, CBook*>& mapBooks)
 {
     for(auto it= mapWords.begin(); it!=mapWords.end(); it++)
     {

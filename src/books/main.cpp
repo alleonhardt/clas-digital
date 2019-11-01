@@ -49,7 +49,7 @@ int main()
         struct timespec start, finish;
         double elapsed;
         clock_gettime(CLOCK_MONOTONIC, &start);
-        std::list<std::string>* l_sugg = manager.getSuggestions_acc(sInput);
+        std::list<std::string>* l_sugg = manager.getSuggestions_acc(sInput, false, false);
         clock_gettime(CLOCK_MONOTONIC, &finish);
         elapsed = (finish.tv_sec - start.tv_sec);
         elapsed += (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
@@ -59,17 +59,8 @@ int main()
         delete l_sugg;
         std::cout << std::endl;
         
-        clock_gettime(CLOCK_MONOTONIC, &start);
-        l_sugg = manager.getSuggestions_acc2(sInput, false, true);
-        clock_gettime(CLOCK_MONOTONIC, &finish);
-        elapsed = (finish.tv_sec - start.tv_sec);
-        elapsed += (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
-        std::cout << "Results in: " << elapsed << std::endl;
-        for(auto it=l_sugg->begin(); it!=l_sugg->end();it++)
-            std::cout << (*it) << std::endl;
-        delete l_sugg;
         */
-
+        
         std::cout << "Fuzzyness: ";
         std::string sFuzzy;
         getline(std::cin, sFuzzy);
@@ -124,6 +115,7 @@ int main()
         }
         std::cout << "Results found: " << (int)counter << "\n";
    }
+   
 }
      
 
