@@ -311,7 +311,7 @@ function SetAdvancedAuthor(x)
     document.getElementById("SearchForAuthor").value=x.value;
 }
 
-function SetAdvancedDateFrom(x)
+function SetAdvancedDateBefore(x)
 {
     document.getElementById("PublicatedBefore").value=x.value;
 }
@@ -351,14 +351,14 @@ function ShowSelectedValues(obj)
 	obj.innerHTML = "";
 	let json = obj.drawablejson;
     let author = "Author: <input id='author' onchange='SetAdvancedAuthor(this);return true;' class='specialultbut' style='background:white;margin-right:0.5;border:0;' type='text' value='' </input>";
-    let dateFrom = "From: <input id='PublicatedBefore' onchange='SetAdvancedDateFrom(this);return true;' class='specialultbut' style='background:white;margin-right:0.5;border:0;' size='5' type='number' step='1' min='0' value='0'>";
-    let dateAfter= "After: <input id='PublicatedAfter' onchange='SetAdvancedDateAfter(this);return true;' class='specialultbut' style='background:white;margin-right:0.5;border:0;' size='5' type='number' step='1' min='0' value='0'>";
+    let dateAfter = "After: <input id='PublicatedAfter' onchange='SetAdvancedDateAfter(this);return true;' class='specialultbut' style='background:white;margin-right:0.5;border:0;' size='5' type='number' step='1' min='0' value='0'>";
+    let dateBefore = "Before: <input id='PublicatedBefore' onchange='SetAdvancedDateBefore(this);return true;' class='specialultbut' style='background:white;margin-right:0.5;border:0;' size='5' type='number' step='1' min='0' value='0'>";
     let onlyIn = "<select id='fuzzyness' onchange='SetAdvancedOnlyIn(this);return true;' class='specialultbut' style='background:white;margin-right:0.5;border:0;'><option value='0'>Search Everything</option><option value='1'>Search only Metadata</option><option value='2'>Search only Text</option></select>";
     let fuzzy = "<select id='fuzzyness' onchange='SetAdvancedFuzzy(this);return true;' class='specialultbut' style='background:white;margin-right:0.5;border:0;'><option value='0'>Exact matches</option><option value='1'>Fuzzy matching</option></select>";
     let results = "<select id='maxresultsperpage' onchange='OpenFilter(this);return true;' class='specialultbut' style='background:white;margin-right:0.5rem;border:0;'><option value='10'>Show 10 results per page</option><option value='20'>Show 20 results per page</option><option value='50'>Show 50 results per page</option><option value='1000000'>Show all results</option></select>";
     let sort = "<select id='f_sort' onchange='OpenFilter(this);return true;' class='specialultbut' onclick='return true;' style='background:white;margin-right: 0.5rem;border: 0;'><option value='0'>Sort by relevance</option><option value='2'>Sort alphabetically</option><option value='1'>Sort chronologically</option></select>";
     let bib = "<button class='specialultbut' style='background:white;border: 0;' onclick='CreateBibliography();return true;'>Create Bibliography</button></div><hr style='padding: 0;'>";
-    document.getElementById("ResultBanner").innerHTML ="<div style='margin-top: 2rem;margin-bottom:0;'>" + author + dateFrom + dateAfter + onlyIn + fuzzy + results + sort + bib +"<span style='color: grey;'>"+json.max_results+" Ergebnisse gefunden in "+json.time+"s</span>";
+    document.getElementById("ResultBanner").innerHTML ="<div style='margin-top: 2rem;margin-bottom:0;'>" + author + dateAfter+ dateBefore+ onlyIn + fuzzy + results + sort + bib +"<span style='color: grey;'>"+json.max_results+" Ergebnisse gefunden in "+json.time+"s</span>";
 	if(json.max_results==0)
 	    return;
 	obj.start = json.show_from;
