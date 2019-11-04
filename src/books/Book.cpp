@@ -288,59 +288,65 @@ void CBook::removePages(std::map<int, std::vector<std::string>>* results1, std::
     }
 }
 
-bool CBook::onSamePage(std::vector<std::string> sWords, bool fuzzyness)
+bool CBook::onSamePage(std::vector<std::string> sWords)
 {
-    std::vector<size_t> pages1;
-    if(fuzzyness == false && m_mapWordsPages.count(sWords[0]) > 0)
-        pages1 = std::get<0>(m_mapWordsPages[sWords[0]]);
-    else if (m_mapFuzzy.count(sWords[0]) > 0)
-    {
-        for(auto elem : m_mapFuzzy[sWords[0]]) {
-            std::vector<size_t> pages = std::get<0>(m_mapWordsPages.at(elem.first));
-            pages1.insert(pages1.begin(), pages.begin(), pages.end());
-        }
-    }
-    if(pages1.size() == 0) return false;
+    std::vector<size_t> pages1 = pages(sWords[0]);
+    if(pages1.size() == 0) 
+        return false;
 
-    std::vector<size_t> pages2;
-    if(fuzzyness == false && m_mapWordsPages.count(sWords[1]) > 0)
-        pages2 = std::get<0>(m_mapWordsPages[sWords[1]]);
-    else if(m_mapFuzzy.count(sWords[1]) > 0)
+    for(size_t i=1; i<sWords.size(); i++)
     {
-        for(auto elem : m_mapFuzzy[sWords[1]]) {
-            std::vector<size_t> pages = std::get<0>(m_mapWordsPages.at(elem.first));
-            pages2.insert(pages2.begin(), pages.begin(), pages.end());
-        }
-    }
-    if(pages2.size() == 0) return false;
+        std::vector<size_t> pages2 = pages(sWords[i]);
+        if(pages2.size() == 0) 
+            return false;
 
-    for(size_t i=0; i<pages1.size(); i++) {
-        if(std::find(pages2.begin(), pages2.end(), pages1[i]) != pages2.end())
-            return true;
+        bool found=false;
+        for(size_t j=0; j<pages1.size(); j++) {
+            if(std::find(pages2.begin(), pages2.end(), pages1[j]) != pages2.end()) {
+                found=true;
+                break;
+            }
+        }
+
+        if(found==false) return false;
     }
     
-    return false;
+    return true;
+}
+
+std::vector<size_t> CBook::pages(std::string sWord) {
+    std::vector<size_t> pages;
+
+    if(m_mapWordsPages.count(sWord) > 0)
+        pages = std::get<0>(m_mapWordsPages[sWord]);
+    else if(m_mapFuzzy.count(sWord) > 0) {
+        for(auto elem : m_mapFuzzy[sWord]) {
+            std::vector<size_t> foo = std::get<0>(m_mapWordsPages.at(elem.first));
+            pages.insert(pages.begin(), foo.begin(), foo.end());
+        }
+    }
+    return pages;
 }
 
 
 // **** GET PREVIEW FUNCTIONS **** //
-std::string CBook::getPreview(std::string sWord)
+std::string CBook::getPreview(std::string sInput)
 {
     // *** Get First preview *** //
-    std::vector<std::string> searchedWords = func::split2(sWord, "+");
+    std::vector<std::string> searchedWords = func::split2(sInput, "+");
     std::string prev = getOnePreview(searchedWords[0]);
 
     // *** Get second Preview (if second word) *** //
-    if(searchedWords.size() > 1) {
-
+    for(size_t i=1; i<searchedWords.size(); i++)
+    {
         //Try finding second word in current preview
-        size_t pos = prev.find(searchedWords[1]);
+        size_t pos = prev.find(searchedWords[i]);
         if(pos!=std::string::npos) {
-            prev.insert(pos+searchedWords[1].length(), "</mark>");
+            prev.insert(pos+searchedWords[i].length(), "</mark>");
             prev.insert(pos, "<mark>");
         } 
         else
-            prev += "\n" + getOnePreview(searchedWords[1]);
+            prev += "\n" + getOnePreview(searchedWords[i]);
     }
     return prev;
 }

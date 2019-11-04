@@ -23,7 +23,7 @@ public:
     /**
     * @brief constructor
     */
-    CSearch(CSearchOptions* searchOpts);
+    CSearch(CSearchOptions* searchOpts, std::string sWord);
     ~CSearch();
 
     // *** GETTER *** //

@@ -3,10 +3,11 @@
 /**
 * @brief constructor
 */
-CSearch::CSearch(CSearchOptions* searchOpts) {
+CSearch::CSearch(CSearchOptions* searchOpts, std::string sWord) {
     m_sOpts = searchOpts;
     m_sWord = m_sOpts->getSearchedWord();
     m_mapSR = new std::map<std::string, double>;
+    m_sWord = sWord;
 }
 
 CSearch::~CSearch() {

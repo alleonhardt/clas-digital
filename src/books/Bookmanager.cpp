@@ -81,21 +81,20 @@ void CBookManager::addBook(std::string sKey) {
 */
 std::list<std::string>* CBookManager::search(CSearchOptions* searchOpts)
 {
-    std::vector<std::string> searchedWords = func::split2(searchOpts->getSearchedWord(), "+");
+    std::vector<std::string> sWords = func::split2(searchOpts->getSearchedWord(), "+");
 
     //Start first search
-    CSearch search(searchOpts);
-    search.setWord(searchedWords[0]);
+    CSearch search(searchOpts, sWords[0]);
     std::map<std::string, double>* results = search.search(m_mapWords, m_mapWordsTitle, m_mapBooks);
 
-    if(searchedWords.size() > 1) {
-        CSearch search2(searchOpts);
-        search2.setWord(searchedWords[1]);
+    for(size_t i=1; i<sWords.size(); i++)
+    {
+        CSearch search2(searchOpts, sWords[i]);
         std::map<std::string, double>* results2 = search2.search(m_mapWords, m_mapWordsTitle, m_mapBooks);
         for(auto it=results->begin(); it!=results->end(); ++it) {
             if(results2->count(it->first) == 0)
                 results->erase(it);
-            else if(m_mapBooks[it->first]->getOcr() == true && m_mapBooks[it->first]->onSamePage(searchedWords, searchOpts->getFuzzyness()) == false)
+            else if(m_mapBooks[it->first]->getOcr() == true && m_mapBooks[it->first]->onSamePage(sWords))
                 results->erase(it);
         }
     }
@@ -203,7 +202,6 @@ void CBookManager::createMapWordsTitle()
             m_mapWordsTitle[yt->first][it->first] = 0.1;
     }
 }
-
 
             
 /**
