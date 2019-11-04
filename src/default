@@ -52,7 +52,7 @@ server {
 	root /etc/clas-digital/web;
 
 	# Add index.php to the list if you are using PHP
-	index Search.html;
+	#index Search.html;
 	error_page 502 /custom_error502.html;
 
 	ssl on;
@@ -111,16 +111,16 @@ server {
         	proxy_pass         http://localhost:9000;
 	}
 	
-	location = / {
-        	proxy_pass         http://localhost:9000/search;
-		proxy_redirect 	http://localhost:9000/ http://localhost:9000/search;
+#	location = / {
+#        	proxy_pass         http://localhost:9000/search;
+#		proxy_redirect 	http://localhost:9000/ http://localhost:9000/search;
 #		proxy_cache_key $uri$is_args$args;
 #		proxy_buffering        on;
 #            	proxy_cache            STATIC;
 #            	proxy_cache_valid      200  1d;
 #            	proxy_cache_use_stale  error timeout invalid_header updating
 #                                   http_500 http_502 http_503 http_504;
-	}
+#	}
 
 	location / {
 		# First attempt to serve request as file, then
