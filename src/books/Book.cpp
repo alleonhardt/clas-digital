@@ -290,12 +290,14 @@ void CBook::removePages(std::map<int, std::vector<std::string>>* results1, std::
 
 bool CBook::onSamePage(std::vector<std::string> sWords)
 {
+    std::cout << "onSamePage... " << std::endl;
     std::vector<size_t> pages1 = pages(sWords[0]);
     if(pages1.size() == 0) 
         return false;
 
     for(size_t i=1; i<sWords.size(); i++)
     {
+        std::cout << "Word " << i << std::endl;
         std::vector<size_t> pages2 = pages(sWords[i]);
         if(pages2.size() == 0) 
             return false;
@@ -332,6 +334,7 @@ std::vector<size_t> CBook::pages(std::string sWord) {
 // **** GET PREVIEW FUNCTIONS **** //
 std::string CBook::getPreview(std::string sInput)
 {
+    std::cout << "Get Prieview... " << std::endl;
     // *** Get First preview *** //
     std::vector<std::string> searchedWords = func::split2(sInput, "+");
     std::string prev = getOnePreview(searchedWords[0]);
@@ -339,6 +342,7 @@ std::string CBook::getPreview(std::string sInput)
     // *** Get second Preview (if second word) *** //
     for(size_t i=1; i<searchedWords.size(); i++)
     {
+        std::cout << "Word... " << i << std::endl;
         //Try finding second word in current preview
         size_t pos = prev.find(searchedWords[i]);
         if(pos!=std::string::npos) {
@@ -378,14 +382,15 @@ std::string CBook::getOnePreview(std::string sWord)
     if(front+len >= sSource.length()) len = sSource.length()-front;
     std::string finalResult = sSource.substr(front, len);
 
+    //*** Shorten preview if needed *** //
+    shortenPreview(finalResult);
+
     // *** Add highlighting *** //
     if (pos > 75) pos = 75;
     finalResult.insert(pos+sWord.length(), "</mark>");
     finalResult.insert(pos, "<mark>");
 
-    //*** Shorten preview if needed *** //
-    shortenPreview(finalResult);
-
+    
     //*** Append [...] front and back *** //
     finalResult.insert(0, " \u2026"); 
     finalResult.append(" \u2026");
@@ -466,24 +471,24 @@ size_t CBook::getPreviewPosition(std::string sWord)
 }
 
 
-void CBook::shortenPreview(std::string& finalResult)
+void CBook::shortenPreview(std::string& str)
 {
     //Delete invalid chars front
     for(;;)
     {
-        if((int)finalResult.front() < 0)
-            finalResult.erase(0,1);
-        else if((int)finalResult.back() < 0)
-            finalResult.pop_back();
+        if((int)str.front() < 0)
+            str.erase(0,1);
+        else if((int)str.back() < 0)
+            str.pop_back();
         else
             break;
     }
 
     //Check vor invalid literals and escape
-    for(unsigned int i=0; i<finalResult.length(); i++)
+    for(unsigned int i=0; i<str.length(); i++)
     {
-        if(finalResult[i] == '\"' || finalResult[i] == '\'' || finalResult[i] == '\\') {
-            finalResult.insert(i, "\\");
+        if(str[i] == '\"' || str[i] == '\'' || str[i] == '\\', str[i] == '<' || str[i] == '>') {
+            str.insert(i, "\\");
             i++;
         }
     }
