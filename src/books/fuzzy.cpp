@@ -1,5 +1,5 @@
 #include "fuzzy.hpp"
-using levenshteinSSE::levenshtein;
+//using levenshteinSSE::levenshtein;
 
 namespace fuzzy
 {
@@ -98,10 +98,10 @@ double fuzzy_cmp(std::string sWord1, std::string sWord2)
         return 1; 
 
     //Calculate levenshtein distance
-    //size_t ldIterative = levenshteinDistance(sWord1.c_str(), sWord2.c_str());
-    std::basic_string<char> a_(std::begin(sWord1), std::end(sWord1));
-    std::basic_string<char> b_(std::begin(sWord2), std::end(sWord2));
-    auto distance = levenshtein(a_, b_);
+    size_t distance = levenshteinDistance(sWord1.c_str(), sWord2.c_str());
+    //std::basic_string<char> a_(std::begin(sWord1), std::end(sWord1));
+    //std::basic_string<char> b_(std::begin(sWord2), std::end(sWord2));
+    //auto distance = levenshtein(a_, b_);
 
     //Calculate score
     return static_cast<double>(distance)/ len2;

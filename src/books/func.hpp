@@ -9,7 +9,6 @@
 #include <locale>
 #include <regex>
 #include <codecvt>
-#include "levenshtein-sse.hpp"
 
 namespace func 
 {
