@@ -4,7 +4,7 @@ project(clas-digital)
 include_directories(
   "src"
   "deps")
-set(CMAKE_CXX_FLAGS "-O3 -Wall -Wextra -Werror -Wpedantic -std=c++1z")
+set(CMAKE_CXX_FLAGS "-march=sandybridge -O3 -std=c++1z")
 
 find_package(Threads REQUIRED)
 find_package(CURL REQUIRED)
