@@ -37,7 +37,6 @@ bool CBookManager::initialize()
     //Create map of all words + and of all words in all titles
     createMapWords();
     createMapWordsTitle();
-    std::cout << "\n";
     std::cout << "Map words: " << m_mapWords.size() << "\n";
     std::cout << "Map title: " << m_mapWordsTitle.size() << "\n";
 
@@ -82,11 +81,23 @@ void CBookManager::addBook(std::string sKey) {
 */
 std::list<std::string>* CBookManager::search(CSearchOptions* searchOpts)
 {
-    //Select search
-    CSearch search(searchOpts);
+    std::vector<std::string> sWords = func::split2(searchOpts->getSearchedWord(), "+");
 
-    //Search
+    //Start first search
+    CSearch search(searchOpts, sWords[0]);
     std::map<std::string, double>* results = search.search(m_mapWords, m_mapWordsTitle, m_mapBooks);
+
+    for(size_t i=1; i<sWords.size(); i++)
+    {
+        CSearch search2(searchOpts, sWords[i]);
+        std::map<std::string, double>* results2 = search2.search(m_mapWords, m_mapWordsTitle, m_mapBooks);
+        for(auto it=results->begin(); it!=results->end(); ++it) {
+            if(results2->count(it->first) == 0)
+                results->erase(it);
+            else if(m_mapBooks[it->first]->getOcr() == true && m_mapBooks[it->first]->onSamePage(sWords))
+                results->erase(it);
+        }
+    }
 
     //Sort results results
     return convertToList(results, searchOpts->getFilterResults());
@@ -102,14 +113,12 @@ std::list<std::string>* CBookManager::search(CSearchOptions* searchOpts)
 */
 std::list<std::string>* CBookManager::convertToList(std::map<std::string, double>* mapSR, int sorting)
 {
-    DBG_INF();
     std::list<std::string>* listBooks = new std::list<std::string>;
     if(mapSR->size() == 0) return listBooks;
     else if(mapSR->size() == 1) {
         listBooks->push_back(mapSR->begin()->first);
         return listBooks;
     }
-    DBG_INF();
 
 	// Declaring the type of Predicate that accepts 2 pairs and return a bool
 	typedef std::function<bool(std::pair<std::string, double>, std::pair<std::string, double>)> Comp;
@@ -144,16 +153,13 @@ std::list<std::string>* CBookManager::convertToList(std::map<std::string, double
 			    return s1 < s2;
 			};
 
-    DBG_INF();
     //Sort by defined sort logic
 	std::set<std::pair<std::string, double>, Comp> sorted(mapSR->begin(), mapSR->end(), compFunctor);
 
     //Convert to list
     for(std::pair<std::string, double> element : sorted)
         listBooks->push_back(element.first); 
-    DBG_INF();
 
-    delete mapSR;
     return listBooks;
 }
 
@@ -197,3 +203,60 @@ void CBookManager::createMapWordsTitle()
     }
 }
 
+            
+/**
+* @brief return a list of 10 words, fitting search Word, sorted by in how many books they apear
+*/
+std::list<std::string>* CBookManager::getSuggestions_acc(std::string sWord, bool t, bool o)
+{
+    std::map<std::string, double>* sugg_1 = new std::map<std::string, double>;
+    std::map<std::string, double>* sugg_2 = new std::map<std::string, double>;
+    
+    //Get suggestions out of map of words
+    if(t==false)
+        sugg_1 = getSuggestions_acc(sWord, m_mapWords);
+
+    //get suggestion out of map of title
+    if(o==false) 
+        sugg_2 = getSuggestions_acc(sWord, m_mapWordsTitle);
+
+    if(t==true) sugg_1 = sugg_2;
+    else if(t==false && o==false) sugg_1->insert(sugg_2->begin(), sugg_2->end());
+
+    std::list<std::string>* results = convertToList(sugg_1, 0);
+    if(results->size() > 10) {
+        auto it = results->begin();
+        for(size_t i=0;i<results->size()-9;i++, it++);
+        results->erase(it, results->end());
+    }
+
+    //delete maps and return results
+    delete sugg_1;
+    delete sugg_2;
+    return results;
+}            
+
+
+std::map<std::string, double>* CBookManager::getSuggestions_acc(std::string sWord, MAPWORDS& mapWords)
+{
+    std::map<std::string, double>* suggs = new std::map<std::string, double>;
+    for(auto it=mapWords.begin(); it!=mapWords.end(); it++) {
+        double val = fuzzy::fuzzy_cmp(it->first, sWord);
+        if(val <= 0.2) {
+            double rel = (1-val)*it->second.size();
+            if(suggs->size() < 10) 
+                (*suggs)[it->first] = rel;
+            else
+            {
+                for(auto yt=suggs->begin(); yt!=suggs->end(); yt++) {
+                    if(yt->second < rel) {
+                        (*suggs)[it->first] = rel;
+                        suggs->erase(yt);
+                        break;
+                     }
+                }
+            }
+        }
+    }
+    return suggs;
+}

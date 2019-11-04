@@ -22,8 +22,14 @@ private:
 
     //Map of all books
     std::unordered_map<std::string, CBook*> m_mapBooks;
-    std::unordered_map<std::string, std::map<std::string, double>> m_mapWords;
-    std::unordered_map<std::string, std::map<std::string, double>> m_mapWordsTitle;
+
+
+    //Map of words / map of words in titles
+    typedef std::unordered_map<std::string, std::map<std::string, double>> MAPWORDS;
+    MAPWORDS m_mapWords;
+    MAPWORDS m_mapWordsTitle;
+
+    std::list<std::pair<std::string, size_t>> m_listWords;
 
     std::shared_mutex m_searchLock;
 
@@ -76,6 +82,11 @@ public:
     */
     void createMapWordsTitle();
 
+    /**
+    * @brief return a list of 10 words, fitting search Word, sorted by in how many books they apear
+    */
+    std::list<std::string>* getSuggestions_acc(std::string sWord, bool t, bool o);
+    std::map<std::string, double>* getSuggestions_acc(std::string sWord, MAPWORDS& mapWords);
 }; 
 
 

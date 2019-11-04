@@ -1,5 +1,6 @@
 #include <iostream>
 #include <list>
+#include <ctime>
 #include "json.hpp"
 #include "CBookManager.hpp"
 #include "CBook.hpp"
@@ -7,6 +8,15 @@
 
 int main()
 {
+    /*
+    std::ifstream read("web/books/XUA36SSS/ocr.txt");
+    std::string str((std::istreambuf_iterator<char>(read)), std::istreambuf_iterator<char>());
+
+    std::ofstream write("test.txt");
+    for(auto it : func::extractWordsFromString(str))
+        write << it.first << "\n";
+
+    */
     CBookManager manager;
 
     std::ifstream read("bin/zotero.json");
@@ -29,10 +39,28 @@ int main()
         std::string sInput;
         getline(std::cin, sInput);
         func::convertToLower(sInput);
+        sInput = func::convertStr(sInput);
 
         if(sInput == "q")
             return 0;
 
+
+        /*
+        struct timespec start, finish;
+        double elapsed;
+        clock_gettime(CLOCK_MONOTONIC, &start);
+        std::list<std::string>* l_sugg = manager.getSuggestions_acc(sInput, false, false);
+        clock_gettime(CLOCK_MONOTONIC, &finish);
+        elapsed = (finish.tv_sec - start.tv_sec);
+        elapsed += (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
+        std::cout << "Results in: " << elapsed << std::endl;
+        for(auto it=l_sugg->begin(); it!=l_sugg->end();it++)
+            std::cout << (*it) << std::endl;
+        delete l_sugg;
+        std::cout << std::endl;
+        
+        */
+        
         std::cout << "Fuzzyness: ";
         std::string sFuzzy;
         getline(std::cin, sFuzzy);
@@ -54,6 +82,7 @@ int main()
         {
             CBook* book = manager.getMapOfBooks()[(*it)];
             std::cout << "\033[1;32m" << book->getKey() << ": " << book->getShow() << "\n";
+            std::cout << "Preview: " << std::endl;
             std::cout << "\033[1;31m" << book->getPreview(sInput)<< "\n";
 
             // *** Print Pages *** //
@@ -86,6 +115,7 @@ int main()
         }
         std::cout << "Results found: " << (int)counter << "\n";
    }
+   
 }
      
 

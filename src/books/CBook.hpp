@@ -148,6 +148,8 @@ public:
     */
     void removePages(std::map<int, std::vector<std::string>>* results1, std::map<int, std::vector<std::string>>* results2);
 
+    bool onSamePage(std::vector<std::string> sWords);
+    std::vector<size_t> pages(std::string sWord);
 
 
     // ***** GET PREVIEW - functions ***** //
@@ -158,6 +160,10 @@ public:
     * @return Preview
     */
     std::string getPreview(std::string sWord);
+    std::string getOnePreview(std::string sWord);
+
+    std::string getPreviewText(std::string& sWord, size_t& pos);
+    std::string getPreviewTitle(std::string& sWord, size_t& pos);
 
     /*
     * @brief Find preview with matched word (best match), and page on which the match was found.

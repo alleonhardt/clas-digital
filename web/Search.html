@@ -306,6 +306,41 @@ function OpenFilter(x)
 	}
 }
 
+function SetAdvancedAuthor(x)
+{
+    document.getElementById("SearchForAuthor").value=x.value;
+}
+
+function SetAdvancedDateBefore(x)
+{
+    document.getElementById("PublicatedBefore").value=x.value;
+}
+function SetAdvancedDateAfter(x)
+{
+    document.getElementById("PublicatedAfter").value=x.value;
+}
+function SetAdvancedOnlyIn(x)
+{
+    if(x.value==0) {
+        document.getElementById("SearchInOCR").checked=false;
+        document.getElementById("SearchInTitle").checked=false;
+    }
+    if(x.value==1 && document.getElementById("SearchInTitle").checked==false) {
+        document.getElementById("SearchInTitle").checked=true;
+        document.getElementById("SearchInOCR").checked=false;
+    }
+
+    if(x.value==2 && document.getElementById("SearchInOCR").checked==false) {
+        document.getElementById("SearchInOCR").checked=true;
+        document.getElementById("SearchInTitle").checked=false;
+    }
+}
+
+function SetAdvancedFuzzy(x)
+{
+	document.getElementById("FuzzyID").value=x.value;
+}
+
 function callMetadata(x)
 {
     window.location = "/ShowMetadata.html?scanId="+x.dataset.scanid;
@@ -315,7 +350,15 @@ function ShowSelectedValues(obj)
 {
 	obj.innerHTML = "";
 	let json = obj.drawablejson;
-    document.getElementById("ResultBanner").innerHTML =  "<div style='margin-top: 2rem;margin-bottom:0;'><select id='maxresultsperpage' onchange='OpenFilter(this);return true;' class='specialultbut' style='background:white;margin-right:0.5rem;border:0;'><option value='10'>Show 10 results per page</option><option value='20'>Show 20 results per page</option><option value='50'>Show 50 results per page</option><option value='1000000'>Show all results per page</option></select><select id='f_sort' onchange='OpenFilter(this);return true;' class='specialultbut' onclick='return true;' style='background:white;margin-right: 0.5rem;border: 0;'><option value='0'>Sort by relevance</option><option value='2'>Sort alphabetically</option><option value='1'>Sort chronologically</option></select><button class='specialultbut' style='background:white;border: 0;' onclick='CreateBibliography();return true;'>Create Bibliography</button></div><hr style='padding: 0;'><span style='color: grey;'>"+json.max_results+" Ergebnisse gefunden in "+json.time+"s</span>";
+    let author = "Author: <input id='author' onchange='SetAdvancedAuthor(this);return true;' class='specialultbut' style='background:white;margin-right:0.5;border:0;' type='text' value='' </input>";
+    let dateAfter = "After: <input id='PublicatedAfter' onchange='SetAdvancedDateAfter(this);return true;' class='specialultbut' style='background:white;margin-right:0.5;border:0;' size='5' type='number' step='1' min='0' value='0'>";
+    let dateBefore = "Before: <input id='PublicatedBefore' onchange='SetAdvancedDateBefore(this);return true;' class='specialultbut' style='background:white;margin-right:0.5;border:0;' size='5' type='number' step='1' min='0' value='0'>";
+    let onlyIn = "<select id='fuzzyness' onchange='SetAdvancedOnlyIn(this);return true;' class='specialultbut' style='background:white;margin-right:0.5;border:0;'><option value='0'>Search Everything</option><option value='1'>Search only Metadata</option><option value='2'>Search only Text</option></select>";
+    let fuzzy = "<select id='fuzzyness' onchange='SetAdvancedFuzzy(this);return true;' class='specialultbut' style='background:white;margin-right:0.5;border:0;'><option value='0'>Exact matches</option><option value='1'>Fuzzy matching</option></select>";
+    let results = "<select id='maxresultsperpage' onchange='OpenFilter(this);return true;' class='specialultbut' style='background:white;margin-right:0.5rem;border:0;'><option value='10'>Show 10 results per page</option><option value='20'>Show 20 results per page</option><option value='50'>Show 50 results per page</option><option value='1000000'>Show all results</option></select>";
+    let sort = "<select id='f_sort' onchange='OpenFilter(this);return true;' class='specialultbut' onclick='return true;' style='background:white;margin-right: 0.5rem;border: 0;'><option value='0'>Sort by relevance</option><option value='2'>Sort alphabetically</option><option value='1'>Sort chronologically</option></select>";
+    let bib = "<button class='specialultbut' style='background:white;border: 0;' onclick='CreateBibliography();return true;'>Create Bibliography</button></div><hr style='padding: 0;'>";
+    document.getElementById("ResultBanner").innerHTML ="<div style='margin-top: 2rem;margin-bottom:0;'>" + author + dateAfter+ dateBefore+ onlyIn + fuzzy + results + sort + bib +"<span style='color: grey;'>"+json.max_results+" Ergebnisse gefunden in "+json.time+"s</span>";
 	if(json.max_results==0)
 	    return;
 	obj.start = json.show_from;
@@ -425,7 +468,7 @@ function sendToPage(name)
 	let inputObj = document.getElementById(name);
 	let input = inputObj.value;
 	//Form the request for the server
-	let requ = "/search?q="+encodeURIComponent(input);
+	let requ = "/search?q="+encodeURIComponent(input).replace(/%20/g, "+");
 	console.log(requ);
 
 	//Create the json file with the advanced search options
@@ -739,7 +782,7 @@ function ShowLinks()
 
 		<div id="searchboxid" class="button_box_top">
         <div class="logo"> <img src="static/clas-logotype-frankfurt-00618f-blue-712x450.png" width="15%" height="12%" title="Cultural And Literary Animal Studies" alt="CLAS Logo"> </div>
-        <div class="betaversion"> This is a Beta version. Report Bugs at <a href="https://github.com/ShadowItaly/clas-digital/issues">clas-digital/issues</a> </div> 
+        <div class="betaversion"> This is a Beta version. Report Bugs at <a href="https://github.com/ShadowItaly/clas-digital/issues">clas-digital/issues</a>. Or use E-Mail: <a href="mailto:clas-digital-technik@dlist.server.uni-frankfurt.de">clas-digital-technik@dlist.server.uni-frankfurt.de</a>. </div> 
 				<!--<div class="form-wrapper-2 cf"> -->
 					<input id="SpecialSID" style='padding: 0.3rem;width: 20%;border-radius: 25px;' type="text" placeholder="Search here..." required>
 					<button id="srchButton" class="srchBtrn" style='display:none;' type="button" onclick="sendToPage('SpecialSID')">Search</button></input>
