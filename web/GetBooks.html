@@ -854,14 +854,14 @@ function shownone(x)
 
 function reset(x)
 {
-    document.getElementById("linklst").style.height = "1.5rem";
+    document.getElementById("linklst").style.height = "1.2rem";
     x.style.height = "";
     x.scrollTop = 0;
 }
 
 function showall(x)
 {
-    //document.getElementById("linklst").style.height = "60%";
+    document.getElementById("linklst").style.height = "";
     insideWindow = true;
     if(x.style.height != "80vh")
     {
