@@ -99,6 +99,8 @@ public:
     */
     std::string getShow();
 
+    std::string getZit(size_t page);
+
     /**
     * @return string with Auhtor + first 10 words title + date
     */

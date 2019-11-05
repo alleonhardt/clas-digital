@@ -304,11 +304,14 @@ function OpenFilter(x)
 	{
 	    window.location = lnk.replace(x.id+"="+val,x.id+"="+retval);
 	}
+
+    document.getElementById("SpecialSID").focus();
 }
 
 function SetAdvancedAuthor(x)
 {
     document.getElementById("SearchForAuthor").value=x.value;
+    document.getElementById("SpecialSID").focus();
 }
 
 function SetAdvancedCollections(x)
@@ -330,15 +333,18 @@ function SetAdvancedCollections(x)
         document.getElementById("uniqueSaule"+elm.value).checked = true;
         console.log(elm.value);
     })
+    document.getElementById("SpecialSID").focus();
 }
 
 function SetAdvancedDateBefore(x)
 {
     document.getElementById("PublicatedBefore").value=x.value;
+    document.getElementById("SpecialSID").focus();
 }
 function SetAdvancedDateAfter(x)
 {
     document.getElementById("PublicatedAfter").value=x.value;
+    document.getElementById("SpecialSID").focus();
 }
 function SetAdvancedOnlyIn(x)
 {
@@ -355,11 +361,13 @@ function SetAdvancedOnlyIn(x)
         document.getElementById("SearchInOCR").checked=true;
         document.getElementById("SearchInTitle").checked=false;
     }
+    document.getElementById("SpecialSID").focus();
 }
 
 function SetAdvancedFuzzy(x)
 {
 	document.getElementById("FuzzyID").value=x.value;
+    document.getElementById("SpecialSID").focus();
 }
 
 function AddAdvancedBar() 
@@ -378,6 +386,7 @@ function AddAdvancedBar()
     let curDisplay = banner.style.display;
 
     banner.style.display = (curDisplay == "block") ? "none" : "block"; 
+    document.getElementById("SpecialSID").focus();
 }
 
 function callMetadata(x)
@@ -863,9 +872,9 @@ function ShowLinks()
                     Before:
                     <input id='publicatedBefore' onchange='SetAdvancedDateBefore(this);return true;' class='specialultbut' style='background:white;margin-right:0.5;border:0;' size='5' type='number' step='1' min='0' value='2019'>
                     <select id='searchIn' onchange='SetAdvancedOnlyIn(this);return true;' class='specialultbut' style='background:white;margin-right:0.5;border:0;'>
-                        <option value='0'>Search Everything</option>
-                        <option value='1'>Search only Metadata</option>
-                        <option value='2'>Search only Text</option>
+                        <option value='0'>Show Everything</option>
+                        <option value='1'>Show only Books without Text</option>
+                        <option value='2'>Show only Books with Text</option>
                     </select>
                     <select id='fuzzyness' onchange='SetAdvancedFuzzy(this);return true;' class='specialultbut' style='background:white;margin-right:0.5;border:0;'>
                         <option value='0'>Exact matches</option>

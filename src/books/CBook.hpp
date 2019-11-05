@@ -162,7 +162,7 @@ public:
     std::string getPreview(std::string sWord);
     std::string getOnePreview(std::string sWord);
 
-    std::string getPreviewText(std::string& sWord, size_t& pos);
+    std::string getPreviewText(std::string& sWord, size_t& pos, size_t& page);
     std::string getPreviewTitle(std::string& sWord, size_t& pos);
 
     /*
