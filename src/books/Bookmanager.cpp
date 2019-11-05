@@ -234,14 +234,17 @@ void CBookManager::createListWords()
 */
 std::list<std::string>* CBookManager::getSuggestions_fast(std::string sWord)
 {
-    std::list<std::string>* listSuggestions = new std::list<std::string>;
+    std::map<std::string, double>* suggs = new std::map<std::string, double>;
     size_t counter=0;
     for(auto it=m_listWords.begin(); it!=m_listWords.end() && counter < 10; it++) {
-        if(fuzzy::fuzzy_cmp(it->first, sWord) <= 0.2) {
-            listSuggestions->push_back(it->first);
+        double value = fuzzy::fuzzy_cmp(it->first, sWord);
+        if( value <= 0.2) {
+            (*suggs)[it->first] = value;
             counter++;
         }
     }
+    std::list<std::string>* listSuggestions = convertToList(suggs, 0);
+    delete suggs;
     return listSuggestions;
 }
             
