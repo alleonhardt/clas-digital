@@ -577,6 +577,15 @@ function getParameterByName(name, url) {
     return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }
 
+function triggerDblclick(x)
+{
+    var event = new MouseEvent('dblclick', {
+    'view': window,
+    'bubbles': true,
+    'cancelable': true
+  });
+    x.dispatchEvent(event);
+}
 
 function init() {
 	    //document.getElementById("query").innerHTML = getParameterByName('query');
@@ -600,11 +609,11 @@ function init() {
 	    globalScrollLock = true;
 	    if(val.length>1)
 	    {
-		val[1].dblclick();
+		triggerDblclick(val[1]);
 	    }
 	    else
 	    {
-		val[0].dblclick();
+		triggerDblclick(val[0]);
 	    }
 	}
     document.getElementById("olol").onscroll = function() {
@@ -615,7 +624,7 @@ function init() {
 	    }
 	    let val = getVisiblePagesOCR();
 	    globalScrollLock = true; 
-	    val[0].dblclick();
+	    triggerDblclick(val[0]);
 	}
 
 	let parsedUrlParams = parseURLParams(window.location.href);
