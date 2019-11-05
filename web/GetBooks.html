@@ -714,7 +714,7 @@ function init() {
 
 		  let resultLinks = "";
 		  for(let i = 0; i < pagesList.length; i++) {
-		  resultLinks = resultLinks + " " + "<a class='coollnklist' onclick='document.getElementById(\"uniqueocrpage"+pagesList[i]+"\").scrollIntoView();window.location.replace(\"#page"+pagesList[i]+"\");changecolor(this);return true;'>" + pagesList[i] + "</a>";
+		  resultLinks = resultLinks + " " + "<a class='coollnklist' onclick='document.getElementById(\"uniqueocrpage"+pagesList[i]+"\").scrollIntoView();window.location.replace(\"#page"+pagesList[i]+"\");changecolor(this);return true;' data-page='"+pagesList[i]+"'>" + pagesList[i] + "</a>";
 
 			for(let y = 0; y < HighlightList.length; y++)
 			{
@@ -741,7 +741,7 @@ function init() {
 			  }
 			  else
 			  {
-										   resultLinks.innerHTML = resultLinks.innerHTML + " " + "<a class='coollnklist' onclick='document.getElementById(\"uniqueocrpage"+searchResults.pages[i].page+"\").scrollIntoView();window.location.replace(\"#page"+searchResults.pages[i].page+"\");changecolor(this);return true;'>" + searchResults.pages[i].page + " ("
+										   resultLinks.innerHTML = resultLinks.innerHTML + " " + "<a class='coollnklist' onclick='document.getElementById(\"uniqueocrpage"+searchResults.pages[i].page+"\").scrollIntoView();window.location.replace(\"#page"+searchResults.pages[i].page+"\");changecolor(this);return true;' data-page='"+searchResults.pages[i].page+"'>" + searchResults.pages[i].page + " ("
 				  + "<span id='pageHitList"+searchResults.pages[i].page +"'>"					 
 				  + searchResults.pages[i].word + "</span>)</a>";
 			  }
@@ -774,7 +774,7 @@ window.addEventListener("load", init, false);
 
 .optioncont {
     display: block;
-    height: 2.5rem;
+    height: 2.3rem;
     margin: 0;
     padding: 0;
     padding-top: 0.5rem;
@@ -861,12 +861,27 @@ function reset(x)
 
 function showall(x)
 {
-    document.getElementById("linklst").style.height = "";
+    document.getElementById("linklst").style.height = "100%";
     insideWindow = true;
     if(x.style.height != "80vh")
     {
 	x.style.height = "80vh";
-	x.style.overflow = "auto";
+    }
+}
+
+function SelectNextHit()
+{
+    let curr = window.location.hash;
+    let integer = parseInt(curr.substr(5));
+    let lnks = document.getElementsByClassName("coollnklist");
+
+    for(let i = 0; i < lnks.length; i++)
+    {
+	if(parseInt(lnks[i].dataset.page) > integer)
+	{
+	    lnks[i].click();
+	    return;
+	}
     }
 }
 </script>
@@ -876,7 +891,7 @@ function showall(x)
     <div id="MoreInfoSrch" style='display: none;'>Ihr Suchbegriff '<mark id='query'></mark>'wurde auf folgenden Seiten gefunden: </div>!------>
 	<div class="pageContainer">
 	    <div style='top: 0;display: inline-grid; grid-column: 2 /span 1;height:98vh;'> 
-		<div id="SearchOpts" class="optioncont" onmouseout='shownone(this);' onmouseover='showall(this);' style='top: 0;background-color: white;overflow:auto;'><div style='display:grid;grid-template-columns: 90% 10%;padding: 0;'><div id='linklst' class='linkliststyler'></div><button style='grid-column: 2 /span 1;'>Next</button></div>
+		<div id="SearchOpts" class="optioncont" onmouseout='shownone(this);' onmouseover='showall(this);' style='top: 0;background-color: white;overflow:auto;'><div style='display:grid;grid-template-columns: 90% 10%;padding: 0;'><div id='linklst' class='linkliststyler'></div><button style='grid-column: 2 /span 1;max-height: 2rem' onclick="SelectNextHit();return true;">Next</button></div>
 		    <div id="biblio" style='color: green;'></div><div id="searchboxstuff"><hr><span style='margin-right: 1rem;'>Search again for:</span><input id='srchbox' type='text' placeholder="Next search..."><hr>
 		    </div>
 	    </div>
