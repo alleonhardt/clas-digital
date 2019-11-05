@@ -5,6 +5,7 @@
 
 		<!-- Bootstrap CSS -->
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 		<!--<link rel="stylesheet" href="style.css">-->
 		<title>Search - clas digital</title>
 
@@ -17,8 +18,7 @@
 mark {
 	font-weight: bold;
 	background: white;
-}
-.resultbox {
+} .resultbox {
 	margin-left: 11%;
 	margin-right: 11%;
 }
@@ -231,6 +231,15 @@ https://github.com/ShadowItaly/clas-digital/issues/56.close:focus {
 	color: #D88F3C;
 }
 
+.srchbtn {
+      border: none; /* Remove borders */
+      color: grey; /* White text */
+      /* padding: 12px 16px; Some padding */
+      font-size: 16px; /* Set a font size */
+      cursor: pointer; /* Mouse pointer on hover */
+      border-radius: 50%;
+}
+
 		</style>
 		<script src="user.js"></script>
 		<script>
@@ -244,42 +253,6 @@ function getSliderValue(x)
 	else
 		return "Do approximate matching		      ";
 
-}
-
-//Opens the search options
-function openSearchOpts(name)
-{
-
-	LoadSearchData(search_parameters);
-
-
-	//Get the modal banner which contains all the advanced options
-	let advancedOpts = document.getElementById("ModalBanner");
-	//Tell the modal banner it should display itself right now
-	advancedOpts.style.display = "block";
-
-	//Show the last set amount of fuzzyness in the modal banner
-	let x = document.getElementById("FuzzyID").value;
-	document.getElementById("SliderNum").innerHTML = getSliderValue(x);
-
-	//Prepare the close button, on close click it will hide the modal banner
-	let close = document.getElementById("CloseSModal");
-	close.onclick = function() {
-		advancedOpts.style.display = "none";
-		let inp = document.getElementById("SpecialSID");
-		inp.focus();
-
-	}
-
-	//If the user clicked outside of the modal banner close the window as well
-	window.onclick = function(event) {
-		if (event.target == advancedOpts) {
-			advancedOpts.style.display = "none";
-			let inp = document.getElementById("SpecialSID");
-			inp.focus();
-
-		}
-	} 
 }
 
 
@@ -851,8 +824,7 @@ function ShowLinks()
         <div class="betaversion"> This is a Beta version. Report Bugs at <a href="https://github.com/ShadowItaly/clas-digital/issues">clas-digital/issues</a>. Or use E-Mail: <a href="mailto:clas-digital-technik@dlist.server.uni-frankfurt.de">clas-digital-technik@dlist.server.uni-frankfurt.de</a>. </div> 
 				<!--<div class="form-wrapper-2 cf"> -->
 					<input id="SpecialSID" style='padding: 0.3rem;width: 20%;border-radius: 25px;' type="text" placeholder="Search here..." required>
-					<button id="srchButton" class="srchBtrn" style='display:none;' type="button" onclick="sendToPage('SpecialSID')">Search</button></input>
-					<!--<button class="btclass2" type="button" onclick="openSearchOpts('AdvancedSearchOptions')">Advanced</button> -->
+                    <button id="srchButton" class='srchbtn' style='margin-left: -2.8rem;' type="button" onclick="sendToPage('SpecialSID')"><i class="fa fa-search"></i></button></input>
 				<!--</div>-->
 			<div id="ResultBanner" style="display:none; margin-top:2rem;" >
 
