@@ -456,15 +456,10 @@ function GetOCRTxt() {
 			    let parsedUrlParams = parseURLParams(window.location.href);
 				Server.Get("/books/"+parsedUrlParams['scanId']+"/ocr.txt",function(content) {
 			    
-			      //let doc2 = document.createElement("div");
-			      //let doc = document.createElement("p");
-
 			      content = content.replace(new RegExp("<",'g'),"&lt;");
 			      content = content.replace(new RegExp(">",'g'),"&gt;");
-			      //content = content.replace(new RegExp(parsedUrlParams['query'],'g'), '<mark>'+parsedUrlParams['query']+'</mark>');
 
 			      UpdateOCRTxt(content,resolve);
-				  //if(document.getElementById("InfoScreen").style.display == "none")
 
 							},function(content){
 								let Index = window.location.href.indexOf("scanId=");
@@ -475,31 +470,11 @@ function GetOCRTxt() {
 }
 
 
-
-function loadExcept(x)
-{
-	console.log("Loading stuff");
-	let lst = document.getElementsByClassName("ocrpage");
-	for(var i = 0; i < lst.length; i++)
-	{
-			lst[i].innerHTML = pageVal[i];
-	}
-}
-
-async function deleteAll()
-{
-	let lst = document.getElementsByClassName("ocrpage");
-	for(var i = 0; i < lst.length; i++)
-	{
-			lst[i].innerHTML = "";
-	}
-}
-
 function UpdateOCRTxt(x,res)
 {
 	  let RegSrch = /-----\s(\d+)\s.\s(\d+)\s-----/g;
 	x = '<p data-page="1" id="uniqueocrpage0" class="ocrpage">' + x;
-    x = x.replace(RegSrch,'</p><p data-page="$1" id="uniqueocrpage$1" class="ocrpage" ondblclick="SwitchToPage(this);"><span class="pagelayout"> Page $1 / $2 </span><br>');
+        x = x.replace(RegSrch,'</p><p data-page="$1" id="uniqueocrpage$1" class="ocrpage" ondblclick="SwitchToPage(this);"><span class="pagelayout"> Page $1 / $2 </span><br>');
   	x+="</p>";
 	
 	document.getElementById("OCRBuffer").innerHTML = x;
@@ -633,7 +608,7 @@ function init() {
 	    if(globalScrollLock)
 	    { 
 		globalScrollLock = false;
-		return;
+		return false;
 	    }
 	    console.log("Pages on scroll and focus!");
 		
@@ -641,6 +616,8 @@ function init() {
 	    globalScrollLock = true;
 	    triggerDblclick(val[0]);
 	    UpdateLinkPrev();
+	    updateAfterScroll();
+	    return false;
 	}
     document.getElementById("OCRBuffer").onscroll = function() {
 	    console.log("Ocr scrolls now!");
@@ -697,22 +674,12 @@ function init() {
 			anchorNode.name = "page" + scanInfo.pages[i].pageNumber;
 			anchorNode.id = "uniquePageNode"+scanInfo.pages[i].pageNumber;
 			pageNode.insertBefore(anchorNode,pageNode.firstChild);
-			//document.querySelector(".reader").appendChild(anchorNode);			
 			document.querySelector(".reader").appendChild(pageNode);
 			pageNode.scanFilePath = "/books/"+scanId+ "/" + scanInfo.pages[i].file.substr(scanInfo.pages[i].file.search("page"));
 			pageNode.info = i;
 		}
 
-		// if an anchor was specified go there (as it is now defined)
-		if(location.hash)
-			location.hash = location.hash;
-		updateAfterScroll();
-	}, function() {
-		document.body.innerHTML = "<center><h1>Access denied!</h1></center>";
-	});
-
-	document.getElementsByClassName("reader")[0].addEventListener("scroll", updateAfterScroll, false);
-		Server.Get("/getmetadata?scanId=" + scanId, function(content) {
+	    Server.Get("/getmetadata?scanId=" + scanId, function(content) {
 		metadata = JSON.parse(content);
 		    document.getElementById("biblio").innerHTML = metadata.bib;
 		if(metadata.data.creators[0].lastName === undefined)
@@ -723,6 +690,15 @@ function init() {
 		// print some error message here
 	});
 
+		// if an anchor was specified go there (as it is now defined)
+		if(location.hash)
+			location.hash = location.hash;
+
+
+		updateAfterScroll();
+	}, function() {
+		document.body.innerHTML = "<center><h1>Access denied!</h1></center>";
+	});
 	
 	if(!parsedUrlParams.hasOwnProperty("query"))
 		return;
@@ -977,7 +953,7 @@ function SelectNextHit()
 		<div id="OCRBuffer" class="ocrdispstyle"><p>Loading...</p></div>
 	    </div>
 	    </div>
-	    <div id="thepagereader" class="reader" tabindex="0">
+	    <div id="thepagereader" class='reader' tabindex='0'>
 	    </div>
 	</div>
 	<div id="SizeOfRem" style="width:2rem;display:none"></div>
