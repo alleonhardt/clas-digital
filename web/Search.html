@@ -304,11 +304,14 @@ function OpenFilter(x)
 	{
 	    window.location = lnk.replace(x.id+"="+val,x.id+"="+retval);
 	}
+
+    document.getElementById("SpecialSID").focus();
 }
 
 function SetAdvancedAuthor(x)
 {
     document.getElementById("SearchForAuthor").value=x.value;
+    document.getElementById("SpecialSID").focus();
 }
 
 function SetAdvancedCollections(x)
@@ -330,15 +333,18 @@ function SetAdvancedCollections(x)
         document.getElementById("uniqueSaule"+elm.value).checked = true;
         console.log(elm.value);
     })
+    document.getElementById("SpecialSID").focus();
 }
 
 function SetAdvancedDateBefore(x)
 {
     document.getElementById("PublicatedBefore").value=x.value;
+    document.getElementById("SpecialSID").focus();
 }
 function SetAdvancedDateAfter(x)
 {
     document.getElementById("PublicatedAfter").value=x.value;
+    document.getElementById("SpecialSID").focus();
 }
 function SetAdvancedOnlyIn(x)
 {
@@ -355,11 +361,13 @@ function SetAdvancedOnlyIn(x)
         document.getElementById("SearchInOCR").checked=true;
         document.getElementById("SearchInTitle").checked=false;
     }
+    document.getElementById("SpecialSID").focus();
 }
 
 function SetAdvancedFuzzy(x)
 {
 	document.getElementById("FuzzyID").value=x.value;
+    document.getElementById("SpecialSID").focus();
 }
 
 function AddAdvancedBar() 
@@ -378,6 +386,7 @@ function AddAdvancedBar()
     let curDisplay = banner.style.display;
 
     banner.style.display = (curDisplay == "block") ? "none" : "block"; 
+    document.getElementById("SpecialSID").focus();
 }
 
 function callMetadata(x)
