@@ -373,7 +373,7 @@ function getVisiblePagesOCR()
 	let visiblePages = new Array();
 	for(let i = 0; i < allPages.length; i++) {
 		if(isElementInViewport(allPages[i])) {
-		    if(document.getElementById("olol").scrollTop<((allPages[i].offsetTop+allPages[i].clientHeight-300)))
+		    if(document.getElementById("OCRBuffer").scrollTop<((allPages[i].offsetTop+allPages[i].clientHeight-300)))
 			{
 			    visiblePages.push(allPages[i]);
 			}
@@ -487,7 +487,7 @@ async function deleteAll()
 function UpdateOCRTxt(x,res)
 {
 	  let RegSrch = /-----\s(\d+)\s.\s(\d+)\s-----/g;
-	x = '<p data-page="1" class="ocrpage">' + x;
+	x = '<p data-page="1" id="uniqueocrpage0" class="ocrpage">' + x;
     x = x.replace(RegSrch,'</p><p data-page="$1" id="uniqueocrpage$1" class="ocrpage" ondblclick="SwitchToPage(this);"><span class="pagelayout"> Page $1 / $2 </span><br>');
   	x+="</p>";
 	
@@ -577,6 +577,33 @@ function getParameterByName(name, url) {
     return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }
 
+function UpdateLinkPrev()
+{
+	    let val = document.getElementsByClassName("coollnklist");
+	    let page = window.location.hash.substr(5);
+	    if(page=="")
+		page=0;
+	    else
+		page=parseInt(page);
+	    for(let i = 0; i < val.length; i++)
+	    {
+		if(page<=val[i].dataset.page)
+		{
+		    val[i].scrollIntoView();
+		    return;
+		}
+
+	    }
+}
+function triggerDblclick(x)
+{
+    var event = new MouseEvent('dblclick', {
+    'view': window,
+    'bubbles': true,
+    'cancelable': true
+  });
+    x.dispatchEvent(event);
+}
 
 function init() {
 	    //document.getElementById("query").innerHTML = getParameterByName('query');
@@ -600,14 +627,16 @@ function init() {
 	    globalScrollLock = true;
 	    if(val.length>1)
 	    {
-		val[1].dblclick();
+		triggerDblclick(val[1]);
 	    }
 	    else
 	    {
-		val[0].dblclick();
+		triggerDblclick(val[0]);
 	    }
+	    UpdateLinkPrev();
 	}
-    document.getElementById("olol").onscroll = function() {
+    document.getElementById("OCRBuffer").onscroll = function() {
+	    console.log("Ocr scrolls now!");
 	    if(globalScrollLock)
 	    {
 		globalScrollLock = false;
@@ -615,7 +644,8 @@ function init() {
 	    }
 	    let val = getVisiblePagesOCR();
 	    globalScrollLock = true; 
-	    val[0].dblclick();
+	    triggerDblclick(val[0]);
+	    UpdateLinkPrev();
 	}
 
 	let parsedUrlParams = parseURLParams(window.location.href);
@@ -741,7 +771,7 @@ function init() {
 			  }
 			  else
 			  {
-										   resultLinks.innerHTML = resultLinks.innerHTML + " " + "<a class='coollnklist' onclick='document.getElementById(\"uniqueocrpage"+searchResults.pages[i].page+"\").scrollIntoView();window.location.replace(\"#page"+searchResults.pages[i].page+"\");changecolor(this);return true;' data-page='"+searchResults.pages[i].page+"'>" + searchResults.pages[i].page + " ("
+										   resultLinks.innerHTML = resultLinks.innerHTML + " " + "<a class='coollnklist' onclick='document.getElementById(\"uniqueocrpage"+searchResults.pages[i].page+"\").scrollIntoView();window.location.replace(\"#page"+searchResults.pages[i].page+"\");changecolor(this);return true;' data-page='"+searchResults.pages[i].page+"'>" + searchResults.pages[i].page + "("
 				  + "<span id='pageHitList"+searchResults.pages[i].page +"'>"					 
 				  + searchResults.pages[i].word + "</span>)</a>";
 			  }
@@ -824,9 +854,12 @@ window.addEventListener("load", init, false);
     grid-column: 1 /span 1;
     grid-row: 1 / span 1;
     margin: 0;
+    margin-left: 0.5rem;
     line-height: 2rem;
     background-color: white;
     padding-bottom: 2rem;
+    overflow: auto;
+    white-space: nowrap;
 }
 
 a:visited {
@@ -873,6 +906,7 @@ function changecolor(x)
 
 function shownone(x)
 {
+    document.getElementById("linklst").style["white-space"] = "nowrap";
     document.getElementById("upimg").style.display = "none";
     document.getElementById("downimg").style.display = "block";
     document.getElementById("divdrop").onclick = function(){showall(document.getElementById("SearchOpts"));};
@@ -885,6 +919,7 @@ function showall(x)
     if(x.style.height != "80vh")
     {
 	x.classList.replace("secondoptioncontlay","currentoptioncontlay");
+	document.getElementById("linklst").style["white-space"] = "normal";
 	document.getElementById("divdrop").onclick = function(){shownone(document.getElementById("SearchOpts"));};
 	document.getElementById("upimg").style.display = "block";
 	document.getElementById("downimg").style.display = "none";
