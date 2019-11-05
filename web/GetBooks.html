@@ -600,11 +600,11 @@ function init() {
 	    globalScrollLock = true;
 	    if(val.length>1)
 	    {
-		val[1].ondblclick();
+		val[1].dblclick();
 	    }
 	    else
 	    {
-		val[0].ondblclick();
+		val[0].dblclick();
 	    }
 	}
     document.getElementById("olol").onscroll = function() {
@@ -615,7 +615,7 @@ function init() {
 	    }
 	    let val = getVisiblePagesOCR();
 	    globalScrollLock = true; 
-	    val[0].ondblclick();
+	    val[0].dblclick();
 	}
 
 	let parsedUrlParams = parseURLParams(window.location.href);
