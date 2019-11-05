@@ -305,7 +305,7 @@ https://github.com/ShadowItaly/clas-digital/issues/56.close:focus {
     margin-left:-11rem;
     background-color: #f1f1f1;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 2;
+    z-index: 1;
 }
 
 
@@ -633,7 +633,6 @@ function ShowSelectedValues(obj)
 
 function sendSugg(input)
 {
-    console.log(input);
     let requ = "/getsugg?q="+encodeURIComponent(input);
 
     var xhttp = new XMLHttpRequest();
@@ -648,7 +647,7 @@ function sendSugg(input)
            for(let i=0;i<obj.length;i++)
            {
                var node = document.createElement("a");
-               node.onclick=function(){sugg_func(this);};
+               node.onmousedown=function(){sugg_func(this);};
                var textNode = document.createTextNode(obj[i]);
                node.appendChild(textNode);
                suggs.appendChild(node);
@@ -718,6 +717,15 @@ function sendToPage(name)
 
 function sugg_func(x) 
 {
+    console.log(x.textContent);
+    let searchBox = document.getElementById("SpecialSID");
+    searchBox.value=x.textContent;
+    searchBox.focus();
+}
+
+function sugg_appear(x) 
+{
+    console.log(x.textContent);
     let searchBox = document.getElementById("SpecialSID");
     searchBox.value=x.textContent;
     searchBox.focus();
@@ -1006,7 +1014,7 @@ function ShowLinks()
         <div class="betaversion"> This is a Beta version. Report Bugs at <a href="https://github.com/ShadowItaly/clas-digital/issues">clas-digital/issues</a>. Or use E-Mail: <a href="mailto:clas-digital-technik@dlist.server.uni-frankfurt.de">clas-digital-technik@dlist.server.uni-frankfurt.de</a>. </div> 
 				<!--<div class="form-wrapper-2 cf"> -->
                 <div >
-					<input id="SpecialSID" onfocusout='sugg_disapear()' style='padding: 0.3rem;width: 20%;border-radius: 25px;' type="text" placeholder="Search here..." required>
+					<input id="SpecialSID" onblur='sugg_disapear();return true;' style='padding: 0.3rem;width: 20%;border-radius: 25px;' type="text" placeholder="Search here..." required>
                     <button id="srchButton" class='srchbtn' style='margin-left: -2.8rem;' type="button" onclick="sendToPage('SpecialSID')"><i class="fa fa-search"></i></button></input>
                 </div>
 				<!--</div>-->
