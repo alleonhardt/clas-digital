@@ -547,9 +547,9 @@ function sendToPage(name)
 	    requ += "&ocr_only=true";
 	if(document.getElementById("SearchForAuthor").value != "")
 		requ += "&author="+document.getElementById("SearchForAuthor").value;
-	if(document.getElementById("PublicatedAfter").value != 0)
+	if(document.getElementById("PublicatedAfter").value != 1700)
 	    requ += "&publicatedafter="+document.getElementById("PublicatedAfter").value;
-	if(document.getElementById("PublicatedBefore").value != 2019)
+	if(document.getElementById("PublicatedBefore").value != 2049)
 	    requ +=  "&publicatedbefore="+ document.getElementById("PublicatedBefore").value;
 	let myList = document.getElementsByClassName("upSaule");
 	
@@ -839,9 +839,9 @@ function ShowLinks()
 				</div>
 				<div class="checker">
 					<p class="slider">Search only in books publicated from</p>
-					<input id="PublicatedAfter" type="number" step="1" min="0" value="0">
+					<input id="PublicatedAfter" type="number" step="50" min="0" value="1700">
 					<p class="slider"> until </p>
-					<input id="PublicatedBefore" type="number" step="1" min="1" value="2019">
+					<input id="PublicatedBefore" type="number" step="50" min="1" value="2049">
 				</div>			
 				<div>
 					<button class='btn btn-outline-success my2 my-sm-0 inlineButton' onclick="ApplySearchData();">Apply</button>
@@ -872,9 +872,9 @@ function ShowLinks()
                         <option value='all' selected>Search all Collections</option>
                     </select>
                     After:
-                    <input id='publicatedAfter' onchange='SetAdvancedDateAfter(this);return true;' class='specialultbut' style='background:white;margin-right:0.5;border:0;' size='5' type='number' step='1' min='0' value='0'>
+                    <input id='publicatedAfter' onchange='SetAdvancedDateAfter(this);return true;' class='specialultbut' style='background:white;margin-right:0.5;border:0;' size='5' type='number' step='50' min='0' value='1700'>
                     Before:
-                    <input id='publicatedBefore' onchange='SetAdvancedDateBefore(this);return true;' class='specialultbut' style='background:white;margin-right:0.5;border:0;' size='5' type='number' step='1' min='0' value='2019'>
+                    <input id='publicatedBefore' onchange='SetAdvancedDateBefore(this);return true;' class='specialultbut' style='background:white;margin-right:0.5;border:0;' size='5' type='number' step='50' min='0' value='2049'>
                     <select id='searchIn' onchange='SetAdvancedOnlyIn(this);return true;' class='specialultbut' style='background:white;margin-right:0.5;border:0;'>
                         <option value='0'>Show Everything</option>
                         <option value='1'>Show only Books without Text</option>
