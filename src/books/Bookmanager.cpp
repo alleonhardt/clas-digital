@@ -209,6 +209,7 @@ void CBookManager::createMapWordsTitle()
 */
 std::list<std::string>* CBookManager::getSuggestions_acc(std::string sWord, bool t, bool o)
 {
+    func::convertToLower(sWord);
     std::map<std::string, double>* sugg_1 = new std::map<std::string, double>;
     std::map<std::string, double>* sugg_2 = new std::map<std::string, double>;
     
