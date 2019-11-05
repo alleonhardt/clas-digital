@@ -299,6 +299,27 @@ https://github.com/ShadowItaly/clas-digital/issues/56.close:focus {
       border-radius: 50%;
 }
 
+.sugg {
+    display:none;
+    position:absolute;
+    margin-left:-11rem;
+    background-color: #f1f1f1;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 2;
+}
+
+
+.sugg a {
+    color: black;
+    padding: 2px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.sugg a:hover {
+    background-color: #ddd;
+}
+
 		</style>
 		<script src="user.js"></script>
 		<script>
@@ -610,17 +631,28 @@ function ShowSelectedValues(obj)
     obj.innerHTML+=next_prev;
 }
 
-function sendSugg()
+function sendSugg(input)
 {
-    let input = document.getElementById("SpecialSID").value;
     console.log(input);
     let requ = "/getsugg?q="+encodeURIComponent(input);
 
     var xhttp = new XMLHttpRequest();
+    var suggs = document.getElementById("suggs");
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
            // Typical action to be performed when the document is ready:
-           console.log(xhttp.responseText);
+           suggs.innerHTML="";
+           suggs.style.display="inline-block";
+
+           var obj = JSON.parse(this.responseText);
+           for(let i=0;i<obj.length;i++)
+           {
+               var node = document.createElement("a");
+               node.onclick=function(){sugg_func(this);};
+               var textNode = document.createTextNode(obj[i]);
+               node.appendChild(textNode);
+               suggs.appendChild(node);
+           }
         }
     };
     xhttp.open("GET", requ, true);
@@ -682,6 +714,18 @@ function sendToPage(name)
 	}
 
        	window.location = requ;
+}
+
+function sugg_func(x) 
+{
+    let searchBox = document.getElementById("SpecialSID");
+    searchBox.value=x.textContent;
+    searchBox.focus();
+}
+
+function sugg_disapear()
+{
+    document.getElementById("suggs").style.display="none";
 }
 
 function SelectAll(y)
@@ -892,7 +936,7 @@ function ShowLinks()
             }
             else
             {
-                sendSugg();
+                sendSugg(document.getElementById("SpecialSID").value+event.key);
             }
 
             
@@ -961,9 +1005,13 @@ function ShowLinks()
         <div class="logo"> <img src="static/clas-logotype-frankfurt-00618f-blue-712x450.png" width="15%" height="12%" title="Cultural And Literary Animal Studies" alt="CLAS Logo"> </div>
         <div class="betaversion"> This is a Beta version. Report Bugs at <a href="https://github.com/ShadowItaly/clas-digital/issues">clas-digital/issues</a>. Or use E-Mail: <a href="mailto:clas-digital-technik@dlist.server.uni-frankfurt.de">clas-digital-technik@dlist.server.uni-frankfurt.de</a>. </div> 
 				<!--<div class="form-wrapper-2 cf"> -->
-					<input id="SpecialSID" style='padding: 0.3rem;width: 20%;border-radius: 25px;' type="text" placeholder="Search here..." required>
+                <div >
+					<input id="SpecialSID" onfocusout='sugg_disapear()' style='padding: 0.3rem;width: 20%;border-radius: 25px;' type="text" placeholder="Search here..." required>
                     <button id="srchButton" class='srchbtn' style='margin-left: -2.8rem;' type="button" onclick="sendToPage('SpecialSID')"><i class="fa fa-search"></i></button></input>
+                </div>
 				<!--</div>-->
+            <div id="suggs" class="sugg" align="left">
+            </div>
 			<div id="ResultBanner" style="display:none; margin-top:2rem;" >
 
                 <div id='ResultBannerHeader'>
