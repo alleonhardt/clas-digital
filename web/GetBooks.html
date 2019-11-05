@@ -215,7 +215,7 @@ body {
 
 .reader {
 	grid-column: 1 / span 1;
-	grid-row: 1 / span 2;
+	grid-row: 1;
 	width: 100%;
 	height: 100%;
 	background-color: grey;
@@ -772,7 +772,7 @@ window.addEventListener("load", init, false);
     overflow: scroll;
 }
 
-.SpecialOCR {
+.ocrdispstyle {
 	display:block;
 	width: 100%;
 	height: 100%;
@@ -780,16 +780,8 @@ window.addEventListener("load", init, false);
 	margin-bottom: 0.5rem;
 	margin-top: 1rem;
 	padding-right: 0;
-	overflow: hidden;
 	background-color: grey;
-
-}
-
-.ocrdispstyle {
-	height: 100%;
-	margin-top: 0;
 	overflow: scroll;
-	padding: 0;
 }
 
 .ocrdispstyle p {
@@ -927,9 +919,7 @@ function SelectNextHit()
 	    </div>
 
 
-	    <div id="olol" class="SpecialOCR">
-		<div id="OCRBuffer" class="ocrdispstyle"><p>Loading...</p></div>
-	    </div>
+	    <div id="OCRBuffer" class="ocrdispstyle"><p>Loading...</p></div>
 	    </div>
 	    <div id="thepagereader" class='reader' tabindex='0'>
 	    </div>
