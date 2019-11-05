@@ -714,7 +714,7 @@ function init() {
 
 		  let resultLinks = "";
 		  for(let i = 0; i < pagesList.length; i++) {
-		  resultLinks = resultLinks + " " + "<a class='coollnklist' onclick='document.getElementById(\"uniqueocrpage"+pagesList[i]+"\").scrollIntoView();window.location.replace(\"#page"+pagesList[i]+"\");changecolor(this);return true;' data-page='"+pagesList[i]+"'>" + pagesList[i] + "</a>";
+			resultLinks = resultLinks + " " + "<a class='coollnklist' onclick='document.getElementById(\"uniqueocrpage"+pagesList[i]+"\").scrollIntoView();window.location.replace(\"#page"+pagesList[i]+"\");changecolor(this);return true;' data-page='"+pagesList[i]+"'>" + pagesList[i] + "</a>";
 
 			for(let y = 0; y < HighlightList.length; y++)
 			{
@@ -838,34 +838,47 @@ a:active {
     color: red;
 }
 
+.DropdownClass {
+    margin: auto;
+    display: block;
+}
+
+.DivDropdown {
+    width: 100%;
+    background-color:white;
+    margin-top:0;
+}
+.DivDropdown:hover {
+    background-color: #00FFFF;
+}
 </style>
 <script>
 let insideWindow = false;
 function changecolor(x)
 {
     x.style.color = "#800080";
-    reset(document.getElementById("SearchOpts"));
-}
-function shownone(x)
-{
-    insideWindow = false;
-    window.setTimeout(function(){if(!insideWindow){reset(x);}},500);
+    shownone(document.getElementById("SearchOpts"));
 }
 
-function reset(x)
+function shownone(x)
 {
     document.getElementById("linklst").style.height = "1.2rem";
+    document.getElementById("upimg").style.display = "none";
+    document.getElementById("downimg").style.display = "block";
+    document.getElementById("divdrop").onclick = function(){showall(document.getElementById("SearchOpts"));};
     x.style.height = "";
     x.scrollTop = 0;
 }
 
 function showall(x)
 {
-    document.getElementById("linklst").style.height = "100%";
-    insideWindow = true;
     if(x.style.height != "80vh")
     {
 	x.style.height = "80vh";
+	document.getElementById("divdrop").onclick = function(){shownone(document.getElementById("SearchOpts"));};
+	document.getElementById("linklst").style.height = "100%";
+	document.getElementById("upimg").style.display = "block";
+	document.getElementById("downimg").style.display = "none";
     }
 }
 
@@ -891,10 +904,15 @@ function SelectNextHit()
     <div id="MoreInfoSrch" style='display: none;'>Ihr Suchbegriff '<mark id='query'></mark>'wurde auf folgenden Seiten gefunden: </div>!------>
 	<div class="pageContainer">
 	    <div style='top: 0;display: inline-grid; grid-column: 2 /span 1;height:98vh;'> 
-		<div id="SearchOpts" class="optioncont" onmouseout='shownone(this);' onmouseover='showall(this);' style='top: 0;background-color: white;overflow:auto;'><div style='display:grid;grid-template-columns: 90% 10%;padding: 0;'><div id='linklst' class='linkliststyler'></div><button style='grid-column: 2 /span 1;max-height: 2rem' onclick="SelectNextHit();return true;">Next</button></div>
+		<div id="SearchOpts" class="optioncont" style='top: 0;background-color: white;overflow:auto;'><div style='display:grid;grid-template-columns: 90% 10%;padding: 0;'><div id='linklst' class='linkliststyler'></div><button style='grid-column: 2 /span 1;max-height: 1.7rem' onclick="SelectNextHit();return true;">Next</button></div>
 		    <div id="biblio" style='color: green;'></div><div id="searchboxstuff"><hr><span style='margin-right: 1rem;'>Search again for:</span><input id='srchbox' type='text' placeholder="Next search..."><hr>
 		    </div>
 	    </div>
+	    <div id='divdrop' class='DivDropdown' onclick='showall(document.getElementById("SearchOpts"))'>
+		<img id='downimg' class='DropdownClass' src="/down.svg">
+		<img id='upimg' class='DropdownClass' style='display:none!important;' src='/up.svg'>
+	    </div>
+
 
 	    <div id="olol" class="SpecialOCR">
 		<div id="OCRBuffer" class="ocrdispstyle"><p>Loading...</p></div>
