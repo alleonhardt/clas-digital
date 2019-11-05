@@ -152,6 +152,7 @@ body {
   overflow: auto;
 }
 
+
 .blackLine {
 	width: 120%;
 	height: 1rem;
@@ -230,8 +231,9 @@ body {
 
 .page {
 margin: 0;
+margin-top: 3rem;
 padding: 1rem;
-padding-top: 0.2rem;
+padding-top: 1rem;
 padding-bottom: 0.8rem;
 padding-right: 0;
 }
@@ -365,18 +367,15 @@ function getVisiblePages()
 
 function getVisiblePagesOCR()
 {
-
 	let allPages = document.getElementsByClassName("ocrpage");
 	let visiblePages = new Array();
 	for(let i = 0; i < allPages.length; i++) {
-		if(isElementInViewport(allPages[i])) {
-		    if(document.getElementById("OCRBuffer").scrollTop<((allPages[i].offsetTop+allPages[i].clientHeight-300)))
-			{
-			    visiblePages.push(allPages[i]);
-			}
+		if(isElementInViewport2(allPages[i])) {
+		    visiblePages.push(allPages[i]);
 		}
 	}
 
+	console.log(visiblePages[0]);
 	return(visiblePages);
 }
 
@@ -407,6 +406,21 @@ function isElementInViewport (el) {
 		return(false);
 
 	return(true);
+}
+
+function isElementInViewport2(el) {
+	var rect = el.getBoundingClientRect();
+	var optsrect = document.getElementById("SearchOpts").getBoundingClientRect();
+	
+	// it's definitely outside if bottom < 0
+	if(rect.bottom <= 0)
+		return(false);
+	if(rect.top > document.getElementById("OCRBuffer").clientHeight)
+		return(false);
+	if(rect.bottom<(optsrect.bottom+90))
+		return(false);
+	return(true);
+
 }
 
 function padNumber(num, padCount) {
@@ -587,6 +601,7 @@ function UpdateLinkPrev()
 		if(page<=val[i].dataset.page)
 		{
 		    val[i].scrollIntoView();
+		    val[i].scrollLeft += "100";
 		    if(document.getElementById("SearchOpts").classList.contains("secondoptioncontlay"))
 			document.getElementById("SearchOpts").scrollTop = 0;
 		    return;
@@ -624,14 +639,7 @@ function init() {
 		
 	    let val = getVisiblePages();
 	    globalScrollLock = true;
-	    if(val.length>1)
-	    {
-		triggerDblclick(val[1]);
-	    }
-	    else
-	    {
-		triggerDblclick(val[0]);
-	    }
+	    triggerDblclick(val[0]);
 	    UpdateLinkPrev();
 	}
     document.getElementById("OCRBuffer").onscroll = function() {
@@ -688,7 +696,8 @@ function init() {
 			let anchorNode = document.createElement("a");
 			anchorNode.name = "page" + scanInfo.pages[i].pageNumber;
 			anchorNode.id = "uniquePageNode"+scanInfo.pages[i].pageNumber;
-			document.querySelector(".reader").appendChild(anchorNode);			
+			pageNode.insertBefore(anchorNode,pageNode.firstChild);
+			//document.querySelector(".reader").appendChild(anchorNode);			
 			document.querySelector(".reader").appendChild(pageNode);
 			pageNode.scanFilePath = "/books/"+scanId+ "/" + scanInfo.pages[i].file.substr(scanInfo.pages[i].file.search("page"));
 			pageNode.info = i;
@@ -743,7 +752,7 @@ function init() {
 
 		  let resultLinks = "";
 		  for(let i = 0; i < pagesList.length; i++) {
-			resultLinks = resultLinks + " " + "<a class='coollnklist' onclick='document.getElementById(\"uniqueocrpage"+pagesList[i]+"\").scrollIntoView();window.location.replace(\"#page"+pagesList[i]+"\");changecolor(this);return true;' data-page='"+pagesList[i]+"'>" + pagesList[i] + "</a>";
+			resultLinks = resultLinks + " " + "<a class='coollnklist' onclick='document.getElementById(\"uniqueocrpage"+pagesList[i]+"\").scrollIntoView();triggerDblclick(document.getElementById(\"uniqueocrpage"+pagesList[i]+"\"));changecolor(this);return true;' data-page='"+pagesList[i]+"'>" + pagesList[i] + "</a>";
 
 			for(let y = 0; y < HighlightList.length; y++)
 			{
@@ -770,7 +779,7 @@ function init() {
 			  }
 			  else
 			  {
-										   resultLinks.innerHTML = resultLinks.innerHTML + " " + "<a class='coollnklist' onclick='document.getElementById(\"uniqueocrpage"+searchResults.pages[i].page+"\").scrollIntoView();window.location.replace(\"#page"+searchResults.pages[i].page+"\");changecolor(this);return true;' data-page='"+searchResults.pages[i].page+"'>" + searchResults.pages[i].page + "("
+										   resultLinks.innerHTML = resultLinks.innerHTML + " " + "<a class='coollnklist' onclick='document.getElementById(\"uniqueocrpage"+searchResults.pages[i].page+"\").scrollIntoView();triggerDblclick(document.getElementById(\"uniqueocrpage"+searchResults.pages[i].page+"\"));changecolor(this);return true;' data-page='"+searchResults.pages[i].page+"'>" + searchResults.pages[i].page + "("
 				  + "<span id='pageHitList"+searchResults.pages[i].page +"'>"					 
 				  + searchResults.pages[i].word + "</span>);</a>";
 			  }
@@ -792,7 +801,7 @@ window.addEventListener("load", init, false);
 <style>
 .pageContainer {
 	display: grid;
-	position; fixed;
+	position: fixed;
 	top: 0;
 	left: 0;
 	height: 100vh;
@@ -832,8 +841,8 @@ window.addEventListener("load", init, false);
 .ocrdispstyle p {
 	font-size: small;
 	background-color: white;
-	margin-bottom: 0;
-	padding: 2rem;
+	margin-bottom: 4rem;
+	padding: 1rem;
 	min-height: 350px;
 }
 
@@ -858,7 +867,6 @@ window.addEventListener("load", init, false);
     background-color: white;
     padding-bottom: 2rem;
     overflow: auto;
-    text-overflow: ellipsis;
     white-space: nowrap;
     font-size: small;
     text-align: justify;
@@ -917,6 +925,7 @@ function shownone(x)
 	x.classList.replace("currentoptioncontlay","secondoptioncontlay");
     }
     x.scrollTop = 0;
+    UpdateLinkPrev();
 }
 
 function showall(x)
