@@ -214,10 +214,11 @@ body {
 }
 
 .reader {
+	display: inline-grid;
 	grid-column: 1 / span 1;
 	grid-row: 1;
 	width: 100%;
-	height: 100%;
+	height: 100vh;
 	background-color: grey;
 	overflow: scroll;
 	margin: 0;
@@ -761,7 +762,7 @@ window.addEventListener("load", init, false);
 	width: 100%;
 	grid-template-columns: 60% 40%;
 	background-color: grey;
-	overflow:hidden;
+	overflow:scroll;
 }
 
 .optioncont {
@@ -785,6 +786,7 @@ window.addEventListener("load", init, false);
 }
 
 .ocrdispstyle p {
+	display: block;
 	font-size: small;
 	background-color: white;
 	margin-bottom: 4rem;
@@ -909,22 +911,37 @@ function SelectNextHit()
     <div id="MoreInfoSrch" style='display: none;'>Ihr Suchbegriff '<mark id='query'></mark>'wurde auf folgenden Seiten gefunden: </div>!------>
 	<div class="pageContainer">
 	    <div style='top: 0;display: inline-grid; grid-column: 2 /span 1;height:98vh;'> 
-		<div id="SearchOpts" class="optioncont secondoptioncontlay" style='top: 0;background-color: white;overflow:scroll;'><div style='display:grid;grid-template-columns: 90% 10%;padding: 0;'><div id='linklst' class='linkliststyler'></div><button style='grid-column: 2 /span 1;max-height: 1.7rem' onclick="SelectNextHit();return true;">Next</button></div>
-		    <div id="biblio" style='color: green;'></div><div id="searchboxstuff"><hr><span style='margin-right: 1rem;'>Search again for:</span><input id='srchbox' type='text' placeholder="Next search..."><hr>
+	
+		<div id="SearchOpts" class="optioncont secondoptioncontlay" style='top: 0;background-color: white;overflow:scroll;'>
+		    
+		    <div style='display:grid;grid-template-columns: 90% 10%;padding: 0;'>
+			<div id='linklst' class='linkliststyler'></div>
+			<button style='grid-column: 2 /span 1;max-height: 1.7rem' onclick="SelectNextHit();return true;">Next</button>
 		    </div>
-	    </div>
-	    <div id='divdrop' class='DivDropdown' onclick='showall(document.getElementById("SearchOpts"))'>
-		<img id='downimg' class='DropdownClass' src="/down.svg">
-		<img id='upimg' class='DropdownClass' style='display:none!important;' src='/up.svg'>
-	    </div>
+		    
+		    <div id="biblio" style='color: green;'></div>
+		    <div id="searchboxstuff">
+			<hr/>
+			<span style='margin-right: 1rem;'>Search again for:</span>
+			<input id='srchbox' type='text' placeholder="Next search..." />
+			<hr/>
+		    </div>
+		</div>
+
+		<div id='divdrop' class='DivDropdown' onclick='showall(document.getElementById("SearchOpts"))'>
+		    <img id='downimg' class='DropdownClass' src="/down.svg">
+		    <img id='upimg' class='DropdownClass' style='display:none!important;' src='/up.svg'>
+		</div> 
 
 
-	    <div id="OCRBuffer" class="ocrdispstyle"><p>Loading...</p></div>
+		<div id="OCRBuffer" class="ocrdispstyle">
+		    <p>Loading...</p>
+		</div>
 	    </div>
+
 	    <div id="thepagereader" class='reader' tabindex='0'>
 	    </div>
 	</div>
-	<div id="SizeOfRem" style="width:2rem;display:none"></div>
 </body>
 </html>
 
