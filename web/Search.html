@@ -97,6 +97,12 @@ mark {
 	box-shadow: 0px 3px 0px #0000FF;
 }
 
+.advanceopts {
+    background:white;
+    margin-right:0.5;
+    border:0;'
+}
+
 
 .btclass2 {
 	background: white;
@@ -305,16 +311,45 @@ function SetAdvancedCollections(x)
     document.getElementById("SpecialSID").focus();
 }
 
-function SetAdvancedDateBefore(x)
+function SetAdvancedYear(x)
 {
-    document.getElementById("PublicatedBefore").value=x.value;
-    document.getElementById("SpecialSID").focus();
+    if(x.value==1)
+    {
+        document.getElementById("InnerInnerBanner").style.display = "block";
+        document.getElementById("publicatedAfter").focus();
+    }
+    if(x.value==0)
+    {
+        document.getElementById("PublicatedAfter").value=1700;
+        document.getElementById("PublicatedBefore").value=2049;
+        document.getElementById("SpecialSID").focus();
+    }
+    else
+    {
+        document.getElementById("PublicatedAfter").value=x.value;
+        let year = parseInt(x.value)+99;  
+        document.getElementById("PublicatedBefore").value=year;
+        document.getElementById("SpecialSID").focus();
+    }
 }
-function SetAdvancedDateAfter(x)
+
+function SetCustom()
 {
-    document.getElementById("PublicatedAfter").value=x.value;
+    let after = document.getElementById("publicatedAfter").value;
+    let before = document.getElementById("publicatedBefore").value;
+    document.getElementById("PublicatedAfter").value=after;
+    document.getElementById("PublicatedBefore").value=before;
+    document.getElementById("InnerInnerBanner").style.display = "none";
     document.getElementById("SpecialSID").focus();
+    var year = document.getElementById("year");
+    year.remove(6);
+    var opt = document.createElement("option");
+    opt.value=2;
+    opt.text=after + " till " + before;
+    year.add(opt);
+    year.value=2;
 }
+
 function SetAdvancedOnlyIn(x)
 {
     if(x.value==0) {
@@ -358,6 +393,7 @@ function ShowSelectedValues(obj)
 	obj.innerHTML = "";
 	let json = obj.drawablejson;
 
+    // *** ADD PILLARS *** //
     if(ServerDataObj===undefined)
         console.log("Cant find server data!");
     else
@@ -375,6 +411,7 @@ function ShowSelectedValues(obj)
         console.log("Server data found!");
         }
     }
+
 
     // *** BEFORE IN AddAdvancedBar CHANGE BACK LATER *** //
     document.getElementById("author").value = document.getElementById("SearchForAuthor").value;
@@ -397,10 +434,26 @@ function ShowSelectedValues(obj)
         document.getElementById("searchIn").value=1;
     else if(document.getElementById("SearchInOCR").checked==true)
         document.getElementById("searchIn").value=2;
-    document.getElementById("publicatedAfter").value = document.getElementById("PublicatedAfter").value;
-    document.getElementById("publicatedBefore").value = document.getElementById("PublicatedBefore").value;
-    // *****************************************************//
 
+    let after = parseInt(document.getElementById("PublicatedAfter").value);
+    let before = parseInt(document.getElementById("PublicatedBefore").value);
+    let year = document.getElementById("year");
+    if(after%100 != 0)
+    {
+        var opt = document.createElement("option");
+        opt.value=2;
+        opt.text=after + " till " + before;
+        year.add(opt);
+        year.value=2;
+    }
+    else if(before != 2049)
+        year.value=after;
+    
+    else
+        document.getElementById("year").value=0;
+
+
+    // *** ADD RESULTS FOOTER *** //
     let maxResultsElement = document.getElementById("maxResults");
     let searchTimeElement = document.getElementById("searchTime");
 
@@ -861,30 +914,44 @@ function ShowLinks()
 			<div id="ResultBanner" style="display:none; margin-top:2rem;" >
 
                 <div id='ResultBannerHeader'>
-                    <button class='specialultbut' style="background:white;border:0;" onclick='AddAdvancedBar();return true;'>Advanced Bar</button>
+                    <button class='specialultbut' class='advanceopts' onclick='AddAdvancedBar();return true;'>Advanced Bar</button>
                 </div>
 
                 <div id="InnerResultBanner" style="display:block;margin-top:2rem;">
                     Author:
-                    <input id='author' onchange="SetAdvancedAuthor(this);return true;" class="specialultbut" style="background:white;margin-right:0.5;border:0;" type="text" value=""> </input>
+                    <input id='author' onchange="SetAdvancedAuthor(this);return true;" class="specialultbut" class='advanceopts' type="text" value=""> </input>
                     Collections:
-                    <select id='collections' onchange='SetAdvancedCollections(this);return true;' class"=specialultbut" style="background:white;margin-right:0.5;border:0;">
+                    <select id='collections' onchange='SetAdvancedCollections(this);return true;' class"=specialultbut" class='advanceopts'>
                         <option value='all' selected>Search all Collections</option>
                     </select>
-                    After:
-                    <input id='publicatedAfter' onchange='SetAdvancedDateAfter(this);return true;' class='specialultbut' style='background:white;margin-right:0.5;border:0;' size='5' type='number' step='50' min='0' value='1700'>
-                    Before:
-                    <input id='publicatedBefore' onchange='SetAdvancedDateBefore(this);return true;' class='specialultbut' style='background:white;margin-right:0.5;border:0;' size='5' type='number' step='50' min='0' value='2049'>
-                    <select id='searchIn' onchange='SetAdvancedOnlyIn(this);return true;' class='specialultbut' style='background:white;margin-right:0.5;border:0;'>
+                    
+                    Year:
+                    <select id='year' onchange='SetAdvancedYear(this);return true;' clas='specialultbut' class='advanceopts'>
+                        <option value='0'>Any Time</option>
+                        <option value='1700'>1700s</option>
+                        <option value='1800'>1800s</option>
+                        <option value='1900'>1900s</option>
+                        <option value='2000'>2000s</option>
+                        <option value= '1'>Custom</option>
+                    </select>
+                        <select id='searchIn' onchange='SetAdvancedOnlyIn(this);return true;' class='specialultbut' class='advanceopts'>
                         <option value='0'>Show Everything</option>
                         <option value='1'>Show only Books without Text</option>
                         <option value='2'>Show only Books with Text</option>
                     </select>
-                    <select id='fuzzyness' onchange='SetAdvancedFuzzy(this);return true;' class='specialultbut' style='background:white;margin-right:0.5;border:0;'>
+                    <select id='fuzzyness' onchange='SetAdvancedFuzzy(this);return true;' class='specialultbut' class='advanceopts'>
                         <option value='0'>Exact matches</option>
                         <option value='1'>Fuzzy matching</option>
                     </select>
                 </div>
+                <div id="InnerInnerBanner" style="display:none;margin-top:2rem;">
+                    After:
+                    <input id='publicatedAfter' class='specialultbut' class='advanceopts' size='5' type='number' step='50' min='0' value='1700'></input>
+                    Before:
+                    <input id='publicatedBefore' class='specialultbut' class='advanceopts' size='5' type='number' step='50' min='0' value='2049'></input>
+                    <button id='advancedApply' class='specialultbut' class='advanceopts' onclick='SetCustom();return true;'>Apply</button>
+                </div>
+
 
                 <div id="ResultBannerFooter" style="margin-top: 2rem; margin-bottom:0;">
                    <select id='maxresultsperpage' onchange='OpenFilter(this);return true;' class='specialultbut' style='background:white;margin-right:0.5rem;border:0;'>
