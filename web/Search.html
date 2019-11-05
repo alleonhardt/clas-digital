@@ -311,6 +311,27 @@ function SetAdvancedAuthor(x)
     document.getElementById("SearchForAuthor").value=x.value;
 }
 
+function SetAdvancedCollections(x)
+{
+    if(x.value=="all") 
+    {
+        let allCollections = document.getElementsByClassName("upSaule"); 
+        for(let i=0; i<allCollections.length; i++)
+            allCollections[i].checked = true;
+    }
+    else{
+        let allCollections = document.getElementsByClassName("upSaule"); 
+        for(let i=0; i<allCollections.length; i++)
+            allCollections[i].checked = false;
+    }
+
+
+    [].forEach.call(  document.querySelectorAll('#collections :checked')  , function(elm){
+        document.getElementById("uniqueSaule"+elm.value).checked = true;
+        console.log(elm.value);
+    })
+}
+
 function SetAdvancedDateBefore(x)
 {
     document.getElementById("PublicatedBefore").value=x.value;
@@ -341,6 +362,24 @@ function SetAdvancedFuzzy(x)
 	document.getElementById("FuzzyID").value=x.value;
 }
 
+function AddAdvancedBar() 
+{
+    document.getElementById("author").value = document.getElementById("SearchForAuthor").value;
+    if(document.getElementById("FuzzyID").value == 1)
+        document.getElementById("fuzzyness").value=1;
+    if(document.getElementById("SearchInTitle").checked==true)
+        document.getElementById("searchIn").value=1;
+    else if(document.getElementById("SearchInOCR").checked==true)
+        document.getElementById("searchIn").value=2;
+    document.getElementById("publicatedAfter").value = document.getElementById("PublicatedAfter").value;
+    document.getElementById("publicatedBefore").value = document.getElementById("PublicatedBefore").value;
+    let banner = document.getElementById("InnerResultBanner");
+
+    let curDisplay = banner.style.display;
+
+    banner.style.display = (curDisplay == "block") ? "none" : "block"; 
+}
+
 function callMetadata(x)
 {
     window.location = "/ShowMetadata.html?scanId="+x.dataset.scanid;
@@ -350,15 +389,33 @@ function ShowSelectedValues(obj)
 {
 	obj.innerHTML = "";
 	let json = obj.drawablejson;
-    let author = "Author: <input id='author' onchange='SetAdvancedAuthor(this);return true;' class='specialultbut' style='background:white;margin-right:0.5;border:0;' type='text' value='' </input>";
-    let dateAfter = "After: <input id='PublicatedAfter' onchange='SetAdvancedDateAfter(this);return true;' class='specialultbut' style='background:white;margin-right:0.5;border:0;' size='5' type='number' step='1' min='0' value='0'>";
-    let dateBefore = "Before: <input id='PublicatedBefore' onchange='SetAdvancedDateBefore(this);return true;' class='specialultbut' style='background:white;margin-right:0.5;border:0;' size='5' type='number' step='1' min='0' value='0'>";
-    let onlyIn = "<select id='fuzzyness' onchange='SetAdvancedOnlyIn(this);return true;' class='specialultbut' style='background:white;margin-right:0.5;border:0;'><option value='0'>Search Everything</option><option value='1'>Search only Metadata</option><option value='2'>Search only Text</option></select>";
-    let fuzzy = "<select id='fuzzyness' onchange='SetAdvancedFuzzy(this);return true;' class='specialultbut' style='background:white;margin-right:0.5;border:0;'><option value='0'>Exact matches</option><option value='1'>Fuzzy matching</option></select>";
-    let results = "<select id='maxresultsperpage' onchange='OpenFilter(this);return true;' class='specialultbut' style='background:white;margin-right:0.5rem;border:0;'><option value='10'>Show 10 results per page</option><option value='20'>Show 20 results per page</option><option value='50'>Show 50 results per page</option><option value='1000000'>Show all results</option></select>";
-    let sort = "<select id='f_sort' onchange='OpenFilter(this);return true;' class='specialultbut' onclick='return true;' style='background:white;margin-right: 0.5rem;border: 0;'><option value='0'>Sort by relevance</option><option value='2'>Sort alphabetically</option><option value='1'>Sort chronologically</option></select>";
-    let bib = "<button class='specialultbut' style='background:white;border: 0;' onclick='CreateBibliography();return true;'>Create Bibliography</button></div><hr style='padding: 0;'>";
-    document.getElementById("ResultBanner").innerHTML ="<div style='margin-top: 2rem;margin-bottom:0;'>" + author + dateAfter+ dateBefore+ onlyIn + fuzzy + results + sort + bib +"<span style='color: grey;'>"+json.max_results+" Ergebnisse gefunden in "+json.time+"s</span>";
+
+    if(ServerDataObj===undefined)
+        console.log("Cant find server data!");
+    else
+    {
+        if(ServerDataObj.pillars != undefined)
+        {
+            let x = document.getElementById("ordered_pillars");
+            for(let i = 0; i < ServerDataObj.pillars.length; i++)
+            {
+                var opt = document.createElement("option");
+                opt.value=ServerDataObj.pillars[i].key;
+                opt.text=ServerDataObj.pillars[i].name;
+                document.getElementById("collections").add(opt);
+            }
+        console.log("Server data found!");
+        }
+    }
+    let maxResultsElement = document.getElementById("maxResults");
+    let searchTimeElement = document.getElementById("searchTime");
+
+    maxResultsElement.innerHTML = json.max_results;
+    searchTimeElement.innerHTML = json.time;
+
+    let resultBanner = document.getElementById("ResultBanner");
+    resultBanner.style.display = "block";
+
 	if(json.max_results==0)
 	    return;
 	obj.start = json.show_from;
@@ -786,8 +843,52 @@ function ShowLinks()
 				<!--<div class="form-wrapper-2 cf"> -->
 					<input id="SpecialSID" style='padding: 0.3rem;width: 20%;border-radius: 25px;' type="text" placeholder="Search here..." required>
 					<button id="srchButton" class="srchBtrn" style='display:none;' type="button" onclick="sendToPage('SpecialSID')">Search</button></input>
-					<button class="btclass2" type="button" onclick="openSearchOpts('AdvancedSearchOptions')">Advanced</button>
+					<!--<button class="btclass2" type="button" onclick="openSearchOpts('AdvancedSearchOptions')">Advanced</button> -->
 				<!--</div>-->
-			<div id="ResultBanner"></div>
+			<div id="ResultBanner" style="display:none; margin-top:2rem;" >
+
+                <div id='ResultBannerHeader'>
+                    <button class='specialultbut' style="background:white;border:0;" onclick='AddAdvancedBar();return true;'>Advanced Bar</button>
+                </div>
+
+                <div id="InnerResultBanner" style="display:none;margin-top:2rem;">
+                    Author:
+                    <input id='author' onchange="SetAdvancedAuthor(this);return true;" class="specialultbut" style="background:white;margin-right:0.5;border:0;" type="text" value=""> </input>
+                    Collections:
+                    <select id='collections' onchange='SetAdvancedCollections(this);return true;' class"=specialultbut" style="background:white;margin-right:0.5;border:0;" multiple>
+                        <option value='all'>Search all Collections</option>
+                    </select>
+                    After:
+                    <input id='publicatedAfter' onchange='SetAdvancedDateAfter(this);return true;' class='specialultbut' style='background:white;margin-right:0.5;border:0;' size='5' type='number' step='1' min='0' value='0'>
+                    Before:
+                    <input id='publicatedBefore' onchange='SetAdvancedDateBefore(this);return true;' class='specialultbut' style='background:white;margin-right:0.5;border:0;' size='5' type='number' step='1' min='0' value='2019'>
+                    <select id='searchIn' onchange='SetAdvancedOnlyIn(this);return true;' class='specialultbut' style='background:white;margin-right:0.5;border:0;'>
+                        <option value='0'>Search Everything</option>
+                        <option value='1'>Search only Metadata</option>
+                        <option value='2'>Search only Text</option>
+                    </select>
+                    <select id='fuzzyness' onchange='SetAdvancedFuzzy(this);return true;' class='specialultbut' style='background:white;margin-right:0.5;border:0;'>
+                        <option value='0'>Exact matches</option>
+                        <option value='1'>Fuzzy matching</option>
+                    </select>
+                </div>
+
+                <div id="ResultBannerFooter" style="margin-top: 2rem; margin-bottom:0;">
+                   <select id='maxresultsperpage' onchange='OpenFilter(this);return true;' class='specialultbut' style='background:white;margin-right:0.5rem;border:0;'>
+                       <option value='10'>Show 10 results per page</option>
+                       <option value='20'>Show 20 results per page</option>
+                       <option value='50'>Show 50 results per page</option>
+                       <option value='1000000'>Show all results</option>
+                   </select>
+                   <select id='f_sort' onchange='OpenFilter(this);return true;' class='specialultbut' onclick='return true;' style='background:white;margin-right: 0.5rem;border: 0;'>
+                       <option value='0'>Sort by relevance</option>
+                       <option value='2'>Sort alphabetically</option>
+                       <option value='1'>Sort chronologically</option>
+                   </select>
+                   <button class='specialultbut' style='background:white;border: 0;' onclick='CreateBibliography();return true;'>Create Bibliography</button>
+                   <hr style='padding: 0;'>
+                   <span style='color: grey;'><span id="maxResults"></span> Ergebnisse gefunden in <span id="searchTime"></span></span>
+                </div>
+            </div>
 			<div id="SearchHitList" start="0" class="list-type2"></div>
 		</div> </body>
