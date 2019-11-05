@@ -76,11 +76,8 @@ h2 {
 
 .coollnklist {
     margin: 0;
-    margin-right: 1rem;
-    margin-left: 1rem;
     margin-top: 0.25rem;
     color: blue;
-    text-decoration: underline;
     cursor: pointer;
 }
 
@@ -206,9 +203,9 @@ body {
 	overflow: auto;
 	width: 100%;
 	margin-left: -1rem;
-  white-space: pre-wrap;
-  background: white;
-  padding: 1rem;
+	white-space: pre-wrap;
+	background: white;
+	padding: 1rem;
 }
 
 .ocrstyle p {
@@ -223,7 +220,7 @@ body {
 	background-color: grey;
 	overflow: scroll;
 	margin: 0;
-	margin-top: 0.5rem;
+	top: 1rem;
 	padding: 0;
 }
 
@@ -590,6 +587,8 @@ function UpdateLinkPrev()
 		if(page<=val[i].dataset.page)
 		{
 		    val[i].scrollIntoView();
+		    if(document.getElementById("SearchOpts").classList.contains("secondoptioncontlay"))
+			document.getElementById("SearchOpts").scrollTop = 0;
 		    return;
 		}
 
@@ -773,7 +772,7 @@ function init() {
 			  {
 										   resultLinks.innerHTML = resultLinks.innerHTML + " " + "<a class='coollnklist' onclick='document.getElementById(\"uniqueocrpage"+searchResults.pages[i].page+"\").scrollIntoView();window.location.replace(\"#page"+searchResults.pages[i].page+"\");changecolor(this);return true;' data-page='"+searchResults.pages[i].page+"'>" + searchResults.pages[i].page + "("
 				  + "<span id='pageHitList"+searchResults.pages[i].page +"'>"					 
-				  + searchResults.pages[i].word + "</span>)</a>";
+				  + searchResults.pages[i].word + "</span>);</a>";
 			  }
 			let thpage = document.getElementById("uniqueocrpage"+searchResults.pages[i].page);
 			thpage.innerHTML=thpage.innerHTML.replace(new RegExp('(\\b'+searchResults.pages[i].word.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')+'\\b)','gi'),'<mark>$1</mark>');
@@ -805,8 +804,7 @@ window.addEventListener("load", init, false);
 .optioncont {
     display: block;
     margin: 0;
-    padding: 0;
-    padding-top: 0.5rem;
+    padding: 0.5rem;
     background-color: white;
     overflow: scroll;
 }
@@ -826,7 +824,7 @@ window.addEventListener("load", init, false);
 
 .ocrdispstyle {
 	height: 100%;
-	margin-top: 0.4rem;
+	margin-top: 0;
 	overflow: scroll;
 	padding: 0;
 }
@@ -834,7 +832,7 @@ window.addEventListener("load", init, false);
 .ocrdispstyle p {
 	font-size: small;
 	background-color: white;
-	margin-bottom: 1rem;
+	margin-bottom: 0;
 	padding: 2rem;
 	min-height: 350px;
 }
@@ -855,11 +853,15 @@ window.addEventListener("load", init, false);
     grid-row: 1 / span 1;
     margin: 0;
     margin-left: 0.5rem;
+    margin-right: 0.5rem;
     line-height: 2rem;
     background-color: white;
     padding-bottom: 2rem;
     overflow: auto;
+    text-overflow: ellipsis;
     white-space: nowrap;
+    font-size: small;
+    text-align: justify;
 }
 
 a:visited {
@@ -891,7 +893,7 @@ a:active {
     transition-duration: 1s;
 }
 .currentoptioncontlay {
-    height: 80vh;
+    height: 40vh;
     transition-timing-function: ease-in-out;
     transition-duration: 1s;
 }
@@ -906,19 +908,23 @@ function changecolor(x)
 
 function shownone(x)
 {
-    document.getElementById("linklst").style["white-space"] = "nowrap";
-    document.getElementById("upimg").style.display = "none";
-    document.getElementById("downimg").style.display = "block";
-    document.getElementById("divdrop").onclick = function(){showall(document.getElementById("SearchOpts"));};
+    if(x.classList.contains("currentoptioncontlay"))
+    {
+	document.getElementById("linklst").style["white-space"] = "nowrap";
+	document.getElementById("upimg").style.display = "none";
+	document.getElementById("downimg").style.display = "block";
+	document.getElementById("divdrop").onclick = function(){showall(document.getElementById("SearchOpts"));};
+	x.classList.replace("currentoptioncontlay","secondoptioncontlay");
+    }
     x.scrollTop = 0;
-    x.classList.replace("currentoptioncontlay","secondoptioncontlay");
 }
 
 function showall(x)
 {
-    if(x.style.height != "80vh")
+    if(x.style.height != "40vh")
     {
-	x.classList.replace("secondoptioncontlay","currentoptioncontlay");
+	if(x.classList.contains("secondoptioncontlay"))
+	    x.classList.replace("secondoptioncontlay","currentoptioncontlay");
 	document.getElementById("linklst").style["white-space"] = "normal";
 	document.getElementById("divdrop").onclick = function(){shownone(document.getElementById("SearchOpts"));};
 	document.getElementById("upimg").style.display = "block";
