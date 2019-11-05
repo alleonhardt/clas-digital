@@ -774,7 +774,6 @@ window.addEventListener("load", init, false);
 
 .optioncont {
     display: block;
-    height: 2.3rem;
     margin: 0;
     padding: 0;
     padding-top: 0.5rem;
@@ -824,8 +823,8 @@ window.addEventListener("load", init, false);
 .linkliststyler {
     grid-column: 1 /span 1;
     grid-row: 1 / span 1;
-    height: 1rem;
     margin: 0;
+    line-height: 2rem;
     background-color: white;
     padding-bottom: 2rem;
 }
@@ -847,9 +846,21 @@ a:active {
     width: 100%;
     background-color:white;
     margin-top:0;
+    cursor: pointer;
 }
 .DivDropdown:hover {
     background-color: #00FFFF;
+}
+
+.secondoptioncontlay {
+    height: calc(2.3rem + 17px);
+    transition-timing-function: ease-in-out;
+    transition-duration: 1s;
+}
+.currentoptioncontlay {
+    height: 80vh;
+    transition-timing-function: ease-in-out;
+    transition-duration: 1s;
 }
 </style>
 <script>
@@ -862,21 +873,19 @@ function changecolor(x)
 
 function shownone(x)
 {
-    document.getElementById("linklst").style.height = "1.2rem";
     document.getElementById("upimg").style.display = "none";
     document.getElementById("downimg").style.display = "block";
     document.getElementById("divdrop").onclick = function(){showall(document.getElementById("SearchOpts"));};
-    x.style.height = "";
     x.scrollTop = 0;
+    x.classList.replace("currentoptioncontlay","secondoptioncontlay");
 }
 
 function showall(x)
 {
     if(x.style.height != "80vh")
     {
-	x.style.height = "80vh";
+	x.classList.replace("secondoptioncontlay","currentoptioncontlay");
 	document.getElementById("divdrop").onclick = function(){shownone(document.getElementById("SearchOpts"));};
-	document.getElementById("linklst").style.height = "100%";
 	document.getElementById("upimg").style.display = "block";
 	document.getElementById("downimg").style.display = "none";
     }
@@ -904,7 +913,7 @@ function SelectNextHit()
     <div id="MoreInfoSrch" style='display: none;'>Ihr Suchbegriff '<mark id='query'></mark>'wurde auf folgenden Seiten gefunden: </div>!------>
 	<div class="pageContainer">
 	    <div style='top: 0;display: inline-grid; grid-column: 2 /span 1;height:98vh;'> 
-		<div id="SearchOpts" class="optioncont" style='top: 0;background-color: white;overflow:auto;'><div style='display:grid;grid-template-columns: 90% 10%;padding: 0;'><div id='linklst' class='linkliststyler'></div><button style='grid-column: 2 /span 1;max-height: 1.7rem' onclick="SelectNextHit();return true;">Next</button></div>
+		<div id="SearchOpts" class="optioncont secondoptioncontlay" style='top: 0;background-color: white;overflow:scroll;'><div style='display:grid;grid-template-columns: 90% 10%;padding: 0;'><div id='linklst' class='linkliststyler'></div><button style='grid-column: 2 /span 1;max-height: 1.7rem' onclick="SelectNextHit();return true;">Next</button></div>
 		    <div id="biblio" style='color: green;'></div><div id="searchboxstuff"><hr><span style='margin-right: 1rem;'>Search again for:</span><input id='srchbox' type='text' placeholder="Next search..."><hr>
 		    </div>
 	    </div>
