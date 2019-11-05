@@ -207,8 +207,8 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
 	    bool auth_only = false;
 	    bool ocr_only = false;
 	    std::string author = "";
-	    int pubafter = 0;
-	    int pubbef = 2019;
+	    int pubafter = 1700;
+	    int pubbef = 2049;
 	    std::vector<std::string> pillars;
 	    std::string debugpill;
 	    int resultsperpage = 10;
