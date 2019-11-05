@@ -67,6 +67,26 @@ void do_createbiblio(const Request &req,Response &resp,CBookManager &manager)
     }
 }
 
+void get_sugg(const Request &req, Response &resp, CBookManager &manager)
+{
+    try
+    {
+        std::string sInput = req.get_param_value("q");
+        std::list<std::string>* listSugg = manager.getSuggestions_acc(sInput, false, false);
+        std::cout << "List Sugg: " << listSugg->size() << std::endl;
+        nlohmann::json responseJson;
+        for(auto it=listSugg->begin(); it!=listSugg->end();it++) {
+            std::cout << (*it) << std::endl;
+            responseJson.push_back((*it)); 
+        }
+        delete listSugg;
+        resp.set_content(responseJson.dump(),"application/json");
+    }
+    catch(...)
+    {
+        resp.set_content("{}","application/json");
+    }
+}
 void get_metadata(const Request &req, Response &resp, CBookManager &manager)
 {
     try
@@ -452,7 +472,8 @@ int main()
     srv.Get("/search",[&](const Request &req, Response &resp) { do_search(req,resp,fileSearchHtml,zoteroPillars,manager);});
     srv.Get("/searchinbook",[&](const Request &req, Response &resp) { do_searchinbook(req,resp,manager);});
     srv.Get("/createbibliography",[&](const Request &req, Response &resp) { do_createbiblio(req,resp,manager);});
-
+    
+    srv.Get("/getsugg",[&](const Request &req, Response &resp) { get_sugg(req,resp,manager);});
     srv.Get("/getmetadata", [&](const Request &req, Response &resp) { get_metadata(req,resp,manager);});
     srv.Get("/authenticate",&do_authentification);
     srv.Get("/userlist",&do_senduserlist);
@@ -461,4 +482,6 @@ int main()
     srv.listen("localhost", 9000);
     return 0;
 }
+
+
 
