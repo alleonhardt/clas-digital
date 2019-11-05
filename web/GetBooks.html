@@ -97,7 +97,6 @@ padding-right: 0;
 	display:block;
 	width: 100%;
 	margin: 0;
-	margin-bottom: 0.5rem;
 	margin-top: 1rem;
 	padding-right: 0;
 	background-color: grey;
@@ -164,7 +163,7 @@ a:active {
 }
 
 .secondoptioncontlay {
-    height: calc(2.3rem + 17px);
+    height: calc(1rem + 17px);
     transition-timing-function: ease-in-out;
     transition-duration: 1s;
 }
@@ -320,14 +319,6 @@ function isElementInViewport2(el) {
 
 }
 
-function padNumber(num, padCount) {
-	let outStr = num + "";
-	while(outStr.length < padCount)
-		outStr = "0" + outStr;
-
-	return(outStr);
-}
-
 function parseURLParams(url) {
 	let parser = document.createElement('a');
 	parser.href = url;
@@ -341,6 +332,7 @@ function parseURLParams(url) {
 	
 	return(searchObject);
 }
+
 function doAdditionalSearch() {
 	let parsedUrlParams = parseURLParams(window.location.href);
 	window.open("/GetBooks?query="+document.getElementById("adSrch").value+"&scanId="+parsedUrlParams['scanId']+"&fuzzyness="+parsedUrlParams['fuzzyness']);
@@ -350,39 +342,22 @@ function doAdditionalSearch() {
 
 function GetOCRTxt() {
 				return new Promise(function(resolve,reject){
+				
 			    let parsedUrlParams = parseURLParams(window.location.href);
 				Server.Get("/books/"+parsedUrlParams['scanId']+"/ocr.txt",function(content) {
 			    
-			      content = content.replace(new RegExp("<",'g'),"&lt;");
-			      content = content.replace(new RegExp(">",'g'),"&gt;");
+				content = content.replace(new RegExp("<",'g'),"&lt;");
+				content = content.replace(new RegExp(">",'g'),"&gt;");
 
-			      UpdateOCRTxt(content,resolve);
+				let RegSrch = /-----\s(\d+)\s.\s(\d+)\s-----/g;
+				content = '<p data-page="1" id="uniqueocrpage0" class="ocrpage">' + content;
+				content = content.replace(RegSrch,'</p><p data-page="$1" id="uniqueocrpage$1" class="ocrpage" ondblclick="SwitchToPage(this);"><span class="pagelayout"> Page $1 / $2 </span><br>');
+				content+="</p>";	
+				document.getElementById("OCRBuffer").innerHTML = content;
+				resolve(10);
 
-							},function(content){
-								let Index = window.location.href.indexOf("scanId=");
-								let value = window.location.href.substr(Index+7);
-								document.body.innerHTML = "<center><h1>Access denied!</h1></center>";
+							},function(content){document.getElementById("OCRBuffer").innerHTML = "Could not load ocr file, sorry for that...";});
 							});
-							});
-}
-
-
-function UpdateOCRTxt(x,res)
-{
-	  let RegSrch = /-----\s(\d+)\s.\s(\d+)\s-----/g;
-	x = '<p data-page="1" id="uniqueocrpage0" class="ocrpage">' + x;
-        x = x.replace(RegSrch,'</p><p data-page="$1" id="uniqueocrpage$1" class="ocrpage" ondblclick="SwitchToPage(this);"><span class="pagelayout"> Page $1 / $2 </span><br>');
-  	x+="</p>";
-	
-	document.getElementById("OCRBuffer").innerHTML = x;
-	
-	let lst = document.getElementsByClassName("ocrpage");
-	for(var i = 0; i < lst.length; i++)
-	{
-		//pageVal[i] = lst[i].innerHTML;
-		//lst[i].innerHTML = "";
-	}
-	res(10);
 }
 
 function SwitchToPage(x)
@@ -404,49 +379,8 @@ function SwitchToPage(x)
     }
 }
 
-let onChangeFunc = function() {};
-
-function ShowInfoText()
-{
-	//deleteAll();
-  	document.getElementsByClassName("pageContainer")[0].style["grid-template-columns"] = "60% 40%";
-	document.getElementById("InfoScreen").style.display = "inline-grid";
-	HighlightButton(document.getElementById("ShowInfoButton"));
-}
-
-function HighlightButton(x)
-{
-  document.getElementsByClassName("butact")[0].classList.remove("butact");
-  x.classList.add("butact");
-}
-
 
 let metadata = {};
-
-function getElementTop ( Elem ) 
-{
-    var elem;
-
-    if ( document.getElementById ) 
-    {   
-        elem = document.getElementById ( Elem );
-    } 
-    else if ( document.all ) 
-    {
-        elem = document.all[Elem];
-    }           
-
-    yPos = elem.offsetTop;
-    tempEl = elem.offsetParent;
-
-    while ( tempEl != null ) 
-    {
-        yPos += tempEl.offsetTop;
-        tempEl = tempEl.offsetParent;
-    }  
-
-    return yPos;
-}   
 
 let globalScrollLock = false;
 function getParameterByName(name, url) {
@@ -481,6 +415,7 @@ function UpdateLinkPrev()
 
 	    }
 }
+
 function triggerDblclick(x)
 {
     var event = new MouseEvent('dblclick', {
@@ -492,7 +427,7 @@ function triggerDblclick(x)
 }
 
 function init() {
-	    //document.getElementById("query").innerHTML = getParameterByName('query');
+	    document.getElementById("srchbox").innerHTML = getParameterByName('query');
 	    document.getElementById("srchbox").addEventListener("keypress",function(event){
 			if(event.key == "Enter")
 			{
@@ -549,20 +484,20 @@ function init() {
 			pageNode.pageNumber = scanInfo.pages[i].pageNumber;
 			pageNode.id = "uniqueDivId"+scanInfo.pages[i].pageNumber;
 		    pageNode.ondblclick = function(){
-						console.log(this.pageNumber);
+		    console.log(this.pageNumber);
 		    let page = document.getElementById("uniqueocrpage"+this.pageNumber);
 		    let vspg = getVisiblePagesOCR();
 		    if(vspg.indexOf(page)==-1)
 		    {
-										   page.scrollIntoView();
+			page.scrollIntoView();
 			if(window.history.replaceState)
 			{
 			    let newurl = window.location.search;
 			    newurl+="#page"+this.pageNumber;
 			    window.history.replaceState({},null,newurl);
 			}
-										   }
-										   };
+		    }
+		    };
 			pageNode.classList.add("page");
 			pageNode.classList.add("placeholder");
 			let anchorNode = document.createElement("a");
@@ -589,7 +524,6 @@ function init() {
 		if(location.hash)
 			location.hash = location.hash;
 
-
 		updateAfterScroll();
 	}, function() {
 		document.body.innerHTML = "<center><h1>Access denied!</h1></center>";
@@ -607,9 +541,6 @@ function init() {
 
         if(searchResults.pages != undefined)
         {
-		//document.getElementById("searchQuery").innerHTML = parsedUrlParams["query"];
-		document.getElementById("linklst").innerHTML = "Loading ocr file...";
-
 		waitforocr.then(function(vwhatyever){
 		
 		if(searchResults.is_fuzzy === false)
@@ -661,8 +592,10 @@ function init() {
 		document.getElementsByClassName("coollnklist")[0].click();
 	});
 							      }}, function() {
-															     alert("Something went wrong please report this to the system admins");
+		document.getElementById("linklst").innerHTML = "Could not load hit list :(";
+
 	});
+
 
 }
 
@@ -721,7 +654,7 @@ function SelectNextHit()
 </head>
 <body>
 	<div class="pageContainer">
-	    <div style='top: 0;display: inline-grid; grid-column: 2 /span 1;height:98vh;'> 
+	    <div style='top: 0;display: inline-grid; grid-column: 2 /span 1;height: 100vh;margin-bottom: 0;'> 
 	
 		<div id="SearchOpts" class="optioncont secondoptioncontlay" style='top: 0;background-color: white;overflow:scroll;'>
 		    
