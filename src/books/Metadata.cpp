@@ -215,6 +215,19 @@ std::string CMetadata::getShow()
 
     return sResult;
 }
+
+std::string CMetadata::getZit(size_t page)
+{
+    std::string sZit = getShow();
+    sZit.pop_back();
+    sZit.insert(0, "(");
+    if(page != 1000000)
+        sZit.append(", S. " + std::to_string(page) + ".)");
+    else
+        sZit.append(".)");
+
+    return sZit;
+}
 /**
 * @return string with Auhtor + first 6 words 15 words of title + date
 */

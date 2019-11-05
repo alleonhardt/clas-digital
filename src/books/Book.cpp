@@ -362,10 +362,11 @@ std::string CBook::getOnePreview(std::string sWord)
 {
     std::string sSource;
     size_t pos;
+    size_t page=1000000;
 
     // *** get Source string and position *** //
     if(m_bOcr == true) 
-        sSource = getPreviewText(sWord, pos);
+        sSource = getPreviewText(sWord, pos, page);
     else
         sSource = getPreviewTitle(sWord, pos);
 
@@ -389,12 +390,13 @@ std::string CBook::getOnePreview(std::string sWord)
 
     //*** Append [...] front and back *** //
     finalResult.insert(0, " \u2026"); 
-    finalResult.append(" \u2026");
-
-    return finalResult;
+    if(page!=1000000)
+        return finalResult += " \u2026 (S." + std::to_string(page) +")";
+    else
+        return finalResult += " \u2026";
 }
 
-std::string CBook::getPreviewText(std::string& sWord, size_t& pos)
+std::string CBook::getPreviewText(std::string& sWord, size_t& pos, size_t& page)
 {
     // *** get match *** //
     if(m_mapWordsPages.count(sWord) > 0)
@@ -405,7 +407,7 @@ std::string CBook::getPreviewText(std::string& sWord, size_t& pos)
         return "";
 
     // *** Get Page *** //
-    size_t page = std::get<0>(m_mapWordsPages[sWord])[0];
+    page = std::get<0>(m_mapWordsPages[sWord])[0];
     if(page == 1000000)
         return "";
 
