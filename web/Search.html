@@ -341,30 +341,7 @@ function SetAdvancedFuzzy(x)
 
 function AddAdvancedBar() 
 {
-    document.getElementById("author").value = document.getElementById("SearchForAuthor").value;
-
-    let allCollections = document.getElementsByClassName("upSaule"); 
-    let found = true;
-    for(let i=0; i<allCollections.length; i++) {
-        if(allCollections[i].checked == true)
-            document.getElementById("collections").value=allCollections[i].dataset.key;
-        else
-            found = false;
-    }
-    if (found==true)
-        document.getElementById("collections").value="all";
-            
-
-    if(document.getElementById("FuzzyID").value == 1)
-        document.getElementById("fuzzyness").value=1;
-    if(document.getElementById("SearchInTitle").checked==true)
-        document.getElementById("searchIn").value=1;
-    else if(document.getElementById("SearchInOCR").checked==true)
-        document.getElementById("searchIn").value=2;
-    document.getElementById("publicatedAfter").value = document.getElementById("PublicatedAfter").value;
-    document.getElementById("publicatedBefore").value = document.getElementById("PublicatedBefore").value;
     let banner = document.getElementById("InnerResultBanner");
-
     let curDisplay = banner.style.display;
 
     banner.style.display = (curDisplay == "block") ? "none" : "block"; 
@@ -398,6 +375,32 @@ function ShowSelectedValues(obj)
         console.log("Server data found!");
         }
     }
+
+    // *** BEFORE IN AddAdvancedBar CHANGE BACK LATER *** //
+    document.getElementById("author").value = document.getElementById("SearchForAuthor").value;
+
+    let allCollections = document.getElementsByClassName("upSaule"); 
+    let found = true;
+    for(let i=0; i<allCollections.length; i++) {
+        if(allCollections[i].checked == true)
+            document.getElementById("collections").value=allCollections[i].dataset.key;
+        else
+            found = false;
+    }
+    if (found==true)
+        document.getElementById("collections").value="all";
+            
+
+    if(document.getElementById("FuzzyID").value == 1)
+        document.getElementById("fuzzyness").value=1;
+    if(document.getElementById("SearchInTitle").checked==true)
+        document.getElementById("searchIn").value=1;
+    else if(document.getElementById("SearchInOCR").checked==true)
+        document.getElementById("searchIn").value=2;
+    document.getElementById("publicatedAfter").value = document.getElementById("PublicatedAfter").value;
+    document.getElementById("publicatedBefore").value = document.getElementById("PublicatedBefore").value;
+    // *****************************************************//
+
     let maxResultsElement = document.getElementById("maxResults");
     let searchTimeElement = document.getElementById("searchTime");
 
