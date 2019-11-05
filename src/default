@@ -106,6 +106,10 @@ server {
 #                                   http_500 http_502 http_503 http_504;
 	}
 
+location /getsugg {
+        	proxy_pass         http://localhost:9000;
+	}
+
 	location /authenticate {
 		internal;
         	proxy_pass         http://localhost:9000;

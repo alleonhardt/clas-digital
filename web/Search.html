@@ -299,13 +299,9 @@ function SetAdvancedCollections(x)
         let allCollections = document.getElementsByClassName("upSaule"); 
         for(let i=0; i<allCollections.length; i++)
             allCollections[i].checked = false;
+        document.getElementById("uniqueSaule"+x.value).checked = true;
     }
 
-
-    [].forEach.call(  document.querySelectorAll('#collections :checked')  , function(elm){
-        document.getElementById("uniqueSaule"+elm.value).checked = true;
-        console.log(elm.value);
-    })
     document.getElementById("SpecialSID").focus();
 }
 
@@ -346,6 +342,19 @@ function SetAdvancedFuzzy(x)
 function AddAdvancedBar() 
 {
     document.getElementById("author").value = document.getElementById("SearchForAuthor").value;
+
+    let allCollections = document.getElementsByClassName("upSaule"); 
+    let found = true;
+    for(let i=0; i<allCollections.length; i++) {
+        if(allCollections[i].checked == true)
+            document.getElementById("collections").value=allCollections[i].dataset.key;
+        else
+            found = false;
+    }
+    if (found==true)
+        document.getElementById("collections").value="all";
+            
+
     if(document.getElementById("FuzzyID").value == 1)
         document.getElementById("fuzzyness").value=1;
     if(document.getElementById("SearchInTitle").checked==true)
@@ -492,6 +501,22 @@ function ShowSelectedValues(obj)
     obj.innerHTML+=next_prev;
 }
 
+function sendSugg()
+{
+    let input = document.getElementById("SpecialSID").value;
+    console.log(input);
+    let requ = "/getsugg?q="+encodeURIComponent(input);
+
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+           // Typical action to be performed when the document is ready:
+           console.log(xhttp.responseText);
+        }
+    };
+    xhttp.open("GET", requ, true);
+    xhttp.send();
+}
 
 //Searches in the server with the given search options and displays a list of matches
 function sendToPage(name)
@@ -734,14 +759,14 @@ function ShowLinks()
 		inp.focus();
 		inp.addEventListener("keydown",function(event){
 
+            let curPage = parseInt(getParameterByName('page'));  
+            let nextPage=curPage;
             if(event.key == "Enter")
 			{
 				document.getElementById("srchButton").click();
 			}
 
-            let curPage = parseInt(getParameterByName('page'));  
-            let nextPage=curPage;
-            if(event.key == ">") 
+            else if(event.key == ">") 
             {
                 nextPage = curPage+1;
                 if(getParameterByName('q')!=null && getParameterByName('page')==null)
@@ -749,12 +774,16 @@ function ShowLinks()
                 else
                     window.location=window.location.search.replace('page='+curPage, 'page='+nextPage);
             }
-            if(event.key == "<")
+            else if(event.key == "<")
             {
                 nextPage = curPage-1;
                 if(nextPage < 1)
                     nextPage = 1;
                 window.location=window.location.search.replace('page='+curPage, 'page='+nextPage);
+            }
+            else
+            {
+                sendSugg();
             }
 
             
@@ -836,8 +865,8 @@ function ShowLinks()
                     Author:
                     <input id='author' onchange="SetAdvancedAuthor(this);return true;" class="specialultbut" style="background:white;margin-right:0.5;border:0;" type="text" value=""> </input>
                     Collections:
-                    <select id='collections' onchange='SetAdvancedCollections(this);return true;' class"=specialultbut" style="background:white;margin-right:0.5;border:0;" multiple>
-                        <option value='all'>Search all Collections</option>
+                    <select id='collections' onchange='SetAdvancedCollections(this);return true;' class"=specialultbut" style="background:white;margin-right:0.5;border:0;">
+                        <option value='all' selected>Search all Collections</option>
                     </select>
                     After:
                     <input id='publicatedAfter' onchange='SetAdvancedDateAfter(this);return true;' class='specialultbut' style='background:white;margin-right:0.5;border:0;' size='5' type='number' step='1' min='0' value='0'>
