@@ -603,12 +603,33 @@ function init() {
 				window.location = newurl;
 			}
 		});
-
 	    document.getElementById("thepagereader").onscroll = function() {
+	    if(globalScrollLock)
+	    { 
+		globalScrollLock = false;
+		return false;
+	    }
+	    console.log("Pages on scroll and focus!");
+		
+	    let val = getVisiblePages();
+	    globalScrollLock = true;
+	    triggerDblclick(val[0]);
+	    UpdateLinkPrev();
 	    updateAfterScroll();
 	    return false;
 	}
-
+    document.getElementById("OCRBuffer").onscroll = function() {
+	    console.log("Ocr scrolls now!");
+	    if(globalScrollLock)
+	    {
+		globalScrollLock = false;
+		return;
+	    }
+	    let val = getVisiblePagesOCR();
+	    globalScrollLock = true; 
+	    triggerDblclick(val[0]);
+	    UpdateLinkPrev();
+	}
 	let parsedUrlParams = parseURLParams(window.location.href);
 	let scanId = parsedUrlParams['scanId'];
 	let waitforocr = GetOCRTxt();
