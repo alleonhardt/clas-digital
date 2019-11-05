@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <codecvt>
 #include "func.hpp"
+//#include "levenshtein-sse.hpp"
 
 namespace fuzzy
 {

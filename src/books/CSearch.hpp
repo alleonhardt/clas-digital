@@ -84,7 +84,7 @@ public:
     * @param[in] mapWords map of all words with a list of books in which this word accures
     * @param[in, out] mapSR searchresults
     */
-    void fuzzySearch(MAPWORDS& mapWords, std::unordered_map<std::string, CBook*>& mapBooks);
+    void fuzzySearch(MAPWORDS& mapWords, std::unordered_map<std::string, CBook*>& mapBooks, bool t);
 
     /**
     * @brief check whether searched word matches with author of a book.

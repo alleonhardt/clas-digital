@@ -82,9 +82,9 @@ std::map<std::string, double>* CSearch::search(MAPWORDS& mWs, MAPWORDS& mWsTitle
     {
         //Search in ocr and/ or in title
         if(getOnlyTitle() == false)
-            fuzzySearch(mWs, mapBooks);
+            fuzzySearch(mWs, mapBooks, false);
         if(getOnlyOcr() == false)
-            fuzzySearch(mWsTitle, mapBooks);
+            fuzzySearch(mWsTitle, mapBooks, true);
     }
 
     //Check for author
@@ -116,13 +116,15 @@ void CSearch::normalSearch(MAPWORDS& mapWords)
 * @param[in] mapWords map of all words with a list of books in which this word accures
 * @param[in, out] mapSR searchresults
 */
-void CSearch::fuzzySearch(MAPWORDS& mapWords, std::unordered_map<std::string, CBook*>& mapBooks)
+void CSearch::fuzzySearch(MAPWORDS& mapWords, std::unordered_map<std::string, CBook*>& mapBooks, bool t)
 {
     for(auto it= mapWords.begin(); it!=mapWords.end(); it++)
     {
         double value = fuzzy::fuzzy_cmp(it->first, m_sWord);
-        if(value <= 0.2) 
+        if(value <= 0.2 && t==false) 
             myInsert(it->second, it->first, mapBooks, value);
+        else if(value <= 0.2)
+            m_mapSR->insert(it->second.begin(), it->second.end());
     }
 }
 
@@ -202,6 +204,8 @@ void CSearch::myInsert(std::map<std::string, double>& found, std::string sMatch,
         (*m_mapSR)[it->first] += it->second*(1-value*5);
 
         //Add match to map
+        if(mapBooks[it->first]->getOcr() == false)
+            continue;
         if (mapBooks[it->first]->getMapFuzzy()[m_sWord].front().second > value)
             mapBooks[it->first]->getMapFuzzy()[m_sWord].push_front({sMatch, value});
         else

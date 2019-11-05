@@ -290,17 +290,15 @@ void CBook::removePages(std::map<int, std::vector<std::string>>* results1, std::
 
 bool CBook::onSamePage(std::vector<std::string> sWords)
 {
-    std::cout << "onSamePage... " << std::endl;
     std::vector<size_t> pages1 = pages(sWords[0]);
-    if(pages1.size() == 0) 
-        return false;
+    if(pages1.size() == 0) return false;
 
     for(size_t i=1; i<sWords.size(); i++)
     {
         std::cout << "Word " << i << std::endl;
         std::vector<size_t> pages2 = pages(sWords[i]);
-        if(pages2.size() == 0) 
-            return false;
+
+        if(pages2.size() == 0) return false;
 
         bool found=false;
         for(size_t j=0; j<pages1.size(); j++) {
@@ -334,7 +332,6 @@ std::vector<size_t> CBook::pages(std::string sWord) {
 // **** GET PREVIEW FUNCTIONS **** //
 std::string CBook::getPreview(std::string sInput)
 {
-    std::cout << "Get Prieview... " << std::endl;
     // *** Get First preview *** //
     std::vector<std::string> searchedWords = func::split2(sInput, "+");
     std::string prev = getOnePreview(searchedWords[0]);
@@ -342,7 +339,6 @@ std::string CBook::getPreview(std::string sInput)
     // *** Get second Preview (if second word) *** //
     for(size_t i=1; i<searchedWords.size(); i++)
     {
-        std::cout << "Word... " << i << std::endl;
         //Try finding second word in current preview
         size_t pos = prev.find(searchedWords[i]);
         if(pos!=std::string::npos) {
@@ -352,6 +348,7 @@ std::string CBook::getPreview(std::string sInput)
         else
             prev += "\n" + getOnePreview(searchedWords[i]);
     }
+    std::cout << prev << std::endl;
     return prev;
 }
 
@@ -372,25 +369,24 @@ std::string CBook::getOnePreview(std::string sWord)
     else
         sSource = getPreviewTitle(sWord, pos);
 
-    if(sSource=="")
-        return "No Preview.";
+    if(sSource=="") return "No Preview.";
 
     // *** Generate substring *** //
     size_t front = 0;
     size_t len = 150;
     if(pos > 75) front = pos - 75;
     if(front+len >= sSource.length()) len = sSource.length()-front;
-    std::string finalResult = sSource.substr(front, len);
 
-    //*** Shorten preview if needed *** //
-    shortenPreview(finalResult);
+    std::string finalResult = sSource.substr(front, len);
 
     // *** Add highlighting *** //
     if (pos > 75) pos = 75;
     finalResult.insert(pos+sWord.length(), "</mark>");
     finalResult.insert(pos, "<mark>");
 
-    
+    //*** Shorten preview if needed *** //
+    shortenPreview(finalResult);
+
     //*** Append [...] front and back *** //
     finalResult.insert(0, " \u2026"); 
     finalResult.append(" \u2026");
@@ -401,9 +397,11 @@ std::string CBook::getOnePreview(std::string sWord)
 std::string CBook::getPreviewText(std::string& sWord, size_t& pos)
 {
     // *** get match *** //
-    if(m_mapWordsPages.count(sWord) == 0 && m_mapFuzzy.count(sWord) > 0) 
+    if(m_mapWordsPages.count(sWord) > 0)
+        sWord = sWord;
+    else if(m_mapFuzzy.count(sWord) > 0) 
         sWord = m_mapFuzzy[sWord].front().first;
-    else if(m_mapWordsPages.count(sWord) == 0)
+    else 
         return "";
 
     // *** Get Page *** //
@@ -485,11 +483,11 @@ void CBook::shortenPreview(std::string& str)
     }
 
     //Check vor invalid literals and escape
-    for(unsigned int i=0; i<str.length(); i++)
+    for(unsigned int i=str.length(); i>0; i--)
     {
-        if(str[i] == '\"' || str[i] == '\'' || str[i] == '\\', str[i] == '<' || str[i] == '>') {
-            str.insert(i, "\\");
-            i++;
-        }
+        if(str[i-1] == '\"' || str[i-1] == '\'' || str[i-1] == '\\')
+            str.erase(i-1, 1);
+        if(str[i-1] == '<' && str[i] != 'm' && str[i] != '/')
+            str.erase(i-1, 1);
     }
 }

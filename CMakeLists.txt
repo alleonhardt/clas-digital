@@ -6,6 +6,7 @@ include_directories(
   "deps")
 set(CMAKE_CXX_FLAGS "-O3 -Wall -Wextra -Werror -Wpedantic -std=c++1z")
 
+
 find_package(Threads REQUIRED)
 find_package(CURL REQUIRED)
 
