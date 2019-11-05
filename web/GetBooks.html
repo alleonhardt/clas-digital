@@ -6,211 +6,12 @@
 <!-- <link rel="stylesheet" href="container.css"/>-->
 <style>
 
-.mybtn {
-    background-color: #FFD700;
-    width: 8rem;
-    height: 2rem;
-    font-size: large;
-	margin-bottom: 8rem;
-}
-
-.mybtn:hover{
-    background-color: #FF3700;
-}
-
-@import url('https://fonts.googleapis.com/css?family=Raleway:200,300');
-
-html {
-	padding-top: 1rem;
-	padding-bottom: 1rem;
-	background-color: lightgrey;
-}
-
-
-html * {
-	font-family: "Raleway", serif;
-	font-weight: 200;
-	box-sizing: border-box;
-	-webkit-font-smoothing: antialiased;
-}
-
-body {
-	font-size: 1.4em;
-}
-
-body>.container {
-width: 60rem;
-       min-height: 75vh;
-margin: 0 auto;
-padding: 1rem;
-	 padding-left: 4rem;
-	 padding-right: 4rem;
-	padding-bottom: 4rem;
-	 background-color: white;
-display: none;
-}
-
-body>.container.active {
-display: block;
-}
-
-p {
-	font-size: 1.4rem;
-	line-height: 1.9em;
-}
-
-p strong {
-	font-weight: 300;
-}
-
-h1 {
-	font-size: 2rem;
-	margin-bottom: 4rem;
-	text-align: center;
-}
-
-h2 {
-	margin-top: 4rem;
-	font-size: 1.9rem;
-}
 
 .coollnklist {
     margin: 0;
     margin-top: 0.25rem;
     color: blue;
     cursor: pointer;
-}
-
-h2>span {
-display: inline-block;
-width: 1.7em;
-height: 1.7em;
-	background-color: #FF6666;
-color: white;
-       border-radius: 50%;
-       text-align: center;
-       line-height: 1.55em;
-       vertical-align: middle;
-       padding-left: 0.15em;
-margin: 0;
-} 
-
-input[type="text"] {
-	font-size: inherit;
-border: none;
-	border-bottom: 1px solid #DC143C;
-}
-
-input[type="text"]:hover,input[type="text"]:focus  {
-outline: none;
-}
-
-
-em {
-	color: steelblue;
-	font-style: normal;
-
-}
-
-html {
-	padding: 0;
-	margin: 0;
-}
-
-body {
-/*	display: grid;
-	igrid-template-columns: 25rem 1fr;*/
-	padding: 0;
-	margin: 0;
-	background: grey;
-}
-
-.info {
-	grid-column: 2 / span 1;
-	background-color: white;
-	margin: 1rem;
-	margin-top: 0rem;
-	margin-bottom: 0;
-	padding: 1rem;
-	padding-top:0;
-	overflow: scroll;
-}
-
-.matchedWord {
-  color: black;
-  background: yellow;
-}
-
-.ocrbutton {
-  position: fixed;
-  display: block;
-  top: 0;
-  margin-left: 58%;
-  width: 21%;
-  padding: 0;
-  height: 6%;
-  overflow: auto;
-}
-
-
-.blackLine {
-	width: 120%;
-	height: 1rem;
-	margin-left: -1rem !important;
-	background: grey;
-	color: grey;
-	border: 0;
-}
-
-.nextbutton {
-  position: fixed;
-  display: block;
-  top: 0;
-  width: 21%;
-  padding: 0;
-  margin-left: 79%;
-  height: 6%;
-  overflow: auto;
-}
-
-.nextbutton2 {
-  position: fixed;
-  display: block;
-  top: 0;
-  width: 21%;
-  padding: 0;
-  margin-left: 79%;
-  height: 6%;
-  overflow: auto;
-}
-
-.butactive,.nextbutton:hover,.nextbutton2:hover,.ocrbutton:hover,.metabutton:hover {
-  color: white;
-  background: black;
-}
-
-
-
-.metabutton {
-  position:	fixed;
-  display: block;
-  top: 3rem;
-  height: 3rem;
-  width: 40rem;
-  overflow: auto;
-}
-
-.ocrstyle {
-	overflow: auto;
-	width: 100%;
-	margin-left: -1rem;
-	white-space: pre-wrap;
-	background: white;
-	padding: 1rem;
-}
-
-.ocrstyle p {
-	font-size: small;
 }
 
 .reader {
@@ -223,10 +24,6 @@ body {
 	margin: 0;
 	top: 1rem;
 	padding: 0;
-}
-
-.hidden {
-  display: none;
 }
 
 .page {
@@ -276,6 +73,106 @@ padding-right: 0;
 	display: none !important;
 }
 
+.pageContainer {
+	display: grid;
+	position: fixed;
+	top: 0;
+	left: 0;
+	height: 100vh;
+	width: 100%;
+	grid-template-columns: 60% 40%;
+	background-color: grey;
+	overflow:hidden;
+}
+
+.optioncont {
+    display: block;
+    margin: 0;
+    padding: 0.5rem;
+    background-color: white;
+    overflow: scroll;
+}
+
+.ocrdispstyle {
+	display:block;
+	width: 100%;
+	margin: 0;
+	margin-bottom: 0.5rem;
+	margin-top: 1rem;
+	padding-right: 0;
+	background-color: grey;
+	overflow: scroll;
+}
+
+.ocrdispstyle p {
+	display: block;
+	font-size: small;
+	background-color: white;
+	margin-bottom: 4rem;
+	padding: 2.5rem;
+	text-align: justify;
+	min-height: 350px;
+}
+
+.butact {
+	background-color: orange;
+	color: white;
+}
+
+
+.butX:hover {
+	background-color: black;
+	color: orange;
+}
+
+.linkliststyler {
+    grid-column: 1 /span 1;
+    grid-row: 1 / span 1;
+    margin: 0;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+    line-height: 2rem;
+    background-color: white;
+    padding-bottom: 2rem;
+    overflow: auto;
+    white-space: nowrap;
+    font-size: small;
+    text-align: justify;
+}
+
+a:visited {
+    color: purple;
+}
+
+a:active {
+    color: red;
+}
+
+.DropdownClass {
+    margin: auto;
+    display: block;
+}
+
+.DivDropdown {
+    width: 100%;
+    background-color:white;
+    margin-top:0;
+    cursor: pointer;
+}
+.DivDropdown:hover {
+    background-color: #00FFFF;
+}
+
+.secondoptioncontlay {
+    height: calc(2.3rem + 17px);
+    transition-timing-function: ease-in-out;
+    transition-duration: 1s;
+}
+.currentoptioncontlay {
+    height: 40vh;
+    transition-timing-function: ease-in-out;
+    transition-duration: 1s;
+}
 </style>
 <script>
 class Server {
@@ -771,109 +668,6 @@ function init() {
 
 
 window.addEventListener("load", init, false);
-</script>
-<style>
-.pageContainer {
-	display: grid;
-	position: fixed;
-	top: 0;
-	left: 0;
-	height: 100vh;
-	width: 100%;
-	grid-template-columns: 60% 40%;
-	background-color: grey;
-	overflow:hidden;
-}
-
-.optioncont {
-    display: block;
-    margin: 0;
-    padding: 0.5rem;
-    background-color: white;
-    overflow: scroll;
-}
-
-.ocrdispstyle {
-	display:block;
-	width: 100%;
-	margin: 0;
-	margin-bottom: 0.5rem;
-	margin-top: 1rem;
-	padding-right: 0;
-	background-color: grey;
-	overflow: scroll;
-}
-
-.ocrdispstyle p {
-	display: block;
-	font-size: small;
-	background-color: white;
-	margin-bottom: 4rem;
-	padding: 1rem;
-	min-height: 350px;
-}
-
-.butact {
-	background-color: orange;
-	color: white;
-}
-
-
-.butX:hover {
-	background-color: black;
-	color: orange;
-}
-
-.linkliststyler {
-    grid-column: 1 /span 1;
-    grid-row: 1 / span 1;
-    margin: 0;
-    margin-left: 0.5rem;
-    margin-right: 0.5rem;
-    line-height: 2rem;
-    background-color: white;
-    padding-bottom: 2rem;
-    overflow: auto;
-    white-space: nowrap;
-    font-size: small;
-    text-align: justify;
-}
-
-a:visited {
-    color: purple;
-}
-
-a:active {
-    color: red;
-}
-
-.DropdownClass {
-    margin: auto;
-    display: block;
-}
-
-.DivDropdown {
-    width: 100%;
-    background-color:white;
-    margin-top:0;
-    cursor: pointer;
-}
-.DivDropdown:hover {
-    background-color: #00FFFF;
-}
-
-.secondoptioncontlay {
-    height: calc(2.3rem + 17px);
-    transition-timing-function: ease-in-out;
-    transition-duration: 1s;
-}
-.currentoptioncontlay {
-    height: 40vh;
-    transition-timing-function: ease-in-out;
-    transition-duration: 1s;
-}
-</style>
-<script>
 let insideWindow = false;
 function changecolor(x)
 {
@@ -926,8 +720,6 @@ function SelectNextHit()
 </script>
 </head>
 <body>
-    <!---
-    <div id="MoreInfoSrch" style='display: none;'>Ihr Suchbegriff '<mark id='query'></mark>'wurde auf folgenden Seiten gefunden: </div>!------>
 	<div class="pageContainer">
 	    <div style='top: 0;display: inline-grid; grid-column: 2 /span 1;height:98vh;'> 
 	
