@@ -69,7 +69,7 @@ public:
     * @brief calls spezific search function, searches, and creates map of  matches. Removes all 
     * books that do not match with search options.
     */
-    std::map<std::string, double>* search(MAPWORDS& mWs, MAPWORDS& mWsTitle, 
+    std::map<std::string, double>* search(MAPWORDS& mWs, MAPWORDS& mWsTitle, MAPWORDS& mWsAuthor,
                 std::unordered_map<std::string, CBook*>& mapBooks);
 
     /**
@@ -86,10 +86,14 @@ public:
     */
     void fuzzySearch(MAPWORDS& mapWords, std::unordered_map<std::string, CBook*>& mapBooks, bool t);
 
-    /**
-    * @brief check whether searched word matches with author of a book.
+    /*
+    * @brief inserts searchResults into map of searchresults and assigns value of match
+    * @param[out] mapSR
+    * @param[in] found
+    * @param[out] matches
+    * @param[in] value
     */
-    void checkAuthor(std::unordered_map<std::string, CBook*>& mapBooks);
+    void myInsert(std::map<std::string, double>& found, std::string sMatch, std::unordered_map<std::string, CBook*>& mapBooks, double value);
 
     /**
     * @brief remove all books that do not match with searchoptions
@@ -104,18 +108,8 @@ public:
     */
     bool checkSearchOptions(CBook* book);
 
-    /*
-    * @brief inserts searchResults into map of searchresults and assigns value of match
-    * @param[out] mapSR
-    * @param[in] found
-    * @param[out] matches
-    * @param[in] value
-    */
-    void myInsert(std::map<std::string, double>& found, std::string sMatch, std::unordered_map<std::string, CBook*>& mapBooks, double value);
-
     /**
     * @brief delete searchOptions
     */
     void deleteSearchOptions();
-
 };

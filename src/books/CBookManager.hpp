@@ -28,6 +28,7 @@ private:
     typedef std::unordered_map<std::string, std::map<std::string, double>> MAPWORDS;
     MAPWORDS m_mapWords;
     MAPWORDS m_mapWordsTitle;
+    MAPWORDS m_mapWordsAuthors;
 
     std::list<std::pair<std::string, size_t>> m_listWords;
 
@@ -81,6 +82,11 @@ public:
     * @brief create map of all words (key) and book-titles in which the word occurs (value)
     */
     void createMapWordsTitle();
+
+    /**
+    * @brief create map of all words (key) and author names in which the word occurs (value)
+    */
+    void createMapWordsAuthor();
 
     void createListWords();
 

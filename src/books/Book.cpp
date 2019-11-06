@@ -346,13 +346,17 @@ std::string CBook::getPreview(std::string sInput)
         //Try finding second word in current preview
         size_t pos = prev.find(searchedWords[i]);
         if(pos!=std::string::npos) {
-            prev.insert(pos+searchedWords[i].length(), "</mark>");
+            size_t end = prev.find(" ", pos);
+            if(end != std::string::npos) {
+                prev.insert(end-1, "</mark>");
+            }
+            else
+                prev.insert(pos+searchedWords[i].length(), "</mark>");
             prev.insert(pos, "<mark>");
         } 
         else
             prev += "\n" + getOnePreview(searchedWords[i]);
     }
-    std::cout << prev << std::endl;
     return prev;
 }
 
@@ -386,7 +390,11 @@ std::string CBook::getOnePreview(std::string sWord)
 
     // *** Add highlighting *** //
     if (pos > 75) pos = 75;
-    finalResult.insert(pos+sWord.length(), "</mark>");
+    size_t end = finalResult.find(" ", pos+1);
+    if(end!=std::string::npos)
+        finalResult.insert(end, "</mark>");
+    else
+        finalResult.insert(pos+sWord.length(), "</mark>");
     finalResult.insert(pos, "<mark>");
 
     //*** Shorten preview if needed *** //

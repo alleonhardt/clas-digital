@@ -37,8 +37,10 @@ bool CBookManager::initialize()
     //Create map of all words + and of all words in all titles
     createMapWords();
     createMapWordsTitle();
-    std::cout << "Map words: " << m_mapWords.size() << "\n";
-    std::cout << "Map title: " << m_mapWordsTitle.size() << "\n";
+    createMapWordsAuthor();
+    std::cout << "Map words:   " << m_mapWords.size() << "\n";
+    std::cout << "Map title:   " << m_mapWordsTitle.size() << "\n";
+    std::cout << "Map authors: " << m_mapWordsAuthors.size() << "\n";
     createListWords();
 
     return true;
@@ -86,12 +88,12 @@ std::list<std::string>* CBookManager::search(CSearchOptions* searchOpts)
 
     //Start first search
     CSearch search(searchOpts, sWords[0]);
-    std::map<std::string, double>* results = search.search(m_mapWords, m_mapWordsTitle, m_mapBooks);
+    std::map<std::string, double>* results = search.search(m_mapWords, m_mapWordsTitle, m_mapWordsAuthors, m_mapBooks);
 
     for(size_t i=1; i<sWords.size(); i++)
     {
         CSearch search2(searchOpts, sWords[i]);
-        std::map<std::string, double>* results2 = search2.search(m_mapWords, m_mapWordsTitle, m_mapBooks);
+        std::map<std::string, double>* results2 = search2.search(m_mapWords, m_mapWordsTitle, m_mapWordsAuthors, m_mapBooks);
         for(auto it=results->begin(); it!=results->end(); ++it) {
             if(results2->count(it->first) == 0)
                 results->erase(it);
@@ -202,6 +204,17 @@ void CBookManager::createMapWordsTitle()
         for(auto yt=mapWords.begin(); yt!=mapWords.end(); yt++)
             m_mapWordsTitle[yt->first][it->first] = 0.1;
     }
+}
+
+/**
+* @brief create map of all words (key) and author names in which the word occurs (value)
+*/
+void CBookManager::createMapWordsAuthor()
+{
+    //Iterate over all books. Add words to list (if the word does not already exist in map of all words)
+    //or add book to list of books (if word already exists).
+    for(auto it=m_mapBooks.begin(); it!=m_mapBooks.end(); it++)
+        m_mapWordsAuthors[it->second->getAuthor()][it->first] = 0.1;
 }
 
 /**
