@@ -377,6 +377,10 @@ function GetOCRTxt() {
 				content = content.replace(RegSrch,'</p><p data-page="$1" id="uniqueocrpage$1" class="ocrpage" ondblclick="SwitchToPage(this);"> Page $1 / $2 <br/>');
 				content+="</p>";	
 				document.getElementById("OCRBuffer").innerHTML = content;
+				if(location.hash!="")
+				{
+				    document.getElementById("uniqueocrpage"+location.hash.substr(5)).scrollIntoView();
+				}
 				resolve(10);
 
 							},function(content){document.getElementById("OCRBuffer").innerHTML = "Could not load ocr file, sorry for that...";});
@@ -585,15 +589,17 @@ function init() {
 	    Server.Get("/getmetadata?scanId=" + scanId, function(content) {
 		metadata = JSON.parse(content);
 		    document.getElementById("biblio").innerHTML = metadata.bib;
-		if(metadata.data.creators[0].lastName === undefined)
-			document.title = metadata.data.creators[0].name+" - clas digital";
-		else
-			document.title = metadata.data.creators[0].lastName+" - clas digital";
+		if(metadata.data.creators != undefined)
+		    if(metadata.data.creators[0] != undefined)
+			if(metadata.data.creators[0].lastName === undefined)
+			    document.title = metadata.data.creators[0].name+" - clas digital";
+			else
+			    document.title = metadata.data.creators[0].lastName+" - clas digital";
 	}, function() {
 		// print some error message here
 	});
 
-		// if an anchor was specified go there (as it is now defined)
+
 		if(location.hash)
 			location.hash = location.hash;
 
