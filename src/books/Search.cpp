@@ -158,7 +158,7 @@ void CSearch::removeBooks(std::unordered_map<std::string, CBook*>& mapBooks)
 {
     for(auto it=m_mapSR->begin(); it!=m_mapSR->end();)
     {
-        if(it->second < 0.0001 || checkSearchOptions(mapBooks[it->first]) == false)
+        if(checkSearchOptions(mapBooks[it->first]) == false)
             m_mapSR->erase(it++);
         else
             ++it;
