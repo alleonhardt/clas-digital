@@ -177,6 +177,7 @@ void do_searchinbook(const Request& req, Response &resp, CBookManager &manager)
 	    }
 	    else
 	    {
+		std::cout<<"Vector size for page "<<it.first<<" size: "<<it.second.size()<<std::endl;
 		for(auto const &inner : it.second)
 		{
 		    nlohmann::json entry;
