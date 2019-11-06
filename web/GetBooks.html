@@ -598,7 +598,7 @@ function init() {
 
 		updateAfterScroll();
 	}, function() {
-		document.body.innerHTML = "<center><h1>Access denied!</h1></center>";
+		document.getElementById("linklst").innerHTML = "Could not load images, sorry for that :(";
 	});
 	
 	if(!parsedUrlParams.hasOwnProperty("query"))
