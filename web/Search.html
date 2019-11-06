@@ -55,6 +55,7 @@ mark {
 
 /*Keeping the search box in the middle in the top of the screen*/
 .button_box_top {
+    position:relative;
 	text-align: center;
 	width: 100%;
 	margin: auto;
@@ -302,7 +303,8 @@ https://github.com/ShadowItaly/clas-digital/issues/56.close:focus {
 .sugg {
     display:none;
     position:absolute;
-    margin-left:-11rem;
+    left:40.5%;
+    top:2.4rem;
     background-color: #f1f1f1;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     z-index: 1;
@@ -945,18 +947,17 @@ function ShowLinks()
 
 
 		<div id="searchboxid" class="button_box_top">
-        <div class="logo"> <img src="static/clas-logotype-frankfurt-00618f-blue-712x450.png" width="15%" height="12%" title="Cultural And Literary Animal Studies" alt="CLAS Logo"> </div>
-        <div class="betaversion"> This is a Beta version. Report Bugs at <a href="https://github.com/ShadowItaly/clas-digital/issues">clas-digital/issues</a>. Or use E-Mail: <a href="mailto:clas-digital-technik@dlist.server.uni-frankfurt.de">clas-digital-technik@dlist.server.uni-frankfurt.de</a>. </div> 
-				<!--<div class="form-wrapper-2 cf"> -->
-                <div >
-					<input id="SpecialSID" onblur='sugg_disapear();return true;' style='padding: 0.3rem;width: 20%;border-radius: 25px;' type="text" placeholder="Search here..." required>
-                    <button id="srchButton" class='srchbtn' style='margin-left: -2.8rem;' type="button" onclick="sendToPage('SpecialSID')"><i class="fa fa-search"></i></button></input>
-                </div>
-				<!--</div>-->
-            <div id="suggs" class="sugg" align="left">
+            <div class="logo"> <img src="static/clas-logotype-frankfurt-00618f-blue-712x450.png" width="15%" height="12%" title="Cultural And Literary Animal Studies" alt="CLAS Logo"> </div>
+            
+            <div class="betaversion"> This is a Beta version. Report Bugs at <a href="https://github.com/ShadowItaly/clas-digital/issues">clas-digital/issues</a>. Or use E-Mail: <a href="mailto:clas-digital-technik@dlist.server.uni-frankfurt.de">clas-digital-technik@dlist.server.uni-frankfurt.de</a>. </div> 
+            <div style='position:relative'>
+			    <input id="SpecialSID" onblur='sugg_disapear();return true;' style='padding: 0.3rem;width: 20%;border-radius: 25px;position:relative;' type="text" placeholder="Search here..." required>
+                    <button id="srchButton" class='srchbtn' style='margin-left: -2.8rem;' type="button" onclick="sendToPage('SpecialSID')"><i class="fa fa-search"></i></button>
+                </input>
+                <div id="suggs" class="sugg" align="left"></div>
             </div>
+            
 			<div id="ResultBanner" style="display:none; margin-top:2rem;" >
-
                 <div id='ResultBannerHeader'>
                     <button class='advanceopts' onclick='AddAdvancedBar();return true;'>Advanced Bar</button>
                 </div>
