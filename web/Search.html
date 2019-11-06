@@ -580,8 +580,8 @@ function ShowSelectedValues(obj)
     let val = "<hr><div class='linkcontainer'>";
     let counter = 1;
     let resultsperpage = 10;
-    if(getParameterByName('maxresultsperpage')!=null)
-	resultsperpage = parseInt(getParameterByName('maxresultsperpage'));
+    if(getParameterByName('limit')!=null)
+	resultsperpage = parseInt(getParameterByName('limit'));
     for(let i = 0; i < json.max_results; i+=resultsperpage)
     {
 	let lnk = window.location.search;
@@ -663,12 +663,7 @@ function sendSugg(input)
 function sendToPage(name)
 {
 	filterOpts["ShowOnlyTextsWithOCR"] = false;
-	document.getElementById("ResultBanner").innerHTML="";
-	//First of all put the search box to the top in order to show the results
 	
-	let searchbox = document.getElementById("searchboxid");
-	searchbox.setAttribute("class","button_box_top");
-
 	//Get the searched word
 	let inputObj = document.getElementById(name);
 	let input = inputObj.value;
@@ -689,6 +684,8 @@ function sendToPage(name)
 	    requ += "&publicatedafter="+document.getElementById("PublicatedAfter").value;
 	if(document.getElementById("PublicatedBefore").value != 2049)
 	    requ +=  "&publicatedbefore="+ document.getElementById("PublicatedBefore").value;
+	if(document.getElementById("limit").value != 10)
+	    requ += "&maxresultsperpage="+document.getElementById("limit").value;
 	let myList = document.getElementsByClassName("upSaule");
 	
 	let val = "";
@@ -775,59 +772,6 @@ function changecolor(obj)
 	return true;
 }
 
-function LoadSearchData(sp)
-{
-
-	document.getElementById("SearchInOCR").checked = sp.ocr_only;
-	document.getElementById("FuzzyID").value = sp.fuzzyness;
-	document.getElementById("SearchInTitle").checked = sp.title_only;
-	document.getElementById("SearchForAuthor").value = sp.author_name;
-	document.getElementById("PublicatedAfter").value = sp.pub_after;
-	document.getElementById("PublicatedBefore").value = sp.pub_before;
-	
-	document.getElementById('SliderNum').innerHTML = getSliderValue(sp.fuzzyness);
-	let pill = document.getElementsByClassName("upSaule");
-	for(let i = 0; i < sp.pillars.length; i++)
-	{
-		pill[i].checked = sp.pillars[i];
-	}
-
-	console.log(sp);
-}
-
-
-function ApplySearchData()
-{
-	//Create the json file with the advanced search options
-	search_parameters.fuzzyness = document.getElementById("FuzzyID").value;
-	search_parameters.title_only = document.getElementById("SearchInTitle").checked;
-	search_parameters.ocr_only = document.getElementById("SearchInOCR").checked;
-	search_parameters.author_name = document.getElementById("SearchForAuthor").value;
-	search_parameters.pub_after = document.getElementById("PublicatedAfter").value;
-	search_parameters.pub_before = document.getElementById("PublicatedBefore").value;
-	let pill = document.getElementsByClassName("upSaule");
-	search_parameters.pillars = null;
-	for(let i = 0; i < pill.length; i++)
-	{
-		if(search_parameters.pillars == null)
-			search_parameters.pillars = [pill[i].checked];
-		else
-			search_parameters.pillars.push(pill[i].checked);
-	}
-	document.getElementById("CloseSModal").click();
-	console.log(search_parameters);
-}
-
-function ResetToDefault()
-{
-	LoadSearchData(default_search_parameters);
-	let kk = document.getElementsByClassName("upSaule");
-	for(let i = 0; i < kk.length; i++)
-	{
-		kk[i].checked = true;
-	}
-}
-
        window.addEventListener("load",function(){User.initialise('searchlink');ExecuteInitialise();ShowLinks();},false);
 
 function getParameterByName(name, url) {
@@ -888,9 +832,7 @@ function ShowLinks()
 	}
 	ShowSelectedValues(obj);
 	if(getParameterByName('f_sort')!=null) document.getElementById("filterselect").value = getParameterByName('f_sort');
-	if(getParameterByName('maxresultsperpage')!=null) document.getElementById("maxresultsperpage").value = getParameterByName('maxresultsperpage');
-	ApplySearchData();
-	default_search_parameters = JSON.parse(JSON.stringify(search_parameters));
+	if(getParameterByName('maxresultsperpage')!=null) document.getElementById("limit").value = getParameterByName('maxresultsperpage');
 }
 		</script>
 		<style>
@@ -994,8 +936,6 @@ function ShowLinks()
 					<input id="PublicatedBefore" type="number" step="50" min="1" value="2049">
 				</div>			
 				<div>
-					<button class='btn btn-outline-success my2 my-sm-0 inlineButton' onclick="ApplySearchData();">Apply</button>
-					<button class='btn btn-outline-info my2 my-sm-0 inlineButton' onclick="ResetToDefault();">Reset to default</button>
 				</div>
 			</div>
 		</div>
@@ -1052,7 +992,7 @@ function ShowLinks()
 
 
                 <div id="ResultBannerFooter" style="margin-top: 2rem; margin-bottom:0;">
-                   <select id='maxresultsperpage' onchange='OpenFilter(this);return true;' class='advanceopts' style='background:white;margin-right:0.5rem;border:0;'>
+                   <select id='limit' onchange='OpenFilter(this);return true;' class='advanceopts' style='background:white;margin-right:0.5rem;border:0;'>
                        <option value='10'>Show 10 results per page</option>
                        <option value='20'>Show 20 results per page</option>
                        <option value='50'>Show 50 results per page</option>
