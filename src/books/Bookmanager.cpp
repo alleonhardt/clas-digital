@@ -251,7 +251,7 @@ std::list<std::string>* CBookManager::getSuggestions_fast(std::string sWord)
     size_t counter=0;
     for(auto it=m_listWords.begin(); it!=m_listWords.end() && counter < 10; it++) {
         double value = fuzzy::fuzzy_cmp(it->first, sWord);
-        if( value <= 0.2) {
+        if(value > 0 && value <= 0.2) {
             (*suggs)[it->first] = value*(-1);
             counter++;
         }
