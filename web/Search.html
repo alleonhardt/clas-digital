@@ -348,7 +348,7 @@ function OpenFilter(x)
 	let lnk = window.location.search;
 	if(getParameterByName('page')!=null)
 	{	
-	    lnk = window.location.search.replace("page="+getParameterByName('page'),"page=1");
+	    lnk = window.location.search.replace("&page="+getParameterByName('page'),"");
 	}
 
 	let val = getParameterByName(x.id);
@@ -356,10 +356,13 @@ function OpenFilter(x)
 	    window.location = lnk + "&"+x.id+"="+retval;
 	else
 	{
-	    window.location = lnk.replace(x.id+"="+val,x.id+"="+retval);
+	    //10 is standard value of maxresultsperpage and 0 is standard value of the sort algorithm the two filters never collide so we can ignore what filter option it is
+	    //and just print the results
+	    if(x.value=="10"||x.value=="0")
+		    window.location = lnk.replace("&"+x.id+"="+val,"");
+	    else
+		window.location = lnk.replace(x.id+"="+val,x.id+"="+retval);
 	}
-
-    document.getElementById("SpecialSID").focus();
 }
 
 function SetAdvancedAuthor(x)
@@ -580,8 +583,8 @@ function ShowSelectedValues(obj)
     let val = "<hr><div class='linkcontainer'>";
     let counter = 1;
     let resultsperpage = 10;
-    if(getParameterByName('limit')!=null)
-	resultsperpage = parseInt(getParameterByName('limit'));
+    if(getParameterByName('maxresultsperpage')!=null)
+	resultsperpage = parseInt(getParameterByName('maxresultsperpage'));
     for(let i = 0; i < json.max_results; i+=resultsperpage)
     {
 	let lnk = window.location.search;
@@ -684,8 +687,8 @@ function sendToPage(name)
 	    requ += "&publicatedafter="+document.getElementById("PublicatedAfter").value;
 	if(document.getElementById("PublicatedBefore").value != 2049)
 	    requ +=  "&publicatedbefore="+ document.getElementById("PublicatedBefore").value;
-	if(document.getElementById("limit").value != 10)
-	    requ += "&maxresultsperpage="+document.getElementById("limit").value;
+	if(document.getElementById("maxresultsperpage").value != 10)
+	    requ += "&maxresultsperpage="+document.getElementById("maxresultsperpage").value;
 	let myList = document.getElementsByClassName("upSaule");
 	
 	let val = "";
@@ -831,8 +834,8 @@ function ShowLinks()
 	    obj.drawablejson.show_to = Math.min(obj.drawablejson.books.length,maxResult);
 	}
 	ShowSelectedValues(obj);
-	if(getParameterByName('f_sort')!=null) document.getElementById("filterselect").value = getParameterByName('f_sort');
-	if(getParameterByName('maxresultsperpage')!=null) document.getElementById("limit").value = getParameterByName('maxresultsperpage');
+	if(getParameterByName('f_sort')!=null) document.getElementById("f_sort").value = getParameterByName('f_sort');
+	if(getParameterByName('maxresultsperpage')!=null) document.getElementById("maxresultsperpage").value = getParameterByName('maxresultsperpage');
 }
 		</script>
 		<style>
@@ -992,7 +995,7 @@ function ShowLinks()
 
 
                 <div id="ResultBannerFooter" style="margin-top: 2rem; margin-bottom:0;">
-                   <select id='limit' onchange='OpenFilter(this);return true;' class='advanceopts' style='background:white;margin-right:0.5rem;border:0;'>
+                   <select id='maxresultsperpage' onchange='OpenFilter(this);return true;' class='advanceopts' style='background:white;margin-right:0.5rem;border:0;'>
                        <option value='10'>Show 10 results per page</option>
                        <option value='20'>Show 20 results per page</option>
                        <option value='50'>Show 50 results per page</option>
