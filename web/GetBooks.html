@@ -126,7 +126,7 @@ padding-right: 0;
 
 .linkliststyler {
     grid-column: 1 /span 1;
-    grid-row: 1 / span 1;
+    grid-row: 2 / span 1;
     margin: 0;
     margin-left: 0.5rem;
     margin-right: 0.5rem;
@@ -163,7 +163,7 @@ a:active {
 }
 
 .secondoptioncontlay {
-    height: calc(1rem + 17px);
+    height: calc(4rem + 17px);
     transition-timing-function: ease-in-out;
     transition-duration: 1s;
 }
@@ -178,20 +178,20 @@ a:active {
 	position: absolute;
 	z-index: 1;
 	overflow: visible;
-	box-shadow: 5px 10px #888888;
+	background-color: #f1f1f1;
+	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
 }
 
 .fuzzysugs a {
     display: block;
     margin: 0px auto;
-    background-color: #EEEEEE;
-    border: 1px black solid;
-    text-align: left;
     padding: 0.3rem;
+    text-decoration: none;
+    text-align: left;
 }
 
 .fuzzysugs a:hover {
-	background-color: lightblue;
+	background-color: #ddd;
 	cursor: pointer;
 }
 </style>
@@ -731,13 +731,7 @@ function SelectNextHit()
 		<div id="SearchOpts" class="optioncont secondoptioncontlay" style='top: 0;background-color: white;overflow:scroll;'>
 		    
 		    <div style='display:grid;grid-template-columns: 90% 10%;padding: 0;'>
-			<div id='linklst' class='linkliststyler'></div>
-			<button style='grid-column: 2 /span 1;max-height: 1.7rem' onclick="SelectNextHit();return true;">Next</button>
-		    </div>
-		    
-		    <div id="biblio" style='color: green;'></div>
-		    <div id="searchboxstuff">
-			<hr/>
+		    <div id="searchboxstuff" style='grid-column: 1 / span 2;height: 3rem;'>
 			<div>
 			<input id='srchbox' style='display:inline-block;margin-left: 30%;' type='text' placeholder="Next search..." /><button style='display:inline-block;margin-right: 0.5rem;' onclick='doCompleteNewSearch();return true;'>Do search</button>
 			</div>
@@ -748,8 +742,13 @@ function SelectNextHit()
 					<a>Link four</a>
 					<a>Link two</a>
 			</div>
-			<hr>
+			<hr style='font-size:small;color:grey;'>
 		    </div>
+			<div id='linklst' class='linkliststyler'></div>
+			<button style='grid-column: 2 /span 1;grid-row: 2 /span 1;max-height: 1.7rem' onclick="SelectNextHit();return true;">Next</button>
+		    </div>
+		    
+		    <div id="biblio" style='color: green;'></div>
 		</div>
 
 		<div id='divdrop' class='DivDropdown' onclick='showall(document.getElementById("SearchOpts"))'>
