@@ -77,6 +77,10 @@ void CBook::createBook(std::string sPath)
     if(!readOcr)
         return;
 
+    std::ofstream writeJson(m_sPath + "/info.json");
+    writeJson << m_metadata.getMetadata();
+    writeJson.close();
+
     std::ifstream readWords(m_sPath + "/pages_new.txt");
     if(!readWords || readWords.peek() == std::ifstream::traits_type::eof() ) {
         createPages();

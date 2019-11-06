@@ -100,10 +100,63 @@ mark {
 .advanceopts {
     background:white;
     margin-right:0.5;
-    border:0;'
+    border:0;
+    font-size:15px;
+    color:#50555a;
+    display: inline-block;
+    /*position: relative;*/
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-right: 18px;
+    padding-left: 12px;
+    line-height: 22px;
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: arial,sans-serif;
+    width:180px;
 }
 
+.advanceopts:hover {
+	box-shadow: 0px 3px 0px #0000FF;
+}
 
+.advanceoptsText {
+    background:white;
+    margin-right:0.5;
+    border:0;
+    font-size:15px;
+    color:#50555a;
+    display: inline-block;
+    /*position: relative;*/
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-right: 18px;
+    padding-left: 12px;
+    line-height: 22px;
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: arial,sans-serif;
+    width:70px;
+}
+
+.advanceoptsInput {
+    background:white;
+    margin-right:0.5;
+    border:0;
+    font-size:15px;
+    color:#50555a;
+    display: inline-block;
+    /*position: relative;*/
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-right: 18px;
+    padding-left: 12px;
+    line-height: 22px;
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: arial,sans-serif;
+    width:100px;
+}
 .btclass2 {
 	background: white;
 	border: 0;
@@ -244,6 +297,27 @@ https://github.com/ShadowItaly/clas-digital/issues/56.close:focus {
       font-size: 16px; /* Set a font size */
       cursor: pointer; /* Mouse pointer on hover */
       border-radius: 50%;
+}
+
+.sugg {
+    display:none;
+    position:absolute;
+    margin-left:-11rem;
+    background-color: #f1f1f1;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+
+.sugg a {
+    color: black;
+    padding: 2px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.sugg a:hover {
+    background-color: #ddd;
 }
 
 		</style>
@@ -557,17 +631,27 @@ function ShowSelectedValues(obj)
     obj.innerHTML+=next_prev;
 }
 
-function sendSugg()
+function sendSugg(input)
 {
-    let input = document.getElementById("SpecialSID").value;
-    console.log(input);
     let requ = "/getsugg?q="+encodeURIComponent(input);
 
     var xhttp = new XMLHttpRequest();
+    var suggs = document.getElementById("suggs");
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
            // Typical action to be performed when the document is ready:
-           console.log(xhttp.responseText);
+           suggs.innerHTML="";
+           suggs.style.display="inline-block";
+
+           var obj = JSON.parse(this.responseText);
+           for(let i=0;i<obj.length;i++)
+           {
+               var node = document.createElement("a");
+               node.onmousedown=function(){sugg_func(this);};
+               var textNode = document.createTextNode(obj[i]);
+               node.appendChild(textNode);
+               suggs.appendChild(node);
+           }
         }
     };
     xhttp.open("GET", requ, true);
@@ -629,6 +713,27 @@ function sendToPage(name)
 	}
 
        	window.location = requ;
+}
+
+function sugg_func(x) 
+{
+    console.log(x.textContent);
+    let searchBox = document.getElementById("SpecialSID");
+    searchBox.value=x.textContent;
+    searchBox.focus();
+}
+
+function sugg_appear(x) 
+{
+    console.log(x.textContent);
+    let searchBox = document.getElementById("SpecialSID");
+    searchBox.value=x.textContent;
+    searchBox.focus();
+}
+
+function sugg_disapear()
+{
+    document.getElementById("suggs").style.display="none";
 }
 
 function SelectAll(y)
@@ -839,7 +944,7 @@ function ShowLinks()
             }
             else
             {
-                sendSugg();
+                sendSugg(document.getElementById("SpecialSID").value+event.key);
             }
 
             
@@ -908,25 +1013,26 @@ function ShowLinks()
         <div class="logo"> <img src="static/clas-logotype-frankfurt-00618f-blue-712x450.png" width="15%" height="12%" title="Cultural And Literary Animal Studies" alt="CLAS Logo"> </div>
         <div class="betaversion"> This is a Beta version. Report Bugs at <a href="https://github.com/ShadowItaly/clas-digital/issues">clas-digital/issues</a>. Or use E-Mail: <a href="mailto:clas-digital-technik@dlist.server.uni-frankfurt.de">clas-digital-technik@dlist.server.uni-frankfurt.de</a>. </div> 
 				<!--<div class="form-wrapper-2 cf"> -->
-					<input id="SpecialSID" style='padding: 0.3rem;width: 20%;border-radius: 25px;' type="text" placeholder="Search here..." required>
+                <div >
+					<input id="SpecialSID" onblur='sugg_disapear();return true;' style='padding: 0.3rem;width: 20%;border-radius: 25px;' type="text" placeholder="Search here..." required>
                     <button id="srchButton" class='srchbtn' style='margin-left: -2.8rem;' type="button" onclick="sendToPage('SpecialSID')"><i class="fa fa-search"></i></button></input>
+                </div>
 				<!--</div>-->
+            <div id="suggs" class="sugg" align="left">
+            </div>
 			<div id="ResultBanner" style="display:none; margin-top:2rem;" >
 
                 <div id='ResultBannerHeader'>
-                    <button class='specialultbut' class='advanceopts' onclick='AddAdvancedBar();return true;'>Advanced Bar</button>
+                    <button class='advanceopts' onclick='AddAdvancedBar();return true;'>Advanced Bar</button>
                 </div>
 
                 <div id="InnerResultBanner" style="display:block;margin-top:2rem;">
-                    Author:
-                    <input id='author' onchange="SetAdvancedAuthor(this);return true;" class="specialultbut" class='advanceopts' type="text" value=""> </input>
-                    Collections:
-                    <select id='collections' onchange='SetAdvancedCollections(this);return true;' class"=specialultbut" class='advanceopts'>
+                    <span class='advanceoptsText'> Author:</span>
+                    <input id='author' onchange="SetAdvancedAuthor(this);return true;" class='advanceoptsInput' type="text" value=""> </input>
+                    <select id='collections' onchange='SetAdvancedCollections(this);return true;' class='advanceopts'>
                         <option value='all' selected>Search all Collections</option>
                     </select>
-                    
-                    Year:
-                    <select id='year' onchange='SetAdvancedYear(this);return true;' clas='specialultbut' class='advanceopts'>
+                    <select id='year' onchange='SetAdvancedYear(this);return true;' class='advanceopts'>
                         <option value='0'>Any Time</option>
                         <option value='1700'>1700s</option>
                         <option value='1800'>1800s</option>
@@ -934,40 +1040,40 @@ function ShowLinks()
                         <option value='2000'>2000s</option>
                         <option value= '1'>Custom</option>
                     </select>
-                        <select id='searchIn' onchange='SetAdvancedOnlyIn(this);return true;' class='specialultbut' class='advanceopts'>
+                        <select id='searchIn' onchange='SetAdvancedOnlyIn(this);return true;' class='advanceopts'>
                         <option value='0'>Show Everything</option>
                         <option value='1'>Show only Books without Text</option>
                         <option value='2'>Show only Books with Text</option>
                     </select>
-                    <select id='fuzzyness' onchange='SetAdvancedFuzzy(this);return true;' class='specialultbut' class='advanceopts'>
+                    <select id='fuzzyness' onchange='SetAdvancedFuzzy(this);return true;' class='advanceopts'>
                         <option value='0'>Exact matches</option>
                         <option value='1'>Fuzzy matching</option>
                     </select>
                 </div>
                 <div id="InnerInnerBanner" style="display:none;margin-top:2rem;">
-                    After:
-                    <input id='publicatedAfter' class='specialultbut' class='advanceopts' size='5' type='number' step='50' min='0' value='1700'></input>
-                    Before:
-                    <input id='publicatedBefore' class='specialultbut' class='advanceopts' size='5' type='number' step='50' min='0' value='2049'></input>
-                    <button id='advancedApply' class='specialultbut' class='advanceopts' onclick='SetCustom();return true;'>Apply</button>
+                    <span class='advanceoptsText'> After:</span>
+                    <input id='publicatedAfter' class='advanceoptsInput' size='5' type='number' step='50' min='0' value='1700'></input>
+                    <span class='advanceopts'> Before:</span>
+                    <input id='publicatedBefore' class='advanceoptsInput' size='5' type='number' step='50' min='0' value='2049'></input>
+                    <button id='advancedApply' class='advanceopts' onclick='SetCustom();return true;'>Apply</button>
                 </div>
 
 
                 <div id="ResultBannerFooter" style="margin-top: 2rem; margin-bottom:0;">
-                   <select id='maxresultsperpage' onchange='OpenFilter(this);return true;' class='specialultbut' style='background:white;margin-right:0.5rem;border:0;'>
+                   <select id='maxresultsperpage' onchange='OpenFilter(this);return true;' class='advanceopts' style='background:white;margin-right:0.5rem;border:0;'>
                        <option value='10'>Show 10 results per page</option>
                        <option value='20'>Show 20 results per page</option>
                        <option value='50'>Show 50 results per page</option>
                        <option value='1000000'>Show all results</option>
                    </select>
-                   <select id='f_sort' onchange='OpenFilter(this);return true;' class='specialultbut' onclick='return true;' style='background:white;margin-right: 0.5rem;border: 0;'>
+                   <select id='f_sort' onchange='OpenFilter(this);return true;' class='advanceopts' onclick='return true;' style='background:white;margin-right: 0.5rem;border: 0;'>
                        <option value='0'>Sort by relevance</option>
                        <option value='2'>Sort alphabetically</option>
                        <option value='1'>Sort chronologically</option>
                    </select>
-                   <button class='specialultbut' style='background:white;border: 0;' onclick='CreateBibliography();return true;'>Create Bibliography</button>
+                   <button class='advanceopts' style='background:white;border: 0;' onclick='CreateBibliography();return true;'>Create Bibliography</button>
                    <hr style='padding: 0;'>
-                   <span style='color: grey;'><span id="maxResults"></span> Ergebnisse gefunden in <span id="searchTime"></span></span>
+                   <span style='color: grey;font-size:13px;'><span id="maxResults"></span> Ergebnisse gefunden in <span id="searchTime"></span></span>
                 </div>
             </div>
 			<div id="SearchHitList" start="0" class="list-type2"></div>

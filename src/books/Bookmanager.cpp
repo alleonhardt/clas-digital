@@ -39,6 +39,7 @@ bool CBookManager::initialize()
     createMapWordsTitle();
     std::cout << "Map words: " << m_mapWords.size() << "\n";
     std::cout << "Map title: " << m_mapWordsTitle.size() << "\n";
+    createListWords();
 
     return true;
 }
@@ -203,12 +204,56 @@ void CBookManager::createMapWordsTitle()
     }
 }
 
+/**
+* @brief create list of all words and relevance, ordered by relevance
+*/
+void CBookManager::createListWords()
+{
+    std::map<std::string, size_t> mapWords;
+    for(auto it = m_mapWords.begin(); it!=m_mapWords.end(); it++) {
+        mapWords[it->first] = it->second.size();
+    }
+
+	typedef std::function<bool(std::pair<std::string, double>, std::pair<std::string, double>)> Comp;
+
+    Comp compFunctor = 
+        [](const auto &a, const auto &b)
+        {
+            if(a.second == b.second) return a.first > b.first;
+            return a.second > b.second;
+        };
+
+    std::set<std::pair<std::string, size_t>, Comp> sorted(mapWords.begin(), mapWords.end(), compFunctor);
+
+    for(auto elem : sorted)
+        m_listWords.push_back({elem.first, elem.second});
+}
+
+/**
+* @brief return a list of 10 words, fitting search Word, sorted by in how many books they apear
+*/
+std::list<std::string>* CBookManager::getSuggestions_fast(std::string sWord)
+{
+    std::map<std::string, double>* suggs = new std::map<std::string, double>;
+    size_t counter=0;
+    for(auto it=m_listWords.begin(); it!=m_listWords.end() && counter < 10; it++) {
+        double value = fuzzy::fuzzy_cmp(it->first, sWord);
+        if( value <= 0.2) {
+            (*suggs)[it->first] = value*(-1);
+            counter++;
+        }
+    }
+    std::list<std::string>* listSuggestions = convertToList(suggs, 0);
+    delete suggs;
+    return listSuggestions;
+}
             
 /**
 * @brief return a list of 10 words, fitting search Word, sorted by in how many books they apear
 */
 std::list<std::string>* CBookManager::getSuggestions_acc(std::string sWord, bool t, bool o)
 {
+    func::convertToLower(sWord);
     std::map<std::string, double>* sugg_1 = new std::map<std::string, double>;
     std::map<std::string, double>* sugg_2 = new std::map<std::string, double>;
     

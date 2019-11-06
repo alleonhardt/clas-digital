@@ -82,9 +82,12 @@ public:
     */
     void createMapWordsTitle();
 
+    void createListWords();
+
     /**
     * @brief return a list of 10 words, fitting search Word, sorted by in how many books they apear
     */
+    std::list<std::string>* getSuggestions_fast(std::string sWord);
     std::list<std::string>* getSuggestions_acc(std::string sWord, bool t, bool o);
     std::map<std::string, double>* getSuggestions_acc(std::string sWord, MAPWORDS& mapWords);
 }; 
