@@ -564,7 +564,7 @@ function ShowSelectedValues(obj)
 			inner+= "?query="+document.getElementById("SpecialSID").value;
 			inner+="&scanId="+json.books[i].scanId;
 			inner+="&fuzzyness="+document.getElementById("FuzzyID").value; 
-			inner+="' style='display: inline-grid;grid-column-start:1;grid-column-end:2;'><h4 style='text-align: left;float:left;'>";
+			inner+="' onclick='changecolor(this);return true;' style='display: inline-grid;grid-column-start:1;grid-column-end:2;'><h4 style='text-align: left;float:left;'>";
 			
 			inner+=json.books[i].description+"</h4></a>   "+"<input onclick='this.was_clicked=1;return true;' class='booklistinp' style='width:1rem;height:1rem;display: inline-grid;grid-column-start:2;grid-column-end:3' data-scanid='"+json.books[i].scanId+"' type='checkbox' unchecked></div>";
 			inner+="<div class='metadata' onclick='callMetadata(this);' data-scanid='"+json.books[i].scanId+"' style='text-align: left;color: green;font-size: small;margin-top: -0.5rem; cursor: pointer;'>";
@@ -769,18 +769,9 @@ function CreateBibliography()
 }
 
 
-function changeColor(obj)
+function changecolor(obj)
 {
-	for(var i = 0; i < obj.childNodes.length; i++)
-	{
-		if(obj.childNodes[i].was_clicked === 1)
-		{
-			obj.childNodes[i].was_clicked = 0;
-			return true;
-		}
-	}
-	obj.style.background = "#b1c4e2";
-	window.location = obj.dataset.specialhref;
+	obj.style.color = "purple";
 	return true;
 }
 
