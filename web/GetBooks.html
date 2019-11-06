@@ -126,7 +126,7 @@ padding-right: 0;
 
 .linkliststyler {
     grid-column: 1 /span 1;
-    grid-row: 1 / span 1;
+    grid-row: 2 / span 1;
     margin: 0;
     margin-left: 0.5rem;
     margin-right: 0.5rem;
@@ -163,7 +163,7 @@ a:active {
 }
 
 .secondoptioncontlay {
-    height: calc(1rem + 17px);
+    height: calc(4rem + 17px);
     transition-timing-function: ease-in-out;
     transition-duration: 1s;
 }
@@ -171,6 +171,28 @@ a:active {
     height: 40vh;
     transition-timing-function: ease-in-out;
     transition-duration: 1s;
+}
+
+.fuzzysugs {
+	visibility: hidden;
+	position: absolute;
+	z-index: 1;
+	overflow: visible;
+	background-color: #f1f1f1;
+	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+
+.fuzzysugs a {
+    display: block;
+    margin: 0px auto;
+    padding: 0.3rem;
+    text-decoration: none;
+    text-align: left;
+}
+
+.fuzzysugs a:hover {
+	background-color: #ddd;
+	cursor: pointer;
 }
 </style>
 <script>
@@ -351,7 +373,7 @@ function GetOCRTxt() {
 
 				let RegSrch = /-----\s(\d+)\s.\s(\d+)\s-----/g;
 				content = '<p data-page="1" id="uniqueocrpage0" class="ocrpage">' + content;
-				content = content.replace(RegSrch,'</p><p data-page="$1" id="uniqueocrpage$1" class="ocrpage" ondblclick="SwitchToPage(this);"><span class="pagelayout"> Page $1 / $2 </span><br>');
+				content = content.replace(RegSrch,'</p><p data-page="$1" id="uniqueocrpage$1" class="ocrpage" ondblclick="SwitchToPage(this);"> Page $1 / $2 <br/>');
 				content+="</p>";	
 				document.getElementById("OCRBuffer").innerHTML = content;
 				resolve(10);
@@ -426,15 +448,65 @@ function triggerDblclick(x)
     x.dispatchEvent(event);
 }
 
+function srchbarlosefocus()
+{
+										    
+    document.getElementById("fuzzysuggestions").style.display = 'none';
+}
+
+async function DoFuzzyMatching(x)
+{
+    let value = document.getElementsByClassName("ocrpage");
+    let results = 0;
+    let suggestions = document.getElementById("fuzzysuggestions");
+    suggestions.style.visibility = 'visible';
+    suggestions.innerHTML = '';
+
+    for(let i = 0; i < value.length; i++)
+    {
+	let strval = value[i].innerHTML;
+	let res = strval.match(new RegExp('.{0,30}('+x+').{0,30}','gi'));
+	if(res==null)
+	    continue;
+	for(let i2 = 0; i2 < res.length; i2++)
+	{
+	    results+=1;
+	    res[i2] = res[i2].replace(new RegExp('('+x+')','gi'),'<mark>$1</mark>');
+
+	    let a = document.createElement("a");
+	    a.innerHTML = res[i2]+"<span style='font-weight: bold;float:right;margin-left: 0.8rem;'> S."+i+"</span>";
+	    a.page = i;
+	    a.word = x;
+	    a.tabIndex = 0;
+	    a.onclick = function(){
+		let page = document.getElementById("uniqueocrpage"+this.page);
+		page.innerHTML = page.innerHTML.replace(new RegExp('('+this.word+')','gi'),'<mark>$1</mark>');
+		page.scrollIntoView();
+		document.getElementById("fuzzysuggestions").style.visibility = 'hidden';
+	    }
+	    suggestions.appendChild(a);
+	    if(results>9)
+	    {
+		console.log(results);
+		return;
+	    }
+	}
+    }
+}
+
+function doCompleteNewSearch()
+{
+    let newurl = "/GetBooks.html?query="+document.getElementById("srchbox").value+"&scanId="+getParameterByName("scanId")+"&fuzzyness="+getParameterByName('fuzzyness');
+    window.location = newurl;
+}
+
+
 function init() {
 	    document.getElementById("srchbox").innerHTML = getParameterByName('query');
-	    document.getElementById("srchbox").addEventListener("keypress",function(event){
-			if(event.key == "Enter")
-			{
-				let newurl = "/GetBooks.html?query="+document.getElementById("srchbox").value+"&scanId="+getParameterByName("scanId")+"&fuzzyness="+getParameterByName('fuzzyness');
-				window.location = newurl;
-			}
+	    document.getElementById("srchbox").addEventListener("input",function(event){
+			DoFuzzyMatching(document.getElementById("srchbox").value);
 		});
+    document.getElementById('searchboxstuff').addEventListener("focusout", function(event){if(event.relatedTarget)event.relatedTarget.click();console.log(event.relatedTarget);document.getElementById("fuzzysuggestions").style.visibility="hidden";});
 	    document.getElementById("thepagereader").onscroll = function() {
 	    if(globalScrollLock)
 	    { 
@@ -526,7 +598,7 @@ function init() {
 
 		updateAfterScroll();
 	}, function() {
-		document.body.innerHTML = "<center><h1>Access denied!</h1></center>";
+		document.getElementById("linklst").innerHTML = "Could not load images, sorry for that :(";
 	});
 	
 	if(!parsedUrlParams.hasOwnProperty("query"))
@@ -534,7 +606,7 @@ function init() {
 
 	parsedUrlParams["query"] = decodeURIComponent(parsedUrlParams["query"]);
 		
-	Server.Get("/searchinbook?scanId=" + scanId + "&query=" + encodeURIComponent(parsedUrlParams["query"])+"&fuzzyness="+encodeURIComponent(parsedUrlParams["fuzzyness"]), function(content) {
+	Server.Get("/searchinbook?scanId=" + scanId + "&query=" + encodeURIComponent(parsedUrlParams["query"].replace(' ','+'))+"&fuzzyness="+encodeURIComponent(parsedUrlParams["fuzzyness"]), function(content) {
 		let searchResults = JSON.parse(content);
 		// temporary needed
 		searchResults.pages = searchResults.books;
@@ -659,17 +731,24 @@ function SelectNextHit()
 		<div id="SearchOpts" class="optioncont secondoptioncontlay" style='top: 0;background-color: white;overflow:scroll;'>
 		    
 		    <div style='display:grid;grid-template-columns: 90% 10%;padding: 0;'>
+		    <div id="searchboxstuff" style='grid-column: 1 / span 2;height: 3rem;'>
+			<div>
+			<input id='srchbox' style='display:inline-block;margin-left: 30%;' type='text' placeholder="Next search..." /><button style='display:inline-block;margin-right: 0.5rem;' onclick='doCompleteNewSearch();return true;'>Do search</button>
+			</div>
+			<div id='fuzzysuggestions' class='fuzzysugs'>
+					<a>Link one</a>
+					<a>Link two</a>
+					<a>Link three</a>
+					<a>Link four</a>
+					<a>Link two</a>
+			</div>
+			<hr style='font-size:small;color:grey;'>
+		    </div>
 			<div id='linklst' class='linkliststyler'></div>
-			<button style='grid-column: 2 /span 1;max-height: 1.7rem' onclick="SelectNextHit();return true;">Next</button>
+			<button style='grid-column: 2 /span 1;grid-row: 2 /span 1;max-height: 1.7rem' onclick="SelectNextHit();return true;">Next</button>
 		    </div>
 		    
 		    <div id="biblio" style='color: green;'></div>
-		    <div id="searchboxstuff">
-			<hr/>
-			<span style='margin-right: 1rem;'>Search again for:</span>
-			<input id='srchbox' type='text' placeholder="Next search..." />
-			<hr/>
-		    </div>
 		</div>
 
 		<div id='divdrop' class='DivDropdown' onclick='showall(document.getElementById("SearchOpts"))'>

@@ -318,6 +318,7 @@ https://github.com/ShadowItaly/clas-digital/issues/56.close:focus {
 
 .sugg a:hover {
     background-color: #ddd;
+    cursor: pointer;
 }
 
 		</style>
@@ -347,7 +348,7 @@ function OpenFilter(x)
 	let lnk = window.location.search;
 	if(getParameterByName('page')!=null)
 	{	
-	    lnk = window.location.search.replace("page="+getParameterByName('page'),"page=1");
+	    lnk = window.location.search.replace("&page="+getParameterByName('page'),"");
 	}
 
 	let val = getParameterByName(x.id);
@@ -355,10 +356,13 @@ function OpenFilter(x)
 	    window.location = lnk + "&"+x.id+"="+retval;
 	else
 	{
-	    window.location = lnk.replace(x.id+"="+val,x.id+"="+retval);
+	    //10 is standard value of maxresultsperpage and 0 is standard value of the sort algorithm the two filters never collide so we can ignore what filter option it is
+	    //and just print the results
+	    if(x.value=="10"||x.value=="0")
+		    window.location = lnk.replace("&"+x.id+"="+val,"");
+	    else
+		window.location = lnk.replace(x.id+"="+val,x.id+"="+retval);
 	}
-
-    document.getElementById("SpecialSID").focus();
 }
 
 function SetAdvancedAuthor(x)
@@ -563,7 +567,7 @@ function ShowSelectedValues(obj)
 			inner+= "?query="+document.getElementById("SpecialSID").value;
 			inner+="&scanId="+json.books[i].scanId;
 			inner+="&fuzzyness="+document.getElementById("FuzzyID").value; 
-			inner+="' style='display: inline-grid;grid-column-start:1;grid-column-end:2;'><h4 style='text-align: left;float:left;'>";
+			inner+="' onclick='changecolor(this);return true;' style='display: inline-grid;grid-column-start:1;grid-column-end:2;'><h4 style='text-align: left;float:left;'>";
 			
 			inner+=json.books[i].description+"</h4></a>   "+"<input onclick='this.was_clicked=1;return true;' class='booklistinp' style='width:1rem;height:1rem;display: inline-grid;grid-column-start:2;grid-column-end:3' data-scanid='"+json.books[i].scanId+"' type='checkbox' unchecked></div>";
 			inner+="<div class='metadata' onclick='callMetadata(this);' data-scanid='"+json.books[i].scanId+"' style='text-align: left;color: green;font-size: small;margin-top: -0.5rem; cursor: pointer;'>";
@@ -662,12 +666,7 @@ function sendSugg(input)
 function sendToPage(name)
 {
 	filterOpts["ShowOnlyTextsWithOCR"] = false;
-	document.getElementById("ResultBanner").innerHTML="";
-	//First of all put the search box to the top in order to show the results
 	
-	let searchbox = document.getElementById("searchboxid");
-	searchbox.setAttribute("class","button_box_top");
-
 	//Get the searched word
 	let inputObj = document.getElementById(name);
 	let input = inputObj.value;
@@ -688,6 +687,8 @@ function sendToPage(name)
 	    requ += "&publicatedafter="+document.getElementById("PublicatedAfter").value;
 	if(document.getElementById("PublicatedBefore").value != 2049)
 	    requ +=  "&publicatedbefore="+ document.getElementById("PublicatedBefore").value;
+	if(document.getElementById("maxresultsperpage").value != 10)
+	    requ += "&maxresultsperpage="+document.getElementById("maxresultsperpage").value;
 	let myList = document.getElementsByClassName("upSaule");
 	
 	let val = "";
@@ -768,72 +769,10 @@ function CreateBibliography()
 }
 
 
-function changeColor(obj)
+function changecolor(obj)
 {
-	for(var i = 0; i < obj.childNodes.length; i++)
-	{
-		if(obj.childNodes[i].was_clicked === 1)
-		{
-			obj.childNodes[i].was_clicked = 0;
-			return true;
-		}
-	}
-	obj.style.background = "#b1c4e2";
-	window.location = obj.dataset.specialhref;
+	obj.style.color = "purple";
 	return true;
-}
-
-function LoadSearchData(sp)
-{
-
-	document.getElementById("SearchInOCR").checked = sp.ocr_only;
-	document.getElementById("FuzzyID").value = sp.fuzzyness;
-	document.getElementById("SearchInTitle").checked = sp.title_only;
-	document.getElementById("SearchForAuthor").value = sp.author_name;
-	document.getElementById("PublicatedAfter").value = sp.pub_after;
-	document.getElementById("PublicatedBefore").value = sp.pub_before;
-	
-	document.getElementById('SliderNum').innerHTML = getSliderValue(sp.fuzzyness);
-	let pill = document.getElementsByClassName("upSaule");
-	for(let i = 0; i < sp.pillars.length; i++)
-	{
-		pill[i].checked = sp.pillars[i];
-	}
-
-	console.log(sp);
-}
-
-
-function ApplySearchData()
-{
-	//Create the json file with the advanced search options
-	search_parameters.fuzzyness = document.getElementById("FuzzyID").value;
-	search_parameters.title_only = document.getElementById("SearchInTitle").checked;
-	search_parameters.ocr_only = document.getElementById("SearchInOCR").checked;
-	search_parameters.author_name = document.getElementById("SearchForAuthor").value;
-	search_parameters.pub_after = document.getElementById("PublicatedAfter").value;
-	search_parameters.pub_before = document.getElementById("PublicatedBefore").value;
-	let pill = document.getElementsByClassName("upSaule");
-	search_parameters.pillars = null;
-	for(let i = 0; i < pill.length; i++)
-	{
-		if(search_parameters.pillars == null)
-			search_parameters.pillars = [pill[i].checked];
-		else
-			search_parameters.pillars.push(pill[i].checked);
-	}
-	document.getElementById("CloseSModal").click();
-	console.log(search_parameters);
-}
-
-function ResetToDefault()
-{
-	LoadSearchData(default_search_parameters);
-	let kk = document.getElementsByClassName("upSaule");
-	for(let i = 0; i < kk.length; i++)
-	{
-		kk[i].checked = true;
-	}
 }
 
        window.addEventListener("load",function(){User.initialise('searchlink');ExecuteInitialise();ShowLinks();},false);
@@ -895,10 +834,8 @@ function ShowLinks()
 	    obj.drawablejson.show_to = Math.min(obj.drawablejson.books.length,maxResult);
 	}
 	ShowSelectedValues(obj);
-	if(getParameterByName('f_sort')!=null) document.getElementById("filterselect").value = getParameterByName('f_sort');
+	if(getParameterByName('f_sort')!=null) document.getElementById("f_sort").value = getParameterByName('f_sort');
 	if(getParameterByName('maxresultsperpage')!=null) document.getElementById("maxresultsperpage").value = getParameterByName('maxresultsperpage');
-	ApplySearchData();
-	default_search_parameters = JSON.parse(JSON.stringify(search_parameters));
 }
 		</script>
 		<style>
@@ -1002,8 +939,6 @@ function ShowLinks()
 					<input id="PublicatedBefore" type="number" step="50" min="1" value="2049">
 				</div>			
 				<div>
-					<button class='btn btn-outline-success my2 my-sm-0 inlineButton' onclick="ApplySearchData();">Apply</button>
-					<button class='btn btn-outline-info my2 my-sm-0 inlineButton' onclick="ResetToDefault();">Reset to default</button>
 				</div>
 			</div>
 		</div>
