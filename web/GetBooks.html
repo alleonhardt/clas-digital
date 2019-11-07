@@ -256,6 +256,10 @@ class PageLoader {
 	deferedCheckQueue() {
 		if(this.queue.length > 0)
 			window.setTimeout(this.checkQueue.bind(this), 50);
+		else
+		{
+		    window.setTimeout(function(){document.getElementById("thepagereader").onscroll = document.getElementById("thepagereader").scroll_backup;},250);
+		}
 	}
 
 	loadPage(pageNode) {
@@ -268,6 +272,8 @@ class PageLoader {
 		img.classList = "findImg";
 		img.page = pageNode.info;
 		img.onload = function() {
+			document.getElementById("thepagereader").scroll_backup = document.getElementById("thepagereader").onscroll;
+			document.getElementById("thepagereader").onscroll = null;
 			pageNode.replaceChild(img, pageNode.querySelector("svg"));
 			this.deferedCheckQueue();
 		}.bind(this);
