@@ -245,7 +245,7 @@ class Server {
 	}
 }
 
-let gUpdateInterval = 1000;
+let gUpdateInterval = 400;
 class PageLoader {
 	constructor() {
 		this.queue = new Array();
@@ -285,9 +285,10 @@ class PageLoader {
 		img.classList = "findImg";
 		img.page = pageNode.info;
 		img.onload = function() {
+			let scrollPosition = document.getElementById("thepagereader").scrollTop;
 			pageNode.replaceChild(img, pageNode.querySelector("svg"));
+			document.getElementById("thepagereader").scrollTop = scrollPosition; //Restore scroll position
 			this.deferedCheckQueue();
-			gUpdateInterval = 50;
 		}.bind(this);
 		img.onerror = function() {
 			if(pageNode.first_try ===undefined)
@@ -437,8 +438,6 @@ function SwitchToPage(x)
 	window.history.replaceState({},null,newurl);
     }
     }
-    else
-	gUpdateInterval = 1000;
     this.onscroll = fnc;
 }
 
@@ -673,8 +672,6 @@ function init() {
 			}
 			this.onscroll = fnc;
 		    }
-		    else
-			gUpdateInterval = 1000;
 		    };
 			pageNode.classList.add("page");
 			pageNode.classList.add("placeholder");
