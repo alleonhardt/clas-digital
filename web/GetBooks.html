@@ -14,10 +14,8 @@
 
 
 .coollnklist {
-    margin: 0;
-    margin-top: 0.25rem;
-    color: blue !important;
     cursor: pointer;
+    color: blue !important;
 }
 .srchbtn {
       border: none; /* Remove borders */
@@ -38,6 +36,10 @@
 	margin: 0;
 	top: 1rem;
 	padding: 0;
+}
+
+mark {
+    background: yellow;
 }
 
 .page {
@@ -209,6 +211,18 @@ a:active {
     cursor: pointer;
 }
 
+.fuzzysugslink mark {
+    color: black;
+    background: yellow;
+}
+
+.fuzzysugs a.fuzzysugslink:hover {
+    color: black;
+    text-decoration: none;
+    text-align: left;
+    background: "#ddd";
+}
+
 </style>
 <script>
 class Server {
@@ -229,7 +243,7 @@ class Server {
 	}
 }
 
-
+let gUpdateInterval = 1000;
 class PageLoader {
 	constructor() {
 		this.queue = new Array();
@@ -271,6 +285,7 @@ class PageLoader {
 		img.onload = function() {
 			pageNode.replaceChild(img, pageNode.querySelector("svg"));
 			this.deferedCheckQueue();
+			gUpdateInterval = 50;
 		}.bind(this);
 		img.onerror = function() {
 			if(pageNode.first_try ===undefined)
@@ -420,6 +435,8 @@ function SwitchToPage(x)
 	window.history.replaceState({},null,newurl);
     }
     }
+    else
+	gUpdateInterval = 1000;
     this.onscroll = fnc;
 }
 
@@ -545,7 +562,7 @@ function sync_pages()
 		val = getVisiblePagesOCR();
 	    else
 		val = getVisiblePages();
-	    triggerDblclick(val[0]);
+	    triggerDblclick(val[0])
 	    UpdateLinkPrev();
 	    updateAfterScroll();
 }
@@ -601,7 +618,7 @@ function init() {
 	    {
 		window.clearTimeout(gCurrentTimer);
 	    }
-	    gCurrentTimer = window.setTimeout(sync_pages,1000);
+	    gCurrentTimer = window.setTimeout(sync_pages,gUpdateInterval);
 	}
 
     document.getElementById("OCRBuffer").onscroll = function() {
@@ -610,7 +627,7 @@ function init() {
 	    {
 		window.clearTimeout(gCurrentTimer);
 	    }
-	    gCurrentTimer = window.setTimeout(sync_pages,1000);
+	    gCurrentTimer = window.setTimeout(sync_pages,gUpdateInterval);
 	}
 
 	let parsedUrlParams = parseURLParams(window.location.href);
@@ -652,6 +669,8 @@ function init() {
 			}
 			this.onscroll = fnc;
 		    }
+		    else
+			gUpdateInterval = 1000;
 		    };
 			pageNode.classList.add("page");
 			pageNode.classList.add("placeholder");
@@ -762,7 +781,7 @@ window.addEventListener("load", init, false);
 let insideWindow = false;
 function changecolor(x)
 {
-    x.style.color = "#800080";
+    x.setAttribute('style','cursor: pointer;color: purple !important');
     shownone(document.getElementById("SearchOpts"));
 }
 
