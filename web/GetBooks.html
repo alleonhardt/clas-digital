@@ -126,7 +126,7 @@ padding-right: 0;
 }
 
 .linkliststyler {
-    grid-column: 1 /span 1;
+    grid-column: 2 /span 1;
     grid-row: 2 / span 1;
     margin: 0;
     margin-left: 0.5rem;
@@ -164,7 +164,7 @@ a:active {
 }
 
 .secondoptioncontlay {
-    height: calc(4rem + 17px);
+    height: calc(4.2rem + 17px);
     transition-timing-function: ease-in-out;
     transition-duration: 1s;
 }
@@ -551,6 +551,7 @@ function init() {
 	}
 	let parsedUrlParams = parseURLParams(window.location.href);
 	let scanId = parsedUrlParams['scanId'];
+	document.getElementById("bookinfo").href = "/ShowMetadata.html?scanId="+scanId;
 	let waitforocr = GetOCRTxt();
 	
 	Server.Get("/books/" + scanId+"/readerInfo.json", function(content) {
@@ -727,20 +728,65 @@ function showall(x)
     }
 }
 
-function SelectNextHit()
+function SelectLastHit()
+{
+    SelectHit(false);
+}
+
+function SelectHit(direction)
 {
     let curr = window.location.hash;
     let integer = parseInt(curr.substr(5));
     let lnks = document.getElementsByClassName("coollnklist");
 
-    for(let i = 0; i < lnks.length; i++)
+    if(direction==false)
     {
-	if(parseInt(lnks[i].dataset.page) > integer)
+	for(let i = lnks.length-1; i > -1; i--)
 	{
-	    lnks[i].click();
-	    return;
+	    if(parseInt(lnks[i].dataset.page) < integer)
+	    {
+		lnks[i].click();
+		return;
+	    }
+	}
+	integer = 1000000;
+	for(let i = lnks.length-1; i > -1; i--)
+	{
+	    if(parseInt(lnks[i].dataset.page) < integer)
+	    {
+		lnks[i].click();
+		return;
+	    }
+	}
+
+    }
+    else
+    {
+	for(let i = 0; i < lnks.length; i++)
+	{
+	    if(parseInt(lnks[i].dataset.page) > integer)
+	    {
+		lnks[i].click();
+		return;
+	    }
+	}
+
+	integer = -1;
+	for(let i = 0; i < lnks.length; i++)
+	{
+	    if(parseInt(lnks[i].dataset.page) > integer)
+	    {
+		lnks[i].click();
+		return;
+	    }
 	}
     }
+}
+
+
+function SelectNextHit()
+{
+    SelectHit(true);
 }
 </script>
 </head>
@@ -750,10 +796,10 @@ function SelectNextHit()
 	
 		<div id="SearchOpts" class="optioncont secondoptioncontlay" style='top: 0;background-color: white;overflow:scroll;'>
 		    
-		    <div style='display:grid;grid-template-columns: 90% 10%;padding: 0;'>
-		    <div id="searchboxstuff" style='grid-column: 1 / span 2;height: 3rem;'>
+		    <div style='display:grid;grid-template-columns: 9% 80% 9%;padding: 0;'>
+		    <div id="searchboxstuff" style='grid-column: 1 / span 3;height: 3rem;float:left;'>	
 			<div>
-			<input id='srchbox' style='display:inline-block;margin-left: 30%;' type='text' placeholder="Next search..." /><button style='display:inline-block;margin-right: 0.5rem;' onclick='doCompleteNewSearch();return true;'>Do search</button>
+			<input id='srchbox' style='display:inline-block;min-width:70%;border-radius: 20px;text-align:center;' type='text' placeholder="Next search..." /><button style='display:inline-block;margin-right: 0.5rem;margin-left: 0.5rem;' onclick='doCompleteNewSearch();return true;'>Do search</button>
 			</div>
 			<div id='fuzzysuggestions' class='fuzzysugs'>
 					<a>Link one</a>
@@ -764,11 +810,15 @@ function SelectNextHit()
 			</div>
 			<hr style='font-size:small;color:grey;'>
 		    </div>
+			<button style='grid-column: 1 /span 1;grid-row: 2 /span 1;max-height: 1.7rem' onclick="SelectLastHit();return true;">Last</button>
 			<div id='linklst' class='linkliststyler'></div>
-			<button style='grid-column: 2 /span 1;grid-row: 2 /span 1;max-height: 1.7rem' onclick="SelectNextHit();return true;">Next</button>
+			<button style='grid-column: 3 /span 1;grid-row: 2 /span 1;max-height: 1.7rem' onclick="SelectNextHit();return true;">Next</button>
 		    </div>
 		    
-		    <div id="biblio" style='color: green;'></div>
+		    <div>
+			<div id="biblio" style='display: inline-block;color: green;'></div>
+			<a id='bookinfo' style='display: inline-block;'>[Book Info]</a>
+		    </div>
 		</div>
 
 		<div id='divdrop' class='DivDropdown' onclick='showall(document.getElementById("SearchOpts"))'>
