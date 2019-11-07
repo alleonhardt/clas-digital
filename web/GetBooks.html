@@ -535,6 +535,7 @@ function doCompleteNewSearch()
 }
 
 let gCurrentFocus = 'ocr';
+let gCurrentTimer;
 
 function sync_pages()
 {
@@ -546,7 +547,6 @@ function sync_pages()
 	    triggerDblclick(val[0]);
 	    UpdateLinkPrev();
 	    updateAfterScroll();
-	    window.setTimeout(sync_pages,1000);
 }
 
 
@@ -594,15 +594,24 @@ function init() {
 		});
     document.getElementById('searchboxstuff').addEventListener("focusout", function(event){if(event.relatedTarget)event.relatedTarget.click();console.log(event.relatedTarget);document.getElementById("fuzzysuggestions").style.visibility="hidden";document.getElementById("fuzzysuggestions").selec = undefined;});
     
-    window.setTimeout(sync_pages,1000);
-    
     document.getElementById("thepagereader").onscroll = function() {
 	    currentFocus = 'page';
+	    if(gCurrentTimer)
+	    {
+		window.clearTimeout(gCurrentTimer);
+	    }
+	    gCurrentTimer = window.setTimeout(sync_pages,1000);
 	}
 
     document.getElementById("OCRBuffer").onscroll = function() {
 	    currentFocus = 'ocr';
+	    if(gCurrentTimer)
+	    {
+		window.clearTimeout(gCurrentTimer);
+	    }
+	    gCurrentTimer = window.setTimeout(sync_pages,1000);
 	}
+
 	let parsedUrlParams = parseURLParams(window.location.href);
 	let scanId = parsedUrlParams['scanId'];
 	document.getElementById("bookinfo").href = "/ShowMetadata.html?scanId="+scanId;
