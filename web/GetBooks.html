@@ -256,10 +256,6 @@ class PageLoader {
 	deferedCheckQueue() {
 		if(this.queue.length > 0)
 			window.setTimeout(this.checkQueue.bind(this), 50);
-		else
-		{
-		    window.setTimeout(function(){document.getElementById("thepagereader").onscroll = document.getElementById("thepagereader").scroll_backup;},250);
-		}
 	}
 
 	loadPage(pageNode) {
@@ -272,8 +268,6 @@ class PageLoader {
 		img.classList = "findImg";
 		img.page = pageNode.info;
 		img.onload = function() {
-			document.getElementById("thepagereader").scroll_backup = document.getElementById("thepagereader").onscroll;
-			document.getElementById("thepagereader").onscroll = null;
 			pageNode.replaceChild(img, pageNode.querySelector("svg"));
 			this.deferedCheckQueue();
 		}.bind(this);
@@ -540,6 +534,21 @@ function doCompleteNewSearch()
     window.location = newurl;
 }
 
+let gCurrentFocus = 'ocr';
+
+function sync_pages()
+{
+	    let val;
+	    if(gCurrentFocus=='ocr')
+		val = getVisiblePages();
+	    else
+		val = getVisiblePagesOCR();
+	    triggerDblclick(val[0]);
+	    UpdateLinkPrev();
+	    updateAfterScroll();
+	    window.setTimeout(sync_pages,1000);
+}
+
 
 function init() {
 	    document.getElementById("srchbox").innerHTML = getParameterByName('query');
@@ -585,37 +594,14 @@ function init() {
 		});
     document.getElementById('searchboxstuff').addEventListener("focusout", function(event){if(event.relatedTarget)event.relatedTarget.click();console.log(event.relatedTarget);document.getElementById("fuzzysuggestions").style.visibility="hidden";document.getElementById("fuzzysuggestions").selec = undefined;});
     
-    let throttle_reader;
+    window.setTimeout(sync_pages,1000);
+    
     document.getElementById("thepagereader").onscroll = function() {
-	    if(throttle_reader)
-	    {
-		window.clearTimeout(throttle_reader);
-	    }
-	    throttle_reader = window.setTimeout(function(){
-	    console.log("Pages on scroll and focus!");
-		
-	    let val = getVisiblePages();
-	    triggerDblclick(val[0]);
-	    UpdateLinkPrev();
-	    updateAfterScroll();
-	    return false;
-	    },1000);
+	    currentFocus = 'page';
 	}
 
-    let throttle_buffer;
     document.getElementById("OCRBuffer").onscroll = function() {
-	    if(throttle_buffer)
-	    {
-		window.clearTimeout(throttle_buffer);
-	    }
-	    throttle_buffer = window.setTimeout(function(){
-	    console.log("Ocr scrolls now!");
-	    
-	    let val = getVisiblePagesOCR();
-	    triggerDblclick(val[0]);
-	    UpdateLinkPrev();
-	    updateAfterScroll();
-	    },1000);
+	    currentFocus = 'ocr';
 	}
 	let parsedUrlParams = parseURLParams(window.location.href);
 	let scanId = parsedUrlParams['scanId'];
