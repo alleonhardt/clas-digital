@@ -40,6 +40,8 @@
 
 mark {
     background: yellow;
+    margin: 0;
+    padding: 0;
 }
 
 .page {
@@ -572,6 +574,8 @@ function init() {
 	    document.getElementById("srchbox").innerHTML = getParameterByName('query');
 	    document.getElementById("srchbox").addEventListener("input",function(event) {
 		document.getElementById("fuzzysuggestions").selec = undefined;
+		if(document.getElementById("srchbox").value=="")
+		    return;
 		DoFuzzyMatching(document.getElementById("srchbox").value);
 	    });
 
@@ -868,7 +872,7 @@ function SelectNextHit()
 		    <div style='display:grid;grid-template-columns: 9% 80% 9%;padding: 0;'>
 		    <div id="searchboxstuff" style='grid-column: 1 / span 3;height: 3rem;float:left;'>	
 			<div>
-			<input id='srchbox' style='display:inline-block;width:98%;border-radius: 20px;text-align:center;' type='text' placeholder="Next search...">
+			<input id='srchbox' style='display:inline-block;width:98%;border-radius: 20px;text-align:center;' type='text' placeholder="search within this book...">
 		<button id="srchButton" class='srchbtn' style='display:inline-block;margin:0;margin-left: -2.4rem;' type="button" onclick="doCompleteNewSearch();return true;"><i class="fa fa-search"></i></button>
                 </input>
 
