@@ -299,7 +299,6 @@ bool CBook::onSamePage(std::vector<std::string> sWords)
 
     for(size_t i=1; i<sWords.size(); i++)
     {
-        std::cout << "Word " << i << std::endl;
         std::vector<size_t> pages2 = pages(sWords[i]);
 
         if(pages2.size() == 0) return false;
