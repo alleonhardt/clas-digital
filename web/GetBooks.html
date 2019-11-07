@@ -523,6 +523,11 @@ function doCompleteNewSearch()
 
 function init() {
 	    document.getElementById("srchbox").innerHTML = getParameterByName('query');
+	    document.getElementById("srchbox").addEventListener("input",function(event) {
+		document.getElementById("fuzzysuggestions").selec = undefined;
+		DoFuzzyMatching(document.getElementById("srchbox").value);
+	    });
+
 	    document.getElementById("srchbox").addEventListener("keydown",function(event){
 			let x = document.getElementById("srchbox").value;
 			let k = document.getElementById("fuzzysuggestions").selec;
@@ -538,17 +543,6 @@ function init() {
 				return;
 			    }
 			    doCompleteNewSearch();
-			    return;
-			}
-			if(event.key=="Backspace")
-			{
-			    if(x.length==1)
-			    {
-				document.getElementById("fuzzysuggestions").style.visibility = 'hidden';
-				return;
-			    }
-			    DoFuzzyMatching(x.substr(0,x.length-1));
-			    return;
 			}
 			if(event.key=="ArrowUp" || event.key=="ArrowDown")
 			{
@@ -567,10 +561,7 @@ function init() {
 			    lst[k].style.background = "#ddd";
 			    event.preventDefault();
 			    document.getElementById("fuzzysuggestions").selec = k;
-			    return;
 			}
-			DoFuzzyMatching(document.getElementById("srchbox").value+event.key);
-			document.getElementById("fuzzysuggestions").selec = undefined;
 		});
     document.getElementById('searchboxstuff').addEventListener("focusout", function(event){if(event.relatedTarget)event.relatedTarget.click();console.log(event.relatedTarget);document.getElementById("fuzzysuggestions").style.visibility="hidden";document.getElementById("fuzzysuggestions").selec = undefined;});
     
@@ -842,7 +833,7 @@ function SelectNextHit()
 		    <div style='display:grid;grid-template-columns: 9% 80% 9%;padding: 0;'>
 		    <div id="searchboxstuff" style='grid-column: 1 / span 3;height: 3rem;float:left;'>	
 			<div>
-			<input id='srchbox' style='display:inline-block;width:80%;border-radius: 20px;text-align:center;' type='text' placeholder="Next search..." /><button style='display:inline-block;margin-right: 0.5rem;margin-left: 0.5rem;' onclick='doCompleteNewSearch();return true;'>Do search</button>
+			<input id='srchbox' style='display:inline-block;width:80%;border-radius: 20px;text-align:center;' type='text' placeholder="Next search..." /><button style='display:inline-block;margin-right: 0.5rem;margin-left: 0.5rem;' onclick='doCompleteNewSearch();return true;'>Do full search</button>
 			</div>
 			<div id='fuzzysuggestions' class='fuzzysugs'>
 					<a>Link one</a>
