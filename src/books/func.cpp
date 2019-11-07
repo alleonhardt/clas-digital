@@ -150,7 +150,8 @@ void split(std::string str, std::string delimiter, std::vector<std::string>& vSt
 {
     size_t pos=0;
     while ((pos = str.find(delimiter)) != std::string::npos) {
-        vStr.push_back(str.substr(0, pos));
+        if(pos!=0)
+            vStr.push_back(str.substr(0, pos));
         str.erase(0, pos + delimiter.length());
     }
 
@@ -169,7 +170,8 @@ std::vector<std::string> split2(std::string str, std::string delimiter)
 
     size_t pos=0;
     while ((pos = str.find(delimiter)) != std::string::npos) {
-        vStr.push_back(str.substr(0, pos));
+        if(pos!=0)
+            vStr.push_back(str.substr(0, pos));
         str.erase(0, pos + delimiter.length());
     }
     vStr.push_back(str);

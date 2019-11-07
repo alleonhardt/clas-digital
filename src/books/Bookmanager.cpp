@@ -92,6 +92,9 @@ std::list<std::string>* CBookManager::search(CSearchOptions* searchOpts)
 
     for(size_t i=1; i<sWords.size(); i++)
     {
+        if(sWords[i].length() == 0)
+            continue;
+
         CSearch search2(searchOpts, sWords[i]);
         std::map<std::string, double>* results2 = search2.search(m_mapWords, m_mapWordsTitle, m_mapWordsAuthors, m_mapBooks);
         for(auto it=results->begin(); it!=results->end(); ++it) {
