@@ -708,7 +708,7 @@ function sendSugg(input)
            for(let i=0;i<obj.length;i++)
            {
                var node = document.createElement("a");
-               node.onmousedown=function(){sugg_func(this);};
+               node.onclick=function(){sugg_func(this);};
                var textNode = document.createTextNode(obj[i]);
                node.appendChild(textNode);
                suggs.appendChild(node);
@@ -912,33 +912,54 @@ function ShowLinks()
 		{
 		let inp = document.getElementById("SpecialSID");
 		inp.focus();
+        inp.addEventListener("input",function(event){
+                sendSugg(document.getElementById("SpecialSID").value);
+        });
 		inp.addEventListener("keydown",function(event){
 
-            let curPage = parseInt(getParameterByName('page'));  
-            let nextPage=curPage;
-            if(event.key == "Enter")
-			{
+            let k = document.getElementById("suggs").selec;
+            if(k==undefined)
+                k=-1;
+            if(event.key == "Enter") {
+                if(k!=-1) {
+                    let lst = document.getElementById("suggs").children;
+                    lst[k].click();
+                }
 				document.getElementById("srchButton").click();
 			}
 
-            else if(event.key == ">") 
-            {
+            else if(event.key=="ArrowUp" || event.key=="ArrowDown") {
+                let lst = document.getElementById("suggs").children;
+                if(k!=-1)
+                    lst[k].style.background="";
+                if(event.key=="ArrowUp") {
+                    k-=1;
+                    if(k<0)
+                        k=lst.length-1;
+                }
+                else
+                    k+=1;
+                k=k%lst.length;
+                lst[k].style.background = "#ddd";
+                event.preventDefault();
+                document.getElementById("suggs").selec=k;
+            }
+
+            let curPage = parseInt(getParameterByName('page'));  
+            let nextPage=curPage;
+
+            if(event.key == ">") {
                 nextPage = curPage+1;
                 if(getParameterByName('q')!=null && getParameterByName('page')==null)
                     window.location=window.location.search+'&page=2';
                 else
                     window.location=window.location.search.replace('page='+curPage, 'page='+nextPage);
             }
-            else if(event.key == "<")
-            {
+            else if(event.key == "<") {
                 nextPage = curPage-1;
                 if(nextPage < 1)
                     nextPage = 1;
                 window.location=window.location.search.replace('page='+curPage, 'page='+nextPage);
-            }
-            else
-            {
-                sendSugg(document.getElementById("SpecialSID").value+event.key);
             }
 
             
