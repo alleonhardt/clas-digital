@@ -613,7 +613,7 @@ function init() {
     document.getElementById('searchboxstuff').addEventListener("focusout", function(event){if(event.relatedTarget)event.relatedTarget.click();console.log(event.relatedTarget);document.getElementById("fuzzysuggestions").style.visibility="hidden";document.getElementById("fuzzysuggestions").selec = undefined;});
     
     document.getElementById("thepagereader").onscroll = function() {
-	    currentFocus = 'page';
+	    gCurrentFocus = 'page';
 	    if(gCurrentTimer)
 	    {
 		window.clearTimeout(gCurrentTimer);
@@ -622,7 +622,7 @@ function init() {
 	}
 
     document.getElementById("OCRBuffer").onscroll = function() {
-	    currentFocus = 'ocr';
+	    gCurrentFocus = 'ocr';
 	    if(gCurrentTimer)
 	    {
 		window.clearTimeout(gCurrentTimer);
