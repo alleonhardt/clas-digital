@@ -6,19 +6,6 @@
 
     <!-- Bootstrap CSS -->
     <title>clas digital</title>
-<style>
-.damn {
-	background-color: grey;
-}
-
-.InfoPage{
-	background-color: white;
-	padding: 2rem;
-	margin-left: 15%;
-	margin-right: 15%;
-	margin-top: 5%;
-}
-</style>
 	<script>
 class Server {
 	static Get(filename, okCallback, errorCallback) {
@@ -42,15 +29,54 @@ function LoadMetadata()
 		let Index = window.location.href.indexOf("scanId=");
 		let value = window.location.href.substr(Index+7);
 		Server.Get("/getmetadata?scanId="+value,function(content) {
-		document.getElementById("details").innerHTML += JSON.parse(content).bib;
+		let json = JSON.parse(content);
+		document.getElementById("details").innerHTML += json.bib;
+		if(json.data.ISBN == undefined || json.data.ISBN=="")
+		    json.data.ISBN = "unknown";
+		if(json.data.date == undefined || json.data.date=="")
+		    json.data.date = "unkown";
+		if(json.citation == undefined || json.data.citation=="")
+		    json.citation = "No citation exists for this book";
+		if(json.data.title == undefined || json.data.title == "")
+		    json.data.title = "unkown";
+		if(json.data.creators != undefined)
+		{
+		    let creator_str = "";
+		    for(let i = 0; i < json.data.creators.length; i++)
+		    {
+			if(json.data.creators[i].firstName != undefined)
+			    creator_str += json.data.creators[i].firstName+' ';
+			if(json.data.creators[i].lastName != undefined)
+			    creator_str += json.data.creators[i].lastName;
+			if((i+1)<json.data.creators.length)
+			    creator_str+=";";
+		    }
+		    document.getElementById("author").innerHTML += creator_str;
+		}
+		else
+		    document.getElementById("author").innerHTML = "unkown";
+
+		document.getElementById("title").innerHTML += json.data.title;
+		document.getElementById("ISBN").innerHTML += json.data.ISBN;
+		document.getElementById("date").innerHTML += json.data.date;
+		document.getElementById("citation").innerHTML += json.citation;
 		},function(){});
 }
 	</script>
   </head>
-<body class ="damn" onload="LoadMetadata();">
-	<div class="InfoPage">
-		<h1>Book details</h1>
+<body style="padding: 5rem;" onload="LoadMetadata();">
+		<h1 style='text-align:center;'>Book details</h1>
+		<p id="title">Title:    </p>
+		<hr>
 		<p id="details">Bibliographie: </p>
-	</div>
+		<hr>
+		<p id="ISBN">ISBN: </p>
+		<hr>
+		<p id="date">Published date: </p>
+		<hr>
+		<p id='citation'>Citation: </p>
+		<hr>
+		<p id='author'>Author: </p>
+		<hr>
 </body>
 </html>

@@ -92,7 +92,10 @@ void get_metadata(const Request &req, Response &resp, CBookManager &manager)
     try
     {
 	std::string scanId = req.get_param_value("scanId");
-	resp.set_content(manager.getMapOfBooks().at(scanId)->getMetadata().getMetadata().dump(),"application/json");
+	CBook *b = manager.getMapOfBooks().at(scanId);
+	nlohmann::json js = b->getMetadata().getMetadata();
+	js["has_ocr"] = b->getOcr();
+	resp.set_content(std::move(js.dump()),"application/json");
     }
     catch(...)
     {
