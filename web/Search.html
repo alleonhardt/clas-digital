@@ -694,6 +694,7 @@ function ShowSelectedValues(obj)
 
 function sendSugg(input)
 {
+    console.log(input);
     let requ = "/getsugg?q="+encodeURIComponent(input);
 
     var xhttp = new XMLHttpRequest();

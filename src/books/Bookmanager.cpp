@@ -247,6 +247,8 @@ void CBookManager::createListWords()
 */
 std::list<std::string>* CBookManager::getSuggestions_fast(std::string sWord)
 {
+    func::convertToLower(sWord);
+    sWord = func::convertStr(sWord);
     std::map<std::string, double>* suggs = new std::map<std::string, double>;
     size_t counter=0;
     for(auto it=m_listWords.begin(); it!=m_listWords.end() && counter < 10; it++) {

@@ -348,7 +348,7 @@ std::string CBook::getPreview(std::string sInput)
         if(pos!=std::string::npos) {
             size_t end = prev.find(" ", pos);
             if(end != std::string::npos) {
-                prev.insert(end-1, "</mark>");
+                prev.insert(end, "</mark>");
             }
             else
                 prev.insert(pos+searchedWords[i].length(), "</mark>");
