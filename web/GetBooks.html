@@ -541,9 +541,9 @@ function sync_pages()
 {
 	    let val;
 	    if(gCurrentFocus=='ocr')
-		val = getVisiblePages();
-	    else
 		val = getVisiblePagesOCR();
+	    else
+		val = getVisiblePages();
 	    triggerDblclick(val[0]);
 	    UpdateLinkPrev();
 	    updateAfterScroll();
