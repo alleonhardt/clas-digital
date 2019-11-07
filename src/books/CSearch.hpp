@@ -107,9 +107,4 @@ public:
     * return Boolean
     */
     bool checkSearchOptions(CBook* book);
-
-    /**
-    * @brief delete searchOptions
-    */
-    void deleteSearchOptions();
 };
