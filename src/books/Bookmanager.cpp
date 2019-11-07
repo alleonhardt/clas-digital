@@ -99,9 +99,9 @@ std::list<std::string>* CBookManager::search(CSearchOptions* searchOpts)
         std::map<std::string, double>* results2 = search2.search(m_mapWords, m_mapWordsTitle, m_mapWordsAuthors, m_mapBooks);
         for(auto it=results->begin(); it!=results->end(); ++it) {
             if(results2->count(it->first) == 0)
-                results->erase(it);
+                it = results->erase(it);
             else if(m_mapBooks[it->first]->getOcr() == true && m_mapBooks[it->first]->onSamePage(sWords))
-                results->erase(it);
+                it =results->erase(it);
         }
     }
 
