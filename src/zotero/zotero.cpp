@@ -238,7 +238,7 @@ std::string Zotero::Request::GetSpecificItem(std::string key)
 	std::string ret = "/items/";
 	ret+=key;
 	ret+="?format=json&include=data,bib,citation&style=kritische-ausgabe";
-	return std::move(ret);
+	return ret;
 }
 
 std::string Zotero::Request::GetItemsInSpecificPillar(std::string key)
@@ -246,14 +246,14 @@ std::string Zotero::Request::GetItemsInSpecificPillar(std::string key)
 	std::string ret = "/collections/";
 	ret+=key;
 	ret+="/items?format=json&include=bib,citation,data&style=kritische-ausgabe";
-	return std::move(ret);
+	return ret;
 }
 std::string Zotero::Request::GetAllItemsFromCollection(std::string collKey)
 {
 	std::string ret = "/collections/";
 	ret+=collKey;
 	ret+="/items/top?format=json&include=bib,citation,data&style=kritische-ausgabe&limit=100";
-	return std::move(ret);
+	return ret;
 }
 
 const nlohmann::json &Zotero::GetPillars()

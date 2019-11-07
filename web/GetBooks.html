@@ -391,6 +391,8 @@ function SwitchToPage(x)
 {
     let val = document.getElementById("uniqueDivId"+x.dataset.page);
     let vspg = getVisiblePages();
+    let fnc = this.onscroll;
+    this.onscroll = null;
     if(vspg.indexOf(val)==-1)
     {
 	if(val != null)
@@ -404,6 +406,7 @@ function SwitchToPage(x)
 	window.history.replaceState({},null,newurl);
     }
     }
+    this.onscroll = fnc;
 }
 
 
@@ -512,32 +515,38 @@ function init() {
 			DoFuzzyMatching(document.getElementById("srchbox").value);
 		});
     document.getElementById('searchboxstuff').addEventListener("focusout", function(event){if(event.relatedTarget)event.relatedTarget.click();console.log(event.relatedTarget);document.getElementById("fuzzysuggestions").style.visibility="hidden";});
-	    document.getElementById("thepagereader").onscroll = function() {
-	    if(globalScrollLock)
-	    { 
-		globalScrollLock = false;
-		return false;
+    
+    let throttle_reader;
+    document.getElementById("thepagereader").onscroll = function() {
+	    if(throttle_reader)
+	    {
+		window.clearTimeout(throttle_reader);
 	    }
+	    throttle_reader = window.setTimeout(function(){
 	    console.log("Pages on scroll and focus!");
 		
 	    let val = getVisiblePages();
-	    globalScrollLock = true;
 	    triggerDblclick(val[0]);
 	    UpdateLinkPrev();
 	    updateAfterScroll();
 	    return false;
+	    },1000);
 	}
+
+    let throttle_buffer;
     document.getElementById("OCRBuffer").onscroll = function() {
-	    console.log("Ocr scrolls now!");
-	    if(globalScrollLock)
+	    if(throttle_buffer)
 	    {
-		globalScrollLock = false;
-		return;
+		window.clearTimeout(throttle_buffer);
 	    }
+	    throttle_buffer = window.setTimeout(function(){
+	    console.log("Ocr scrolls now!");
+	    
 	    let val = getVisiblePagesOCR();
-	    globalScrollLock = true; 
 	    triggerDblclick(val[0]);
 	    UpdateLinkPrev();
+	    updateAfterScroll();
+	    },1000);
 	}
 	let parsedUrlParams = parseURLParams(window.location.href);
 	let scanId = parsedUrlParams['scanId'];
@@ -566,6 +575,8 @@ function init() {
 		    let vspg = getVisiblePagesOCR();
 		    if(vspg.indexOf(page)==-1)
 		    {
+			let fnc = this.onscroll;
+			this.onscroll = null;
 			page.scrollIntoView();
 			if(window.history.replaceState)
 			{
@@ -573,6 +584,7 @@ function init() {
 			    newurl+="#page"+this.pageNumber;
 			    window.history.replaceState({},null,newurl);
 			}
+			this.onscroll = fnc;
 		    }
 		    };
 			pageNode.classList.add("page");
