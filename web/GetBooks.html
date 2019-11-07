@@ -285,9 +285,10 @@ class PageLoader {
 		img.classList = "findImg";
 		img.page = pageNode.info;
 		img.onload = function() {
+			let scrollPosition = document.getElementById("thepagereader").scrollTop;
 			pageNode.replaceChild(img, pageNode.querySelector("svg"));
+			document.getElementById("thepagereader").scrollTop = scrollPosition; //Restore scroll position
 			this.deferedCheckQueue();
-			gUpdateInterval = 50;
 		}.bind(this);
 		img.onerror = function() {
 			if(pageNode.first_try ===undefined)
