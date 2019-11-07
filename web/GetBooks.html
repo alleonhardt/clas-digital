@@ -572,6 +572,8 @@ function init() {
 	    document.getElementById("srchbox").innerHTML = getParameterByName('query');
 	    document.getElementById("srchbox").addEventListener("input",function(event) {
 		document.getElementById("fuzzysuggestions").selec = undefined;
+		if(document.getElementById("srchbox").value=="")
+		    return;
 		DoFuzzyMatching(document.getElementById("srchbox").value);
 	    });
 
