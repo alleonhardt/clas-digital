@@ -98,10 +98,65 @@ mark {
 	box-shadow: 0px 3px 0px #0000FF;
 }
 
-.advanceopts {
+.selectdiv {
+    position:relative;
+    display:inline;
+}
+
+select::-ms-expand {
+    display:none;
+}
+
+.selectdiv:after {
+    content: '>';
+    font: 17px "Consolas", monospace;
+    color: #333;
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    transform: rotate(90deg);
+    right: 11px;
+
+    top: 0px;
+    padding: 0 0 2px;
+    border-bottom: 1px solid #999;
+
+    position: absolute;
+    pointer-events: none;
+    z-index:0;
+    
+}
+
+.selectdiv select{
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+      
     background:white;
     margin-right:0.5;
     border:0;
+    font-size:14px;
+    color:#50555a;
+    display: inline-block;
+    /*position: relative;*/
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-right: 18px;
+    padding-left: 12px;
+    line-height: 22px;
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: arial,sans-serif;
+    width:186px;
+    border: 1px solid #cccccc;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.advanceopts {
+    background:white;
+    border:0;
+    margin-right:0.5;
     font-size:15px;
     color:#50555a;
     display: inline-block;
@@ -124,7 +179,6 @@ mark {
 .advanceoptsText {
     background:white;
     margin-right:0.5;
-    border:0;
     font-size:15px;
     color:#50555a;
     display: inline-block;
@@ -134,16 +188,16 @@ mark {
     padding-right: 18px;
     padding-left: 12px;
     line-height: 22px;
-    cursor: pointer;
+    cursor: default;
     white-space: nowrap;
     font-family: arial,sans-serif;
     width:70px;
+    border: 1px solid #cccccc;
 }
 
 .advanceoptsInput {
     background:white;
     margin-right:0.5;
-    border:0;
     font-size:15px;
     color:#50555a;
     display: inline-block;
@@ -153,10 +207,11 @@ mark {
     padding-right: 18px;
     padding-left: 12px;
     line-height: 22px;
-    cursor: pointer;
+    cursor: auto;
     white-space: nowrap;
     font-family: arial,sans-serif;
     width:100px;
+    border: 1px solid #cccccc;
 }
 .btclass2 {
 	background: white;
@@ -962,13 +1017,19 @@ function ShowLinks()
                     <button class='advanceopts' onclick='AddAdvancedBar();return true;'>Advanced Bar</button>
                 </div>
 
-                <div id="InnerResultBanner" style="display:block;margin-top:2rem;">
+                <div id="InnerResultBanner" style="display:none;margin-top:2rem;">
                     <span class='advanceoptsText'> Author:</span>
                     <input id='author' onchange="SetAdvancedAuthor(this);return true;" class='advanceoptsInput' type="text" value=""> </input>
-                    <select id='collections' onchange='SetAdvancedCollections(this);return true;' class='advanceopts'>
+                    <div class='selectdiv' style="display:inline-block;">
+                    <label>
+                    <select id='collections' onchange='SetAdvancedCollections(this);return true;'>
                         <option value='all' selected>Search all Collections</option>
                     </select>
-                    <select id='year' onchange='SetAdvancedYear(this);return true;' class='advanceopts'>
+                    </label>
+                    </div>
+                    <div class='selectdiv' style="display:inline-block;">
+                    <label>
+                    <select id='year' onchange='SetAdvancedYear(this);return true;'>
                         <option value='0'>Any Time</option>
                         <option value='1700'>1700s</option>
                         <option value='1800'>1800s</option>
@@ -976,38 +1037,56 @@ function ShowLinks()
                         <option value='2000'>2000s</option>
                         <option value= '1'>Custom</option>
                     </select>
-                        <select id='searchIn' onchange='SetAdvancedOnlyIn(this);return true;' class='advanceopts'>
+                    </label>
+                    </div>
+                        <div class='selectdiv' style="display:inline-block;">
+                        <label>
+                        <select id='searchIn' onchange='SetAdvancedOnlyIn(this);return true;'>
                         <option value='0'>Show Everything</option>
                         <option value='1'>Show only Books without Text</option>
                         <option value='2'>Show only Books with Text</option>
-                    </select>
-                    <select id='fuzzyness' onchange='SetAdvancedFuzzy(this);return true;' class='advanceopts'>
+                        </select>
+                        </label>
+                        </div>
+                    <div class='selectdiv' style="display:inline-block;">
+                    <label>
+                    <select id='fuzzyness' onchange='SetAdvancedFuzzy(this);return true;'>
                         <option value='0'>Exact matches</option>
                         <option value='1'>Fuzzy matching</option>
                     </select>
+                    </label>
+                    </div>
                 </div>
                 <div id="InnerInnerBanner" style="display:none;margin-top:2rem;">
                     <span class='advanceoptsText'> After:</span>
                     <input id='publicatedAfter' class='advanceoptsInput' size='5' type='number' step='50' min='0' value='1700'></input>
-                    <span class='advanceopts'> Before:</span>
+                    <span class='advanceoptsText'> Before:</span>
                     <input id='publicatedBefore' class='advanceoptsInput' size='5' type='number' step='50' min='0' value='2049'></input>
                     <button id='advancedApply' class='advanceopts' onclick='SetCustom();return true;'>Apply</button>
                 </div>
 
 
                 <div id="ResultBannerFooter" style="margin-top: 2rem; margin-bottom:0;">
-                   <select id='maxresultsperpage' onchange='OpenFilter(this);return true;' class='advanceopts' style='background:white;margin-right:0.5rem;border:0;'>
+                    <div class='selectdiv' style="display:inline-block;">
+                    <label>
+                    <select id='maxresultsperpage' onchange='OpenFilter(this);return true;' style='background:white;'>
                        <option value='10'>Show 10 results per page</option>
                        <option value='20'>Show 20 results per page</option>
                        <option value='50'>Show 50 results per page</option>
                        <option value='1000000'>Show all results</option>
                    </select>
-                   <select id='f_sort' onchange='OpenFilter(this);return true;' class='advanceopts' onclick='return true;' style='background:white;margin-right: 0.5rem;border: 0;'>
+                   <label>
+                   </div>
+                    <div class='selectdiv' style="display:inline-block;">
+                    <label>
+                   <select id='f_sort' onchange='OpenFilter(this);return true;' onclick='return true;' style='background:white;'>
                        <option value='0'>Sort by relevance</option>
                        <option value='2'>Sort alphabetically</option>
                        <option value='1'>Sort chronologically</option>
                    </select>
-                   <button class='advanceopts' style='background:white;border: 0;' onclick='CreateBibliography();return true;'>Create Bibliography</button>
+                   </label>
+                   </div>
+                   <button class='advanceopts' onclick='CreateBibliography();return true;'>Create Bibliography</button>
                    <hr style='padding: 0;'>
                    <span style='color: grey;font-size:13px;'><span id="maxResults"></span> Ergebnisse gefunden in <span id="searchTime"></span></span>
                 </div>
