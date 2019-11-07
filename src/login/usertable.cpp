@@ -119,7 +119,7 @@ std::string UserHandler::toJSON()
 	//Replace the , by the ] to close the list
 	json[json.length()-1] = ']';
 
-	return std::move(json);
+	return json;
 }
 
 void UserHandler::RemoveUser(std::string email)
@@ -176,7 +176,7 @@ std::string UserHandler::DoLogin(std::string email, std::string password)
 	//Set the session id to the new value, will kick any user that is singed in twice
 	it->second->SetSessionId(sessid);
 	//return the generated session id
-	return std::move(sessid);
+	return sessid;
 }
 
 std::shared_ptr<User> UserHandler::GetUserBySessid(std::string x)

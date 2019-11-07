@@ -2,16 +2,28 @@
 <html>
 <head>
 <title>clas digital</title>
-<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 <!-- <link rel="stylesheet" href="container.css"/>-->
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+		<!-- Bootstrap CSS -->
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	
 <style>
 
 
 .coollnklist {
-    margin: 0;
-    margin-top: 0.25rem;
-    color: blue;
     cursor: pointer;
+    color: blue !important;
+}
+.srchbtn {
+      border: none; /* Remove borders */
+      color: grey; /* White text */
+      /* padding: 12px 16px; Some padding */
+      font-size: 16px; /* Set a font size */
+      cursor: pointer; /* Mouse pointer on hover */
+      border-radius: 50%;
 }
 
 .reader {
@@ -24,6 +36,10 @@
 	margin: 0;
 	top: 1rem;
 	padding: 0;
+}
+
+mark {
+    background: yellow;
 }
 
 .page {
@@ -45,7 +61,7 @@ padding-right: 0;
 }
 
 .page img, .page svg {
-	width: 100%;
+	width: 98%;
 }
 
 .LinkListClass a {
@@ -108,6 +124,7 @@ padding-right: 0;
 	display: block;
 	font-size: small;
 	background-color: white;
+	margin-right: 1rem;
 	margin-bottom: 4rem;
 	padding: 2.5rem;
 	text-align: justify;
@@ -126,7 +143,7 @@ padding-right: 0;
 }
 
 .linkliststyler {
-    grid-column: 1 /span 1;
+    grid-column: 2 /span 1;
     grid-row: 2 / span 1;
     margin: 0;
     margin-left: 0.5rem;
@@ -164,7 +181,7 @@ a:active {
 }
 
 .secondoptioncontlay {
-    height: calc(4rem + 17px);
+    height: calc(6rem + 17px);
     transition-timing-function: ease-in-out;
     transition-duration: 1s;
 }
@@ -172,6 +189,7 @@ a:active {
     height: 40vh;
     transition-timing-function: ease-in-out;
     transition-duration: 1s;
+    overflow: scroll;
 }
 
 .fuzzysugs {
@@ -183,18 +201,28 @@ a:active {
 	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
 }
 
-.fuzzysugs a {
+.fuzzysugslink {
     display: block;
+    color: black;
     margin: 0px auto;
     padding: 0.3rem;
     text-decoration: none;
     text-align: left;
+    cursor: pointer;
 }
 
-.fuzzysugs a:hover {
-	background-color: #ddd;
-	cursor: pointer;
+.fuzzysugslink mark {
+    color: black;
+    background: yellow;
 }
+
+.fuzzysugs a.fuzzysugslink:hover {
+    color: black;
+    text-decoration: none;
+    text-align: left;
+    background: "#ddd";
+}
+
 </style>
 <script>
 class Server {
@@ -215,7 +243,7 @@ class Server {
 	}
 }
 
-
+let gUpdateInterval = 1000;
 class PageLoader {
 	constructor() {
 		this.queue = new Array();
@@ -257,6 +285,7 @@ class PageLoader {
 		img.onload = function() {
 			pageNode.replaceChild(img, pageNode.querySelector("svg"));
 			this.deferedCheckQueue();
+			gUpdateInterval = 50;
 		}.bind(this);
 		img.onerror = function() {
 			if(pageNode.first_try ===undefined)
@@ -391,6 +420,8 @@ function SwitchToPage(x)
 {
     let val = document.getElementById("uniqueDivId"+x.dataset.page);
     let vspg = getVisiblePages();
+    let fnc = this.onscroll;
+    this.onscroll = null;
     if(vspg.indexOf(val)==-1)
     {
 	if(val != null)
@@ -404,6 +435,9 @@ function SwitchToPage(x)
 	window.history.replaceState({},null,newurl);
     }
     }
+    else
+	gUpdateInterval = 1000;
+    this.onscroll = fnc;
 }
 
 
@@ -482,13 +516,26 @@ async function DoFuzzyMatching(x)
 	    a.innerHTML = res[i2]+"<span style='font-weight: bold;float:right;margin-left: 0.8rem;'> S."+i+"</span>";
 	    a.page = i;
 	    a.word = x;
+	    a.result = results-1;
 	    a.tabIndex = 0;
+	    a.classList.add("fuzzysugslink");
 	    a.onclick = function(){
 		let page = document.getElementById("uniqueocrpage"+this.page);
 		page.innerHTML = page.innerHTML.replace(new RegExp('('+this.word+')','gi'),'<mark>$1</mark>');
 		page.scrollIntoView();
 		document.getElementById("fuzzysuggestions").style.visibility = 'hidden';
 	    }
+
+	    a.onmouseover = function() {
+		    let sugg = document.getElementById("fuzzysuggestions");
+		    let lnks = document.getElementsByClassName("fuzzysugslink");
+		    let value = sugg.selec;
+		    if(value!=undefined)
+			lnks[value].style.background = "";
+		    a.style.background = "#ddd";
+		    sugg.selec = a.result;
+	    }
+
 	    suggestions.appendChild(a);
 	    if(results>9)
 	    {
@@ -505,42 +552,87 @@ function doCompleteNewSearch()
     window.location = newurl;
 }
 
+let gCurrentFocus = 'ocr';
+let gCurrentTimer;
+
+function sync_pages()
+{
+	    let val;
+	    if(gCurrentFocus=='ocr')
+		val = getVisiblePagesOCR();
+	    else
+		val = getVisiblePages();
+	    triggerDblclick(val[0])
+	    UpdateLinkPrev();
+	    updateAfterScroll();
+}
+
 
 function init() {
 	    document.getElementById("srchbox").innerHTML = getParameterByName('query');
-	    document.getElementById("srchbox").addEventListener("input",function(event){
-			DoFuzzyMatching(document.getElementById("srchbox").value);
+	    document.getElementById("srchbox").addEventListener("input",function(event) {
+		document.getElementById("fuzzysuggestions").selec = undefined;
+		DoFuzzyMatching(document.getElementById("srchbox").value);
+	    });
+
+	    document.getElementById("srchbox").addEventListener("keydown",function(event){
+			let x = document.getElementById("srchbox").value;
+			let k = document.getElementById("fuzzysuggestions").selec;
+			if(k==undefined)
+			    k = -1;
+
+			if(event.key == "Enter")
+			{
+			    if(k!=-1)
+			    {
+				let lst = document.getElementsByClassName("fuzzysugslink");
+				lst[k].click();
+				return;
+			    }
+			    doCompleteNewSearch();
+			}
+			if(event.key=="ArrowUp" || event.key=="ArrowDown")
+			{
+			    let lst = document.getElementsByClassName("fuzzysugslink");
+			    if(k!=-1)
+				lst[k].style.background = "";
+			    if(event.key=="ArrowUp")
+			    {
+				k-=1;
+				if(k < 0)
+				    k = lst.length-1;
+			    }
+			    else
+				k+=1;
+			    k = k%lst.length;
+			    lst[k].style.background = "#ddd";
+			    event.preventDefault();
+			    document.getElementById("fuzzysuggestions").selec = k;
+			}
 		});
-    document.getElementById('searchboxstuff').addEventListener("focusout", function(event){if(event.relatedTarget)event.relatedTarget.click();console.log(event.relatedTarget);document.getElementById("fuzzysuggestions").style.visibility="hidden";});
-	    document.getElementById("thepagereader").onscroll = function() {
-	    if(globalScrollLock)
-	    { 
-		globalScrollLock = false;
-		return false;
-	    }
-	    console.log("Pages on scroll and focus!");
-		
-	    let val = getVisiblePages();
-	    globalScrollLock = true;
-	    triggerDblclick(val[0]);
-	    UpdateLinkPrev();
-	    updateAfterScroll();
-	    return false;
-	}
-    document.getElementById("OCRBuffer").onscroll = function() {
-	    console.log("Ocr scrolls now!");
-	    if(globalScrollLock)
+    document.getElementById('searchboxstuff').addEventListener("focusout", function(event){if(event.relatedTarget)event.relatedTarget.click();console.log(event.relatedTarget);document.getElementById("fuzzysuggestions").style.visibility="hidden";document.getElementById("fuzzysuggestions").selec = undefined;});
+    
+    document.getElementById("thepagereader").onscroll = function() {
+	    gCurrentFocus = 'page';
+	    if(gCurrentTimer)
 	    {
-		globalScrollLock = false;
-		return;
+		window.clearTimeout(gCurrentTimer);
 	    }
-	    let val = getVisiblePagesOCR();
-	    globalScrollLock = true; 
-	    triggerDblclick(val[0]);
-	    UpdateLinkPrev();
+	    gCurrentTimer = window.setTimeout(sync_pages,gUpdateInterval);
 	}
+
+    document.getElementById("OCRBuffer").onscroll = function() {
+	    gCurrentFocus = 'ocr';
+	    if(gCurrentTimer)
+	    {
+		window.clearTimeout(gCurrentTimer);
+	    }
+	    gCurrentTimer = window.setTimeout(sync_pages,gUpdateInterval);
+	}
+
 	let parsedUrlParams = parseURLParams(window.location.href);
 	let scanId = parsedUrlParams['scanId'];
+	document.getElementById("bookinfo").href = "/ShowMetadata.html?scanId="+scanId;
 	let waitforocr = GetOCRTxt();
 	
 	Server.Get("/books/" + scanId+"/readerInfo.json", function(content) {
@@ -566,6 +658,8 @@ function init() {
 		    let vspg = getVisiblePagesOCR();
 		    if(vspg.indexOf(page)==-1)
 		    {
+			let fnc = this.onscroll;
+			this.onscroll = null;
 			page.scrollIntoView();
 			if(window.history.replaceState)
 			{
@@ -573,7 +667,10 @@ function init() {
 			    newurl+="#page"+this.pageNumber;
 			    window.history.replaceState({},null,newurl);
 			}
+			this.onscroll = fnc;
 		    }
+		    else
+			gUpdateInterval = 1000;
 		    };
 			pageNode.classList.add("page");
 			pageNode.classList.add("placeholder");
@@ -668,7 +765,8 @@ function init() {
 			thpage.innerHTML=thpage.innerHTML.replace(new RegExp('(\\b'+searchResults.pages[i].word.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')+'\\b)','gi'),'<mark>$1</mark>');
 		  }
 		}
-		document.getElementsByClassName("coollnklist")[0].click();
+		if(location.hash=="")
+		    document.getElementsByClassName("coollnklist")[0].click();
 	});
 							      }}, function() {
 		document.getElementById("linklst").innerHTML = "Could not load hit list :(";
@@ -683,7 +781,7 @@ window.addEventListener("load", init, false);
 let insideWindow = false;
 function changecolor(x)
 {
-    x.style.color = "#800080";
+    x.setAttribute('style','cursor: pointer;color: purple !important');
     shownone(document.getElementById("SearchOpts"));
 }
 
@@ -714,33 +812,66 @@ function showall(x)
     }
 }
 
-function SelectNextHit()
+function SelectLastHit()
+{
+    SelectHit(false);
+}
+
+function SelectHit(direction)
 {
     let curr = window.location.hash;
     let integer = parseInt(curr.substr(5));
     let lnks = document.getElementsByClassName("coollnklist");
 
-    for(let i = 0; i < lnks.length; i++)
+    if(direction==false)
     {
-	if(parseInt(lnks[i].dataset.page) > integer)
+	for(let i = lnks.length-1; i > -1; i--)
 	{
-	    lnks[i].click();
-	    return;
+	    if(parseInt(lnks[i].dataset.page) < integer)
+	    {
+		lnks[i].click();
+		return;
+	    }
 	}
+	//We are at or before the first hit, so jump to the last hit
+	lnks[lnks.length-1].click();
+	return;
     }
+    else
+    {
+	for(let i = 0; i < lnks.length; i++)
+	{
+	    if(parseInt(lnks[i].dataset.page) > integer)
+	    {
+		lnks[i].click();
+		return;
+	    }
+	}
+	//We are at the last hit so jump to the first one
+	lnks[0].click();
+    }
+}
+
+
+function SelectNextHit()
+{
+    SelectHit(true);
 }
 </script>
 </head>
 <body>
 	<div class="pageContainer">
-	    <div style='top: 0;display: inline-grid; grid-column: 2 /span 1;height: 100vh;margin-bottom: 0;'> 
+	    <div style='top: 0;display: inline-grid; grid-column: 2 /span 1;height: 100vh;margin-bottom: 0;margin-right: 1rem;'> 
 	
 		<div id="SearchOpts" class="optioncont secondoptioncontlay" style='top: 0;background-color: white;overflow:scroll;'>
 		    
-		    <div style='display:grid;grid-template-columns: 90% 10%;padding: 0;'>
-		    <div id="searchboxstuff" style='grid-column: 1 / span 2;height: 3rem;'>
+		    <div style='display:grid;grid-template-columns: 9% 80% 9%;padding: 0;'>
+		    <div id="searchboxstuff" style='grid-column: 1 / span 3;height: 3rem;float:left;'>	
 			<div>
-			<input id='srchbox' style='display:inline-block;margin-left: 30%;' type='text' placeholder="Next search..." /><button style='display:inline-block;margin-right: 0.5rem;' onclick='doCompleteNewSearch();return true;'>Do search</button>
+			<input id='srchbox' style='display:inline-block;width:98%;border-radius: 20px;text-align:center;' type='text' placeholder="Next search...">
+		<button id="srchButton" class='srchbtn' style='display:inline-block;margin:0;margin-left: -2.4rem;' type="button" onclick="doCompleteNewSearch();return true;"><i class="fa fa-search"></i></button>
+                </input>
+
 			</div>
 			<div id='fuzzysuggestions' class='fuzzysugs'>
 					<a>Link one</a>
@@ -751,11 +882,15 @@ function SelectNextHit()
 			</div>
 			<hr style='font-size:small;color:grey;'>
 		    </div>
+			<button style='grid-column: 1 /span 1;grid-row: 2 /span 1;max-height: 1.7rem' onclick="SelectLastHit();return true;">Last</button>
 			<div id='linklst' class='linkliststyler'></div>
-			<button style='grid-column: 2 /span 1;grid-row: 2 /span 1;max-height: 1.7rem' onclick="SelectNextHit();return true;">Next</button>
+			<button style='grid-column: 3 /span 1;grid-row: 2 /span 1;max-height: 1.7rem' onclick="SelectNextHit();return true;">Next</button>
 		    </div>
 		    
-		    <div id="biblio" style='color: green;'></div>
+		    <div>
+			<div id="biblio" style='display: inline-block;color: green;'></div>
+			<a id='bookinfo' style='display: inline-block;'>[Book Info]</a>
+		    </div>
 		</div>
 
 		<div id='divdrop' class='DivDropdown' onclick='showall(document.getElementById("SearchOpts"))'>

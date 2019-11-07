@@ -14,7 +14,7 @@ std::string User::toJSON() const
 	ret+="\",\"access\": ";
 	ret+=std::to_string(_accessRights);
 	ret+="}";
-	return std::move(ret);
+	return ret;
 }
 
 int User::GetAccessRights() const
