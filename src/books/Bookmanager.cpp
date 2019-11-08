@@ -98,11 +98,10 @@ std::list<std::string>* CBookManager::search(CSearchOptions* searchOpts)
         CSearch search2(searchOpts, sWords[i]);
         std::map<std::string, double>* results2 = search2.search(m_mapWords, m_mapWordsTitle, m_mapWordsAuthors, m_mapBooks);
 
-        std::cout << "Results: " << results->size() << "\n results2: " << results2->size() << "\n";
         for(auto it=results->begin(); it!=results->end();) {
             if(results2->count(it->first) == 0)
                  it = results->erase(it);
-            else if(m_mapBooks[it->first]->getOcr() == true && m_mapBooks[it->first]->onSamePage(sWords))
+            else if(m_mapBooks[it->first]->getOcr() == true && m_mapBooks[it->first]->onSamePage(sWords)==false)
                  it = results->erase(it);
             else
                 ++it;
