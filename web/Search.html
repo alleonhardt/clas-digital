@@ -1039,9 +1039,11 @@ function ShowLinks()
             
             <div class="betaversion"> This is a Beta version. Report Bugs at <a href="https://github.com/ShadowItaly/clas-digital/issues">clas-digital/issues</a>. Or use E-Mail: <a href="mailto:clas-digital-technik@dlist.server.uni-frankfurt.de">clas-digital-technik@dlist.server.uni-frankfurt.de</a>. </div> 
             <div style='position:relative'>
-			    <input id="SpecialSID" onblur='sugg_disapear();return true;' style='padding: 0.3rem;width: 20%;border-radius: 25px;position:relative;' type="text" placeholder="Search here..." required>
-                    <button id="srchButton" class='srchbtn' style='margin-left: -2.8rem;' type="button" onclick="sendToPage('SpecialSID')"><i class="fa fa-search"></i></button>
+
+			    <input id="SpecialSID" onblur='sugg_disapear();return true;' style='display:inline-block;width:20%;border-radius: 25px;' type="text" placeholder="Search here..." required>
+                    <button id="srchButton" class='srchbtn' style='display:inline-block;margin:0;margin-left: -2.8rem;' type="button" onclick="sendToPage('SpecialSID');return true;"><i class="fa fa-search"></i></button>
                 </input>
+
                 <div id="suggs" class="sugg" align="left"></div>
             </div>
             
@@ -1052,7 +1054,7 @@ function ShowLinks()
 
                 <div id="InnerResultBanner" style="display:none;margin-top:2rem;">
                     <span class='advanceoptsText'> Author:</span>
-                    <input id='author' onchange="SetAdvancedAuthor(this);return true;" class='advanceoptsInput' type="text" value=""> </input>
+                    <input id='author' onchange="SetAdvancedAuthor(this);return true;" class='advanceoptsInput' type="text" placeholder="... " value=""> </input>
                     <div class='selectdiv' style="display:inline-block;">
                     <label>
                     <select id='collections' onchange='SetAdvancedCollections(this);return true;'>
