@@ -105,9 +105,7 @@ void CSearch::normalSearch(MAPWORDS& mapWords)
     std::cout << "Searching for " << m_sWord << "\n";
     if(mapWords.count(m_sWord) > 0) {
         std::map<std::string, double> found = mapWords.at(m_sWord);
-        for(auto jt=found.begin(); jt!=found.end(); jt++)
-                (*m_mapSR)[jt->first] += jt->second;
-
+        m_mapSR->insert(found.begin(), found.end());
     }
 }
 
@@ -125,11 +123,7 @@ void CSearch::fuzzySearch(MAPWORDS& mapWords, std::unordered_map<std::string, CB
         if(value <= 0.2 && t==false) 
             myInsert(it->second, it->first, mapBooks, value);
         else if(value <= 0.2)
-        {
-            std::map<std::string, double> found = it->second;
-            for(auto jt=found.begin(); jt!=found.end(); jt++)
-                (*m_mapSR)[jt->first] += jt->second;
-        }
+            m_mapSR->insert(it->second.begin(), it->second.end());
     }
 }
 
