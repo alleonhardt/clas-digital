@@ -213,6 +213,7 @@ select::-ms-expand {
     width:100px;
     border: 1px solid #cccccc;
 }
+
 .btclass2 {
 	background: white;
 	border: 0;
@@ -701,7 +702,6 @@ function sendSugg(input)
     else
         str=input;
     let requ = "/getsugg?q="+encodeURIComponent(str);
-    console.log(requ);
 
 
     var xhttp = new XMLHttpRequest();
@@ -1041,9 +1041,11 @@ function ShowLinks()
             
             <div class="betaversion"> This is a Beta version. Report Bugs at <a href="https://github.com/ShadowItaly/clas-digital/issues">clas-digital/issues</a>. Or use E-Mail: <a href="mailto:clas-digital-technik@dlist.server.uni-frankfurt.de">clas-digital-technik@dlist.server.uni-frankfurt.de</a>. </div> 
             <div style='position:relative'>
-			    <input id="SpecialSID" onblur='sugg_disapear();return true;' style='padding: 0.3rem;width: 20%;border-radius: 25px;position:relative;' type="text" placeholder="Search here..." required>
-                    <button id="srchButton" class='srchbtn' style='margin-left: -2.8rem;' type="button" onclick="sendToPage('SpecialSID')"><i class="fa fa-search"></i></button>
+
+			    <input id="SpecialSID" onblur='sugg_disapear();return true;' style='display:inline-block;width:20%;border-radius:25px;hight:2rem;padding:3px 10px;' type="text" placeholder="Search here..." required>
+                    <button id="srchButton" class='srchbtn' style='display:inline-block;margin:0;margin-left: -2.8rem;' type="button" onclick="sendToPage('SpecialSID');return true;"><i class="fa fa-search"></i></button>
                 </input>
+
                 <div id="suggs" class="sugg" align="left"></div>
             </div>
             
@@ -1053,43 +1055,43 @@ function ShowLinks()
                 </div>
 
                 <div id="InnerResultBanner" style="display:none;margin-top:2rem;">
-                    <span class='advanceoptsText'> By:</span>
-                    <input id='author' onchange="SetAdvancedAuthor(this);return true;" class='advanceoptsInput' type="text" value="" placeholder="All authors"/>
+                    <span class='advanceoptsText' style="width:45px;"> By:</span>
+                    <input id='author' onchange="SetAdvancedAuthor(this);return true;" class='advanceoptsInput' style="width:130px" type="text" value="" placeholder="All authors"/>
                     <div class='selectdiv' style="display:inline-block;">
-                    <label>
-                    <select id='collections' onchange='SetAdvancedCollections(this);return true;'>
-                        <option value='all' selected>Search all Collections</option>
-                    </select>
-                    </label>
-                    </div>
-                    <div class='selectdiv' style="display:inline-block;">
-                    <label>
-                    <select id='year' onchange='SetAdvancedYear(this);return true;'>
-                        <option value='0'>Any Time</option>
-                        <option value='1700'>1700s</option>
-                        <option value='1800'>1800s</option>
-                        <option value='1900'>1900s</option>
-                        <option value='2000'>2000s</option>
-                        <option value= '1'>Custom</option>
-                    </select>
-                    </label>
-                    </div>
-                        <div class='selectdiv' style="display:inline-block;">
                         <label>
-                        <select id='searchIn' onchange='SetAdvancedOnlyIn(this);return true;'>
-                        <option value='0'>Show Everything</option>
-                        <option value='1'>Show only Books without Text</option>
-                        <option value='2'>Show only Books with Text</option>
+                        <select id='collections' onchange='SetAdvancedCollections(this);return true;'>
+                            <option value='all' selected>Search all Collections</option>
                         </select>
                         </label>
+                    </div>
+                    <div class='selectdiv' style="display:inline-block;">
+                        <label>
+                        <select id='year' onchange='SetAdvancedYear(this);return true;'>
+                            <option value='0'>Any Time</option>
+                            <option value='1700'>1700s</option>
+                            <option value='1800'>1800s</option>
+                            <option value='1900'>1900s</option>
+                            <option value='2000'>2000s</option>
+                            <option value= '1'>Custom</option>
+                        </select>
+                        </label>
+                    </div>
+                        <div class='selectdiv' style="display:inline-block;">
+                            <label>
+                            <select id='searchIn' onchange='SetAdvancedOnlyIn(this);return true;'>
+                                <option value='0'>Show Everything</option>
+                                <option value='1'>Show only Books without Text</option>
+                                <option value='2'>Show only Books with Text</option>
+                            </select>
+                            </label>
                         </div>
                     <div class='selectdiv' style="display:inline-block;">
-                    <label>
-                    <select id='fuzzyness' onchange='SetAdvancedFuzzy(this);return true;'>
-                        <option value='0'>Exact matches</option>
-                        <option value='1'>Fuzzy matching</option>
-                    </select>
-                    </label>
+                        <label>
+                        <select id='fuzzyness' onchange='SetAdvancedFuzzy(this);return true;'>
+                            <option value='0'>Exact matches</option>
+                            <option value='1'>Fuzzy matching</option>
+                        </select>
+                        </label>
                     </div>
                 </div>
                 <div id="InnerInnerBanner" style="display:none;margin-top:2rem;">
