@@ -1,0 +1,1 @@
+let gGeneralJavascriptFile = 0;
