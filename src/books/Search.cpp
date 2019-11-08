@@ -155,12 +155,10 @@ void CSearch::myInsert(std::map<std::string, double>& found, std::string sMatch,
 */
 void CSearch::removeBooks(std::unordered_map<std::string, CBook*>& mapBooks)
 {
-    for(auto it=m_mapSR->begin(); it!=m_mapSR->end();)
+    for(auto it=m_mapSR->begin(); it!=m_mapSR->end();++it)
     {
         if(checkSearchOptions(mapBooks[it->first]) == false)
-            m_mapSR->erase(it++);
-        else
-            ++it;
+            m_mapSR->erase(it);
     }
 }
 
