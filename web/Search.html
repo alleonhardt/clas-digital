@@ -694,8 +694,15 @@ function ShowSelectedValues(obj)
 
 function sendSugg(input)
 {
-    console.log(input);
-    let requ = "/getsugg?q="+encodeURIComponent(input);
+    var n = input.indexOf(" ");
+    var str;
+    if(n!=-1)
+        str = input.substr(n+1);
+    else
+        str=input;
+    let requ = "/getsugg?q="+encodeURIComponent(str);
+    console.log(requ);
+
 
     var xhttp = new XMLHttpRequest();
     var suggs = document.getElementById("suggs");
@@ -776,9 +783,12 @@ function sendToPage(name)
 
 function sugg_func(x) 
 {
-    console.log(x.textContent);
     let searchBox = document.getElementById("SpecialSID");
-    searchBox.value=x.textContent;
+    var r = searchBox.value.indexOf(" ");
+    if(r != -1)
+        searchBox.value= searchBox.value.substring(0,r+1) + x.textContent;
+    else
+        searchBox.value=x.textContent;
     searchBox.focus();
 }
 
