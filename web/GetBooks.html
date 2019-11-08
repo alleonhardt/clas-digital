@@ -15,7 +15,7 @@
 </head>
 <body>
 	<div class="pageContainer">
-	    <div style='top: 0;display: inline-grid; grid-column: 2 /span 1;height: 100vh;margin-bottom: 0;margin-right: 1rem;width:40vh;'> 
+	    <div style='top: 0;display: inline-grid; grid-column: 2 /span 1;height: 100vh;margin-bottom: 0;margin-right: 1rem;'> 
 	
 		<div id="SearchOpts" class="optioncont secondoptioncontlay" style='top: 0;background-color: white;overflow:scroll;'>
 		    
@@ -45,14 +45,13 @@
 			<div id="biblio" style='display: inline-block;color: green;'></div>
 			<a id='bookinfo' style='display: inline-block;'>[Book Info]</a>
 		    </div>
+		    <div id='divdrop' class='DivDropdown' onclick='showall(document.getElementById("SearchOpts"))'>
+			<img id='downimg' class='DropdownClass' src="/down.svg">
+			<img id='upimg' class='DropdownClass' style='display:none!important;' src='/up.svg'>
+		    </div> 
 		</div>
 
-		<div id='divdrop' class='DivDropdown' onclick='showall(document.getElementById("SearchOpts"))'>
-		    <img id='downimg' class='DropdownClass' src="/down.svg">
-		    <img id='upimg' class='DropdownClass' style='display:none!important;' src='/up.svg'>
-		</div> 
-
-
+		
 		<div id="OCRBuffer" class="ocrdispstyle">
 		    <p>Loading...</p>
 		</div>
