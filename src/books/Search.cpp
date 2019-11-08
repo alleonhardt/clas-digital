@@ -5,7 +5,6 @@
 */
 CSearch::CSearch(CSearchOptions* searchOpts, std::string sWord) {
     m_sOpts = searchOpts;
-    m_sWord = m_sOpts->getSearchedWord();
     m_mapSR = new std::map<std::string, double>;
     m_sWord = sWord;
 }
@@ -105,8 +104,8 @@ void CSearch::normalSearch(MAPWORDS& mapWords)
 {
     std::cout << "Searching for " << m_sWord << "\n";
     if(mapWords.count(m_sWord) > 0) {
-        std::map<std::string, double> searchResults = mapWords.at(m_sWord);
-        m_mapSR->insert(searchResults.begin(), searchResults.end());
+        std::map<std::string, double> found = mapWords.at(m_sWord);
+        m_mapSR->insert(found.begin(), found.end());
     }
 }
 
@@ -159,7 +158,7 @@ void CSearch::removeBooks(std::unordered_map<std::string, CBook*>& mapBooks)
     for(auto it=m_mapSR->begin(); it!=m_mapSR->end();)
     {
         if(checkSearchOptions(mapBooks[it->first]) == false)
-            m_mapSR->erase(it++);
+            it = m_mapSR->erase(it);
         else
             ++it;
     }
@@ -194,11 +193,6 @@ bool CSearch::checkSearchOptions(CBook* book)
     return false;
 }
 
-/**
-* @brief delete searchOptions
-*/
-void CSearch::deleteSearchOptions() {
-    delete m_sOpts;
-}
+
 
 

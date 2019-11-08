@@ -283,12 +283,14 @@ std::map<int, std::vector<std::string>>* CBook::findPages(std::string sWord, boo
 */
 void CBook::removePages(std::map<int, std::vector<std::string>>* results1, std::map<int, std::vector<std::string>>* results2)
 {
-    for(auto it=results1->begin(); it!=results1->end(); ++it)
+    for(auto it=results1->begin(); it!=results1->end();)
     {
         if(results2->count(it->first) == 0)
-            results1->erase(it);
-        else
+            it = results1->erase(it);
+        else {
             it->second.insert(it->second.end(), (*results2)[it->first].begin(), (*results2)[it->first].end());
+            ++it;
+        }
     }
 }
 
@@ -299,19 +301,22 @@ bool CBook::onSamePage(std::vector<std::string> sWords)
 
     for(size_t i=1; i<sWords.size(); i++)
     {
+        
         std::vector<size_t> pages2 = pages(sWords[i]);
 
         if(pages2.size() == 0) return false;
 
         bool found=false;
         for(size_t j=0; j<pages1.size(); j++) {
+            std::cout << pages1[j] << std::endl;
             if(std::find(pages2.begin(), pages2.end(), pages1[j]) != pages2.end()) {
                 found=true;
                 break;
             }
         }
 
-        if(found==false) return false;
+        if(found==false) 
+            return false;
     }
     
     return true;
