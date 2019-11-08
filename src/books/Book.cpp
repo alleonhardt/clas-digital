@@ -283,12 +283,14 @@ std::map<int, std::vector<std::string>>* CBook::findPages(std::string sWord, boo
 */
 void CBook::removePages(std::map<int, std::vector<std::string>>* results1, std::map<int, std::vector<std::string>>* results2)
 {
-    for(auto it=results1->begin(); it!=results1->end(); ++it)
+    for(auto it=results1->begin(); it!=results1->end();)
     {
         if(results2->count(it->first) == 0)
-            results1->erase(it);
-        else
+            it = results1->erase(it);
+        else {
             it->second.insert(it->second.end(), (*results2)[it->first].begin(), (*results2)[it->first].end());
+            ++it;
+        }
     }
 }
 

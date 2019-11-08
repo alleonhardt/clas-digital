@@ -717,6 +717,7 @@ function sendSugg(input)
            {
                var node = document.createElement("a");
                node.onclick=function(){sugg_func(this);};
+               node.onmousedown=function(){sugg_func(this);};
                var textNode = document.createTextNode(obj[i]);
                node.appendChild(textNode);
                suggs.appendChild(node);
