@@ -687,12 +687,9 @@ function init() {
 	    Server.Get("/getmetadata?scanId=" + scanId, function(content) {
 		metadata = JSON.parse(content);
 		    document.getElementById("biblio").innerHTML = metadata.bib;
-		if(metadata.data.creators != undefined)
-		    if(metadata.data.creators[0] != undefined)
-			if(metadata.data.creators[0].lastName === undefined)
-			    document.title = metadata.data.creators[0].name+" - clas digital";
-			else
-			    document.title = metadata.data.creators[0].lastName+" - clas digital";
+		console.log(metadata.data.creators);
+		if(metadata.data.creators.length>0)
+		    document.title = metadata.data.creators[0].lastName+" ("+metadata.data.date+"). "+metadata.data.title;
 	}, function() {
 		// print some error message here
 	});
