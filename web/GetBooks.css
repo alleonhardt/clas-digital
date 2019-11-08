@@ -131,6 +131,7 @@ padding-right: 0;
 
 .linkliststyler {
     grid-column: 2 /span 1;
+    max-width: 80%;
     grid-row: 2 / span 1;
     margin: 0;
     margin-left: 0.5rem;
