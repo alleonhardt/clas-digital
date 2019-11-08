@@ -140,7 +140,7 @@ padding-right: 0;
     line-height: 2rem;
     background-color: white;
     padding-bottom: 2rem;
-    overflow: auto;
+    overflow: scroll;
     white-space: nowrap;
     font-size: small;
     text-align: justify;
