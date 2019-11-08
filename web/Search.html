@@ -624,7 +624,7 @@ function ShowSelectedValues(obj)
 			inner+= "?query="+document.getElementById("SpecialSID").value;
 			inner+="&scanId="+json.books[i].scanId;
 			inner+="&fuzzyness="+document.getElementById("FuzzyID").value; 
-			inner+="' onclick='changecolor(this);return true;' style='display: inline-grid;grid-column-start:1;grid-column-end:2;'><h4 style='text-align: left;float:left;'>";
+			inner+="' onclick='return changecolor(this);' style='display: inline-grid;grid-column-start:1;grid-column-end:2;'><h4 style='text-align: left;float:left;'>";
 			
 			inner+=json.books[i].description+"</h4></a>   "+"<input onclick='this.was_clicked=1;return true;' class='booklistinp' style='width:1rem;height:1rem;display: inline-grid;grid-column-start:2;grid-column-end:3' data-scanid='"+json.books[i].scanId+"' type='checkbox' unchecked></div>";
 			inner+="<div class='metadata' onclick='callMetadata(this);' data-scanid='"+json.books[i].scanId+"' style='text-align: left;color: green;font-size: small;margin-top: -0.5rem; cursor: pointer;'>";
@@ -830,6 +830,8 @@ function CreateBibliography()
 function changecolor(obj)
 {
 	obj.style.color = "purple";
+        console.log("SEARCH IN OCR: " + document.getElementById("SearchInOCR").checked);
+        console.log("SEARCH IN TITLE: "+ document.getElementById("SearchInTitle").checked);
 	return true;
 }
 
@@ -1001,11 +1003,11 @@ function ShowLinks()
 					<input oninput="document.getElementById('SliderNum').innerHTML=getSliderValue(this.value);" id="FuzzyID" style="float:right;"type="range" min="0" max="1" value="0" class="slider" id="myRange"></div>
 				<div class="checker">
 					<p class="slider">Search only in Titel</p>
-					<label class="checkbox-inline"><input id="SearchInTitle" type="checkbox" value=""></label>
+					<label class="checkbox-inline"><input id="SearchInTitle" type="checkbox"></label>
 				</div>
 				<div class="checker">
 					<p class="slider">Search only in OCR</p>
-					<label class="checkbox-inline"><input id="SearchInOCR" type="checkbox" value=""></label>
+					<label class="checkbox-inline"><input id="SearchInOCR" type="checkbox"></label>
 				</div>
 				<div class="checker">
 					<p class="slider">Search only for this author</p>
