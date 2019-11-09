@@ -405,8 +405,13 @@ void do_usertableupdate(const Request &req, Response &resp)
 }
 
 
-int main()
+int main(int argc, char **argv)
 {
+    if(argc < 2)
+	return 0;
+    int startPort = std::stoi(argv[1]);
+    std::cout<<"Starting on port: "<<startPort<<std::endl;
+
     //Register for sigterm as it is send by systemd to stop the service.
     signal(SIGTERM, sig_handler);
     CBookManager manager;
@@ -482,7 +487,7 @@ int main()
     srv.Get("/userlist",&do_senduserlist);
     srv.Post("/userlist",&do_usertableupdate);
     std::cout<<"C++ Api server startup successfull!"<<std::endl;
-    srv.listen("localhost", 9000);
+    srv.listen("localhost", startPort);
     return 0;
 }
 
