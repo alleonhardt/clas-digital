@@ -32,17 +32,29 @@ mark {
     margin-bottom: 2%;
 }
 
+.tickbox{
+    float:left;
+    padding:20px;
+    width:17%;
+    box-sizing:border-box;
+}
 
 .searchResults {
 	margin-top: 1rem;
-    width:80%;
     text-align:left;
+    list-style-type:none;
 }
 .searchResult {
 	margin-bottom:2rem;
+    margin-left:10%;
+    float:left;
+    width:73%;
+    padding:20px;
+    box-sizing:border-box;
+
 }
+
 .metadata{
-    width: 85%;
     color:green;
     font-size:small;
     cursor:pointer;

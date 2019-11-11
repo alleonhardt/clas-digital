@@ -124,36 +124,40 @@ function ShowSelectedValues(obj)
 			
 			let newList = document.createElement("li");
 			newList.id = json.books[i].scanId;
-            newList.setAttribute("class", "searchResult");
+
+            let div1 = document.createElement("div")
+            div1.setAttribute("class", "searchResult");
+
             let desc = document.createElement("span");
             if(!json.books[i].hasocr || (json.books[i].hasocr == undefined))
 				desc.innerHTML = json.books[i].description;
 			else
                 desc.innerHTML = "<a href='/GetBooks.html?query="+document.getElementById("SpecialSID").value+"&scanId="+json.books[i].scanId+"&fuzzyness="+document.getElementById("fuzzyness").value+"'>"+json.books[i].description+"</a>";
-            newList.appendChild(desc);
+            div1.appendChild(desc);
 
             let bib = document.createElement("span");
             bib.innerHTML = "<a class='metadata' href='/ShowMetadata.html?scanId=" + json.books[i].scanId+"'>"+json.books[i].bibliography +"</a>";
-            newList.appendChild(bib);
+            div1.appendChild(bib);
+
             let prev = document.createElement("span");
             prev.innerHTML = json.books[i].preview;
-            newList.appendChild(prev);
+            div1.appendChild(prev);
+            newList.appendChild(div1);
+
+            let div2 = document.createElement("div");
+            div2.setAttribute("class", "tickbox");
+            let aBox = document.createElement("input");
+            aBox.setAttribute("class", "booklistinp");
+            aBox.setAttribute("type", "checkbox");
+            aBox.setAttribute("data-scanid", json.books[i]);
+            aBox.setAttribute("onclick", "this.was_clicked=1;return true;");
+            div2.appendChild(aBox);
+            newList.appendChild(div2);
             hitList.appendChild(newList);
 
             /*
-			newList.classList.add("resultbox");
-
 			inner+=json.books[i].description+"</h4></a>   "+"<input onclick='this.was_clicked=1;return true;' class='booklistinp' style='width:1rem;height:1rem;display: inline-grid;grid-column-start:2;grid-column-end:3' data-scanid='"+json.books[i].scanId+"' type='checkbox' unchecked></div>";
-
-			inner+="<div class='metadata' onclick='callMetadata(this);' data-scanid='"+json.books[i].scanId+"' style='text-align: left;color: green;font-size: small;margin-top: -0.5rem; cursor: pointer;'>";
-			inner+=json.books[i].bibliography;
-			inner+="</div><p style='text-align: left;' id='";
-			inner+=json.books[i].scanId;
-			inner+="-preview'>"+json.books[i].preview+"</p>";
-			newList.innerHTML = inner;
-			//Show the new link in the search hit list
-			obj.appendChild(newList);
-            */
+			*/
 	}
 	
     let val = "<hr><div class='linkcontainer'>";
@@ -317,6 +321,7 @@ function CreateBibliography()
 	let biblst = "";
 	for(let i = 0; i < lst.length; i++)
 	{
+        console.log("hey");
 		if(lst[i].checked)
 		{
 			if(biblst=="")
@@ -332,8 +337,6 @@ function CreateBibliography()
 	}
 	window.open("/createbibliography?books="+biblst);
 }
-
-
 
 
 window.addEventListener("load",function(){initialise('searchlink');ExecuteInitialise();ShowLinks();},false);
