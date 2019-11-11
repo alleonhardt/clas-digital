@@ -340,6 +340,22 @@ function initialise()
 			    document.getElementById("fuzzysuggestions").selec = k;
 			}
 		});
+
+
+    let kk;
+    function resize(e) {
+	const d_y = kk - e.y;
+
+    }
+
+
+    document.getElementsByClassName("resizer")[0].addEventListener("mousedown",function(e) {
+	document.getElementsByClassName("resizer")[0].onmouseup = function() {
+	    document.removeEventListener("mousemove", resize, false);
+	}
+	document.addEventListener("mousemove",resize,false);
+	kk = e.y;
+    }, false);
 }
 
 
