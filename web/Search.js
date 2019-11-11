@@ -81,6 +81,7 @@ function ShowSelectedValues(obj)
 	let json = obj.drawablejson;
 
 
+    // *** PARSE YEAR *** //
     let after = parseInt(document.getElementById("publicatedAfter").value);
     let before = parseInt(document.getElementById("publicatedBefore").value);
     let year = document.getElementById("year");
@@ -115,28 +116,35 @@ function ShowSelectedValues(obj)
 	
 	let bookvalues=[];
 
+    let hitList = document.getElementById("hitList");
+
 	for(var i = json.show_from; i < json.show_to; i++)
 	{
 			bookvalues.push(json.books[i].scanId);
 			
-			let newList = document.createElement("div");
+			let newList = document.createElement("li");
 			newList.id = json.books[i].scanId;
-			newList.classList.add("resultbox");
-			let inner = "";
-			if(!json.books[i].hasocr || (json.books[i].hasocr == undefined))
-			{
-				inner = "<div class='some_grid_class'><a '";
-			}
+            newList.setAttribute("class", "searchResult");
+            let desc = document.createElement("span");
+            if(!json.books[i].hasocr || (json.books[i].hasocr == undefined))
+				desc.innerHTML = json.books[i].description;
 			else
-			{
-				inner = "<div class='some_grid_class'><a href='/GetBooks.html";
-			}
-			inner+= "?query="+document.getElementById("SpecialSID").value;
-			inner+="&scanId="+json.books[i].scanId;
-			inner+="&fuzzyness="+document.getElementById("fuzzyness").value; 
-			inner+="' onclick='return changecolor(this);' style='display: inline-grid;grid-column-start:1;grid-column-end:2;'><h4 style='text-align: left;float:left;'>";
-			
+                desc.innerHTML = "<a href='/GetBooks.html?query="+document.getElementById("SpecialSID").value+"&scanId="+json.books[i].scanId+"&fuzzyness="+document.getElementById("fuzzyness").value+"'>"+json.books[i].description+"</a>";
+            newList.appendChild(desc);
+
+            let bib = document.createElement("span");
+            bib.innerHTML = "<a class='metadata' href='/ShowMetadata.html?scanId=" + json.books[i].scanId+"'>"+json.books[i].bibliography +"</a>";
+            newList.appendChild(bib);
+            let prev = document.createElement("span");
+            prev.innerHTML = json.books[i].preview;
+            newList.appendChild(prev);
+            hitList.appendChild(newList);
+
+            /*
+			newList.classList.add("resultbox");
+
 			inner+=json.books[i].description+"</h4></a>   "+"<input onclick='this.was_clicked=1;return true;' class='booklistinp' style='width:1rem;height:1rem;display: inline-grid;grid-column-start:2;grid-column-end:3' data-scanid='"+json.books[i].scanId+"' type='checkbox' unchecked></div>";
+
 			inner+="<div class='metadata' onclick='callMetadata(this);' data-scanid='"+json.books[i].scanId+"' style='text-align: left;color: green;font-size: small;margin-top: -0.5rem; cursor: pointer;'>";
 			inner+=json.books[i].bibliography;
 			inner+="</div><p style='text-align: left;' id='";
@@ -145,6 +153,7 @@ function ShowSelectedValues(obj)
 			newList.innerHTML = inner;
 			//Show the new link in the search hit list
 			obj.appendChild(newList);
+            */
 	}
 	
     let val = "<hr><div class='linkcontainer'>";
