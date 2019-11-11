@@ -168,7 +168,7 @@ function ShowSelectedValues(obj)
         else
             newlnk = window.location.search.replace(rep,"page="+counter);
         if(json.page==counter)
-            newlst.innerHTML = "<a "+counter +"</a>";
+            newlst.innerHTML = counter;
         else
             newlst.innerHTML = "<a href='"+newlnk+"'>"+counter+"</a>";
         linkcontainer.appendChild(newlst);

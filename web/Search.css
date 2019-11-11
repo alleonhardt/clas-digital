@@ -22,20 +22,7 @@ mark {
 }
 .linkcontainer {
     list-style-type:none;
-    /*
-    margin: auto;
-    width: 80%;
-    padding-bottom: 1.5rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    */
-}
-
-.linkcontainer:hover{
-    /*
-    overflow-wrap: break-word;
-    overflow: visible;
-    */
+    margin-left:-3%;
 }
 
 .prev_next{
@@ -56,13 +43,14 @@ mark {
 	margin-top: 1rem;
     text-align:left;
     list-style-type:none;
+    overflow:hidden;
 }
 .searchResult {
 	margin-bottom:2rem;
     margin-left:10%;
     float:left;
     width:73%;
-    padding:20px;
+    padding:20px 20px;
     box-sizing:border-box;
 }
 
