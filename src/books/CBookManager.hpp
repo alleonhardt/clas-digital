@@ -30,11 +30,17 @@ private:
     MAPWORDS m_mapWordsTitle;
     MAPWORDS m_mapWordsAuthors;
 
+    typedef std::unordered_map<std::string, std::set<std::string>> dict;
+    dict m_dict;
+
     std::list<std::pair<std::string, size_t>> m_listWords;
 
     std::shared_mutex m_searchLock;
 
 public:
+
+    //Constructor
+    CBookManager();
 
     // **** getter **** //
 

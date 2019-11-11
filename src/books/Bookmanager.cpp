@@ -1,6 +1,22 @@
 #include "CBookManager.hpp"
 #include "debug/debug.hpp"
 
+//Constructor
+CBookManager::CBookManager()
+{
+    std::string sBuffer;
+    std::ifstream read("web/dictionary_low.txt");
+    
+    while(getline(read, sBuffer))
+    {
+        std::vector<std::string> vec = func::split2(sBuffer, ":");
+        std::vector<std::string> vec2 = func::split2(vec[1], ",");
+        for(size_t i=0; i<vec2.size(); i++)
+            m_dict[vec[0]].insert(vec2[i]);
+    }
+    std::cout << "Created dictionary. Size: " << m_dict.size() << "\n";
+}
+
 /**
 * @return map of all book
 */
@@ -88,7 +104,7 @@ std::list<std::string>* CBookManager::search(CSearchOptions* searchOpts)
 
     //Start first search
     CSearch search(searchOpts, sWords[0]);
-    std::map<std::string, double>* results = search.search(m_mapWords, m_mapWordsTitle, m_mapWordsAuthors, m_mapBooks);
+    std::map<std::string, double>* results = search.search(m_mapWords, m_mapWordsTitle, m_mapWordsAuthors, m_mapBooks, m_dict);
 
     for(size_t i=1; i<sWords.size(); i++)
     {
@@ -96,7 +112,7 @@ std::list<std::string>* CBookManager::search(CSearchOptions* searchOpts)
             continue;
 
         CSearch search2(searchOpts, sWords[i]);
-        std::map<std::string, double>* results2 = search2.search(m_mapWords, m_mapWordsTitle, m_mapWordsAuthors, m_mapBooks);
+        std::map<std::string, double>* results2 = search2.search(m_mapWords, m_mapWordsTitle, m_mapWordsAuthors, m_mapBooks, m_dict);
 
         for(auto it=results->begin(); it!=results->end();) {
             if(results2->count(it->first) == 0)
