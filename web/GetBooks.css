@@ -8,23 +8,24 @@ body {
     width: 100%;
     left: 0;
     top: 0;
-    height: 3.5rem;
+    height: 3rem;
     min-height: 2rem;
     z-index: 3;
     background: white;
 }
 
 .topnav {
+    resize: vertical;
     left: 0;
     position: fixed;
-    height: 4.5rem;
-    top: 3.5rem;
+    height: 1.5rem;
+    top: 3rem;
     width: 100%;
     overflow: auto;
     z-index: 2;
     background: white;
     border-bottom: 2px solid black;
-
+    overflow-y: scroll;
 }
 
 .topnav button {
@@ -105,7 +106,7 @@ body {
 
 .ocrpage {
     position: sticky;
-    top: 9rem;
+    top: 6rem;
     font-size: small;
     text-align: justify;
     min-height: 350px;

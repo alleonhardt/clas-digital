@@ -154,7 +154,18 @@ function CreatePageLayout()
     }
 
     let timer = null;
+    let currentSize = document.getElementsByClassName("topnav")[0].getBoundingClientRect().bottom;
     document.body.onscroll = function() {
+	let gNewSize = document.getElementsByClassName("topnav")[0].getBoundingClientRect().bottom;
+	if(currentSize!=gNewSize)
+	{
+	    console.log("Resizing ocrs top value!");
+	    let lst = document.getElementsByClassName("ocrpage");
+	    for(let i = 0; i < lst.length; i++)
+		lst[i].style.top = (gNewSize+17)+"px";
+	    currentSize = gNewSize;
+	}
+
 	if(timer)
 	{
 	    window.clearTimeout(timer);
