@@ -64,16 +64,16 @@ void CSearch::setWord(std::string sWord) {
 * @brief calls spezific search function, searches, and creates map of  matches. Removes all 
 * books that do not match with search options.
 */
-std::map<std::string, double>* CSearch::search(MAPWORDS& mWs, MAPWORDS& mWsTitle, MAPWORDS& mWsAuthor, std::unordered_map<std::string, CBook*>& mapBooks)
+std::map<std::string, double>* CSearch::search(MAPWORDS& mWs, MAPWORDS& mWsTitle, MAPWORDS& mWsAuthor, map_books& mapBooks, dict& d_dict)
 {
     //Normal search (full-match)
     if (getFuzzyness() == false)
     {
         //Search in ocr and/ or in title
         if(getOnlyTitle() == false)
-            normalSearch(mWs);
+            normalSearch(mWs, d_dict, mapBooks);
         if(getOnlyOcr() == false)
-            normalSearch(mWsTitle);
+            normalSearch(mWsTitle, d_dict, mapBooks);
         normalSearch(mWsAuthor);
     }
 
@@ -100,8 +100,31 @@ std::map<std::string, double>* CSearch::search(MAPWORDS& mWs, MAPWORDS& mWsTitle
 * @param[in] mapWords map of all words with a list of books in which this word accures
 * @param[in, out] mapSR searchresults
 */
+void CSearch::normalSearch(MAPWORDS& mapWords, dict& d_dict, map_books& mapBooks)
+{
+    
+    if(d_dict.count(m_sWord) > 0) {
+        for(auto it : d_dict[m_sWord]) {
+            std::cout << "Searching for " << it << "\n";
+            if(mapWords.count(it) > 0) {
+                std::map<std::string, double> found = mapWords.at(it);
+                myInsert(found, it, mapBooks);
+            }        
+        }
+    }
+
+    else
+        normalSearch(mapWords);
+}
+
+/**
+* @brief search full-match
+* @param[in] mapWords map of all words with a list of books in which this word accures
+* @param[in, out] mapSR searchresults
+*/
 void CSearch::normalSearch(MAPWORDS& mapWords)
 {
+    
     std::cout << "Searching for " << m_sWord << "\n";
     if(mapWords.count(m_sWord) > 0) {
         std::map<std::string, double> found = mapWords.at(m_sWord);
@@ -109,13 +132,12 @@ void CSearch::normalSearch(MAPWORDS& mapWords)
     }
 }
 
-
 /**
 * @brief search fuzzy 
 * @param[in] mapWords map of all words with a list of books in which this word accures
 * @param[in, out] mapSR searchresults
 */
-void CSearch::fuzzySearch(MAPWORDS& mapWords, std::unordered_map<std::string, CBook*>& mapBooks, bool t)
+void CSearch::fuzzySearch(MAPWORDS& mapWords, map_books& mapBooks, bool t)
 {
     for(auto it= mapWords.begin(); it!=mapWords.end(); it++)
     {
@@ -134,7 +156,7 @@ void CSearch::fuzzySearch(MAPWORDS& mapWords, std::unordered_map<std::string, CB
 * @param[out] sMatch
 * @param[in] value
 */
-void CSearch::myInsert(std::map<std::string, double>& found, std::string sMatch, std::unordered_map<std::string, CBook*>& mapBooks, double value)
+void CSearch::myInsert(std::map<std::string, double>& found, std::string sMatch, map_books& mapBooks, double value)
 {
     for(auto it=found.begin(); it!=found.end(); it++) {
         (*m_mapSR)[it->first] += it->second*(1-value*5);
@@ -149,11 +171,30 @@ void CSearch::myInsert(std::map<std::string, double>& found, std::string sMatch,
     }
 }
 
+/*
+* @brief inserts searchResults into map of searchresults and assigns value of match
+* @param[out] mapSR
+* @param[in] found
+* @param[out] sMatch
+* @param[in] value
+*/
+void CSearch::myInsert(std::map<std::string, double>& found, std::string sMatch, map_books& mapBooks)
+{
+    for(auto it=found.begin(); it!=found.end(); it++) {
+        (*m_mapSR)[it->first] += it->second;
+
+        //Add match to map
+        if(mapBooks[it->first]->getOcr() == false)
+            continue;
+        mapBooks[it->first]->getMapFull()[m_sWord].push_back(sMatch);
+    }
+}
+
 /**
 * @brief remove all books that don't agree with searchOptions.
 * @param[in, out] mapSR map of search results
 */
-void CSearch::removeBooks(std::unordered_map<std::string, CBook*>& mapBooks)
+void CSearch::removeBooks(map_books& mapBooks)
 {
     for(auto it=m_mapSR->begin(); it!=m_mapSR->end();)
     {

@@ -48,6 +48,9 @@ std::unordered_map<std::string, std::tuple<std::vector<size_t>,int,size_t>>& CBo
 std::unordered_map<std::string, std::list<std::pair<std::string, double>>>& CBook::getMapFuzzy() {
     return m_mapFuzzy;
 }
+std::unordered_map<std::string, std::list<std::string>>& CBook::getMapFull() {
+    return m_mapFull;
+}
 
 std::string CBook::getAuthor() { return m_sAuthor; }
 int CBook::getDate() { return m_date; }
@@ -243,9 +246,13 @@ std::map<int, std::vector<std::string>>* CBook::findPages(std::string sWord, boo
     std::map<int, std::vector<std::string>>* mapPages = new std::map<int, std::vector<std::string>>;
 
     //Fuzzyness = false
-    if (fuzzyness == false && m_mapWordsPages.count(sWord) > 0) {
-        for(auto page : std::get<0>(m_mapWordsPages[sWord]))
-            (*mapPages)[page] = {};
+    if (fuzzyness == false) {
+        if(m_mapFull.count(sWord) > 0) {
+            for(auto elem : m_mapFull[sWord]) {
+                for(auto page : std::get<0>(m_mapWordsPages.at(elem)))
+                    (*mapPages)[page].push_back(elem);
+            }
+        }
     }
 
     //Fuzzyness = true
@@ -417,6 +424,8 @@ std::string CBook::getPreviewText(std::string& sWord, size_t& pos, size_t& page)
     // *** get match *** //
     if(m_mapWordsPages.count(sWord) > 0)
         sWord = sWord;
+    else if(m_mapFull.count(sWord) > 0)
+        sWord = m_mapFull[sWord].front();
     else if(m_mapFuzzy.count(sWord) > 0) 
         sWord = m_mapFuzzy[sWord].front().first;
     else 

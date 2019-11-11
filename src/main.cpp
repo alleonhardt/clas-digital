@@ -75,7 +75,6 @@ void get_sugg(const Request &req, Response &resp, CBookManager &manager)
 	    auto start = std::chrono::system_clock::now();
         std::list<std::string>* listSugg = manager.getSuggestions_fast(sInput);
 		std::chrono::duration<double> elapsed_seconds = std::chrono::system_clock::now()-start;
-        std::cout << "List Sugg: " << listSugg->size() << "in: " << elapsed_seconds.count() << std::endl;
         nlohmann::json responseJson;
         for(auto it=listSugg->begin(); it!=listSugg->end();it++)
             responseJson.push_back((*it)); 
@@ -487,8 +486,7 @@ int main(int argc, char **argv)
     srv.Get("/search",[&](const Request &req, Response &resp) { do_search(req,resp,fileSearchHtml,zoteroPillars,manager);});
     srv.Get("/searchinbook",[&](const Request &req, Response &resp) { do_searchinbook(req,resp,manager);});
     srv.Get("/createbibliography",[&](const Request &req, Response &resp) { do_createbiblio(req,resp,manager);});
-    
-    srv.Get("/getsugg",[&](const Request &req, Response &resp) { get_sugg(req,resp,manager);});
+    srv.Get("/api/v1/typeahead/corpus",[&](const Request &req, Response &resp) { get_sugg(req,resp,manager);});
     srv.Get("/getmetadata", [&](const Request &req, Response &resp) { get_metadata(req,resp,manager);});
     srv.Get("/authenticate",&do_authentification);
     srv.Get("/userlist",&do_senduserlist);

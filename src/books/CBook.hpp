@@ -24,6 +24,7 @@ private:
 
     //Map of matches
     std::unordered_map<std::string, std::list<std::pair<std::string, double>>> m_mapFuzzy;
+    std::unordered_map<std::string, std::list<std::string>> m_mapFull;
 
     //Map of words_pages
     std::unordered_map<std::string, std::tuple<std::vector<size_t>, int, size_t>> m_mapWordsPages;
@@ -99,6 +100,7 @@ public:
 
     std::unordered_map<std::string, std::tuple<std::vector<size_t>, int, size_t>>&   getMapWordsPages();
     std::unordered_map<std::string, std::list<std::pair<std::string, double>>>& getMapFuzzy();
+    std::unordered_map<std::string, std::list<std::string>>& getMapFull();
 
  
     // **** SETTER **** //
