@@ -149,8 +149,7 @@ function ShowSelectedValues(obj)
             let aBox = document.createElement("input");
             aBox.setAttribute("class", "booklistinp");
             aBox.setAttribute("type", "checkbox");
-            aBox.setAttribute("data-scanid", json.books[i]);
-            aBox.setAttribute("onclick", "this.was_clicked=1;return true;");
+            aBox.setAttribute("data-scanid", json.books[i].scanId);
             div2.appendChild(aBox);
             newList.appendChild(div2);
             hitList.appendChild(newList);
@@ -321,9 +320,9 @@ function CreateBibliography()
 	let biblst = "";
 	for(let i = 0; i < lst.length; i++)
 	{
-        console.log("hey");
 		if(lst[i].checked)
 		{
+            console.log(lst[i].dataset.scanid);
 			if(biblst=="")
 				biblst=lst[i].dataset.scanid;
 			else
