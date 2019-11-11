@@ -1,29 +1,89 @@
 body {
-    display: grid;
-    grid-template-rows: 10% 90%;
-    margin: 0;
-    padding: 0;
-    height: 100vh;
-    overflow: hidden;
     background: grey;
+    padding: 0.5rem;
+}
+
+.searchbox {
+    position: fixed;
+    width: 100%;
+    left: 0;
+    top: 0;
+    height: 3.5rem;
+    min-height: 2rem;
+    z-index: 3;
+    background: white;
 }
 
 .topnav {
+    left: 0;
+    position: fixed;
+    height: 4.5rem;
+    top: 3.5rem;
     width: 100%;
-    padding-top: 1rem;
-    grid-row: 1 /span 1;
     overflow: auto;
+    z-index: 2;
     background: white;
     border-bottom: 2px solid black;
+
+}
+
+.topnav button {
+    background: white;
+    border: 0;
+}
+
+.topnav button:hover {
+    border-bottom: 2px solid blue;
+}
+
+.linknav {
+    display: grid;
+    grid-template-columns: 7% 86% 7%;
+}
+
+.lastbutcont {
+    grid-column: 1 /span 1;
+}
+
+.lastbut {
+    position: sticky;
+    top: 0.2rem;
+    margin-left: 1rem;
+    cursor: pointer;
+}
+
+.nextbutcont {
+    grid-column: 3 /span 1;
+}
+
+.nextbut {
+    position: sticky;
+    top: 0.2rem;
+    margin: auto;
+    cursor: pointer;
+}
+
+#fullsearchhitlist {
+    grid-column: 2 /span 1;
+    font-size: small;
+    line-height: 1.5rem;
+    overflow-wrap: break-word;
+}
+
+.hitlinkstyle {
+    margin-top: 0.2rem;
+    margin: auto;
+    color: blue;
+    cursor: pointer;
 }
 
 .botpage {
     background: grey;
-    margin-left: 17px;
-    padding: 0.5rem;
-    width: calc(100% - 2rem);
     overflow: auto;
-    grid-row: 2 /span 1;
+}
+
+.bibliostyle {
+    color: green;
 }
 
 .pagecontainer {
@@ -35,6 +95,7 @@ body {
 }
 
 .ocrcontainer {
+    position: relative;
     background: white;
     grid-column: 2 /span 1;
     grid-row: 1 /span 1;
@@ -44,7 +105,7 @@ body {
 
 .ocrpage {
     position: sticky;
-    top: 1rem;
+    top: 9rem;
     font-size: small;
     text-align: justify;
     min-height: 350px;
@@ -59,4 +120,26 @@ body {
     width: 100%;
     grid-row: 1 /span 1;
     grid-column: 1 /span 1;
+}
+
+.fuzzysugslink {
+    display: block;
+    color: black;
+    margin: 0px auto;
+    padding: 0.3rem;
+    text-decoration: none;
+    text-align: left;
+    cursor: pointer;
+}
+
+.fuzzysugslink mark {
+    color: black;
+    background: yellow;
+}
+
+.fuzzysugslink:hover {
+    color: black;
+    text-decoration: none;
+    text-align: left;
+    background-color: #ddd;
 }
