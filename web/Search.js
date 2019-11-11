@@ -77,10 +77,7 @@ function callMetadata(x)
 
 function ShowSelectedValues(obj)
 {
-	obj.innerHTML = "";
-	let json = obj.drawablejson;
-
-
+	
     // *** PARSE YEAR *** //
     let after = parseInt(document.getElementById("publicatedAfter").value);
     let before = parseInt(document.getElementById("publicatedBefore").value);
@@ -104,6 +101,7 @@ function ShowSelectedValues(obj)
     let maxResultsElement = document.getElementById("maxResults");
     let searchTimeElement = document.getElementById("searchTime");
 
+    json=obj.drawablejson;
     maxResultsElement.innerHTML = json.max_results;
     searchTimeElement.innerHTML = json.time;
 
@@ -112,15 +110,10 @@ function ShowSelectedValues(obj)
 
 	if(json.max_results==0)
 	    return;
-	obj.start = json.show_from;
 	
-	let bookvalues=[];
-
     let hitList = document.getElementById("hitList");
-
 	for(var i = json.show_from; i < json.show_to; i++)
 	{
-			bookvalues.push(json.books[i].scanId);
 			
 			let newList = document.createElement("li");
 			newList.id = json.books[i].scanId;
@@ -157,14 +150,15 @@ function ShowSelectedValues(obj)
 	
     document.getElementById("bottomBorder").style.display="block";
 
-    let val = "";
     let counter = 1;
     let resultsperpage = 10;
     if(getParameterByName('maxresultsperpage')!=null)
 	    resultsperpage = parseInt(getParameterByName('maxresultsperpage'));
+    let linkcontainer = document.getElementById("linkcontainer");
     for(let i = 0; i < json.max_results; i+=resultsperpage)
     {
-        let lnk = window.location.search;
+        let newlst = document.createElement("li");
+        newlst.setAttribute("class", "link");
         let rep = getParameterByName('page');
         rep = 'page='+rep;
 
@@ -172,17 +166,15 @@ function ShowSelectedValues(obj)
         if(getParameterByName('page')==null)
             newlnk = window.location.search+"&page="+counter;
         else
-            newlnk=window.location.search.replace(rep,"page="+counter);
+            newlnk = window.location.search.replace(rep,"page="+counter);
         if(json.page==counter)
-            val+="<a style='margin-right: 1rem;' disabled>"+counter+"</a>";
-          else
-            val+="<a style='margin-right: 1rem;' href='"+newlnk+"'>"+counter+"</a>";
+            newlst.innerHTML = "<a "+counter +"</a>";
+        else
+            newlst.innerHTML = "<a href='"+newlnk+"'>"+counter+"</a>";
+        linkcontainer.appendChild(newlst);
         counter++;
     }
-    val+="</div>";
-    obj.innerHTML+=val;
 
-    let next_prev = "<div class='prev_next'>";
     let rep = getParameterByName('page');
     rep = 'page='+rep;
     let next_page=json.page+1;
@@ -195,21 +187,18 @@ function ShowSelectedValues(obj)
 
     let prevlnk = '';
     let nextlnk = '';
-    if(getParameterByName('page')==null)
-    {
-	prevlnk = window.location.search + "&page="+prev_page;
-	nextlnk = window.location.search + "&page="+next_page;
+    if(getParameterByName('page')==null) {
+	    prevlnk = window.location.search + "&page="+prev_page;
+	    nextlnk = window.location.search + "&page="+next_page;
     }
-    else
-    {
-	prevlnk=window.location.search.replace(rep,"page="+prev_page);
-	nextlnk=window.location.search.replace(rep,"page="+next_page);
+    else {
+	    prevlnk=window.location.search.replace(rep,"page="+prev_page);
+	    nextlnk=window.location.search.replace(rep,"page="+next_page);
     }
-
-    next_prev+="<a style='margin-right: 2rem; padding: 1.5em; margin:0em' href='"+prevlnk+"'>"+"prev"+"</a>";
-    next_prev+="<a style='margin-right: 2rem; padding: 1.5em; margin:0em' href='"+nextlnk+"'>"+"next"+"</a>";
-    next_prev+="</div>";
-    obj.innerHTML+=next_prev;
+    document.getElementById("prev").setAttribute("href", prevlnk);
+    document.getElementById("next").setAttribute("href", nextlnk);
+    document.getElementById("prev").style.display="inline-block";
+    document.getElementById("next").style.display="inline-block";
 }
 
 function sendSugg(input)

@@ -16,21 +16,33 @@ mark {
 	margin-right: 11%;
 }
 
+.link {
+    display:inline-block;
+    margin:0.5rem;
+}
 .linkcontainer {
+    list-style-type:none;
+    /*
     margin: auto;
     width: 80%;
     padding-bottom: 1.5rem;
     overflow: hidden;
     text-overflow: ellipsis;
+    */
 }
 
 .linkcontainer:hover{
+    /*
     overflow-wrap: break-word;
     overflow: visible;
+    */
 }
 
 .prev_next{
-    margin-bottom: 2%;
+    display:none;
+    margin-right: 2rem; 
+    padding: 1.5em; 
+    margin:0em
 }
 
 .tickbox{
@@ -52,7 +64,6 @@ mark {
     width:73%;
     padding:20px;
     box-sizing:border-box;
-
 }
 
 .metadata{
