@@ -468,3 +468,5 @@ function doCompleteNewSearch()
     let newurl = "/GetBooks.html?query="+document.getElementById("srchbox").value+"&scanId="+getParameterByName("scanId")+"&fuzzyness="+getParameterByName('fuzzyness');
     window.location = newurl;
 }
+
+window.addEventListener("load",initialise,false);
