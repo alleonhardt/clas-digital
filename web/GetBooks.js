@@ -47,6 +47,8 @@ function HighlightHitsAndConstructLinkList()
 	    {
 		inner+="("+hitlist.books[i].words+"); ";
 	    }
+	    else
+		inner+=" ";
 	    link.innerHTML = inner;
 	    link.page = hitlist.books[i].page;
 	    link.classList.add('hitlinkstyle');
