@@ -1,5 +1,6 @@
 body {
     margin:0;
+    font-family: arial,sans-serif;
 }
 html {
     margin:0;
@@ -15,21 +16,20 @@ mark {
 	margin-right: 11%;
 }
 
-.linkcontainer {
-    margin: auto;
-    width: 80%;
-    padding-bottom: 1.5rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
+.link {
+    display:inline-block;
+    margin:0.5rem;
 }
-
-.linkcontainer:hover{
-    overflow-wrap: break-word;
-    overflow: visible;
+.linkcontainer {
+    list-style-type:none;
+    margin-left:-3%;
 }
 
 .prev_next{
-    margin-bottom: 2%;
+    display:none;
+    margin-right: 2rem; 
+    padding: 1.5em; 
+    margin:0em
 }
 
 .tickbox{
@@ -43,15 +43,15 @@ mark {
 	margin-top: 1rem;
     text-align:left;
     list-style-type:none;
+    overflow:hidden;
 }
 .searchResult {
 	margin-bottom:2rem;
     margin-left:10%;
     float:left;
     width:73%;
-    padding:20px;
+    padding:20px 20px;
     box-sizing:border-box;
-
 }
 
 .metadata{
