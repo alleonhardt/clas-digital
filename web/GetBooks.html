@@ -1,65 +1,48 @@
 <!DOCTYPE html>
 <html>
-<head>
-<title>clas digital</title>
-<!-- <link rel="stylesheet" href="container.css"/>-->
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <head>
+	<title>clas digital</title>
+	<!-- <link rel="stylesheet" href="container.css"/>-->
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-		<!-- Bootstrap CSS -->
-		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
 	<link rel="stylesheet" href="/GetBooks.css">	
-    <script src="/general.js"></script>
-    <script src="/GetBooks.js"></script>
-</head>
-<body>
-	<div class="pageContainer">
-	    <div style='top: 0;display: inline-grid; grid-column: 2 /span 1;height: 100vh;margin-bottom: 0;margin-right: 1rem;'> 
-	
-		<div id="SearchOpts" class="optioncont secondoptioncontlay" style='top: 0;background-color: white;overflow:scroll;'>
-		    
-		    <div style='display:grid;grid-template-columns: 9% 80% 9%;padding: 0;'>
-		    <div id="searchboxstuff" style='grid-column: 1 / span 3;height: 3rem;float:left;'>	
-			<div>
-			<input id='srchbox' style='display:inline-block;width:98%;border-radius: 20px;text-align:center;' type='text' placeholder="search within this book...">
-		<button id="srchButton" class='srchbtn' style='display:inline-block;margin:0;margin-left: -2.4rem;' type="button" onclick="doCompleteNewSearch();return true;"><i class="fa fa-search"></i></button>
-                </input>
+	<script src="/general.js"></script>
+	<script src="/GetBooks.js"></script>
 
-			</div>
-			<div id='fuzzysuggestions' class='fuzzysugs'>
-					<a>Link one</a>
-					<a>Link two</a>
-					<a>Link three</a>
-					<a>Link four</a>
-					<a>Link two</a>
-			</div>
-			<hr style='font-size:small;color:grey;'>
-		    </div>
-			<button style='grid-column: 1 /span 1;grid-row: 2 /span 1;max-height: 1.7rem' onclick="SelectLastHit();return true;">Last</button>
-			<div id='linklst' class='linkliststyler'></div>
-			<button style='grid-column: 3 /span 1;grid-row: 2 /span 1;max-height: 1.7rem' onclick="SelectNextHit();return true;">Next</button>
-		    </div>
-		    
-		    <div>
-			<div id="biblio" style='display: inline-block;color: green;'></div>
-			<a id='bookinfo' style='display: inline-block;'>[Book Info]</a>
-		    </div>
-		    <div id='divdrop' class='DivDropdown' onclick='showall(document.getElementById("SearchOpts"))'>
-			<img id='downimg' class='DropdownClass' src="/down.svg">
-			<img id='upimg' class='DropdownClass' style='display:none!important;' src='/up.svg'>
-		    </div> 
+	<title>Show Book - clas - digital</title>
+    </head>
+    <body onload="initialise();">
+	<!--- Navbar element for the search bar and the next search -->
+	<div class='searchbox'>
+	    <center>
+		<input id='srchbox' style='width:30%;border-radius: 20px;padding-left: 0.5rem;padding-right: 0.5rem;margin-top: 0.5rem;height: 1.4rem;' type='text' placeholder="search within this book..."/>
+		<div style='position: relative;width: 30%;'>
+		    <div id='fuzzysuggestions' style='visibility:hidden;z-index: 5;position: absolute;top:0;background:white;border: 2px solid black;width: 55vw;'></div>
 		</div>
-
-		
-		<div id="OCRBuffer" class="ocrdispstyle">
-		    <p>Loading...</p>
-		</div>
-	    </div>
-
-	    <div id="thepagereader" class='reader' tabindex='0'>
-	    </div>
+	    </center>
+	    <hr/>
 	</div>
-</body>
+
+	<div class='topnav'>
+	    <!--- Navbar element to iterate over the hit list on the page -->
+	    <nav class='linknav'>
+		<div class='lastbutcont'>
+		    <button class='lastbut' onclick='SelectLastHit();'>Last</button>
+		</div>
+		<div id="fullsearchhitlist">
+		</div>
+		<div class='nextbutcont'>
+		    <button class='nextbut' onclick='SelectNextHit();'>Next</button>
+		</div>
+	    </nav>
+
+	    <center><p id="bibliography" class="bibliostyle"></p></center>
+	</div>
+	<div class='resizer'>
+	</div>
+
+    </body>
 </html>
 

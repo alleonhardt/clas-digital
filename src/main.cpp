@@ -174,18 +174,25 @@ void do_searchinbook(const Request& req, Response &resp, CBookManager &manager)
 	{
 	    if(Fuzzyness==0)
 	    {
-		int k = it.first;
-		js["books"].push_back(k);
+		nlohmann::json entry;
+		entry["page"] = it.first;
+		js["books"].push_back(std::move(entry));
 	    }
 	    else
 	    {
+		nlohmann::json entry;
+		entry["page"] = it.first;
+		std::string val = "";
+
 		for(auto const &inner : it.second)
 		{
-		    nlohmann::json entry;
-		    entry["page"] = it.first;
-		    entry["word"] = glambda(inner,"\"","\\\"");
-		    js["books"].push_back(std::move(entry));	
+		    if(val!="")
+			val+=",";
+		    val += glambda(inner,"\"","\\\"");
 		}
+
+		entry["words"] = val;
+		js["books"].push_back(std::move(entry));	
 	    }
 	}
 	resp.set_content(js.dump(),"application/json");

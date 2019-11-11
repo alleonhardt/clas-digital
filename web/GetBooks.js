@@ -1,355 +1,311 @@
-class Server {
-	static Get(filename, okCallback, errorCallback) {
-		let sendRequest = new XMLHttpRequest();
-		sendRequest.open("GET", filename, true);
-		sendRequest.onreadystatechange = () => {
-			if(sendRequest.readyState == 4) {
-				if(sendRequest.status == 200) {
-					okCallback(sendRequest.responseText);
-				} else {
-					errorCallback(sendRequest.responseText);
-				}
-			}
-		}
-		sendRequest.send(null);
-
+function ServerGet(filename, okCallback, errorCallback) {
+    let sendRequest = new XMLHttpRequest();
+    sendRequest.open("GET", filename, true);
+    sendRequest.onreadystatechange = () => {
+	if(sendRequest.readyState == 4) {
+	    if(sendRequest.status == 200) {
+		okCallback(sendRequest.responseText);
+	    } else {
+		errorCallback(sendRequest.responseText);
+	    }
 	}
+    }
+    sendRequest.send(null);
+
 }
 
-let gUpdateInterval = 400;
-class PageLoader {
-	constructor() {
-		this.queue = new Array();
-	}
+let gOCRLoaded = false;
+let gHitsLoaded = false;
+let gOcrSplittedFile = null;
+let gPageLayoutFile = null;
 
-
-	queuePage(pageNode) {
-		console.log("queuePage called for: " + pageNode.info);
-		if(this.queue.length > 0) {
-			this.queue.unshift(pageNode);
-		} else {
-			this.loadPage(pageNode);
-		}
-	}
-
-	checkQueue() {
-		if(this.queue.length > 0) {
-			this.loadPage(queue.shift());
-		}
-
-		if(this.queue.length > 5)
-			this.queue.splice(5);
-	}
-
-	deferedCheckQueue() {
-		if(this.queue.length > 0)
-			window.setTimeout(this.checkQueue.bind(this), 50);
-	}
-
-	loadPage(pageNode) {
-		console.log("loadPage called for: " + pageNode.info);
-
-		pageNode.classList.remove("placeholder");
-		let img = document.createElement("img");
-		img.src = pageNode.scanFilePath;
-		img.id = "uniqueImageId"+(pageNode.info+1);
-		img.classList = "findImg";
-		img.page = pageNode.info;
-		img.onload = function() {
-			let scrollPosition = document.getElementById("thepagereader").scrollTop;
-			pageNode.replaceChild(img, pageNode.querySelector("svg"));
-			document.getElementById("thepagereader").scrollTop = scrollPosition; //Restore scroll position
-			this.deferedCheckQueue();
-		}.bind(this);
-		img.onerror = function() {
-			if(pageNode.first_try ===undefined)
-			{
-				pageNode.scanFilePath = "/404.jpeg";
-				pageNode.first_try = false;
-				this.loadPage.bind(this)(pageNode);
-			}
-		}.bind(this);
-	}
-}
-
-let pageLoader = new PageLoader(); 
-let pageVal = [];
-function getVisiblePages()
+function CorrectedScrollIntoView(elem)
 {
-	let allPages = document.querySelectorAll("div.page");
-
-	let visiblePages = new Array();
-	for(let i = 0; i < allPages.length; i++) {
-		if(isElementInViewport(allPages[i])) {
-			visiblePages.push(allPages[i]);
-		}
-	}
-	return(visiblePages);
+    let rect = document.getElementsByClassName("topnav")[0].getBoundingClientRect();
+    window.scrollTo(0,elem.offsetTop-(rect.bottom+50));
 }
 
-function getVisiblePagesOCR()
+function HighlightHitsAndConstructLinkList()
 {
-	let allPages = document.getElementsByClassName("ocrpage");
-	let visiblePages = new Array();
-	for(let i = 0; i < allPages.length; i++) {
-		if(isElementInViewport2(allPages[i])) {
-		    visiblePages.push(allPages[i]);
-		}
-	}
+    let hitlist = document.getElementById("fullsearchhitlist").hitsloaded;
 
-	console.log(visiblePages[0]);
-	return(visiblePages);
-}
+    let ulhitlst = document.getElementById("fullsearchhitlist");
+    ulhitlst.innerHTML = "";	//Delete hits if there are any
 
+    if(hitlist && hitlist.books)
+    {
+	let HighlightList = [];
+	if(hitlist.is_fuzzy==false)
+	    HighlightList = getParameterByName('query').split('+');
 
-function updateAfterScroll() {
-	let visiblePages = getVisiblePages();
-
-	for(let i = 0; i < visiblePages.length; i++) {
-		if(visiblePages[i].classList.contains("placeholder"))
-			pageLoader.queuePage(visiblePages[i]);
-	}
-
-	if(visiblePages.length > 0 && 
-			visiblePages[visiblePages.length - 1].nextElementSibling != null &&
-			visiblePages[visiblePages.length - 1].nextElementSibling.classList.contains("placeholder"))
+	for(let i = 0; i < hitlist.books.length; i++)
 	{
-		pageLoader.queuePage(visiblePages[visiblePages.length - 1].nextElementSibling);
+	    let link = document.createElement("a");
+
+	    let inner = hitlist.books[i].page;
+	    if(hitlist.is_fuzzy==true)
+	    {
+		inner+="("+hitlist.books[i].words+"); ";
+	    }
+	    else
+		inner+=" ";
+	    link.innerHTML = inner;
+	    link.page = hitlist.books[i].page;
+	    link.classList.add('hitlinkstyle');
+	    link.onclick = function() {
+		CorrectedScrollIntoView(document.getElementById("uniquepageid"+hitlist.books[i].page));
+		link.style.color = "purple";
+	    }
+
+	    ulhitlst.appendChild(link);
+
+	    if(hitlist.is_fuzzy)
+	    {
+		HighlightList = hitlist.books[i].words.split(",");
+	    }
+
+	    for(let x = 0; x < HighlightList.length; x++)
+	    {
+		let thpage = document.getElementById("uniqueocrpage"+hitlist.books[i].page);
+		if(thpage!=null)
+		    thpage.innerHTML=thpage.innerHTML.replace(new RegExp('('+HighlightList[x].replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')+')','gi'),'<mark>$1</mark>');
+	    }
 	}
-}
-
-function isElementInViewport (el) {
-	var rect = el.getBoundingClientRect();
-	
-	// it's definitely outside if bottom < 0
-	if(rect.bottom <= 0)
-		return(false);
-	if(rect.top > window.innerHeight)
-		return(false);
-
-	return(true);
-}
-
-function isElementInViewport2(el) {
-	var rect = el.getBoundingClientRect();
-	var optsrect = document.getElementById("SearchOpts").getBoundingClientRect();
-	
-	// it's definitely outside if bottom < 0
-	if(rect.bottom <= 0)
-		return(false);
-	if(rect.top > document.getElementById("OCRBuffer").clientHeight)
-		return(false);
-	if(rect.bottom<(optsrect.bottom+90))
-		return(false);
-	return(true);
-
-}
-
-function parseURLParams(url) {
-	let parser = document.createElement('a');
-	parser.href = url;
-
-	let searchObject = {};
-	let queries = parser.search.replace(/^\?/, '').split('&');
-	for(let i = 0; i < queries.length; i++ ) {
-		let split = queries[i].split('=');
-		searchObject[split[0]] = split[1];
-	}
-	
-	return(searchObject);
-}
-
-function doAdditionalSearch() {
-	let parsedUrlParams = parseURLParams(window.location.href);
-	window.open("/GetBooks?query="+document.getElementById("adSrch").value+"&scanId="+parsedUrlParams['scanId']+"&fuzzyness="+parsedUrlParams['fuzzyness']);
-
-}
-
-
-function GetOCRTxt() {
-				return new Promise(function(resolve,reject){
-				
-			    let parsedUrlParams = parseURLParams(window.location.href);
-				Server.Get("/books/"+parsedUrlParams['scanId']+"/ocr.txt",function(content) {
-			    
-				content = content.replace(new RegExp("<",'g'),"&lt;");
-				content = content.replace(new RegExp(">",'g'),"&gt;");
-
-				let RegSrch = /-----\s(\d+)\s.\s(\d+)\s-----/g;
-				content = '<p data-page="1" id="uniqueocrpage0" class="ocrpage">' + content;
-				content = content.replace(RegSrch,'</p><p data-page="$1" id="uniqueocrpage$1" class="ocrpage" ondblclick="SwitchToPage(this);"> Page $1 / $2 <br/>');
-				content+="</p>";	
-				document.getElementById("OCRBuffer").innerHTML = content;
-				if(location.hash!="")
-				{
-				    document.getElementById("uniqueocrpage"+location.hash.substr(5)).scrollIntoView();
-				}
-				resolve(10);
-
-							},function(content){document.getElementById("OCRBuffer").innerHTML = "Could not load ocr file, sorry for that...";});
-							});
-}
-
-function SwitchToPage(x)
-{
-    let val = document.getElementById("uniqueDivId"+x.dataset.page);
-    let vspg = getVisiblePages();
-    let fnc = this.onscroll;
-    this.onscroll = null;
-    if(vspg.indexOf(val)==-1)
-    {
-	if(val != null)
-	    val.scrollIntoView();
-	else
-	    document.getElementById("uniquePageNode"+x.dataset.page).scrollIntoView();
-    if(window.history.replaceState)
-    {
-	let newurl = window.location.search;
-	newurl+="#page"+x.dataset.page;
-	window.history.replaceState({},null,newurl);
     }
+    if(location.hash=="")
+    {
+	CorrectedScrollIntoView(document.getElementById("uniquepageid"+hitlist.books[0].page));
     }
-    this.onscroll = fnc;
-}
-
-
-let metadata = {};
-
-let globalScrollLock = false;
-function getParameterByName(name, url) {
-//COPYRIGHT TO https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
-	if (!url) url = window.location.href;
-    name = name.replace(/[\[\]]/g, '\\$&');
-    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
-        results = regex.exec(url);
-    if (!results) return null;
-    if (!results[2]) return '';
-    return decodeURIComponent(results[2].replace(/\+/g, ' '));
+    else
+    {
+	CorrectedScrollIntoView(document.getElementById("uniquepageid"+location.hash.substr(5)));
+    }
 }
 
 function UpdateLinkPrev()
 {
-	    let val = document.getElementsByClassName("coollnklist");
-	    let page = window.location.hash.substr(5);
-	    if(page=="")
-		page=0;
-	    else
-		page=parseInt(page);
-	    for(let i = 0; i < val.length; i++)
-	    {
-		if(page<=val[i].dataset.page)
-		{
-		    val[i].scrollIntoView();
-		    val[i].scrollLeft += "100";
-		    if(document.getElementById("SearchOpts").classList.contains("secondoptioncontlay"))
-			document.getElementById("SearchOpts").scrollTop = 0;
-		    return;
-		}
-
-	    }
-}
-
-function triggerDblclick(x)
-{
-    var event = new MouseEvent('dblclick', {
-    'view': window,
-    'bubbles': true,
-    'cancelable': true
-  });
-    x.dispatchEvent(event);
-}
-
-function srchbarlosefocus()
-{
-										    
-    document.getElementById("fuzzysuggestions").style.display = 'none';
-}
-
-async function DoFuzzyMatching(x)
-{
-    let value = document.getElementsByClassName("ocrpage");
-    let results = 0;
-    let suggestions = document.getElementById("fuzzysuggestions");
-    suggestions.style.visibility = 'visible';
-    suggestions.innerHTML = '';
-
-    for(let i = 0; i < value.length; i++)
+    let val = document.getElementsByClassName("hitlinkstyle");
+    let page = window.location.hash.substr(5);
+    if(page=="")
+	page=0;
+    else
+	page=parseInt(page);
+    for(let i = 0; i < val.length; i++)
     {
-	let strval = value[i].innerHTML;
-	let res = strval.match(new RegExp('.{0,30}('+x+').{0,30}','gi'));
-	if(res==null)
-	    continue;
-	for(let i2 = 0; i2 < res.length; i2++)
+	if(page<=val[i].page)
 	{
-	    results+=1;
-	    res[i2] = res[i2].replace(new RegExp('('+x+')','gi'),'<mark>$1</mark>');
-
-	    let a = document.createElement("a");
-	    a.innerHTML = res[i2]+"<span style='font-weight: bold;float:right;margin-left: 0.8rem;'> S."+i+"</span>";
-	    a.page = i;
-	    a.word = x;
-	    a.result = results-1;
-	    a.tabIndex = 0;
-	    a.classList.add("fuzzysugslink");
-	    a.onclick = function(){
-		let page = document.getElementById("uniqueocrpage"+this.page);
-		page.innerHTML = page.innerHTML.replace(new RegExp('('+this.word+')','gi'),'<mark>$1</mark>');
-		page.scrollIntoView();
-		document.getElementById("fuzzysuggestions").style.visibility = 'hidden';
-	    }
-
-	    a.onmouseover = function() {
-		    let sugg = document.getElementById("fuzzysuggestions");
-		    let lnks = document.getElementsByClassName("fuzzysugslink");
-		    let value = sugg.selec;
-		    if(value!=undefined)
-			lnks[value].style.background = "";
-		    a.style.background = "#ddd";
-		    sugg.selec = a.result;
-	    }
-
-	    suggestions.appendChild(a);
-	    if(results>9)
-	    {
-		console.log(results);
-		return;
-	    }
+	    val[i].scrollIntoView();
+	    return;
 	}
     }
 }
 
-function doCompleteNewSearch()
+function loadOCRFile(ocrtxt)
 {
-    let newurl = "/GetBooks.html?query="+document.getElementById("srchbox").value+"&scanId="+getParameterByName("scanId")+"&fuzzyness="+getParameterByName('fuzzyness');
-    window.location = newurl;
+    ocrtxt = ocrtxt.replace(new RegExp("<",'g'),"&lt;");
+    ocrtxt = ocrtxt.replace(new RegExp(">",'g'),"&gt;");
+
+    let RegSrch = /-----\s\d+\s.\s\d+\s-----/g;
+    gOcrSplittedFile = ocrtxt.split(RegSrch);
+    gOcrSplittedFile.shift();
+    console.log("SPLIT length: "+gOcrSplittedFile.length);
+    //Pagelayout file loaded yet? Then construct the pages
+    if(gPageLayoutFile!=null)
+	CreatePageLayout();
 }
 
-let gCurrentFocus = 'ocr';
-let gCurrentTimer;
-
-function sync_pages()
+function CreatePageLayout()
 {
-	    let val;
-	    if(gCurrentFocus=='ocr')
-		val = getVisiblePagesOCR();
-	    else
-		val = getVisiblePages();
-	    triggerDblclick(val[0])
+    console.log("OCR size: "+gOcrSplittedFile.length);
+    console.log("Pages size: "+gPageLayoutFile.pages.length);
+    for(let i = 0; i < gOcrSplittedFile.length; i++)
+    {
+	let x = document.createElement("p");
+	let cont = document.createElement("div");
+	let ocrcont = document.createElement("div");
+	let anchor = document.createElement("a");
+	anchor.id = "page"+(i+1);
+
+	ocrcont.classList.add("ocrcontainer");
+
+	cont.classList.add('pagecontainer');
+	cont.id = "uniquepageid"+(i+1);
+	x.innerHTML = gOcrSplittedFile[i]+"<br/><b style='float: right;'>"+(i+1)+"/"+gOcrSplittedFile.length+"</b>";
+	x.id = "uniqueocrpage"+(i+1);
+	x.classList.add('ocrpage');
+	ocrcont.appendChild(anchor);
+	ocrcont.appendChild(x);
+	cont.appendChild(ocrcont);
+	cont.pageNumber = (i+1);
+
+	document.body.appendChild(cont);
+    }
+
+    for(let i = 0; i < gPageLayoutFile.pages.length; i++)
+    {
+	let doc = document.getElementById("uniquepageid"+gPageLayoutFile.pages[i].pageNumber);
+	if(doc==null)
+	{
+	    console.log("Found page without ocr! At : "+gPageLayoutFile.pages[i].pageNumber);
+	    continue;
+	}
+
+	let svgcode = "<svg class='svgpage' data-width='"+gPageLayoutFile.pages[i].width+"' data-height='"+gPageLayoutFile.pages[i].height+"' data-path='"+"/books/"+getParameterByName('scanId')+ "/" + gPageLayoutFile.pages[i].file.substr(gPageLayoutFile.pages[i].file.search("page"))+"' viewBox='0 0 "+gPageLayoutFile.pages[i].width+" "+gPageLayoutFile.pages[i].height+"'><rect x='0' y='0' width='100%' height='100%'/></svg>";
+
+	doc.innerHTML +=svgcode;
+    }
+
+    let timer = null;
+    let currentSize = document.getElementsByClassName("topnav")[0].getBoundingClientRect().bottom;
+    document.body.onscroll = function() {
+	let gNewSize = document.getElementsByClassName("topnav")[0].getBoundingClientRect().bottom;
+	if(currentSize!=gNewSize)
+	{
+	    console.log("Resizing ocrs top value!");
+	    let lst = document.getElementsByClassName("ocrpage");
+	    for(let i = 0; i < lst.length; i++)
+		lst[i].style.top = (gNewSize+17)+"px";
+	    currentSize = gNewSize;
+	}
+
+	if(timer)
+	{
+	    window.clearTimeout(timer);
+	}
+
+	timer = window.setTimeout(function(){
+	    let arr = isPageVisible('svgpage');
+
+	    if(window.history.replaceState)
+	    {
+		let kk = isPageVisible('pagecontainer');
+		if(kk.length>0)
+		{
+		    let newurl = window.location.search;
+		    newurl+="#page"+kk[0].pageNumber;
+		    window.history.replaceState({},null,newurl);
+		}
+	    }
+
 	    UpdateLinkPrev();
-	    updateAfterScroll();
+	    for(let i = 0; i < arr.length; i++)
+	    {
+		let img = document.createElement("img");
+		img.style.width = arr[i].dataset.width;
+		img.style.height = arr[i].dataset.height;
+		img.classList.add('imgpage');
+		img.src=arr[i].dataset.path;
+		img.onload = function(){
+		    let x = document.body.scrollTop;
+		    arr[i].parentElement.replaceChild(img,arr[i]);
+		    document.body.scrollTop = x;
+		}
+	    }
+	},400);
+    }
+
+    if(gHitsLoaded)
+	HighlightHitsAndConstructLinkList();
+    gOCRLoaded = true;
+}
+
+function isPageVisible(whatisvis)
+{
+    let allPages = document.getElementsByClassName(whatisvis);
+
+    let visiblePages = new Array();
+    for(let i = 0; i < allPages.length; i++) {
+	if(isElementInViewport(allPages[i])) {
+	    visiblePages.push(allPages[i]);
+	}
+    }
+    return(visiblePages);
+}
+
+function isElementInViewport (el) {
+    var rect = el.getBoundingClientRect();
+    var optsrect = document.getElementsByClassName("topnav")[0].getBoundingClientRect();
+
+    // it's definitely outside if bottom < 0
+    if(rect.bottom <= 0)
+	return(false);
+    if(rect.top > window.innerHeight)
+	return(false);
+    if(rect.bottom<(optsrect.bottom+90))
+	return(false);
+    return(true);
 }
 
 
-function init() {
-	    document.getElementById("srchbox").innerHTML = getParameterByName('query');
-	    document.getElementById("srchbox").addEventListener("input",function(event) {
-		document.getElementById("fuzzysuggestions").selec = undefined;
-		if(document.getElementById("srchbox").value=="")
-		    return;
-		DoFuzzyMatching(document.getElementById("srchbox").value);
-	    });
+function loadOCRFileError(errortext)
+{
+    document.getElementById("uniqueocrpage0").innerHTML = "Could not load ocr file sorry for this :(";
+}
 
-	    document.getElementById("srchbox").addEventListener("keydown",function(event){
+function loadMetadataFile(metadatatxt)
+{
+    let json = JSON.parse(metadatatxt);
+    document.getElementById("bibliography").innerHTML = json.bib;
+    if(json.data.creators.length>0)
+	document.title = json.data.creators[0].lastName+" ("+json.data.date+"). "+json.data.title;
+}
+
+function loadMetadataFileError(errortxt)
+{
+    document.getElementById("bibliography").innerHTML = "Could not load metadata sorry for that :(";
+}
+
+function loadPageLayoutFile(layout)
+{   
+    gPageLayoutFile = JSON.parse(layout);
+    //OCR loaded and splitted yet? Then start building the page!
+    if(gOcrSplittedFile!=null)
+	CreatePageLayout();
+}
+
+function loadPageLayoutFileError(errortxt)
+{
+    document.getElementById("bookpageimagcontainer").innerHTML = "Could not load image layout sorry for that :(";
+}
+
+function highlightHitsAndLoadHitlistError(text)
+{
+    document.getElementById("fullsearchhitlist").innerHTML = "<li>Could not load hit list sorry for that</li>";
+    document.getElementById("fullsearchhitlist").hitsloaded = null;
+    if(gOCRLoaded)
+	HighlightHitsAndConstructLinkList();
+    gHitsLoaded = true;
+}
+
+function highlightHitsAndLoadHitlist(hits)
+{
+    let searchhits = JSON.parse(hits);
+    document.getElementById("fullsearchhitlist").hitsloaded = searchhits;
+    if(gOCRLoaded)
+	HighlightHitsAndConstructLinkList();
+    gHitsLoaded = true;
+}
+
+function initialise()
+{
+    let scanId = getParameterByName('scanId');
+    let query = getParameterByName('query');
+    let fuzzyness = getParameterByName('fuzzyness');
+
+    ServerGet("/books/"+scanId+"/ocr.txt", loadOCRFile,loadOCRFileError);
+    ServerGet("/books/"+scanId+"/info.json",loadMetadataFile,loadMetadataFileError);
+    ServerGet("/books/"+scanId+"/readerInfo.json",loadPageLayoutFile,loadMetadataFileError);
+    ServerGet("/searchinbook?scanId="+scanId+'&query='+encodeURIComponent(query)+'&fuzzyness='+fuzzyness,highlightHitsAndLoadHitlist,highlightHitsAndLoadHitlistError);
+
+    document.getElementById("srchbox").oninput = function() {
+	DoFuzzyMatching(this.value);
+    }
+    document.getElementById('srchbox').addEventListener("focusout", function(event){
+	if(event.relatedTarget)
+	    event.relatedTarget.click();
+	document.getElementById("fuzzysuggestions").style.visibility="hidden";
+	document.getElementById("fuzzysuggestions").selec = undefined;});
+	document.getElementById("srchbox").addEventListener("keydown",function(event){
 			let x = document.getElementById("srchbox").value;
 			let k = document.getElementById("fuzzysuggestions").selec;
 			if(k==undefined)
@@ -384,202 +340,33 @@ function init() {
 			    document.getElementById("fuzzysuggestions").selec = k;
 			}
 		});
-    document.getElementById('searchboxstuff').addEventListener("focusout", function(event){if(event.relatedTarget)event.relatedTarget.click();console.log(event.relatedTarget);document.getElementById("fuzzysuggestions").style.visibility="hidden";document.getElementById("fuzzysuggestions").selec = undefined;});
-    
-    document.getElementById("thepagereader").onscroll = function() {
-	    gCurrentFocus = 'page';
-	    if(gCurrentTimer)
-	    {
-		window.clearTimeout(gCurrentTimer);
-	    }
-	    gCurrentTimer = window.setTimeout(sync_pages,gUpdateInterval);
-	}
-
-    document.getElementById("OCRBuffer").onscroll = function() {
-	    gCurrentFocus = 'ocr';
-	    if(gCurrentTimer)
-	    {
-		window.clearTimeout(gCurrentTimer);
-	    }
-	    gCurrentTimer = window.setTimeout(sync_pages,gUpdateInterval);
-	}
-
-	let parsedUrlParams = parseURLParams(window.location.href);
-	let scanId = parsedUrlParams['scanId'];
-	document.getElementById("bookinfo").href = "/ShowMetadata.html?scanId="+scanId;
-	let waitforocr = GetOCRTxt();
-	
-	Server.Get("/books/" + scanId+"/readerInfo.json", function(content) {
-		let scanInfo = JSON.parse(content);
-		
-		scanInfo.pages.sort(function(a, b) {
-			return(a.pageNumber - b.pageNumber);
-		});
-		for(let i = 0; i < scanInfo.pages.length; i++) {
-			let svgCode = "<svg viewBox='0 0 " + 
-				scanInfo.pages[i].width + " " + 
-				scanInfo.pages[i].height + "'/>";
-
-			let pageNode = document.createElement("div");
-			pageNode.innerHTML = svgCode;
-			pageNode.width_x = scanInfo.pages[i].width;
-			pageNode.height_y = scanInfo.pages[i].height;
-			pageNode.pageNumber = scanInfo.pages[i].pageNumber;
-			pageNode.id = "uniqueDivId"+scanInfo.pages[i].pageNumber;
-		    pageNode.ondblclick = function(){
-		    console.log(this.pageNumber);
-		    let page = document.getElementById("uniqueocrpage"+this.pageNumber);
-		    let vspg = getVisiblePagesOCR();
-		    if(vspg.indexOf(page)==-1)
-		    {
-			let fnc = this.onscroll;
-			this.onscroll = null;
-			page.scrollIntoView();
-			if(window.history.replaceState)
-			{
-			    let newurl = window.location.search;
-			    newurl+="#page"+this.pageNumber;
-			    window.history.replaceState({},null,newurl);
-			}
-			this.onscroll = fnc;
-		    }
-		    };
-			pageNode.classList.add("page");
-			pageNode.classList.add("placeholder");
-			let anchorNode = document.createElement("a");
-			anchorNode.name = "page" + scanInfo.pages[i].pageNumber;
-			anchorNode.id = "uniquePageNode"+scanInfo.pages[i].pageNumber;
-			pageNode.insertBefore(anchorNode,pageNode.firstChild);
-			document.querySelector(".reader").appendChild(pageNode);
-			pageNode.scanFilePath = "/books/"+scanId+ "/" + scanInfo.pages[i].file.substr(scanInfo.pages[i].file.search("page"));
-			pageNode.info = i;
-		}
-
-	    Server.Get("/getmetadata?scanId=" + scanId, function(content) {
-		metadata = JSON.parse(content);
-		    document.getElementById("biblio").innerHTML = metadata.bib;
-		console.log(metadata.data.creators);
-		if(metadata.data.creators.length>0)
-		    document.title = metadata.data.creators[0].lastName+" ("+metadata.data.date+"). "+metadata.data.title;
-	}, function() {
-		// print some error message here
-	});
 
 
-		if(location.hash)
-			location.hash = location.hash;
-
-		updateAfterScroll();
-	}, function() {
-		document.getElementById("linklst").innerHTML = "Could not load images, sorry for that :(";
-	});
-	
-	if(!parsedUrlParams.hasOwnProperty("query"))
-		return;
-
-	parsedUrlParams["query"] = decodeURIComponent(parsedUrlParams["query"]);
-		
-	Server.Get("/searchinbook?scanId=" + scanId + "&query=" + encodeURIComponent(parsedUrlParams["query"].replace(' ','+'))+"&fuzzyness="+encodeURIComponent(parsedUrlParams["fuzzyness"]), function(content) {
-		let searchResults = JSON.parse(content);
-		// temporary needed
-		searchResults.pages = searchResults.books;
-
-        if(searchResults.pages != undefined)
-        {
-		waitforocr.then(function(vwhatyever){
-		
-		if(searchResults.is_fuzzy === false)
-		{
-			
-		  let pagesList = [];
-		  let HighlightList = parsedUrlParams["query"].split("+");
-		  for(let i = 0; i < searchResults.pages.length; i++)
-		  	pagesList.push(searchResults.pages[i]);
-		  pagesList = pagesList.filter((v, i, a) => a.indexOf(v) === i); 
-
-		  let resultLinks = "";
-		  for(let i = 0; i < pagesList.length; i++) {
-			resultLinks = resultLinks + " " + "<a class='coollnklist' onclick='document.getElementById(\"uniqueocrpage"+pagesList[i]+"\").scrollIntoView();triggerDblclick(document.getElementById(\"uniqueocrpage"+pagesList[i]+"\"));changecolor(this);return true;' data-page='"+pagesList[i]+"'>" + pagesList[i] + "</a>";
-
-			for(let y = 0; y < HighlightList.length; y++)
-			{
-				//TODO: Search Dieter with full search and get the results to be highlighted....
-				console.log("show me what: "+HighlightList[y]);
-				let strts = document.getElementById("uniqueocrpage"+pagesList[i]).innerHTML;
-				document.getElementById("uniqueocrpage"+pagesList[i]).innerHTML=strts.replace(new RegExp('\\b'+HighlightList[y]+'\\b','gi'),' <mark>'+HighlightList[y]+'</mark> ');
-			}
-		  }
-
-		
-		  document.getElementById("linklst").innerHTML = resultLinks;
-		}
-		else
-		{
-		    let resultLinks = document.getElementById("linklst"); 
-		  resultLinks.innerHTML = "";
-		  for( let i = 0; i < searchResults.pages.length; i++)
-		  {
-			  let isok = document.getElementById("pageHitList"+searchResults.pages[i].page);
-			  if(isok != null)
-			  {
-				  isok.innerHTML += ", "+searchResults.pages[i].word;
-			  }
-			  else
-			  {
-										   resultLinks.innerHTML = resultLinks.innerHTML + " " + "<a class='coollnklist' onclick='document.getElementById(\"uniqueocrpage"+searchResults.pages[i].page+"\").scrollIntoView();triggerDblclick(document.getElementById(\"uniqueocrpage"+searchResults.pages[i].page+"\"));changecolor(this);return true;' data-page='"+searchResults.pages[i].page+"'>" + searchResults.pages[i].page + "("
-				  + "<span id='pageHitList"+searchResults.pages[i].page +"'>"					 
-				  + searchResults.pages[i].word + "</span>);</a>";
-			  }
-			let thpage = document.getElementById("uniqueocrpage"+searchResults.pages[i].page);
-			thpage.innerHTML=thpage.innerHTML.replace(new RegExp('(\\b'+searchResults.pages[i].word.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')+'\\b)','gi'),'<mark>$1</mark>');
-		  }
-		}
-		if(location.hash=="")
-		    document.getElementsByClassName("coollnklist")[0].click();
-	});
-							      }}, function() {
-		document.getElementById("linklst").innerHTML = "Could not load hit list :(";
-
-	});
+    let kk;
+    function resize(e) {
+	const d_y = e.y-kk;
+	kk = e.y;
+	console.log(d_y);
+	let topnav = document.getElementsByClassName("topnav")[0];
+	let resizer = document.getElementsByClassName("resizer")[0];
+	console.log((parseInt(getComputedStyle(topnav, '').height) + d_y) + "px");
 
 
-}
-
-
-window.addEventListener("load", init, false);
-let insideWindow = false;
-function changecolor(x)
-{
-    x.setAttribute('style','cursor: pointer;color: purple !important');
-    shownone(document.getElementById("SearchOpts"));
-}
-
-function shownone(x)
-{
-    if(x.classList.contains("currentoptioncontlay"))
-    {
-	document.getElementById("linklst").style["white-space"] = "nowrap";
-	document.getElementById("upimg").style.display = "none";
-	document.getElementById("downimg").style.display = "block";
-	document.getElementById("divdrop").onclick = function(){showall(document.getElementById("SearchOpts"));};
-	x.classList.replace("currentoptioncontlay","secondoptioncontlay");
+	topnav.style.height = (parseInt(getComputedStyle(topnav, '').height) + d_y) + "px";
+	resizer.style.top = (parseInt(getComputedStyle(resizer, '').top) + d_y) + "px";
     }
-    x.scrollTop = 0;
-    UpdateLinkPrev();
+
+
+    document.getElementsByClassName("resizer")[0].addEventListener("mousedown",function(e) {
+	document.addEventListener("mousemove",resize,false);
+	kk = e.y;
+    }, false);
+    document.addEventListener("mouseup", function(){
+    document.removeEventListener("mousemove", resize, false);
+}, false);
 }
 
-function showall(x)
-{
-    if(x.style.height != "40vh")
-    {
-	if(x.classList.contains("secondoptioncontlay"))
-	    x.classList.replace("secondoptioncontlay","currentoptioncontlay");
-	document.getElementById("linklst").style["white-space"] = "normal";
-	document.getElementById("divdrop").onclick = function(){shownone(document.getElementById("SearchOpts"));};
-	document.getElementById("upimg").style.display = "block";
-	document.getElementById("downimg").style.display = "none";
-    }
-}
+
 
 function SelectLastHit()
 {
@@ -590,13 +377,13 @@ function SelectHit(direction)
 {
     let curr = window.location.hash;
     let integer = parseInt(curr.substr(5));
-    let lnks = document.getElementsByClassName("coollnklist");
+    let lnks = document.getElementsByClassName("hitlinkstyle");
 
     if(direction==false)
     {
 	for(let i = lnks.length-1; i > -1; i--)
 	{
-	    if(parseInt(lnks[i].dataset.page) < integer)
+	    if(parseInt(lnks[i].page) < integer)
 	    {
 		lnks[i].click();
 		return;
@@ -610,7 +397,7 @@ function SelectHit(direction)
     {
 	for(let i = 0; i < lnks.length; i++)
 	{
-	    if(parseInt(lnks[i].dataset.page) > integer)
+	    if(parseInt(lnks[i].page) > integer)
 	    {
 		lnks[i].click();
 		return;
@@ -627,3 +414,57 @@ function SelectNextHit()
     SelectHit(true);
 }
 
+function DoFuzzyMatching(x)
+{
+    if(x=="")
+	return;
+
+    let value = document.getElementsByClassName("ocrpage");
+    let results = 0;
+    let suggestions = document.getElementById("fuzzysuggestions");
+    suggestions.style.visibility = 'visible';
+    suggestions.innerHTML = '';
+
+    for(let i = 0; i < value.length; i++)
+    {
+	let strval = value[i].innerHTML;
+	let res = strval.match(new RegExp('.{0,30}('+x+').{0,30}','gi'));
+	if(res==null)
+	    continue;
+	for(let i2 = 0; i2 < res.length; i2++)
+	{
+	    results+=1;
+	    res[i2] = res[i2].replace(new RegExp('('+x+')','gi'),'<mark>$1</mark>');
+
+	    let a = document.createElement("a");
+	    a.innerHTML = res[i2]+"<span style='font-weight: bold;float:right;margin-left: 0.8rem;'> S."+(i+1)+"</span>";
+	    a.page = i+1;
+	    a.word = x;
+	    a.result = results-1;
+	    a.tabIndex = 0;
+	    a.classList.add("fuzzysugslink");
+	    a.onclick = function(){
+		let page = document.getElementById("uniqueocrpage"+this.page);
+		page.innerHTML = page.innerHTML.replace(new RegExp('('+this.word+')','gi'),'<mark>$1</mark>');
+		CorrectedScrollIntoView(document.getElementById("uniquepageid"+this.page));
+		document.getElementById("fuzzysuggestions").style.visibility = 'hidden';
+	    }
+
+	    suggestions.appendChild(a);
+	    if(results>9)
+	    {
+		console.log(results);
+		return;
+	    }
+	}
+    }
+    if(results==0)
+	suggestions.style.visibility = 'hidden';
+
+}
+
+function doCompleteNewSearch()
+{
+    let newurl = "/GetBooks.html?query="+document.getElementById("srchbox").value+"&scanId="+getParameterByName("scanId")+"&fuzzyness="+getParameterByName('fuzzyness');
+    window.location = newurl;
+}

@@ -1,193 +1,135 @@
-.coollnklist {
-    cursor: pointer;
-    color: blue !important;
-}
-.srchbtn {
-      border: none; /* Remove borders */
-      color: grey; /* White text */
-      /* padding: 12px 16px; Some padding */
-      font-size: 16px; /* Set a font size */
-      cursor: pointer; /* Mouse pointer on hover */
-      border-radius: 50%;
-}
-
-.reader {
-	display: inline-grid;
-	grid-column: 1 / span 1;
-	grid-row: 1;
-	width: 100%;
-	background-color: grey;
-	overflow: scroll;
-	margin: 0;
-	top: 1rem;
-	padding: 0;
-}
-
-mark {
-    background: yellow;
-    margin: 0;
-    padding: 0;
-}
-
-.page {
-margin: 0;
-margin-top: 3rem;
-padding: 1rem;
-padding-top: 1rem;
-padding-bottom: 0.8rem;
-padding-right: 0;
-}
-
-.pagelayout {
-    font-weight: bold;
-    float: left;
-}
-
-.page:first-child {
-	padding-top: 1rem;
-}
-
-.page img, .page svg {
-	width: 98%;
-}
-
-.LinkListClass a {
-	color: blue;
-}
-
-.page svg {
-	background-repeat: no-repeat;
-	background-position: center center;
-	background-color: lightgrey;
-	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'  viewBox='0 0 100 150'%3E%3Ccircle cx='50' cy='50' fill='none' stroke='darkgrey' stroke-width='6' r='25'/%3E%3Ccircle cx='50' cy='50' fill='none' stroke='steelblue' stroke-width='6' r='25' stroke-dasharray='40px 200px'%3E%3CanimateTransform attributeName='transform' type='rotate' calcMode='linear' values='0 50 50;360 50 50' keyTimes='0;1' dur='3s' begin='0s' repeatCount='indefinite'%3E%3C/animateTransform%3E%3C/circle%3E%3C/svg%3E");
-	     background-size: 200px 200px;
-}
-
-.page .placeholder {
-	background-color: white;
-}
-
-
-#scanBibInfo {
-	color: steelblue;
-}
-
-.hideContent {
-	display: none !important;
-}
-
-.pageContainer {
-	display: grid;
-	position: fixed;
-	top: 0;
-	left: 0;
-	height: 100vh;
-	width: 100%;
-	grid-template-columns: 60% 40%;
-	grid-column-gap: 1%;
-	background-color: grey;
-	overflow:hidden;
-}
-
-.optioncont {
-    top:0;
-    left: 60vw;
-    width: calc(40vw - 17px);
-    position: fixed;
-    margin: 0;
+body {
+    background: grey;
     padding: 0.5rem;
-    background-color: white;
-    overflow: scroll;
 }
 
-.ocrdispstyle {
-	display:block;
-	width: 100%;
-	margin: 0;
-	padding-right: 0;
-	background-color: grey;
-	overflow: scroll;
+.searchbox {
+    position: fixed;
+    width: 100%;
+    left: 0;
+    top: 0;
+    height: 3rem;
+    min-height: 2rem;
+    z-index: 3;
+    background: white;
 }
 
-.ocrdispstyle p {
-	display: block;
-	font-size: small;
-	background-color: white;
-	margin-right: 1rem;
-	margin-bottom: 4rem;
-	padding: 2.5rem;
-	text-align: justify;
-	min-height: 350px;
+.topnav {
+    left: 0;
+    position: fixed;
+    height: 1.5rem;
+    top: 3rem;
+    width: 100%;
+    overflow: auto;
+    z-index: 2;
+    background: white;
+    overflow-y: scroll;
 }
 
-.butact {
-	background-color: orange;
-	color: white;
+.resizer {
+    position: fixed;
+    z-index: 2;
+    left: 0;
+    top: 4.5rem;
+    width: 100%;
+    height: 4px;
+    background: black;
+    cursor: s-resize;
 }
 
-
-.butX:hover {
-	background-color: black;
-	color: orange;
+.topnav button {
+    background: white;
+    border: 0;
 }
 
-.linkliststyler {
+.topnav button:hover {
+    border-bottom: 2px solid blue;
+}
+
+.linknav {
+    display: grid;
+    grid-template-columns: 7% 86% 7%;
+}
+
+.lastbutcont {
+    grid-column: 1 /span 1;
+}
+
+.lastbut {
+    position: sticky;
+    top: 0.2rem;
+    margin-left: 1rem;
+    cursor: pointer;
+}
+
+.nextbutcont {
+    grid-column: 3 /span 1;
+}
+
+.nextbut {
+    position: sticky;
+    top: 0.2rem;
+    margin: auto;
+    cursor: pointer;
+}
+
+#fullsearchhitlist {
     grid-column: 2 /span 1;
-    grid-row: 2 / span 1;
-    margin: 0;
-    margin-left: 0.5rem;
-    margin-right: 0.5rem;
-    line-height: 2rem;
-    background-color: white;
-    padding-bottom: 2rem;
-    overflow: scroll;
-    white-space: nowrap;
+    font-size: small;
+    line-height: 1.5rem;
+    overflow-wrap: break-word;
+}
+
+.hitlinkstyle {
+    margin-top: 0.2rem;
+    margin: auto;
+    color: blue;
+    cursor: pointer;
+}
+
+.botpage {
+    background: grey;
+    overflow: auto;
+}
+
+.bibliostyle {
+    color: green;
+}
+
+.pagecontainer {
+    display: grid;
+    width: 100%;
+    grid-template-columns: 58% 40%;
+    grid-column-gap: 2%;
+    margin-top: 4rem;
+}
+
+.ocrcontainer {
+    position: relative;
+    background: white;
+    grid-column: 2 /span 1;
+    grid-row: 1 /span 1;
+    border: 1px solid black;
+    padding: 2.5rem;
+}
+
+.ocrpage {
+    position: sticky;
+    top: 6rem;
     font-size: small;
     text-align: justify;
+    min-height: 350px;
 }
 
-a:visited {
-    color: purple;
+.svgpage {
+    grid-row: 1 /span 1;
+    grid-column: 1 /span 1;
 }
 
-a:active {
-    color: red;
-}
-
-.DropdownClass {
-    margin: auto;
-    display: block;
-}
-
-.DivDropdown {
+.imgpage {
     width: 100%;
-    background-color:white;
-    margin-top:0;
-    cursor: pointer;
-}
-.DivDropdown:hover {
-    background-color: #00FFFF;
-}
-
-.secondoptioncontlay {
-    height: calc(6rem + 17px);
-    transition-timing-function: ease-in-out;
-    transition-duration: 1s;
-}
-.currentoptioncontlay {
-    height: 40vh;
-    transition-timing-function: ease-in-out;
-    transition-duration: 1s;
-    overflow: scroll;
-}
-
-.fuzzysugs {
-	visibility: hidden;
-	position: absolute;
-	z-index: 1;
-	overflow: visible;
-	background-color: #f1f1f1;
-	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    grid-row: 1 /span 1;
+    grid-column: 1 /span 1;
 }
 
 .fuzzysugslink {
@@ -205,11 +147,9 @@ a:active {
     background: yellow;
 }
 
-.fuzzysugs a.fuzzysugslink:hover {
+.fuzzysugslink:hover {
     color: black;
     text-decoration: none;
     text-align: left;
-    background: "#ddd";
+    background-color: #ddd;
 }
-
-
