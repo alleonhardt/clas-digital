@@ -1,5 +1,10 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8)
+if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+    set (CMAKE_INSTALL_PREFIX /etc/clas-digital CACHE PATH whatever FORCE)
+endif()
+
 project(clas-digital)
+
 
 include_directories(
   "src"
@@ -19,10 +24,20 @@ add_executable(clas-digital.o ${SRC_FILES} ${SRC_FILES_BOOKS})
 target_link_libraries(clas-digital.o stdc++fs ${CURL_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries(books.o stdc++fs ${CURL_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
+if(NOT STABLE_INSTALL)
+    set(INSTALL_DIRS /etc/clas-digital-devel)
+    set(SERVICE_TARGET clas-digital-devel)
+else()
+    set(INSTALL_DIRS /etc/clas-digital)
+    set(SERVICE_TARGET clas-digital)
+endif()
+
 
 install(FILES src/clas-digital.service DESTINATION /etc/systemd/system)
-install(FILES bin/cert.pem bin/key.pem DESTINATION /etc/clas-digital/bin)
+install(FILES src/clas-digital-devel.service DESTINATION /etc/systemd/system)
+install(FILES bin/cert.pem bin/key.pem DESTINATION ${INSTALL_DIRS}/bin)
 install(FILES src/default DESTINATION /etc/nginx/sites-available)
-install(PROGRAMS bin/clas-digital.o DESTINATION /etc/clas-digital)
-install(DIRECTORY web DESTINATION /etc/clas-digital PATTERN "web/books/*" EXCLUDE)
-install(CODE "execute_process(COMMAND systemctl daemon-reload COMMAND systemctl restart nginx COMMAND systemctl restart clas-digital)")
+install(PROGRAMS bin/clas-digital.o DESTINATION ${INSTALL_DIRS})
+install(DIRECTORY web DESTINATION ${INSTALL_DIRS} PATTERN "web/books/*" EXCLUDE)
+install(CODE "MESSAGE(\"Installing files done. Restarting nginx and the service ${SERVICE_TARGET}\")")
+install(CODE "execute_process(COMMAND systemctl daemon-reload COMMAND systemctl restart nginx COMMAND systemctl restart ${SERVICE_TARGET})")
