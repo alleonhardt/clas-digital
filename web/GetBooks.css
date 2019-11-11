@@ -15,7 +15,6 @@ body {
 }
 
 .topnav {
-    resize: vertical;
     left: 0;
     position: fixed;
     height: 1.5rem;
@@ -24,8 +23,18 @@ body {
     overflow: auto;
     z-index: 2;
     background: white;
-    border-bottom: 2px solid black;
     overflow-y: scroll;
+}
+
+.resizer {
+    position: fixed;
+    z-index: 2;
+    left: 0;
+    top: 4.5rem;
+    width: 100%;
+    height: 4px;
+    background: black;
+    cursor: s-resize;
 }
 
 .topnav button {
