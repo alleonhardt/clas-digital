@@ -28,7 +28,9 @@ body {
 
 .resizer {
     position: fixed;
+    z-index: 2;
     left: 0;
+    top: 4.5rem;
     width: 100%;
     height: 4px;
     background: black;

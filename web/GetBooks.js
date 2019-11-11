@@ -344,18 +344,26 @@ function initialise()
 
     let kk;
     function resize(e) {
-	const d_y = kk - e.y;
+	const d_y = e.y-kk;
+	kk = e.y;
+	console.log(d_y);
+	let topnav = document.getElementsByClassName("topnav")[0];
+	let resizer = document.getElementsByClassName("resizer")[0];
+	console.log((parseInt(getComputedStyle(topnav, '').height) + d_y) + "px");
 
+
+	topnav.style.height = (parseInt(getComputedStyle(topnav, '').height) + d_y) + "px";
+	resizer.style.top = (parseInt(getComputedStyle(resizer, '').top) + d_y) + "px";
     }
 
 
     document.getElementsByClassName("resizer")[0].addEventListener("mousedown",function(e) {
-	document.getElementsByClassName("resizer")[0].onmouseup = function() {
-	    document.removeEventListener("mousemove", resize, false);
-	}
 	document.addEventListener("mousemove",resize,false);
 	kk = e.y;
     }, false);
+    document.addEventListener("mouseup", function(){
+    document.removeEventListener("mousemove", resize, false);
+}, false);
 }
 
 
