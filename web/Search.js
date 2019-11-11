@@ -153,33 +153,31 @@ function ShowSelectedValues(obj)
             div2.appendChild(aBox);
             newList.appendChild(div2);
             hitList.appendChild(newList);
-
-            /*
-			inner+=json.books[i].description+"</h4></a>   "+"<input onclick='this.was_clicked=1;return true;' class='booklistinp' style='width:1rem;height:1rem;display: inline-grid;grid-column-start:2;grid-column-end:3' data-scanid='"+json.books[i].scanId+"' type='checkbox' unchecked></div>";
-			*/
 	}
 	
-    let val = "<hr><div class='linkcontainer'>";
+    document.getElementById("bottomBorder").style.display="block";
+
+    let val = "";
     let counter = 1;
     let resultsperpage = 10;
     if(getParameterByName('maxresultsperpage')!=null)
-	resultsperpage = parseInt(getParameterByName('maxresultsperpage'));
+	    resultsperpage = parseInt(getParameterByName('maxresultsperpage'));
     for(let i = 0; i < json.max_results; i+=resultsperpage)
     {
-	let lnk = window.location.search;
-	let rep = getParameterByName('page');
-	rep = 'page='+rep;
+        let lnk = window.location.search;
+        let rep = getParameterByName('page');
+        rep = 'page='+rep;
 
-	let newlnk='';
-	if(getParameterByName('page')==null)
-	    newlnk = window.location.search+"&page="+counter;
-	else
-	    newlnk=window.location.search.replace(rep,"page="+counter);
-	if(json.page==counter)
-	    val+="<a style='margin-right: 1rem;' disabled>"+counter+"</a>";
-	  else
-	    val+="<a style='margin-right: 1rem;' href='"+newlnk+"'>"+counter+"</a>";
-	counter++;
+        let newlnk='';
+        if(getParameterByName('page')==null)
+            newlnk = window.location.search+"&page="+counter;
+        else
+            newlnk=window.location.search.replace(rep,"page="+counter);
+        if(json.page==counter)
+            val+="<a style='margin-right: 1rem;' disabled>"+counter+"</a>";
+          else
+            val+="<a style='margin-right: 1rem;' href='"+newlnk+"'>"+counter+"</a>";
+        counter++;
     }
     val+="</div>";
     obj.innerHTML+=val;
