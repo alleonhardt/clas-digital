@@ -126,6 +126,7 @@ function ShowSelectedValues(obj)
 				desc.innerHTML = json.books[i].description;
 			else
                 desc.innerHTML = "<a href='/GetBooks.html?query="+document.getElementById("SpecialSID").value+"&scanId="+json.books[i].scanId+"&fuzzyness="+document.getElementById("fuzzyness").value+"'>"+json.books[i].description+"</a>";
+            desc.setAttribute("class", "desc");
             div1.appendChild(desc);
 
             let bib = document.createElement("span");
