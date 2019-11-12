@@ -123,8 +123,10 @@ void CSearch::normalSearch(MAPWORDS& mapWords, dict& d_dict, map_books& mapBooks
         }
     }
 
-    else
+    else {
+        std::cout << m_sWord << " not in dictionary.\n";
         normalSearch(mapWords);
+    }
 }
 
 /**

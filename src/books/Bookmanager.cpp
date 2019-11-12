@@ -13,7 +13,7 @@ CBookManager::CBookManager()
         std::vector<std::string> vec2 = func::split2(vec[1], ",");
         for(size_t i=0; i<vec2.size(); i++) {
             m_dict[vec[0]].insert(vec2[i]);
-            m_dict[vec2[1]].insert(vec[0]);
+            m_dict[vec2[i]].insert(vec[0]);
         }
     }
     std::cout << "Created dictionary. Size: " << m_dict.size() << "\n";
