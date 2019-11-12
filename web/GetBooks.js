@@ -74,7 +74,8 @@ function HighlightHitsAndConstructLinkList()
     }
     if(location.hash=="")
     {
-	CorrectedScrollIntoView(document.getElementById("uniquepageid"+hitlist.books[0].page));
+	ulhitlst.firstChild.click();
+	//CorrectedScrollIntoView(document.getElementById("uniquepageid"+hitlist.books[0].page));
     }
     else
     {
@@ -348,7 +349,7 @@ function initialise()
 	kk = e.y;
 	let topnav = document.getElementsByClassName("topnav")[0];
 	let resizer = document.getElementsByClassName("resizer")[0];
-	topnav.scrollTop = 0;
+	topnav.style["overflow-y"] = "hidden";
 
 	topnav.style.height = (parseInt(getComputedStyle(topnav, '').height) + d_y) + "px";
 	resizer.style.top = topnav.getBoundingClientRect().bottom + "px";
@@ -360,6 +361,8 @@ function initialise()
 	kk = e.y;
     }, false);
     document.addEventListener("mouseup", function(){
+    let topnav = document.getElementsByClassName("topnav")[0];
+    topnav.style["overflow-y"] = "scroll";
     document.removeEventListener("mousemove", resize, false);
 }, false);
 }
