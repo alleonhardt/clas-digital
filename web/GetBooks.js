@@ -289,13 +289,13 @@ function highlightHitsAndLoadHitlist(hits)
 function initialise()
 {
     let scanId = getParameterByName('scanId');
-    let query = getParameterByName('query');
+    let query = decodeURIComponent(getParameterByName('query')).replace(' ','+');
     let fuzzyness = getParameterByName('fuzzyness');
 
     ServerGet("/books/"+scanId+"/ocr.txt", loadOCRFile,loadOCRFileError);
     ServerGet("/books/"+scanId+"/info.json",loadMetadataFile,loadMetadataFileError);
     ServerGet("/books/"+scanId+"/readerInfo.json",loadPageLayoutFile,loadMetadataFileError);
-    ServerGet("/searchinbook?scanId="+scanId+'&query='+encodeURIComponent(query)+'&fuzzyness='+fuzzyness,highlightHitsAndLoadHitlist,highlightHitsAndLoadHitlistError);
+    ServerGet("/searchinbook?scanId="+scanId+'&query='+query+'&fuzzyness='+fuzzyness,highlightHitsAndLoadHitlist,highlightHitsAndLoadHitlistError);
 
     document.getElementById("srchbox").oninput = function() {
 	DoFuzzyMatching(this.value);
