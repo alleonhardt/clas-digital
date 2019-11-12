@@ -97,6 +97,11 @@ server {
 	    try_files $uri $uri/ =404;
 	}
 
+	location /books/ {
+	    autoindex on;
+	    try_files $uri $uri/ =404;
+	}
+
 	location /search {
         	proxy_pass         http://localhost:9992;
  #       	proxy_cache_key $uri$is_args$args;
@@ -184,6 +189,10 @@ server {
         	proxy_pass         http://localhost:9000;
 	}
 	
+	location /books/ {
+	    autoindex on;
+	    try_files $uri $uri/ =404;
+	}
 	location /information/ {
 	    disable_symlinks off;
 	    index index.html index.de.html;
