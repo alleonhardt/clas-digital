@@ -36,7 +36,7 @@ function HighlightHitsAndConstructLinkList()
     {
 	let HighlightList = [];
 	if(hitlist.is_fuzzy==false)
-	    HighlightList = getParameterByName('query').split('+');
+	    HighlightList = decodeURIComponent(getParameterByName('query')).replace(' ','+').split('+');
 
 	for(let i = 0; i < hitlist.books.length; i++)
 	{
@@ -74,7 +74,8 @@ function HighlightHitsAndConstructLinkList()
     }
     if(location.hash=="")
     {
-	CorrectedScrollIntoView(document.getElementById("uniquepageid"+hitlist.books[0].page));
+	ulhitlst.firstChild.click();
+	//CorrectedScrollIntoView(document.getElementById("uniquepageid"+hitlist.books[0].page));
     }
     else
     {
@@ -289,13 +290,13 @@ function highlightHitsAndLoadHitlist(hits)
 function initialise()
 {
     let scanId = getParameterByName('scanId');
-    let query = getParameterByName('query');
+    let query = decodeURIComponent(getParameterByName('query')).replace(' ','+');
     let fuzzyness = getParameterByName('fuzzyness');
 
     ServerGet("/books/"+scanId+"/ocr.txt", loadOCRFile,loadOCRFileError);
     ServerGet("/books/"+scanId+"/info.json",loadMetadataFile,loadMetadataFileError);
     ServerGet("/books/"+scanId+"/readerInfo.json",loadPageLayoutFile,loadMetadataFileError);
-    ServerGet("/searchinbook?scanId="+scanId+'&query='+encodeURIComponent(query)+'&fuzzyness='+fuzzyness,highlightHitsAndLoadHitlist,highlightHitsAndLoadHitlistError);
+    ServerGet("/searchinbook?scanId="+scanId+'&query='+query+'&fuzzyness='+fuzzyness,highlightHitsAndLoadHitlist,highlightHitsAndLoadHitlistError);
 
     document.getElementById("srchbox").oninput = function() {
 	DoFuzzyMatching(this.value);
@@ -346,12 +347,9 @@ function initialise()
     function resize(e) {
 	const d_y = e.y-kk;
 	kk = e.y;
-	console.log(d_y);
 	let topnav = document.getElementsByClassName("topnav")[0];
 	let resizer = document.getElementsByClassName("resizer")[0];
-	topnav.scrollTop = 0;
-	console.log((parseInt(getComputedStyle(topnav, '').height) + d_y) + "px");
-
+	topnav.style["overflow-y"] = "hidden";
 
 	topnav.style.height = (parseInt(getComputedStyle(topnav, '').height) + d_y) + "px";
 	resizer.style.top = topnav.getBoundingClientRect().bottom + "px";
@@ -363,6 +361,8 @@ function initialise()
 	kk = e.y;
     }, false);
     document.addEventListener("mouseup", function(){
+    let topnav = document.getElementsByClassName("topnav")[0];
+    topnav.style["overflow-y"] = "scroll";
     document.removeEventListener("mousemove", resize, false);
 }, false);
 }
