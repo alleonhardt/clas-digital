@@ -221,6 +221,7 @@ std::map<int, std::vector<std::string>>* CBook::getPages(std::string sInput, boo
     if(m_bOcr == false)
         return mapPages;
 
+    std::replace(sInput.begin(), sInput.end(), ' ', '+');
     std::vector<std::string> vWords = func::split2(func::returnToLower(sInput), "+");
 
     //Create map of pages and found words for first word
@@ -234,6 +235,8 @@ std::map<int, std::vector<std::string>>* CBook::getPages(std::string sInput, boo
         removePages(mapPages, mapPages2);
         delete mapPages2;
     }
+
+    std::cout << "Found hits for " << sInput <<  " on " << mapPages->size() << " pages.\n";
 
     return mapPages;
 }
@@ -319,7 +322,6 @@ bool CBook::onSamePage(std::vector<std::string> sWords)
 
         bool found=false;
         for(size_t j=0; j<pages1.size(); j++) {
-            std::cout << pages1[j] << std::endl;
             if(std::find(pages2.begin(), pages2.end(), pages1[j]) != pages2.end()) {
                 found=true;
                 break;

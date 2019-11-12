@@ -43,3 +43,6 @@ change homepage
 color rethinking, easier reading
 remove a bit of overwriting
 cant print on tuesdays
+
+# To recreate certificate request
+openssl req -newkey rsa:2048 -sha256 -outform PEM -out certreq.pem

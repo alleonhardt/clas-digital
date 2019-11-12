@@ -125,7 +125,6 @@ std::list<std::string>* CBookManager::search(CSearchOptions* searchOpts)
                 ++it;
         }
     }
-
     //Sort results results
     return convertToList(results, searchOpts->getFilterResults());
 }
