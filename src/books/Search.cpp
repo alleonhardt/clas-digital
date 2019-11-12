@@ -102,9 +102,19 @@ std::map<std::string, double>* CSearch::search(MAPWORDS& mWs, MAPWORDS& mWsTitle
 */
 void CSearch::normalSearch(MAPWORDS& mapWords, dict& d_dict, map_books& mapBooks)
 {
-    
+    std::string sInput = m_sWord;
     if(d_dict.count(m_sWord) > 0) {
-        for(auto it : d_dict[m_sWord]) {
+
+        //Grundform Suchen:
+        auto it=d_dict[sInput].begin();
+        if((*it) != "") {
+            std::cout << "Passende Grundform gefunden! \""<<(*it)<<"\"\n";
+            sInput = (*it);
+        }
+        else
+            std::cout << "\""<<sInput<<"\" ist bereits in der Grundform.\n";
+
+        for(auto it : d_dict[sInput]) {
             std::cout << "Searching for " << it << "\n";
             if(mapWords.count(it) > 0) {
                 std::map<std::string, double> found = mapWords.at(it);
@@ -113,8 +123,10 @@ void CSearch::normalSearch(MAPWORDS& mapWords, dict& d_dict, map_books& mapBooks
         }
     }
 
-    else
+    else {
+        std::cout << m_sWord << " not in dictionary.\n";
         normalSearch(mapWords);
+    }
 }
 
 /**
