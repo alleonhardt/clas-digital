@@ -215,11 +215,18 @@ select::-ms-expand {
     padding:1px 10px;
 }
 .srchbtn {
-      border: none;         /* Remove borders */
-      color: grey;          /* White text */
-      font-size: 16px;      /* Set a font size */
-      cursor: pointer;      /* Mouse pointer on hover */
-      border-radius: 50%;
+    border: none;         /* Remove borders */
+    color: grey;          /* White text */
+    background: white;
+    font-size: 16px;      /* Set a font size */
+    cursor: pointer;      /* Mouse pointer on hover */
+    border-radius: 50%;
+    display:inline-block;
+    margin:0;
+    margin-left:-2.8rem;
+}
+.srchbtn:hover {
+    background: #c5c5c5;
 }
 
 .sugg {
