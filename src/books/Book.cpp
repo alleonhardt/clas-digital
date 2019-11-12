@@ -253,6 +253,10 @@ std::map<int, std::vector<std::string>>* CBook::findPages(std::string sWord, boo
                     (*mapPages)[page].push_back(elem);
             }
         }
+        else if(m_mapWordsPages.count(sWord) > 0) {
+            for(auto page : std::get<0>(m_mapWordsPages.at(sWord)))
+                (*mapPages)[page].push_back(sWord);
+        }
     }
 
     //Fuzzyness = true
