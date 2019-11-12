@@ -48,23 +48,17 @@
 	float: right;
     display: none;
 }
+
 .topnav-right-in button{
-	box-sizing: border-box;
-	padding: 0.4em 0.8em;
 	margin: 0.5em 0.8em;
 }
 
 .topnav-right-in span {
-	box-sizing: border-box;
 	color: black;
 	font-size: 1.2em;
 	text-align: center;
-	height: 100%;
 }
 
 .topnav-right-out form {
-	box-sizing: border-box;
-	vertical-align: center;
-	padding: 0.4em 0.8em;
-	margin: auto;
+	padding: 0.3em 0.8em;
 }
