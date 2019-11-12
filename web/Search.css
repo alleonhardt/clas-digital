@@ -35,8 +35,9 @@ mark {
 .tickbox{
     float:left;
     padding:20px;
-    width:17%;
+    width:12%;
     box-sizing:border-box;
+    margin-left:4rem;
 }
 
 .searchResults {
@@ -46,12 +47,15 @@ mark {
     overflow:hidden;
 }
 .searchResult {
-	margin-bottom:2rem;
-    margin-left:10%;
+	margin-bottom:1rem;
+    margin-left:7%;
     float:left;
-    width:73%;
+    width:76%;
     padding:20px 20px;
     box-sizing:border-box;
+}
+.desc{
+    font-size:1.4rem;
 }
 
 .metadata{
@@ -142,7 +146,7 @@ select::-ms-expand {
     background:white;
     margin-right:0.5;
     border:0;
-    font-size:14px;
+    font-size:13px;
     color:#50555a;
     display: inline-block;
     /*position: relative;*/
@@ -150,7 +154,7 @@ select::-ms-expand {
     padding-bottom: 0;
     padding-right: 18px;
     padding-left: 12px;
-    line-height: 22px;
+    line-height: 20px;
     cursor: pointer;
     white-space: nowrap;
     font-family: arial,sans-serif;
@@ -164,7 +168,7 @@ select::-ms-expand {
     background:white;
     border:0;
     margin-right:0.5;
-    font-size:14px;
+    font-size:13px;
     color:#50555a;
     display: inline-block;
     /*position: relative;*/
@@ -172,7 +176,7 @@ select::-ms-expand {
     padding-bottom: 0;
     padding-right: 18px;
     padding-left: 12px;
-    line-height: 22px;
+    line-height: 20px;
     cursor: pointer;
     white-space: nowrap;
     font-family: arial,sans-serif;
@@ -186,7 +190,7 @@ select::-ms-expand {
 .advanceoptsText {
     background:white;
     margin-right:0.5;
-    font-size:14px;
+    font-size:13px;
     color:#50555a;
     display: inline-block;
     /*position: relative;*/
@@ -194,7 +198,7 @@ select::-ms-expand {
     padding-bottom: 0;
     padding-right: 18px;
     padding-left: 12px;
-    line-height: 22px;
+    line-height: 20px;
     cursor: default;
     white-space: nowrap;
     font-family: arial,sans-serif;
@@ -205,7 +209,7 @@ select::-ms-expand {
 .advanceoptsInput {
     background:white;
     margin-right:0.5;
-    font-size:14px;
+    font-size:13px;
     color:#50555a;
     display: inline-block;
     /*position: relative;*/
@@ -213,7 +217,7 @@ select::-ms-expand {
     padding-bottom: 0;
     padding-right: 18px;
     padding-left: 12px;
-    line-height: 22px;
+    line-height: 20px;
     cursor: auto;
     white-space: nowrap;
     font-family: arial,sans-serif;
@@ -353,6 +357,12 @@ https://github.com/ShadowItaly/clas-digital/issues/56.close:focus {
 	color: #D88F3C;
 }
 
+.srchbar {
+    display:inline-block;
+    width:25%;
+    border-radius:25px;
+    padding:1px 10px;
+}
 .srchbtn {
       border: none; /* Remove borders */
       color: grey; /* White text */
