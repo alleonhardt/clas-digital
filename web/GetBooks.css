@@ -1,6 +1,7 @@
 body {
     background: grey;
     padding: 0.5rem;
+    font-family: arial,sans-serif;
 }
 
 .searchbox {
