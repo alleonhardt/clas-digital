@@ -36,7 +36,7 @@ function HighlightHitsAndConstructLinkList()
     {
 	let HighlightList = [];
 	if(hitlist.is_fuzzy==false)
-	    HighlightList = getParameterByName('query').split('+');
+	    HighlightList = decodeURIComponent(getParameterByName('query')).split('+');
 
 	for(let i = 0; i < hitlist.books.length; i++)
 	{
@@ -346,12 +346,9 @@ function initialise()
     function resize(e) {
 	const d_y = e.y-kk;
 	kk = e.y;
-	console.log(d_y);
 	let topnav = document.getElementsByClassName("topnav")[0];
 	let resizer = document.getElementsByClassName("resizer")[0];
 	topnav.scrollTop = 0;
-	console.log((parseInt(getComputedStyle(topnav, '').height) + d_y) + "px");
-
 
 	topnav.style.height = (parseInt(getComputedStyle(topnav, '').height) + d_y) + "px";
 	resizer.style.top = topnav.getBoundingClientRect().bottom + "px";
