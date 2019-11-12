@@ -36,7 +36,7 @@ function HighlightHitsAndConstructLinkList()
     {
 	let HighlightList = [];
 	if(hitlist.is_fuzzy==false)
-	    HighlightList = decodeURIComponent(getParameterByName('query')).split('+');
+	    HighlightList = decodeURIComponent(getParameterByName('query')).replace(' ','+').split('+');
 
 	for(let i = 0; i < hitlist.books.length; i++)
 	{
