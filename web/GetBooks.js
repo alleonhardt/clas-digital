@@ -349,11 +349,12 @@ function initialise()
 	console.log(d_y);
 	let topnav = document.getElementsByClassName("topnav")[0];
 	let resizer = document.getElementsByClassName("resizer")[0];
+	topnav.scrollTop = 0;
 	console.log((parseInt(getComputedStyle(topnav, '').height) + d_y) + "px");
 
 
 	topnav.style.height = (parseInt(getComputedStyle(topnav, '').height) + d_y) + "px";
-	resizer.style.top = (parseInt(getComputedStyle(resizer, '').top) + d_y) + "px";
+	resizer.style.top = topnav.getBoundingClientRect().bottom + "px";
     }
 
 

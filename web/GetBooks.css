@@ -18,7 +18,8 @@ body {
 .topnav {
     left: 0;
     position: fixed;
-    height: 1.5rem;
+    height: 2rem;
+    min-height: 2rem;
     top: 3rem;
     width: 100%;
     overflow: auto;
@@ -31,7 +32,7 @@ body {
     position: fixed;
     z-index: 2;
     left: 0;
-    top: 4.5rem;
+    top: 5rem;
     width: 100%;
     height: 4px;
     background: black;
@@ -77,7 +78,7 @@ body {
 #fullsearchhitlist {
     grid-column: 2 /span 1;
     font-size: small;
-    line-height: 1.5rem;
+    line-height: 2rem;
     overflow-wrap: break-word;
 }
 
@@ -116,7 +117,7 @@ body {
 
 .ocrpage {
     position: sticky;
-    top: 6rem;
+    top: 6.5rem;
     font-size: small;
     text-align: justify;
     min-height: 350px;
@@ -133,7 +134,7 @@ body {
     grid-column: 1 /span 1;
 }
 
-.fuzzysugslink {
+div .fuzzysugslink {
     display: block;
     color: black;
     margin: 0px auto;
@@ -146,9 +147,16 @@ body {
 .fuzzysugslink mark {
     color: black;
     background: yellow;
+    margin: 0;
+    padding: 0;
 }
 
-.fuzzysugslink:hover {
+mark {
+    color: black;
+    background: yellow;
+}
+
+div .fuzzysugslink:hover {
     color: black;
     text-decoration: none;
     text-align: left;
