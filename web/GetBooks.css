@@ -15,6 +15,15 @@ body {
     background: white;
 }
 
+.searchstyler {
+    margin-left: -3.6rem;
+    background: white;
+}
+
+.searchstyler:hover {
+    background-color: #ddd;
+}
+
 .topnav {
     left: 0;
     position: fixed;
@@ -34,8 +43,8 @@ body {
     left: 0;
     top: 5rem;
     width: 100%;
-    height: 4px;
-    background: black;
+    height: 10px;
+    background-color: #00618F;
     cursor: s-resize;
 }
 
@@ -132,6 +141,8 @@ body {
     width: 100%;
     grid-row: 1 /span 1;
     grid-column: 1 /span 1;
+    top: 6.5rem;
+    position: sticky;
 }
 
 div .fuzzysugslink {
