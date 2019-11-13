@@ -213,8 +213,7 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
 	{
 	    std::string query;
 	    bool fuzz = false;
-	    bool auth_only = false;
-	    bool ocr_only = false;
+        std::string scope ="all";
 	    std::string author = "";
 	    int pubafter = 1700;
 	    int pubbef = 2049;
@@ -235,8 +234,7 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
 	    //This is the only required parameter
 	    query = req.get_param_value("q",0);
 	    if(req.has_param("fuzzyness")) fuzz = std::stoi(req.get_param_value("fuzzyness",0))!=0;
-	    if(req.has_param("title_only")) auth_only = req.get_param_value("title_only",0)=="true";
-	    if(req.has_param("ocr_only")) ocr_only = req.get_param_value("ocr_only",0) == "true";
+	    if(req.has_param("scope")) scope = req.get_param_value("scope",0);
 	    if(req.has_param("author")) author = req.get_param_value("author",0);
 	    if(req.has_param("pillars"))
 	    {
@@ -253,10 +251,10 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
 
 
 	    std::cout<<"Receveived search request!"<<std::endl;
-	    std::cout<<"Query: "<<query<<"; fuzz: "<<fuzz<<"; title only: "<<auth_only<<"; ocr only: "<<ocr_only<<"; author: "<<author<<"; publicated after: "<<pubafter<<"; publicated before: "<<pubbef<<"; searched pillars: "<<debugpill<<"; vector pillar size: "<<pillars.size()<<"; sorting with value: "<<sort<<" and max results per page: "<<resultsperpage<<std::endl;
+	    std::cout<<"Query: "<<query<<"; fuzz: "<<fuzz<<"; scope: "<<scope<<"author: "<<author<<"; publicated after: "<<pubafter<<"; publicated before: "<<pubbef<<"; searched pillars: "<<debugpill<<"; vector pillar size: "<<pillars.size()<<"; sorting with value: "<<sort<<" and max results per page: "<<resultsperpage<<std::endl;
 
 
-	    CSearchOptions options(query,fuzz,pillars,auth_only,ocr_only,author,pubafter,pubbef,true,sort);
+	    CSearchOptions options(query,fuzz,pillars,scope,author,pubafter,pubbef,true,sort);
 	    std::cout<<"Starting search!"<<std::endl;
 
 	    auto start = std::chrono::system_clock::now();

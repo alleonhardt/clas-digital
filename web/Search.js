@@ -98,15 +98,10 @@ function ShowSelectedValues(obj)
 
 
     // *** ADD RESULTS FOOTER *** //
-    let maxResultsElement = document.getElementById("maxResults");
-    let searchTimeElement = document.getElementById("searchTime");
-
     json=obj.drawablejson;
-    maxResultsElement.innerHTML = json.max_results;
-    searchTimeElement.innerHTML = json.time;
-
-    let resultBanner = document.getElementById("ResultBanner");
-    resultBanner.style.display = "block";
+    document.getElementById("maxResults").innerHTML = json.max_results;
+    document.getElementById("searchTime").innerHTML = json.time;
+    document.getElementById("ResultBanner").style.display = "block";
 
 	if(json.max_results==0)
 	    return;
@@ -251,10 +246,8 @@ function sendToPage(name)
 	//Create the json file with the advanced search options
 	if(document.getElementById("fuzzyness").value=="1")
 	    requ += "&fuzzyness=1";
-	if(document.getElementById("searchIn").value==1)
-	    requ += "&title_only=true";
-	if(document.getElementById("searchIn").value==2)
-	    requ += "&ocr_only=true";
+	if(document.getElementById("scope").value != "all")
+	    requ += "&scope="+document.getElementById("scope").value;
 	if(document.getElementById("author").value != "")
 		requ += "&author="+document.getElementById("author").value;
 	if(document.getElementById("publicatedAfter").value != 1700)
@@ -341,16 +334,14 @@ function getParameterByName(name, url) {
 
 function ShowLinks()
 {
-	if(getParameterByName('title_only')!=null)  document.getElementById("searchIn").value = 1; 
-	if(getParameterByName('ocr_only')!=null)    document.getElementById("searchIn").value = 2;
-	if(getParameterByName('fuzzyness')!=null)   document.getElementById("fuzzyness").value = 1;
-
+    if(getParameterByName('scope') != null)     
+        document.getElementById("scope").value = getParameterByName("scope");
+	if(getParameterByName('fuzzyness')!=null)   
+        document.getElementById("fuzzyness").value = 1;
 	if(getParameterByName('author')!=null) 
         document.getElementById("author").value=getParameterByName('author');
-
 	if(getParameterByName('publicatedafter')!=null) 
         document.getElementById("publicatedAfter").value=parseInt(getParameterByName('publicatedafter'));
-
 	if(getParameterByName('publicatedbefore')!=null) 
         document.getElementById("publicatedBefore").value=parseInt(getParameterByName('publicatedbefore'));
 	if(getParameterByName('pillars')!=null)
