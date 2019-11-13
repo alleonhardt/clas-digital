@@ -23,7 +23,7 @@ function OpenFilter(x)
 	{
 	    //10 is standard value of maxresultsperpage and 0 is standard value of the sort algorithm the two filters never collide so we can ignore what filter option it is
 	    //and just print the results
-	    if(x.value=="10"||x.value=="0")
+	    if(x.value=="10"||x.value=="relevance")
 		    window.location = lnk.replace("&"+x.id+"="+val,"");
 	    else
 		    window.location = lnk.replace(x.id+"="+val,x.id+"="+retval);
@@ -370,7 +370,8 @@ function ShowLinks()
 	    obj.drawablejson.show_to = Math.min(obj.drawablejson.books.length,maxResult);
 	}
 	ShowSelectedValues(obj);
-	if(getParameterByName('f_sort')!=null) document.getElementById("f_sort").value = getParameterByName('f_sort');
+
+	if(getParameterByName('sorting')!=null) document.getElementById("sorting").value = getParameterByName('sorting');
 	if(getParameterByName('maxresultsperpage')!=null) document.getElementById("maxresultsperpage").value = getParameterByName('maxresultsperpage');
 }
 

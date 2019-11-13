@@ -166,6 +166,9 @@ function CreatePageLayout()
 	    let lst = document.getElementsByClassName("ocrpage");
 	    for(let i = 0; i < lst.length; i++)
 		lst[i].style.top = (gNewSize+17)+"px";
+	    lst = document.getElementsByClassName("imgpage");
+	    for(let i = 0; i < lst.length; i++)
+		lst[i].style.top = (gNewSize+17)+"px";
 	    currentSize = gNewSize;
 	}
 
