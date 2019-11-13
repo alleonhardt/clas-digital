@@ -504,7 +504,8 @@ int main(int argc, char **argv)
 		std::string dir = "web/books/";
 		dir+=it.first;
 		command+=dir;
-		system(command.c_str());
+		int x = system(command.c_str());
+		x+=1;
 		dir+="/info.json";
 		std::ofstream json_write(dir.c_str(),std::ios::out);
 		if(json_write.is_open())
@@ -513,7 +514,8 @@ int main(int argc, char **argv)
 	}
     }
 
-    system("systemctl restart nginx");
+    int y = system("systemctl restart nginx");
+    y+=1;
 
 
     srv.Post("/login",&do_login);
