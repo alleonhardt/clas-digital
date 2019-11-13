@@ -25,19 +25,23 @@ CSearchOptions::CSearchOptions()
 * @param[in] from date from which books shall be searched
 * @param[in] to date to which books shall be searched
 **/
-CSearchOptions::CSearchOptions(std::string chSearchedWord, bool fuzzyness, std::vector<std::string> sCollections, bool onlyTitle, bool onlyOCR, std::string slastName, int from, int to, bool full, std::string filterResults)
+CSearchOptions::CSearchOptions(std::string chSearchedWord, bool fuzzyness, std::vector<std::string> sCollections, std::string sScope, std::string slastName, int from, int to, bool full, std::string filterResults)
 {
     func::convertToLower(chSearchedWord);
     std::replace(chSearchedWord.begin(), chSearchedWord.end(), ' ', '+');
 	m_chSearchedWord = func::convertStr(chSearchedWord);
     m_fuzzyness = fuzzyness;
     m_sCollections = sCollections;
-    m_onlyTitle = onlyTitle;
 	func::convertToLower(slastName);
     m_slastName.assign(slastName); 
     m_From = from;
     m_To = to;
-    m_onlyOCR = onlyOCR;
+
+    m_onlyTitle = false;
+    m_onlyOCR = false;
+    if(sScope=="metadata") m_onlyTitle = true;
+    if(sScope=="body")     m_onlyOCR = true;
+
     m_fullAccess = full;
 
     m_filterResults = 0;
