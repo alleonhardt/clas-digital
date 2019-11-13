@@ -63,6 +63,7 @@ server {
         ssl_certificate_key /etc/clas-digital/bin/key.pem;
 	server_name _;
 	
+	include /etc/clas-digital-devel/bin/forbiddenfiles;
     	location /api {
         	proxy_pass         http://localhost:9992;
 	} 
@@ -163,7 +164,9 @@ server {
         ssl_certificate     /etc/clas-digital/bin/cert.pem;
         ssl_certificate_key /etc/clas-digital/bin/key.pem;
 	server_name _;
-	
+
+	include /etc/clas-digital/bin/forbiddenfiles;
+
     	location /api {
         	proxy_pass         http://localhost:9000;
 	} 
