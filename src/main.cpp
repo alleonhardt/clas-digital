@@ -492,7 +492,7 @@ int main(int argc, char **argv)
 	{
 	    for(auto it : manager.getMapOfBooks())
 	    {
-		if(it.second->getOcr() && (it.second->getPublic()))
+		if(it.second->getOcr() && (!it.second->getPublic()))
 		{
 		    std::cout<<"FOUND NON PUBLIC BOOK: "<<it.first<<std::endl;
 		    std::string loc = "location = /books/";
