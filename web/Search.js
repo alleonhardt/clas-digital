@@ -107,6 +107,17 @@ function ShowSelectedValues(obj)
 	    return;
 	
     let hitList = document.getElementById("hitList");
+    let div1 = document.createElement("div");
+    div1.setAttribute("class", "searchResult");
+    let div2 = document.createElement("div");
+    div2.setAttribute("class", "tickbox");
+    let aBox = document.createElement("input");
+    aBox.setAttribute("type", "checkbox");
+    aBox.onchange=function(){SelectAll(this.checked);return true;};
+    div2.appendChild(aBox);
+    hitList.appendChild(div1);
+    hitList.appendChild(div2);
+
 	for(var i = json.show_from; i < json.show_to; i++)
 	{
 			
