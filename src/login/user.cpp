@@ -59,10 +59,18 @@ void User::SetSessionId(std::string sessid)
 
 bool User::AccessCheck(const std::shared_ptr<User> &usr, int accRequired)
 {
+    std::cout<<"Access check from usr "<<usr.get()<<std::endl;
+    if(usr)
+    {
+	std::cout<<"Access: "<<usr->GetAccessRights()<<std::endl;
+	std::cout<<"Access required = "<<accRequired<<std::endl;
+    }
 	if(accRequired==0)
 		return true;
 	else if(!usr||((usr->GetAccessRights()&accRequired)!=accRequired))
 		return false;
+
+	std::cout<<"Access granted"<<std::endl;
 	return true;
 }
 
