@@ -228,7 +228,7 @@ function Upload(x,key)
 	    }
 	    else
 	    {
-		ShowStatus("Server returned error: "+xhr.responseText,"red");
+		return ShowStatus("Server returned error: "+xhr.responseText,"red");
 	    }
 	    //File exists already ask for override permission
 	}
@@ -280,7 +280,7 @@ function ExtractKey()
 function ShowBookContentLink()
 {
     let lnk = ExtractKey();
-    document.getElementById("BookContentLink").innerHTML = "<a href='/books/"+lnk+"/' target='_blank'>Book Content</a>";
+    document.getElementById("BookContentLink").innerHTML = "<a href='/books/"+lnk+"/' target='_blank'>Book File List Index</a>";
 }
 
 function UploadAll()
@@ -290,7 +290,8 @@ function UploadAll()
 
     let finalKey = ExtractKey();
     if(finalKey=="")
-	ShowStatus("Either you forgot to type in the item key or the permalink is in the wrong format!","red");
+	return ShowStatus("Either you forgot to type in the item key or the permalink is in the wrong format!","red");
+
 
 
     let val = document.getElementById("FileDropList").children;
@@ -354,8 +355,9 @@ window.addEventListener("load",function(){initialise("uploadbooklink");init_even
 	<br>
 	<h2><span>3.</span>Welches Werk ist das?</h2>
 	<p>Fuege noch den Link zu Zotero ein um das Item spaeter immer korrekt zuordnen zu koennen:</p>
-	<input id="Permalink" class="description" type="text" placeholder="Permalink hier einfügen" oninput="ShowBookContentLink();"/>
-	<div id="BookContentLink"></div>
+	<input id="Permalink" class="description" type="text" placeholder="Permalink hier einfügen" oninput="ShowBookContentLink();">
+	<div id="BookContentLink" style='display:inline-block;margin-left: 2rem;'></div>
+	</input>
 	<br>
 	<h2><span>4.</span>Speichern!</h2>
 	<div class="saver" id="saver">

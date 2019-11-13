@@ -74,12 +74,28 @@ function HighlightHitsAndConstructLinkList()
     }
     if(location.hash=="")
     {
-	ulhitlst.firstChild.click();
-	//CorrectedScrollIntoView(document.getElementById("uniquepageid"+hitlist.books[0].page));
+	if(ulhitlst.firstChild!=null)
+	    ulhitlst.firstChild.click();
+	else
+	{
+	    let elem = document.getElementsByClassName("svgpage");
+	    if(elem.length>0)
+		LoadImageFromSVG(elem[0]);
+	}
+
     }
     else
     {
-	CorrectedScrollIntoView(document.getElementById("uniquepageid"+location.hash.substr(5)));
+	if(location.hash=="#page1")
+	{
+	     let elem = document.getElementsByClassName("svgpage");
+	     if(elem.length>0)
+		LoadImageFromSVG(elem[0]);
+	}
+	else
+	{
+	    CorrectedScrollIntoView(document.getElementById("uniquepageid"+location.hash.substr(5)));
+	}
     }
 }
 
@@ -148,7 +164,26 @@ function CreatePageLayout()
 	if(doc==null)
 	{
 	    console.log("Found page without ocr! At : "+gPageLayoutFile.pages[i].pageNumber);
-	    continue;
+	    let x = document.createElement("p");
+	    let cont = document.createElement("div");
+	    let ocrcont = document.createElement("div");
+	    let anchor = document.createElement("a");
+	    anchor.id = "page"+gPageLayoutFile.pages[i].pageNumber;
+
+	    ocrcont.classList.add("ocrcontainer");
+
+	    cont.classList.add('pagecontainer');
+	    cont.id = "uniquepageid"+gPageLayoutFile.pages[i].pageNumber;
+	    x.innerHTML = "<br/><b style='float: right;'>"+gPageLayoutFile.pages[i].pageNumber+"/"+gPageLayoutFile.maxPageNum+"</b>";
+	    x.id = "uniqueocrpage"+gPageLayoutFile.pages[i].pageNumber;
+	    x.classList.add('ocrpage');
+	    ocrcont.appendChild(anchor);
+	    ocrcont.appendChild(x);
+	    cont.appendChild(ocrcont);
+	    cont.pageNumber = gPageLayoutFile.pages[i].pageNumber;
+
+	    document.body.appendChild(cont);
+	    doc = cont;
 	}
 
 	let svgcode = "<svg class='svgpage' data-width='"+gPageLayoutFile.pages[i].width+"' data-height='"+gPageLayoutFile.pages[i].height+"' data-path='"+"/books/"+getParameterByName('scanId')+ "/" + gPageLayoutFile.pages[i].file.substr(gPageLayoutFile.pages[i].file.search("page"))+"' viewBox='0 0 "+gPageLayoutFile.pages[i].width+" "+gPageLayoutFile.pages[i].height+"'><rect x='0' y='0' width='100%' height='100%'/></svg>";
@@ -194,16 +229,7 @@ function CreatePageLayout()
 	    UpdateLinkPrev();
 	    for(let i = 0; i < arr.length; i++)
 	    {
-		let img = document.createElement("img");
-		img.style.width = arr[i].dataset.width;
-		img.style.height = arr[i].dataset.height;
-		img.classList.add('imgpage');
-		img.src=arr[i].dataset.path;
-		img.onload = function(){
-		    let x = document.body.scrollTop;
-		    arr[i].parentElement.replaceChild(img,arr[i]);
-		    document.body.scrollTop = x;
-		}
+		LoadImageFromSVG(arr[i]);
 	    }
 	},400);
     }
@@ -211,6 +237,21 @@ function CreatePageLayout()
     if(gHitsLoaded)
 	HighlightHitsAndConstructLinkList();
     gOCRLoaded = true;
+}
+
+function LoadImageFromSVG(x)
+{
+    let img = document.createElement("img");
+    img.style.width = x.dataset.width;
+    img.style.height = x.dataset.height;
+    img.classList.add('imgpage');
+    img.src=x.dataset.path;
+    img.onload = function(){
+	let y = document.body.scrollTop;
+	x.parentElement.replaceChild(img,x);
+	document.body.scrollTop = y;
+    }
+
 }
 
 function isPageVisible(whatisvis)
@@ -243,7 +284,9 @@ function isElementInViewport (el) {
 
 function loadOCRFileError(errortext)
 {
-    document.getElementById("uniqueocrpage0").innerHTML = "Could not load ocr file sorry for this :(";
+    gOcrSplittedFile = [];
+    if(gPageLayoutFile!=null)
+	CreatePageLayout();
 }
 
 function loadMetadataFile(metadatatxt)
@@ -269,8 +312,11 @@ function loadPageLayoutFile(layout)
 
 function loadPageLayoutFileError(errortxt)
 {
-    document.getElementById("bookpageimagcontainer").innerHTML = "Could not load image layout sorry for that :(";
+    gPageLayoutFile = {pages:[]};
+    if(gOcrSplittedFile!=null)
+	CreatePageLayout();
 }
+
 
 function highlightHitsAndLoadHitlistError(text)
 {
@@ -309,41 +355,41 @@ function initialise()
 	    event.relatedTarget.click();
 	document.getElementById("fuzzysuggestions").style.visibility="hidden";
 	document.getElementById("fuzzysuggestions").selec = undefined;});
-	document.getElementById("srchbox").addEventListener("keydown",function(event){
-			let x = document.getElementById("srchbox").value;
-			let k = document.getElementById("fuzzysuggestions").selec;
-			if(k==undefined)
-			    k = -1;
+    document.getElementById("srchbox").addEventListener("keydown",function(event){
+	let x = document.getElementById("srchbox").value;
+	let k = document.getElementById("fuzzysuggestions").selec;
+	if(k==undefined)
+	    k = -1;
 
-			if(event.key == "Enter")
-			{
-			    if(k!=-1)
-			    {
-				let lst = document.getElementsByClassName("fuzzysugslink");
-				lst[k].click();
-				return;
-			    }
-			    doCompleteNewSearch();
-			}
-			if(event.key=="ArrowUp" || event.key=="ArrowDown")
-			{
-			    let lst = document.getElementsByClassName("fuzzysugslink");
-			    if(k!=-1)
-				lst[k].style.background = "";
-			    if(event.key=="ArrowUp")
-			    {
-				k-=1;
-				if(k < 0)
-				    k = lst.length-1;
-			    }
-			    else
-				k+=1;
-			    k = k%lst.length;
-			    lst[k].style.background = "#ddd";
-			    event.preventDefault();
-			    document.getElementById("fuzzysuggestions").selec = k;
-			}
-		});
+	if(event.key == "Enter")
+	{
+	    if(k!=-1)
+	    {
+		let lst = document.getElementsByClassName("fuzzysugslink");
+		lst[k].click();
+		return;
+	    }
+	    doCompleteNewSearch();
+	}
+	if(event.key=="ArrowUp" || event.key=="ArrowDown")
+	{
+	    let lst = document.getElementsByClassName("fuzzysugslink");
+	    if(k!=-1)
+		lst[k].style.background = "";
+	    if(event.key=="ArrowUp")
+	    {
+		k-=1;
+		if(k < 0)
+		    k = lst.length-1;
+	    }
+	    else
+		k+=1;
+	    k = k%lst.length;
+	    lst[k].style.background = "#ddd";
+	    event.preventDefault();
+	    document.getElementById("fuzzysuggestions").selec = k;
+	}
+    });
 
 
     let kk;
@@ -364,10 +410,10 @@ function initialise()
 	kk = e.y;
     }, false);
     document.addEventListener("mouseup", function(){
-    let topnav = document.getElementsByClassName("topnav")[0];
-    topnav.style["overflow-y"] = "scroll";
-    document.removeEventListener("mousemove", resize, false);
-}, false);
+	let topnav = document.getElementsByClassName("topnav")[0];
+	topnav.style["overflow-y"] = "scroll";
+	document.removeEventListener("mousemove", resize, false);
+    }, false);
 }
 
 
