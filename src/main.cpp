@@ -425,6 +425,9 @@ int main(int argc, char **argv)
     try
     {
 	zoteroPillars = Zotero::GetPillars();
+	std::ofstream write_pillars("web/pillars.json",std::ios::out);
+	if(write_pillars.is_open())
+	    write_pillars<<zoteroPillars;
     }
     catch(...)
     {
@@ -478,6 +481,39 @@ int main(int argc, char **argv)
     }
     srchFile.close();
 
+
+    {
+	std::ofstream of("bin/forbiddenfiles",std::ios::out);
+	if(of.is_open())
+	{
+	    for(auto it : manager.getMapOfBooks())
+	    {
+		if(it.second->getOcr() && (!it.second->getPublic()))
+		{
+		    std::cout<<"FOUND NON PUBLIC BOOK: "<<it.first<<std::endl;
+		    std::string loc = "location /books/";
+		    loc+=it.first;
+		    loc+="/ {\n";
+		    of<<loc;
+		    of<<"/atuh_request /authenticate;\n";
+		    of<<"}\n";
+		}
+		std::string command = "mkdir -p ";
+		std::string dir = "web/books/";
+		dir+=it.first;
+		command+=dir;
+		int x = system(command.c_str());
+		x+=1;
+		dir+="/info.json";
+		std::ofstream json_write(dir.c_str(),std::ios::out);
+		if(json_write.is_open())
+		    json_write<<it.second->getMetadata().getMetadata();
+	    }
+	}
+    }
+
+    int y = system("systemctl restart nginx");
+    y+=1;
 
 
     srv.Post("/login",&do_login);
