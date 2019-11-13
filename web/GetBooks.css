@@ -9,7 +9,7 @@ body {
     width: 100%;
     left: 0;
     top: 0;
-    height: 3rem;
+    height: 3.5rem;
     min-height: 2rem;
     z-index: 3;
     background: white;
@@ -30,7 +30,7 @@ body {
     position: fixed;
     height: 2rem;
     min-height: 2rem;
-    top: 3rem;
+    top: 3.5rem;
     width: 100%;
     overflow: auto;
     z-index: 2;
@@ -132,7 +132,7 @@ body {
 
 .ocrpage {
     position: sticky;
-    top: 6.5rem;
+    top: 7rem;
     font-size: small;
     text-align: justify;
     min-height: 350px;
@@ -147,7 +147,7 @@ body {
     width: 100%;
     grid-row: 1 /span 1;
     grid-column: 1 /span 1;
-    top: 6.5rem;
+    top: 7rem;
     position: sticky;
 }
 

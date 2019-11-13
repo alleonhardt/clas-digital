@@ -334,6 +334,7 @@ std::shared_ptr<User> GetUserFromCookie(const Request &req)
     auto pos = x.find("SESSID=");
     auto pos2 = x.find(";",pos);
     std::string cookie = "";
+
     if(pos2==std::string::npos)
 	cookie = x.substr(pos+7);
     else
@@ -344,6 +345,7 @@ std::shared_ptr<User> GetUserFromCookie(const Request &req)
 
 void do_authentification(const Request& req, Response &resp)
 {
+    std::cout<<req.path<<std::endl;
 
     int accreq = 1;
     if(req.path.find("/admin/")!=std::string::npos)
@@ -351,10 +353,11 @@ void do_authentification(const Request& req, Response &resp)
     else if(req.path.find("/write/")!=std::string::npos)
 	accreq = 2;
 
-    resp.status = 403;
+    if(!User::AccessCheck(GetUserFromCookie(req),accreq))
+    {resp.status = 403;return;}
 
-    if(User::AccessCheck(GetUserFromCookie(req),accreq))
-	resp.status = 200;
+    std::cout<<"Access granted!"<<std::endl;
+    resp.status = 200;
 }
 
 void do_senduserlist(const Request &req, Response &resp)
@@ -430,6 +433,7 @@ int main(int argc, char **argv)
 	std::ofstream write_pillars("web/pillars.json",std::ios::out);
 	if(write_pillars.is_open())
 	    write_pillars<<zoteroPillars;
+	write_pillars.close();
     }
     catch(...)
     {
@@ -490,14 +494,14 @@ int main(int argc, char **argv)
 	{
 	    for(auto it : manager.getMapOfBooks())
 	    {
-		if(it.second->getOcr() && (!it.second->getPublic()))
+		if(it.second->getOcr() && (it.second->getPublic()))
 		{
 		    std::cout<<"FOUND NON PUBLIC BOOK: "<<it.first<<std::endl;
-		    std::string loc = "location /books/";
+		    std::string loc = "location = /books/";
 		    loc+=it.first;
 		    loc+="/ {\n";
 		    of<<loc;
-		    of<<"/atuh_request /authenticate;\n";
+		    of<<"auth_request /authenticate;\n";
 		    of<<"}\n";
 		}
 		std::string command = "mkdir -p ";
@@ -512,6 +516,7 @@ int main(int argc, char **argv)
 		    json_write<<it.second->getMetadata().getMetadata();
 	    }
 	}
+	of.close();
     }
 
     int y = system("systemctl restart nginx");
@@ -524,7 +529,7 @@ int main(int argc, char **argv)
     srv.Get("/createbibliography",[&](const Request &req, Response &resp) { do_createbiblio(req,resp,manager);});
     srv.Get("/api/v1/typeahead/corpus",[&](const Request &req, Response &resp) { get_sugg(req,resp,manager);});
     srv.Get("/getmetadata", [&](const Request &req, Response &resp) { get_metadata(req,resp,manager);});
-    srv.Get("/authenticate",&do_authentification);
+    srv.Get(R"(/authenticate.*)",&do_authentification);
     srv.Get("/userlist",&do_senduserlist);
     srv.Post("/userlist",&do_usertableupdate);
     std::cout<<"C++ Api server startup successfull!"<<std::endl;
