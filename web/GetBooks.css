@@ -16,8 +16,9 @@ body {
 }
 
 .searchstyler {
-    margin-left: -3.6rem;
+    border-radius: 50%;
     background: white;
+    margin-left: -1.6rem;
 }
 
 .searchstyler:hover {
@@ -104,8 +105,9 @@ body {
 }
 
 .bibliostyle {
+    font-size: small;
     margin-right: 1rem;
-    margin-top: 0.7rem;
+    margin-top: 0.9rem;
     display: inline-block;
     float: right;
     color: green;
