@@ -25,7 +25,7 @@ CSearchOptions::CSearchOptions()
 * @param[in] from date from which books shall be searched
 * @param[in] to date to which books shall be searched
 **/
-CSearchOptions::CSearchOptions(std::string chSearchedWord, bool fuzzyness, std::vector<std::string> sCollections, bool onlyTitle, bool onlyOCR, std::string slastName, int from, int to, bool full, size_t filterResults)
+CSearchOptions::CSearchOptions(std::string chSearchedWord, bool fuzzyness, std::vector<std::string> sCollections, bool onlyTitle, bool onlyOCR, std::string slastName, int from, int to, bool full, std::string filterResults)
 {
     func::convertToLower(chSearchedWord);
     std::replace(chSearchedWord.begin(), chSearchedWord.end(), ' ', '+');
@@ -39,7 +39,10 @@ CSearchOptions::CSearchOptions(std::string chSearchedWord, bool fuzzyness, std::
     m_To = to;
     m_onlyOCR = onlyOCR;
     m_fullAccess = full;
-    m_filterResults = filterResults;
+
+    m_filterResults = 0;
+    if (filterResults == "alphabetically") m_filterResults = 2;
+    if (filterResults == "chronologically") m_filterResults = 1;
 }
 
 

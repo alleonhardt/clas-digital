@@ -229,7 +229,7 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
 		pillars.push_back(it["key"]);
 	    }
 	    int page = 1;
-	    int sort = 0;
+	    std::string sort = "relevance";
 
 
 	    //This is the only required parameter
@@ -248,7 +248,7 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
 	    try{pubafter = std::stoi(req.get_param_value("publicatedafter"));}catch(...){};
 	    try{pubbef = std::stoi(req.get_param_value("publicatedbefore"));}catch(...){};
 	    try{page = std::stoi(req.get_param_value("page"));}catch(...){};
-	    try{sort = std::stoi(req.get_param_value("f_sort",0));}catch(...){};
+	    try{sort = req.get_param_value("sorting",0);}catch(...){};
 	    try{resultsperpage = std::stoi(req.get_param_value("maxresultsperpage",0));}catch(...){};
 
 
