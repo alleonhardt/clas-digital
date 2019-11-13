@@ -1,14 +1,16 @@
 <!doctype html>
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-		<!--<link rel="stylesheet" href="style.css">-->
-		<title>Upload book - clas digital</title>
+    <!--<link rel="stylesheet" href="style.css">-->
+    <title>Upload book - clas digital</title>
 
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
-		<script src="/user.js"></script>
-		<style>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <script src="/user.js"></script>
+    <link href="/topnav.css" rel="stylesheet" type="text/css">
+
+    <style>
 
 html {
     margin:0;
@@ -18,658 +20,347 @@ body {
 }
 
 .biggerPageClass {
-	padding-left: 10%;
-	padding-right: 10%;
-	padding-top: 0.5rem;
-	padding-bottom: 2rem;
-	overflow: scroll !important;
+    padding-left: 10%;
+    padding-right: 10%;
+    padding-top: 0.5rem;
+    padding-bottom: 2rem;
 }
 
 .filesList {
-	list-style-type: none;
-	width: 100%;
-	color: white;
-	padding: 0;
+    list-style-type: none;
+    width: 100%;
+    color: white;
+    padding: 0;
 }
 
 .filesList>li {
-	display: block;
-	padding: 2rem;
-	background-color: #4682b4;
-	border-bottom: 1px solid white;
+    display: block;
+    padding: 2rem;
+    background-color: #4682b4;
+    border-bottom: 1px solid white;
 }
 
 .filesList li p div {
-	display: block;
-	padding-left: 3rem;
-	padding-right: 3rem;
-	font-size: large;
-	vertical-align: center;
-	line-height: 1rem;
-	color: black;
+    display: block;
+    padding-left: 3rem;
+    padding-right: 3rem;
+    font-size: large;
+    vertical-align: center;
+    line-height: 1rem;
+    color: black;
 }
 
 .filesList li button {
-	margin: auto;
-	margin-left: 1rem;
-	background-color: red;
-	color: black;
-	padding: 0.5rem;
+    margin: auto;
+    margin-left: 1rem;
+    background-color: red;
+    color: black;
+    padding: 0.5rem;
 }
 
 .filesList li button:hover{
-	background-color: black;
-	color: white;
-	transition: all 0.4s ease;
+    background-color: black;
+    color: white;
+    transition: all 0.4s ease;
 }
 
 .filesList p progress{
-	margin: auto;
-	margin-right: 3rem;
+    margin: auto;
+    margin-right: 3rem;
 }
 
 .filesList>li {
-	background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-2 -2 104 168'><polygon stroke='white' stroke-width='2' fill='none' points='0,0 0,162 100,162 100,40 60,0' /><path stroke='white' stroke-width='2' fill='none' d='M60,0 L60,40 L100,40' /></svg>");
-	background-repeat: no-repeat;
-	background-size: 2.2rem;
-	background-position: 1rem center;
-	padding-left:4rem;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-2 -2 104 168'><polygon stroke='white' stroke-width='2' fill='none' points='0,0 0,162 100,162 100,40 60,0' /><path stroke='white' stroke-width='2' fill='none' d='M60,0 L60,40 L100,40' /></svg>");
+    background-repeat: no-repeat;
+    background-size: 2.2rem;
+    background-position: 1rem center;
+    padding-left:4rem;
 
 }
 
 .filesList>li:first-child {
-	background-color: #ccd7ff;
-	height: 8rem;
-	line-height: 4rem;
-	vertical-align: middle;
-	text-align: center;
-	color: grey;
-	border-bottom: none;
-	transition: font 0.2s ease;
+    background-color: #ccd7ff;
+    height: 8rem;
+    line-height: 4rem;
+    vertical-align: middle;
+    text-align: center;
+    color: grey;
+    border-bottom: none;
+    transition: font 0.2s ease;
 }
 
 .filesList>li:not(:first-child):hover {
-	background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-2 -2 104 168'><polygon stroke='white' stroke-width='2' fill='none' points='0,0 0,162 100,162 100,40 60,0' /><path stroke='white' stroke-width='2' fill='none' d='M60,0 L60,40 L100,40' /></svg>"),
-		url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-2 -2 104 168'><path stroke='white' stroke-width='2' fill='none' d='M0,20 L100,20'/><polygon stroke='white' stroke-width='2' fill='none' points='10,20 20,162 80,162 90,20'/><path stroke='white' stroke-width='2' fill='none' d='M25,30 L33,155'/><path stroke='white' stroke-width='2' fill='none' d='M42.5,30 L45,155'/><path stroke='white' stroke-width='2' fill='none' d='M58.5,30 L55,155'/><path stroke='white' stroke-width='2' fill='none' d='M75,30 L67,155'/><path stroke='white' stroke-width='2' fill='none' d='M30,20 L35,0 L65,0 70,20'/></svg>");
-	background-position: 1rem center, right 1rem center;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-2 -2 104 168'><polygon stroke='white' stroke-width='2' fill='none' points='0,0 0,162 100,162 100,40 60,0' /><path stroke='white' stroke-width='2' fill='none' d='M60,0 L60,40 L100,40' /></svg>"),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-2 -2 104 168'><path stroke='white' stroke-width='2' fill='none' d='M0,20 L100,20'/><polygon stroke='white' stroke-width='2' fill='none' points='10,20 20,162 80,162 90,20'/><path stroke='white' stroke-width='2' fill='none' d='M25,30 L33,155'/><path stroke='white' stroke-width='2' fill='none' d='M42.5,30 L45,155'/><path stroke='white' stroke-width='2' fill='none' d='M58.5,30 L55,155'/><path stroke='white' stroke-width='2' fill='none' d='M75,30 L67,155'/><path stroke='white' stroke-width='2' fill='none' d='M30,20 L35,0 L65,0 70,20'/></svg>");
+background-position: 1rem center, right 1rem center;
 }
 
 .saveButton {
-	display: block;
-	margin: 0 auto;
-	height: 4.8rem;
-	width: 25rem;
-	line-height: 2rem;
+    display: block;
+    margin: 0 auto;
+    height: 4.8rem;
+    width: 25rem;
+    line-height: 2rem;
 
 }
 
 .pagesRange {
-	color: white;
-	padding: 1.5rem;
-	padding-left: 5rem;
-	background-color: #4682b4;
-	margin-bottom: 2rem;
-	background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-2 -2 154 186'><polygon stroke='white' stroke-width='2' fill='none' points='50,0  50,50 60,50 100,90 100,132 150,132 150,40 110,0' /><path stroke='white' stroke-width='2' fill='none' d='M110,0 L110,40 L150,40' /><polygon stroke='white' stroke-width='2' stroke-linejoin='bevel' fill='none' points='0,50 0,182 100,182 100,90 60,50' /><path stroke='white' stroke-width='2' fill='none' d='M60,50 L60,90 L100,90' /></svg>");
-	background-repeat: no-repeat;
-	background-size: 3rem;
-	background-position: 1rem center;
+    color: white;
+    padding: 1.5rem;
+    padding-left: 5rem;
+    background-color: #4682b4;
+    margin-bottom: 2rem;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-2 -2 154 186'><polygon stroke='white' stroke-width='2' fill='none' points='50,0  50,50 60,50 100,90 100,132 150,132 150,40 110,0' /><path stroke='white' stroke-width='2' fill='none' d='M110,0 L110,40 L150,40' /><polygon stroke='white' stroke-width='2' stroke-linejoin='bevel' fill='none' points='0,50 0,182 100,182 100,90 60,50' /><path stroke='white' stroke-width='2' fill='none' d='M60,50 L60,90 L100,90' /></svg>");
+    background-repeat: no-repeat;
+    background-size: 3rem;
+    background-position: 1rem center;
 }
 
 .hasText {
-	color: white;
-	padding: 1.5rem;
-	padding-left: 5rem;
-	background-color: #4682b4;
-	margin-bottom: 2rem;
-	background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-2 -2 154 156'><circle cx='50' cy='50' r='50' stroke='white' stroke-width='2' fill='none' /><path stroke='white' stroke-width='2' fill='none' d='M20,30 L80,30'/><path stroke='white' stroke-width='2' fill='none' d='M20,50 L80,50'/><path stroke='white' stroke-width='2' fill='none' d='M20,70 L80,70'/><path stroke='white' stroke-width='2' fill='none' d='M85.0903524534,85.0903524534 L150,150'/></svg>");
-	background-repeat: no-repeat;
-	background-size: 3rem;
-	background-position: 1rem center;
+    color: white;
+    padding: 1.5rem;
+    padding-left: 5rem;
+    background-color: #4682b4;
+    margin-bottom: 2rem;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-2 -2 154 156'><circle cx='50' cy='50' r='50' stroke='white' stroke-width='2' fill='none' /><path stroke='white' stroke-width='2' fill='none' d='M20,30 L80,30'/><path stroke='white' stroke-width='2' fill='none' d='M20,50 L80,50'/><path stroke='white' stroke-width='2' fill='none' d='M20,70 L80,70'/><path stroke='white' stroke-width='2' fill='none' d='M85.0903524534,85.0903524534 L150,150'/></svg>");
+    background-repeat: no-repeat;
+    background-size: 3rem;
+    background-position: 1rem center;
 }
 
 .inputStyle {
-	width: 80%;
-	height: 5vh;
-	opacity: 0;
+    width: 80%;
+    height: 5vh;
+    opacity: 0;
 }
+    </style>
 
-.filelist {
-	background-color: white;
-	color: black;
-	border: 2px solid black;
-	font-size: small;
-	margin-top: 0.1rem;
-	margin-bottom: 0.1rem;
-}
-
-.filelistcont {
-	background-color: grey;
-}
-
-.saver {
-	width: 100%;
-	height: 20%;
-	overflow: auto;
-	z-index: -1;
-	display: block;
-	border-radius: 2rem;
-	margin-top: 3rem;
-}
-
-.progresStyle {
-	display: block;
-	width: 100%;
-	height: 5rem;
-	background-color: grey;
-}
-
-.internStyle {
-	width: 100%;
-	height: 100%;
-	background-color: green;
-	vertical-align: middle;
-	line-height: 1rem;
-	text-align: center;
-	overflow: visible;
-}
-
-.progresStyle p {
-	display: inline-block;
-	color: white;
-	font-size: x-large;
-	position: relative;
-	text-align: center;
-	top: 50%;
-	transform: translateY(-50%);
-}
-
-.hideContent {
-	display: None;
-}
-
-
-/* The Modal (background) */
-.modal {
-	display: none; /* Hidden by default */
-	position: fixed; /* Stay in place */
-	z-index: 1; /* Sit on top */
-	left: 0;
-	top: 0;
-	width: 100%; /* Full width */
-	height: 100%; /* Full height */
-	overflow: auto; /* Enable scroll if needed */
-	background-color: rgb(0,0,0); /* Fallback color */
-	background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-}
-
-/* Modal Content/Box */
-.modal-content {
-	background-color: #fefefe;
-	margin: 5% auto; /* 15% from the top and centered */
-	padding: 20px;
-	border: 1px solid #888;
-	width: 80%; /* Could be more or less, depending on screen size */
-}
-
-/* The Close Button */
-i.close {
-	color: #aaa;
-	float: right;
-	font-size: 28px;
-	font-weight: bold;
-}
-
-.successwrite {
-	color: green;
-	float: right;
-	margin: 0;
-}
-
-.failwrite {
-	color: red;
-	float: right;
-	margin: 0;
-}
-
-.close:hover,
-.close:focus {
-	color: black;
-	text-decoration: none;
-	cursor: pointer;
-} 
-
-.frej {
-	background-color: black;
-	color: white;
-	border: 0;
-	padding: 1rem;
-	margin: 1rem;
-}
-
-		</style>
-
-		<script>
-			function eventoninput(e) {
-			console.log(e.target.files.length);
-			globalFileList = Array.from(e.target.files);
-			ShowFiles();
-			var waitfor = 0;
-
-			document.getElementById("SaveNow").disabled = true;
-			document.getElementById("SaveNow").innerHTML = "Processing input files..";
-			for(let i = globalFileList.length-1; i>=0; i--)
-			{
-				let varstr = globalFileList[i].name.slice(globalFileList[i].name.lastIndexOf("."));
-	
-				if(varstr=='.zip')
-				{
-					waitfor++;
-					let reader = new FileReader();
-					reader.onloadend = function( event ) {
-       					 if ( event.target.readyState !== FileReader.DONE ) {
-           					 return;
-        					}
-						let new_zip = new JSZip();
-						new_zip.loadAsync(reader.result).then(function(zip){
-							for(var x in zip.files)
-							{
-								zip.files[x].name = x;
-								zip.files[x].is_zip_file = true;
-								globalFileList.push(zip.files[x]);
-							}
-							waitfor--;
-							if(waitfor==0)
-							{
-								document.getElementById("SaveNow").disabled = false;
-								document.getElementById("SaveNow").innerHTML = "Speichern!";
-								ShowFiles();
-							}
-						});
-					}
-					reader.readAsArrayBuffer(globalFileList[i]);
-				}
-				else
-				{
-					globalFileList[i].reader_callback_func = function(callback,obj) 					{
-						let reader= new FileReader();
-						reader.onloadend = function(event) {
-							if(event.target.readyState !== FileReader.DONE)
-								return;
-							callback(reader.result);
-						}
-						reader.readAsArrayBuffer(obj);
-					}
-				}
-			}
-
-			if(waitfor==0)
-			{
-				document.getElementById("SaveNow").disabled = false;
-				document.getElementById("SaveNow").innerHTML = "Speichern!";
-			}
-		}
-			let jsonZoteroAccess = 0;
-
-
-
-function DeleteThis(i)
+    <script>
+	function init_events()
 {
-	if(document.getElementById("fileUpID")==undefined)
-		return;
-	globalFileList.splice(i,1);
-	ShowFiles();
+    document.getElementById("fileUpID").addEventListener("change",eventoninput,false);
 }
 
-function ShowFiles()
+function eventoninput(e) {
+    console.log(e.target.files.length);
+    document.getElementById("FileDropList").innerHTML = "<li onclick='document.getElementById("+"\"fileUpID\""+").click()'>Hier klicken um andere Dateien auszuwaehlen</li>";
+
+    for(let i = 0; i < e.target.files.length; i++)
+    {
+	let list = document.createElement("li");
+
+	let p = document.createElement("p");
+	p.innerHTML = "<div>File selected: "+e.target.files[i].name+"</div>";
+
+	let prog = document.createElement("progress");
+	let span = document.createElement("span");
+	prog.style["float"] = "right";
+	prog.style["display"] = "inline-block";
+	prog["max"] = "100";
+
+	span.innerHTML = "0%";
+	span.style["float"] = "right";
+	span.style["margin-right"] = "2rem";
+
+	p.appendChild(prog);
+	p.appendChild(span);
+	list.appendChild(p);
+	list.onclick = function(){this.parentNode.removeChild(this);};
+	document.getElementById("FileDropList").appendChild(list);
+	list.progentry = prog;
+	list.spanentry = span;
+	list.file = e.target.files[i];
+    }
+
+}
+
+function ShowStatus(x,color)
 {
-			
-			let warning = "";
-			for(let i = globalFileList.length-1; i >= 0; i--)
-			{
-				if(globalFileList[i].name.length < 4)
-				{
-					globalFileList.splice(i,1);
-					continue;
-				}
-				let varstr = globalFileList[i].name.slice(globalFileList[i].name.lastIndexOf("."));
-				if(varstr!='.jpg'&&varstr!='.txt')
-				{
-					globalFileList.splice(i,1);
-					continue;
-				}
-			}
-
-			document.getElementById("FileDropList").innerHTML = "<li onclick='document.getElementById("+"\"fileUpID\""+").click()'>Hier klicken um eine Datei auszuwaehlen</li>";
-			for(let i = 0; i < globalFileList.length; i++)
-			{
-				let list = document.createElement("li");
-				
-				if(globalFileList[i].is_zip_file !== undefined)
-				{
-					list.style["background-color"] = "yellow";
-					list.style["margin-left"] = "4rem";
-				}
-				let p = document.createElement("p");
-				p.innerHTML = "<div>File selected: "+globalFileList[i].name+"</div>";
-
-				let prog = document.createElement("progress");
-				let span = document.createElement("span");
-				prog.style["float"] = "right";
-				prog.style["display"] = "inline-block";
-				prog["max"] = "100";
-
-				span.innerHTML = "0%";
-				span.style["float"] = "right";
-				span.style["margin-right"] = "2rem";
-
-				p.appendChild(prog);
-				p.appendChild(span);
-				list.appendChild(p);
-				list.onclick = function(){DeleteThis(i);};
-				document.getElementById("FileDropList").appendChild(list);
-				globalFileList[i].listentry = list;
-				list.progentry = prog;
-				list.spanentry = span;
-			}
+    let ban = document.getElementById("status_banner");
+    ban.innerHTML = x;
+    ban.style.color = color;
+    window.scrollTo(0,0);
 }
 
-let globalFileList = [];
+function Upload(x,key)
+{
+    let xhr = new XMLHttpRequest();
+    if(x.force_overwrite == true)
+	xhr.open("POST","/upload?scanid="+key+"&filename="+x.file.name+"&forced=true",true);
+    else
+	xhr.open("POST","/upload?scanid="+key+"&filename="+x.file.name,true);
 
-//Create an enum to identify the valid types of State Banner changes
-var StateBannerType = {"success":1,"danger":2,"warning":3,"info":4,"release":5};
-Object.freeze(StateBannerType);
-
-//Shows a banner at the top of the screen, used to inform the user of errors and success
-class StateBanner {
-	static ChangeBanner(msg, type)
+    x.progentry.value = 0;
+    xhr.onload = function() {
+	if(xhr.status == 403)
 	{
-		//Show the new banner message
-		let alt = document.getElementById("StateBanner");
-		let newHTML = "<strong>";
-		newHTML+= msg;
-		newHTML+="</strong>";
-		alt.innerHTML = newHTML;
+	    if(xhr.responseText == "file_exists" && x.force_overwrite!=true) //File exists go for overwrite
+	    {
+		x.style.background = "yellow";
+		x.children[0].children[0].innerHTML = "File already exists: "+x.file.name+", overwrite?";
+		let yes = document.createElement("button");
+		let no = document.createElement("button");
+		yes.style.background = "red";
+		yes.innerHTML = "Yes";
+		no.style.background = "green";
+		no.innerHTML = "No";
+		x.children[0].children[0].appendChild(yes);
+		x.children[0].children[0].appendChild(no);
+		x.children[0].children[1].style.display = "none";
+		x.children[0].children[2].style.display = "none";
 
-		//Decide what kind of layout the banner should show
-		if(type===StateBannerType.success)
-		{
-			alt.setAttribute("class","alert alert-success");
+		yes.onclick = function() {
+		    x.force_overwrite = true;
+		    x.style.background = "";
+		    x.children[0].children[1].style.display = "";
+		    x.children[0].children[2].style.display = "";
+		    no.parentNode.removeChild(no);
+		    yes.parentNode.removeChild(yes);
+		    Upload(x,key);
 		}
-		else if(type===StateBannerType.danger)
-		{
-			alt.setAttribute("class","alert alert-danger"); 
+
+		no.onclick = function() {
+		    x.innerHTML = "<p><div>Canceled upload of: "+x.file.name+"</div></p>";
+		    x.style.background = "red";
+		    x.upload_finished = true;
+		    UploadAll();
 		}
-		else if(type===StateBannerType.warning)
-		{
-			alt.setAttribute("class","alert alert-warning"); 
-		}
-		else if(type===StateBannerType.info)
-		{
-			alt.setAttribute("class","alert alert-info"); 
-		}
-		else if(success==StateBannerType.release)
-		{
-			alt.setAttribute("class","None");
-			alt.innerHTML = "";
-		}
+	    }
+	    else
+	    {
+		ShowStatus("Server returned error: "+xhr.responseText,"red");
+	    }
+	    //File exists already ask for override permission
 	}
+	else if(xhr.status==200)
+	{
+	    x.style.background = "green";
+	    x.upload_finished = true;
+	    x.progentry.value = 100;
+	    x.spanentry.innerHTML = 100+"%";
+	    UploadAll();	//Recursivly upload rest of the files
+	}
+	else
+	    return ShowStatus("Unknown error while uploading please dont try again and show this message to the server administrators","red");
+    }
+
+    xhr.onprogress = function (event) {
+	if(event.lengthComputable)
+	{
+	    let xval = Math.round(event.loaded/event.total*100);
+	    x.progentry.value = xval;
+	    x.spanentry.innerHTML = xval+"%";
+	}
+    };
+
+    xhr.send(x.file);
 }
 
-var startUpload = function(){};
-
-function showError(fg,bg,text)
+function ExtractKey()
 {
-	document.getElementById("progressB").style.width = "100%";
-	document.getElementById("okka").innerHTML = text;
-	document.getElementById("okka").style.color = fg;
-	document.getElementById("progressB").style.background = bg;
+    let permalink = document.getElementById("Permalink").value;
+    if(permalink=="")
+	return "";
+
+    let arr = permalink.split("/");
+    let finalKey = "";
+    for(var i = 0; i < arr.length; i++)
+    {
+	if(arr[i]=="itemKey")
+	{
+	    finalKey = arr[i+1];
+	    break;
+	}
+    }
+    if(finalKey=="" && (arr.length==1))
+	finalKey = permalink;
+    return finalKey;
+}
+
+function ShowBookContentLink()
+{
+    let lnk = ExtractKey();
+    document.getElementById("BookContentLink").innerHTML = "<a href='/books/"+lnk+"/' target='_blank'>Book Content</a>";
 }
 
 function UploadAll()
 {
-	let permalink = document.getElementById("Permalink").value;
-	let elem = document.getElementById("fileUpID");
-	elem.onclick = function(){return false;}
-	elem.parentNode.removeChild(elem);
+    let elem = document.getElementById("fileUpID");
+    elem.onclick = function(){return false;};
 
-	if(permalink=="")
+    let finalKey = ExtractKey();
+    if(finalKey=="")
+	ShowStatus("Either you forgot to type in the item key or the permalink is in the wrong format!","red");
+
+
+    let val = document.getElementById("FileDropList").children;
+    for(let i = 1; i < val.length; i++)
+    {
+	if(val[i].upload_finished==undefined || val[i].upload_finished == null)
 	{
-		StateBanner.ChangeBanner("No permalink given!",StateBannerType.danger);
-		window.scrollTo(0,0);
-		return;
+	    val[i].onclick = function() { };
+	    Upload(val[i],finalKey);
+	    return;
 	}
-	if(globalFileList.length<1)
-	{
-		StateBanner.ChangeBanner("No files selected!",StateBannerType.danger);
-		window.scrollTo(0,0);
-		return;
-	}
-	console.log("Upload: "+globalFileList.length+" files");
-
-	let xhr = new XMLHttpRequest();
-	let requ = "/getBookMetadata";
-	let arr = permalink.split("/");
-	for(var i = 0; i < arr.length; i++)
-	{
-		if(arr[i]=="itemKey")
-		{
-			permalink = arr[i+1];
-			break;
-		}
-	}
-	console.log("Extracted item key: "+permalink);
-	requ=requ + "?scanId=" +permalink;
-	xhr.open("GET",requ,true);
-	xhr.onload = function() {
-		if(xhr.status != 200)
-		{
-			showError("black","red",xhr.responseText);
-			return;
-		}
-
-		console.log(xhr.responseText);
-		let js = JSON.parse(xhr.responseText);
-		document.getElementById("BookMeta").innerHTML = js.bib;
-		let advancedOpts = document.getElementById("ModalBanner");
-		//Tell the modal banner it should display itself right now
-		advancedOpts.style.display = "block";
-
-		//Prepare the close button, on close click it will hide the modal banner
-		let close = document.getElementsByClassName("close")[0];
-		close.onclick = function() {
-			advancedOpts.style.display = "none";
-			showError("black","red","Upload rejected");
-			setTimeout(function(){location.reload();},1000);
-		}
-
-		//If the user clicked outside of the modal banner close the window as well
-		window.onclick = function(event) {
-			if (event.target == advancedOpts) {
-				advancedOpts.style.display = "none";
-				showError("black","red","Upload rejected");
-				setTimeout(function(){location.reload();},1000);
-			}
-		}
-
-		startUpload = function() {	
-			document.getElementById("SaveNow").style.display = "None";
-			document.getElementById('ModalBanner').style.display='none';
-			document.getElementById('FileDropList').scrollIntoView();
-
-			
-			instaUpload(permalink,0,false);
-			window.setTimeout(checkstate,1000);
-		}
-		return;
-	}
-	xhr.send(null);
-	console.log(document.getElementById("saver").innerHTML);
-}
-
-function checkstate()
-{
-	let is_finished = false;
-	let no_err = true;
-	for(let x = 0; x < globalFileList.length; x++)
-	{
-		if(globalFileList[x].processed_entry==undefined)
-		{
-		  	console.log(globalFileList[x].name+" is undefined");
-			window.setTimeout(checkstate,1000);
-			return;
-		}
-		else if(globalFileList[x].processed_entry<0)
-			no_err = false;
-	}
-
-	if(no_err)
-		alert("All files were successfully uploaded!");
-	else
-		alert("There were some errors while uploading the book!");
-}
-
-function instaUpload(key,x,force_overwrite)
-{
-	if(x>=globalFileList.length)
-		return;
-
-	let file = globalFileList[x];
- 	let outlist = globalFileList[x].listentry;
-	let checkfile = new XMLHttpRequest();
-	let requ_chk = "/getBookRessources?exist_check=true&book="+key+"&ressource="+file.name;
-	outlist.progentry.value = "0";
-	outlist.spanentry.innerHTML = "0%";
-	checkfile.open("GET",requ_chk,true);
-	checkfile.onload = function() {
-		if(checkfile.status==200&&force_overwrite==false)
-		{
-			console.log(outlist.childNodes);
-			outlist.childNodes[0].childNodes[0].innerHTML = "File: "+file.name+" already exists, overwrite?";
-		  	let yes = document.createElement("button");
-		  	yes.innerHTML = "Yes";
-		  	yes.onclick = function(){instaUpload(key,x,true);};
-		  	outlist.childNodes[0].childNodes[0].appendChild(yes);
-
-		 	let No = document.createElement("button");
-		  	No.innerHTML = "No";
-		  No.onclick = function(){outlist.style["background-color"] = "red";file.processed_entry = 1;outlist.innerHTML = "File: "+file.name+" already exists, aborted by user!";instaUpload(key,x+1,false);};
-		  	outlist.childNodes[0].childNodes[0].appendChild(No);
-
-
-			outlist.style["background-color"] = "#C49102";
-			return;
-		}
-	let reader = new FileReader();
-		//TODO: outlist.
-	reader.onload = function() {
-		let xhr = new XMLHttpRequest();
-		let requ = "/uploadBook?itemKey="+key+"&filename="+file.name+"&overwrite=true";
-		xhr.open("POST",requ,true);
-		xhr.upload.addEventListener("progress", function(oEvent){
-			if(oEvent.lengthComputable)
-			{
-				let xval = Math.round(oEvent.loaded/oEvent.total*100);
-				outlist.progentry.value = xval;
-				outlist.spanentry.innerHTML = xval+"%";
-			}
-		});
-		xhr.onload = function() {
-			instaUpload(key,x+1,false);
-			if(xhr.status!=200)
-			{
-				outlist.innerHTML = xhr.responseText;
-				outlist.style["background-color"] = "red";
-				file.processed_entry = -1;
-				return;
-			}
-			outlist.style["background-color"] = "green";
-			outlist.innerHTML = "Uploaded file: "+file.name+" successfully";
-			file.processed_entry = 0;
-		}
-		xhr.send(reader.result);
-	}
-	reader.readAsArrayBuffer(file);
-	}
-	checkfile.send(null);
+    }
+    ShowStatus("Uploaded all files successfully! In order to find results in the new book you have to restart the server!","green");
 }
 
 
-window.addEventListener("load",function(){User.initialise("uploadbooklink");},false);
-		</script>
-		<link href="/topnav.css" rel="stylesheet" type="text/css">
-		<style>
-.MetaLayout {
-	margin: 3rem;
-	margin-bottom: 5rem;
-}
-		</style>
-	</head>
-	<body>
-		<!-- The navigation bar config -->
-		<div id='tpnav' class="topnav">
-            <a id='homelink' href='/information/'>Information</a>
-            <a id='searchlink' href='/search'>Search</a>
-            <a id='administrationlink' class='classifiedContent' href='/private/admin/Administration.html' data-acc=4>Administration</a>
-            <a id='uploadbooklink' class='classifiedContent active' href='/private/write/UploadBook.html' data-acc=2>Upload Books</a>
-            <a id='managebookslink' class='classifiedContent' href='/private/write/ManageBooks.html' data-acc=2>Manage Books</a>
+window.addEventListener("load",function(){initialise("uploadbooklink");init_events()},false);
+    </script>
+</head>
+<body>
+    <!-- The navigation bar config -->
+    <div id='tpnav' class="topnav">
+	<a id='homelink' href='/information/'>Information</a>
+	<a id='searchlink' href='/search'>Search</a>
+	<a id='administrationlink' class='classifiedContent' href='/private/admin/Administration.html' data-acc=4>Administration</a>
+	<a id='uploadbooklink' class='classifiedContent active' href='/private/write/UploadBook.html' data-acc=2>Upload Books</a>
+	<a id='managebookslink' class='classifiedContent' href='/private/write/ManageBooks.html' data-acc=2>Manage Books</a>
 
-            <div class='topnav-right-in' id='loggedintopnav'>
-                <span id='LoggedInAs'>Logged in</span>
-                <button id='logoutBut' onclick='User.DoLogout()'>Logout</button>
-            </div>
-            <div class='topnav-right-out' id='loggedouttopnav'>
-                <form id ="LoginForm" action="/login" method="post">
-                    <input id="EmailType" type="email" name="email" placeholder="Email" aria-label="Email" required>
-                    <input id="PasswordType" type="password" name="password" placeholder="Password" aria-label="Password" required>
-                    <input type="submit" value="Log In"/>
-                </form>'
-            </div>
+	<div class='topnav-right-in' id='loggedintopnav'>
+	    <span id='LoggedInAs'>Logged in</span>
+	    <button id='logoutBut' onclick='User.DoLogout()'>Logout</button>
+	</div>
+	<div class='topnav-right-out' id='loggedouttopnav'>
+	    <form id ="LoginForm" action="/login" method="post">
+		<input id="EmailType" type="email" name="email" placeholder="Email" aria-label="Email" required>
+		<input id="PasswordType" type="password" name="password" placeholder="Password" aria-label="Password" required>
+		<input type="submit" value="Log In"/>
+	    </form>
+	</div>
 
-        </div>
+    </div>
 
+    <div class='biggerPageClass'>
+	<h3 id='status_banner'></h3>
+	<h1>Volltexte hochladen</h1>
+	<input class="inputStyle" type="file" id="fileUpID" multiple/>
 
-		<div id="StateBanner"></div>
-		<div class="biggerPageClass">
-			<h1>Volltexte hochladen</h1>
-			<input class="inputStyle" type="file" id="fileUpID" multiple/>
+	<h2><span>1.</span>Wo sind die Dateien?</h2>
+	<p>Die Dateien (nur .jpg und .txt hochladen!) der Staatsbibliothek müssen zuerst einmal auf den Projekt-Server gelangen. Lade sie von der Bibliothek auf deinen PC und nutze das Feld unten, um sie wieder auszuwählen. Sie werden dann auf den Projekt-Server übertragen.</p>
+	<p><strong>Wichtig:</strong> Schließe diesen Tab nicht, während der Upload läuft!</p>
+	<ul class="list-group" id="CurrentUploads">
+	</ul>
+	<ul id="FileDropList" class="filesList">
+	    <li onclick='document.getElementById("fileUpID").click()'>Hier klicken um eine Datei auszuwaehlen</li>
+	</ul>
+	<br>
+	<h2><span>2.</span>Ist alles korrekt?</h2>
+	<div aria-label="Vorhandene Scans" class="pagesRange">Noch keine Scans hochgeladen</div>
+	<div aria-label="Durchsuchbarer Text?" class="hasText">Nein, es wurde kein durchsuchbarer Text hochgeladen</div>
 
-			<h2><span>1.</span>Wo sind die Dateien?</h2>
-			<p>Die Zip-Dateien (nur eine aufeinmal) der Staatsbibliothek müssen zuerst einmal auf den Projekt-Server gelangen. Lade sie von der Bibliothek auf deinen PC und nutze das Feld unten, um sie wieder auszuwählen. Sie werden dann auf den Projekt-Server übertragen.</p>
-			<p><strong>Wichtig:</strong> Schließe diesen Tab nicht, während der Upload läuft!</p>
-			<ul class="list-group" id="CurrentUploads">
-			</ul>
-			<ul id="FileDropList" class="filesList">
-				<li onclick='document.getElementById("fileUpID").click()'>Hier klicken um eine Datei auszuwaehlen</li>
-			</ul>
-			<br>
-			<h2><span>2.</span>Ist alles korrekt?</h2>
-			<div aria-label="Vorhandene Scans" class="pagesRange">Noch keine Scans hochgeladen</div>
-			<div aria-label="Durchsuchbarer Text?" class="hasText">Nein, es wurde kein durchsuchbarer Text hochgeladen</div>
-
-			<br>
-			<h2><span>3.</span>Welches Werk ist das?</h2>
-			<p>Fuege noch den Link zu Zotero ein um das Item spaeter immer korrekt zuordnen zu koennen:</p>
-			<input id="Permalink" class="description" type="text" placeholder="Permalink hier einfügen"/>
-			<br>
-			<h2><span>4.</span>Speichern!</h2>
-			<div class="saver" id="saver">
-				<p>Speichere diesen Volltext auf dem Projektserver!</p>
-				<button id="SaveNow" class="saveButton" onclick="UploadAll()">Speichern!</button>
-			</div>
-		</div>
-		<div id="ModalBanner" class="modal">
-			<div class="modal-content">
-				<span class="close">&times;</span>
-				<h4 id="BookMetaHeader">Are you sure that you are uploading the book</h4>
-				<br>
-				<div id="BookMeta" class="MetaLayout"></div>
-				<br>
-				<br>
-				<div id="ButtonTypes">
-					<button class='btn btn-outline-success my2 my-sm-0 inlineButton' onclick="startUpload();return true">Grant upload</button>
-					<button class='btn btn-outline-info my2 my-sm-0 inlineButton' onclick="document.getElementsByClassName('close')[0].click();">Reject upload</button>
-				</div>
-			</div>
-		</div>
-
-	</body>
+	<br>
+	<h2><span>3.</span>Welches Werk ist das?</h2>
+	<p>Fuege noch den Link zu Zotero ein um das Item spaeter immer korrekt zuordnen zu koennen:</p>
+	<input id="Permalink" class="description" type="text" placeholder="Permalink hier einfügen" oninput="ShowBookContentLink();"/>
+	<div id="BookContentLink"></div>
+	<br>
+	<h2><span>4.</span>Speichern!</h2>
+	<div class="saver" id="saver">
+	    <p>Speichere diesen Volltext auf dem Projektserver!</p>
+	    <button id="SaveNow" class="saveButton" onclick="UploadAll();return true;">Speichern!</button>
+	</div>
+    </div>
+</body>

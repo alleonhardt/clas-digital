@@ -11,6 +11,9 @@
 #include <exception>
 #include <string_view>
 #include <filesystem>
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h" //Neeeded for image dimensions
+
 
 
 using namespace httplib;
@@ -73,19 +76,19 @@ void get_sugg(const Request &req, Response &resp, CBookManager &manager)
 {
     try
     {
-        std::string sInput = req.get_param_value("q");
-	    auto start = std::chrono::system_clock::now();
-        std::list<std::string>* listSugg = manager.getSuggestions_fast(sInput);
-		std::chrono::duration<double> elapsed_seconds = std::chrono::system_clock::now()-start;
-        nlohmann::json responseJson;
-        for(auto it=listSugg->begin(); it!=listSugg->end();it++)
-            responseJson.push_back((*it)); 
-        delete listSugg;
-        resp.set_content(responseJson.dump(),"application/json");
+	std::string sInput = req.get_param_value("q");
+	auto start = std::chrono::system_clock::now();
+	std::list<std::string>* listSugg = manager.getSuggestions_fast(sInput);
+	std::chrono::duration<double> elapsed_seconds = std::chrono::system_clock::now()-start;
+	nlohmann::json responseJson;
+	for(auto it=listSugg->begin(); it!=listSugg->end();it++)
+	    responseJson.push_back((*it)); 
+	delete listSugg;
+	resp.set_content(responseJson.dump(),"application/json");
     }
     catch(...)
     {
-        resp.set_content("{}","application/json");
+	resp.set_content("{}","application/json");
     }
 }
 void get_metadata(const Request &req, Response &resp, CBookManager &manager)
@@ -215,7 +218,7 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
 	{
 	    std::string query;
 	    bool fuzz = false;
-        std::string scope ="all";
+	    std::string scope ="all";
 	    std::string author = "";
 	    int pubafter = 1700;
 	    int pubbef = 2049;
@@ -358,6 +361,142 @@ void do_authentification(const Request& req, Response &resp)
 
     std::cout<<"Access granted!"<<std::endl;
     resp.status = 200;
+}
+
+void do_upload(const Request& req, Response &resp, CBookManager &manager)
+{
+    if(!User::AccessCheck(GetUserFromCookie(req),2))
+    {
+	resp.set_content("missing_access_rights","text/plain");
+	resp.status=403;
+	return;
+    }
+
+    bool forcedWrite=false;
+    std::string writePath = "web/books/";
+    std::string scanId = "";
+    std::string fileName = "";
+
+    try{forcedWrite = req.get_param_value("forced")=="true";}catch(...){};
+    try{scanId = req.get_param_value("scanid");}catch(...){};
+    try{fileName = req.get_param_value("filename");}catch(...){};
+
+    std::cout<<"Authorized request to upload files"<<std::endl;
+    std::cout<<"Parsed fileName: "<<fileName<<std::endl;
+    std::cout<<"Parsed scanID: "<<scanId<<std::endl;
+    std::cout<<"Parsed force Overwrite: "<<forcedWrite<<std::endl;
+    if(scanId==""||fileName==""||fileName.find("..")!=std::string::npos||fileName.find("~")!=std::string::npos||scanId.find("..")!=std::string::npos||scanId.find("~")!=std::string::npos)
+    {
+	resp.status=403;
+	resp.set_content("malformed_parameters","text/plain");
+	return;
+    }
+
+    writePath+=scanId;
+    std::string directory = writePath;
+
+    writePath+="/";
+    writePath+=fileName;
+
+    try
+    {
+	manager.getMapOfBooks().at(scanId);
+    }
+    catch(...)
+    {
+	resp.status=403;
+	resp.set_content("book_unknown","text/plain");
+	return;
+    }
+
+    if((std::filesystem::exists(writePath)||!std::filesystem::exists(directory))&&!forcedWrite)
+    {
+	resp.status=403;
+	resp.set_content("file_exists","text/plain");
+	return;
+    }
+
+    auto pos = fileName.find_last_of('.');
+    std::string fileEnd = fileName.substr(pos+1,std::string::npos);
+
+    if(fileEnd=="jpg"||fileEnd=="png"||fileEnd=="JPG"||fileEnd=="PNG")
+    {
+	try
+	{
+	    static std::mutex m;
+
+	    std::string pa = directory;
+	    pa+="/readerInfo.json";
+	    std::lock_guard lck(m);
+	    nlohmann::json file_desc;
+	    if(std::filesystem::exists(pa))
+	    {
+		std::ifstream readerFile(pa.c_str(),std::ios::in);
+		readerFile>>file_desc;
+		readerFile.close();
+	    }
+	    else
+	    {
+		file_desc["maxPageNum"] = 0;
+		file_desc["pages"] = nlohmann::json::array();
+	    }
+
+	    nlohmann::json entry;
+	    entry["file"] = fileName;
+	    std::regex reg("page0*([1-9][0-9]*).*");
+	    std::smatch cm;
+	    int maxPageNum = file_desc["maxPageNum"];
+	    if(std::regex_match(fileName,cm,reg))
+	    {
+		if(cm.size()<2)
+		    throw "malformed_img_naming";
+		entry["pageNumber"]=std::stoi(cm[1]);
+		maxPageNum = std::max(maxPageNum,std::stoi(cm[1]));
+	    }
+
+	    int width,height,z;
+	    stbi_info_from_memory(reinterpret_cast<const unsigned char*>(req.body.c_str()),req.body.length(),&width,&height,&z);
+	    entry["width"] = width;
+	    entry["height"] = height;
+	    bool replace = false;
+	    for(auto &iter : file_desc["pages"])
+	    {
+		if(iter["pageNumber"]==entry["pageNumber"])
+		{
+		    iter["width"] = width;
+		    iter["height"] = height;
+		    iter["file"] = fileName;
+		    replace=true;
+		    break;
+		}
+	    }
+	    file_desc["maxPageNum"] = maxPageNum;
+	    if(!replace)
+		file_desc["pages"].push_back(std::move(entry));
+
+	    std::ofstream writer(pa.c_str(),std::ios::out);
+	    writer<<file_desc;
+	    writer.close();
+	}
+	catch(...)
+	{
+	    resp.status = 403;
+	    resp.set_content("Error while creating readerInfo.json","text/plain");
+	    return;
+	}
+    }
+    else if((fileEnd!="txt")&&(fileEnd!="TXT"))
+    {
+	resp.status = 403;
+	resp.set_content("unsupported_file_type","text/plain");
+	return;
+    }
+    std::cout<<"Uploading file now! File size: "<<req.body.length()<<std::endl;
+
+    std::ofstream ofs(writePath.c_str(),std::ios::out);
+    ofs.write(req.body.c_str(),req.body.length());
+    ofs.close();
+    resp.status=200;
 }
 
 void do_senduserlist(const Request &req, Response &resp)
@@ -539,6 +678,7 @@ int main(int argc, char **argv)
     srv.Get(R"(/authenticate.*)",&do_authentification);
     srv.Get("/userlist",&do_senduserlist);
     srv.Post("/userlist",&do_usertableupdate);
+    srv.Post("/upload",[&](const Request &req, Response &resp){do_upload(req,resp,manager);});
     std::cout<<"C++ Api server startup successfull!"<<std::endl;
     srv.listen("localhost", startPort);
     return 0;

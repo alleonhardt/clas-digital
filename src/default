@@ -69,6 +69,12 @@ server {
 	autoindex_localtime on;
 
 	include /etc/clas-digital-devel/bin/forbiddenfiles;
+
+	location /upload {
+		client_max_body_size 10M;
+        	proxy_pass         http://localhost:9992;
+	}
+
     	location /api {
         	proxy_pass         http://localhost:9992;
 	} 
@@ -78,9 +84,9 @@ server {
 	}
 
 		
-	location /private/ {
-        	auth_request         /authenticate;
-	}
+	#location /private/ {
+        #	auth_request         /authenticate;
+	#}
 
 	location /createbibliography {
         	proxy_pass         http://localhost:9992;

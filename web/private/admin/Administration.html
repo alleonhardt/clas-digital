@@ -105,7 +105,7 @@ function OnUserList()
                         tdiv.classList.add("col-sm-2");
                         let inp = document.createElement("input");
                         inp.setAttribute("type","checkbox");
-                        inp.setAttribute("onclick","UpdateValues(this);");
+                        inp.setAttribute("onclick","UpdateValues(this);SaveUserList();");
                         inp.from_who = jsonObj[x].email;
                         inp.which_attr = single;
 			if(single===0)
@@ -197,7 +197,6 @@ function DeleteUser(elem)
 
 function SaveUserList()
 {
-  StateBanner.ChangeBanner("",StateBannerType.release);
   let xhr = new XMLHttpRequest();
   let requ = "/userlist";
   xhr.open("POST",requ,true);
@@ -211,6 +210,9 @@ function SaveUserList()
   xhr.onload = function() {
     StateBanner.ChangeBanner("Changed user rights successfully!",StateBannerType.success);
     }
+    xhr.onerror = function() {
+    StateBanner.ChangeBanner("You are not authorized to change the user table!",StateBannerType.danger);
+    }
   xhr.send(JSON.stringify(sendObj));
 }
 
@@ -219,7 +221,7 @@ function UpdateValues(elem)
     UserList[elem.from_who] = (UserList[elem.from_who]&(~(1<<elem.which_attr)))|(elem.checked<<elem.which_attr);
 }
 
-window.addEventListener("load",function(){User.initialise("administrationlink");OnUserList();},false);
+window.addEventListener("load",function(){initialise("administrationlink");OnUserList();},false);
 </script>
 <link href="/topnav.css" rel="stylesheet" type="text/css">
   </head>
@@ -256,7 +258,7 @@ window.addEventListener("load",function(){User.initialise("administrationlink");
     </li>
     <li class="list-group-item">
     <div class="row">
-        <div class="col-sm-3"><input id="NUsrName" type="email" placeholder="Name"></input></div>
+        <div class="col-sm-3"><input id="NUsrName" type="email" placeholder="Email" required></input></div>
         <div class="col-sm-3"><input id="NUsrPW" type="password" placeholder="Password"></input></div>
         <div class="col-sm-3"><input id ="NUsrPW2" type="password" placeholder="Repeat Password"></input></div>
         <div class="col-sm-3"><button class='btn btn-success' onclick="CreateNewUser()">Create User</button></div>
@@ -275,5 +277,5 @@ window.addEventListener("load",function(){User.initialise("administrationlink");
     </div>
     </li>
 </ul>
-<button class='btn btn-outline-warning my2 my-sm-0' id="SaveUserButton" onclick='SaveUserList()'>Save Changes</button>
+<!--<button class='btn btn-outline-warning my2 my-sm-0' id="SaveUserButton" onclick='SaveUserList()'>Save Changes</button>-->
 </body>
