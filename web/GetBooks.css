@@ -104,6 +104,10 @@ body {
 }
 
 .bibliostyle {
+    margin-right: 1rem;
+    margin-top: 0.7rem;
+    display: inline-block;
+    float: right;
     color: green;
 }
 
