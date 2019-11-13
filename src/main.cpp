@@ -10,6 +10,8 @@
 #include <chrono>
 #include <exception>
 #include <string_view>
+#include <filesystem>
+
 
 using namespace httplib;
 
@@ -487,6 +489,7 @@ int main(int argc, char **argv)
 
 
     {
+	auto last_mod = std::filesystem::last_write_time("bin/zotero.json");
 	std::ofstream of("bin/forbiddenfiles",std::ios::out);
 	if(of.is_open())
 	{
@@ -502,9 +505,15 @@ int main(int argc, char **argv)
 		    of<<"auth_request /authenticate;\n";
 		    of<<"}\n";
 		}
-		std::string command = "mkdir -p ";
+		std::error_code ec;
 		std::string dir = "web/books/";
 		dir+=it.first;
+
+		auto last_mod_file = std::filesystem::last_write_time(dir,ec);
+		if(!ec && last_mod_file >= last_mod)
+		    continue;
+
+		std::string command = "mkdir -p ";
 		command+=dir;
 		int x = system(command.c_str());
 		x+=1;

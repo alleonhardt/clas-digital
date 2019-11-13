@@ -105,12 +105,15 @@ body {
 }
 
 .bibliostyle {
+    display: block;
+    padding-top: 0.5rem;
     font-size: small;
-    margin-right: 1rem;
-    margin-top: 0.9rem;
-    display: inline-block;
-    float: right;
     color: green;
+    -webkit-touch-callout: all; /* iOS Safari */
+    -webkit-user-select: all; /* Safari */
+    -moz-user-select: all; /* Firefox */
+    -ms-user-select: all; /* Internet Explorer/Edge */
+    user-select: all; /* Chrome and Opera */
 }
 
 .pagecontainer {

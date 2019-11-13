@@ -9,7 +9,7 @@ project(clas-digital)
 include_directories(
   "src"
   "deps")
-set(CMAKE_CXX_FLAGS "-O3 -Wall -Wextra -Werror -Wpedantic -march=native -std=c++1z")
+set(CMAKE_CXX_FLAGS "-O3 -Wall -Wextra -Werror -Wpedantic -march=native -std=c++17")
 
 
 find_package(Threads REQUIRED)
