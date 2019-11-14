@@ -198,6 +198,37 @@ function Upload(x,key)
 	    {
 		x.style.background = "yellow";
 		x.children[0].children[0].innerHTML = "File already exists: "+x.file.name+", overwrite?";
+		let butt = document.createElement("compare");
+		butt.innerHTML = "Compare Files";
+		butt.style.background = "blue";
+		butt.style.float = "right";
+		butt.style.padding = "0.5rem";
+		butt.style.cursor = "pointer";
+		butt.onclick = function() {
+		    OpenModal(x.file,key);
+		}
+		x.children[0].children[0].appendChild(butt);
+		x.children[0].children[1].style.display = "none";
+		x.children[0].children[2].style.display = "none";
+		document.getElementById("nobut").onclick = function() {
+		    HideModal();
+		    x.innerHTML = "<p><div>Canceled upload of: "+x.file.name+"</div></p>";
+		    x.style.background = "red";
+		    x.upload_finished = true;
+		    UploadAll();
+		}
+
+		document.getElementById("yesbut").onclick = function() {
+		    HideModal();
+		    x.force_overwrite = true;
+		    x.style.background = "";
+		    x.children[0].children[1].style.display = "";
+		    x.children[0].children[2].style.display = "";
+		    butt.parentNode.removeChild(butt);
+		    Upload(x,key);
+		}
+		return;
+
 		let yes = document.createElement("button");
 		let no = document.createElement("button");
 		yes.style.background = "red";
@@ -210,20 +241,9 @@ function Upload(x,key)
 		x.children[0].children[2].style.display = "none";
 
 		yes.onclick = function() {
-		    x.force_overwrite = true;
-		    x.style.background = "";
-		    x.children[0].children[1].style.display = "";
-		    x.children[0].children[2].style.display = "";
-		    no.parentNode.removeChild(no);
-		    yes.parentNode.removeChild(yes);
-		    Upload(x,key);
-		}
+		 		}
 
 		no.onclick = function() {
-		    x.innerHTML = "<p><div>Canceled upload of: "+x.file.name+"</div></p>";
-		    x.style.background = "red";
-		    x.upload_finished = true;
-		    UploadAll();
 		}
 	    }
 	    else
@@ -277,6 +297,90 @@ function ExtractKey()
     return finalKey;
 }
 
+function HideModal()
+{
+    document.getElementById("modal").style.display = "none";
+}
+
+function OpenModal(fl,key)
+{
+    let ending = fl.name.substr(fl.name.lastIndexOf(".")+1);
+
+    if(ending == 'jpg'||ending=='JPG'||ending=='png'||ending=='PNG')
+	ShowImageSlide(fl,key);
+    else
+	ShowOCRSlide(fl,key);
+}
+
+function ShowOCRSlide(fl,key)
+{
+    document.getElementById("modal").style.display = "block";
+    let oldf = document.getElementById("oldfile");
+    let newf = document.getElementById("newfile");
+    let oldfileparagraph = document.createElement("p");
+    let newfileparagraph = document.createElement("p");
+    oldfileparagraph.style.background = "white";
+    newfileparagraph.style.background = "white";
+    oldf.appendChild(oldfileparagraph);
+    newf.appendChild(newfileparagraph);
+
+    let xhr = new XMLHttpRequest();
+    xhr.open("GET","/books/"+key+"/"+fl.name,true);
+    xhr.onload = function() {
+	if(xhr.status!=200)
+	{
+	    oldfileparagraph.innerHTML = "Could not load file sorry for that :(";
+	}
+	else
+	{
+	    oldfileparagraph.innerHTML = xhr.responseText;
+	}
+    }
+    xhr.send();
+
+    if (FileReader) {
+	var fr = new FileReader();
+	fr.onload = function () {
+	    newfileparagraph.innerHTML = fr.result;
+	}
+	fr.readAsText(fl);
+    }
+    else
+    {
+	newfileparagraph.innerHTML = "Could not load file sorry for that :(";
+    }
+}
+
+function ShowImageSlide(fl,key)
+{
+    document.getElementById("modal").style.display = "block";
+    let kk = document.getElementById("oldfile");
+    kk.innerHTML = "";
+    document.getElementById("newfile").innerHTML = "";
+
+    let val = document.createElement("img");
+    val.src = "/books/"+key+"/"+fl.name;
+    val.style["max-height"] = "100%";
+    val.style["max-width"] = "100%";
+    val.style.margin = "auto";
+    val.style.display = "inherit";
+    kk.appendChild(val);
+
+    if (FileReader) {
+	var fr = new FileReader();
+	fr.onload = function () {
+	    let valnew = document.createElement("img");
+	    valnew.src = fr.result;
+	    valnew.style["max-height"] = "100%";
+	    valnew.style["max-width"] = "100%";
+	    valnew.style.margin = "auto";
+	    valnew.style.display = "inherit";
+	    document.getElementById("newfile").appendChild(valnew);
+	}
+	fr.readAsDataURL(fl);
+    }
+}
+
 function ShowBookContentLink()
 {
     let lnk = ExtractKey();
@@ -308,7 +412,7 @@ function UploadAll()
 }
 
 
-window.addEventListener("load",function(){initialise("uploadbooklink");init_events()},false);
+window.addEventListener("load",function(){initialise("uploadbooklink");init_events();},false);
     </script>
 </head>
 <body>
@@ -342,6 +446,8 @@ window.addEventListener("load",function(){initialise("uploadbooklink");init_even
 	<h2><span>1.</span>Wo sind die Dateien?</h2>
 	<p>Die Dateien (nur .jpg und .txt hochladen!) der Staatsbibliothek müssen zuerst einmal auf den Projekt-Server gelangen. Lade sie von der Bibliothek auf deinen PC und nutze das Feld unten, um sie wieder auszuwählen. Sie werden dann auf den Projekt-Server übertragen.</p>
 	<p><strong>Wichtig:</strong> Schließe diesen Tab nicht, während der Upload läuft!</p>
+	<h3>Zum Format der Dateien</h3>
+	<p>Jede Bilddatei muss in diesem Format benannt sein: page$NUMBER$.jpg NUMBER bezieht sich hier auf die Seitennummer im Buch. Die OCRs muessen zur Seitentrennung dieses Format verwenden ----- $PAGENUMBER$ / $MAXPAGENUMBER$ -----\n. Es wurden nur Dateien im JPG,PNG und TXT Format angenommen. Falls das Buch von der BSB stammen sollte muss man sich darum keine Sorgen machen, die formatieren ihre Buecher bereits in diesem Format.</p>
 	<ul class="list-group" id="CurrentUploads">
 	</ul>
 	<ul id="FileDropList" class="filesList">
@@ -363,6 +469,16 @@ window.addEventListener("load",function(){initialise("uploadbooklink");init_even
 	<div class="saver" id="saver">
 	    <p>Speichere diesen Volltext auf dem Projektserver!</p>
 	    <button id="SaveNow" class="saveButton" onclick="UploadAll();return true;">Speichern!</button>
+	</div>
+    </div>
+    <div id="modal" style="display: none;position: fixed; top: 10vh;left: 10vw; width: 80vw; padding: 1rem; height: 80vh; z-index: 3;background:grey;">
+	<div style='display: grid; grid-template-columns: 48% 48%;grid-template-rows: 2.5rem calc(100% - 5rem) 2.5rem;height:100%;width:100%;grid-column-gap: 2%;'>
+	    <p style="grid-column: 1 /span 1;grid-row: 1 /span 1;margin:auto;background:white;">Old File</p>
+	    <p style="grid-column: 2 /span 1;grid-row: 1 /span 1;margin:auto;background:white;">New File</p>
+	    <div id="oldfile" style="grid-column: 1 /span 1;grid-row: 2 /span 1;width: 100%;height:100%;margin:auto;overflow: auto;"></div>
+	    <div id="newfile" style="grid-column: 2 /span 1;grid-row: 2 /span 1;width: 100%;height:100%;margin:auto;overflow: auto;"></div>
+	    <button id="nobut" style="grid-column: 1 /span 1;grid-row: 3 /span 1;background-color: green;cursor:pointer;">Keep existing</button>
+	    <button id="yesbut" style="grid-column: 2 /span 1;grid-row: 3 /span 1;background-color: red;cursor: pointer;">Replace existing</button>
 	</div>
     </div>
 </body>
