@@ -13,6 +13,7 @@
 #include <filesystem>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h" //Neeeded for image dimensions
+#include <sstream>
 
 
 
@@ -355,6 +356,8 @@ void do_authentification(const Request& req, Response &resp)
 	accreq = 4;
     else if(req.path.find("/write/")!=std::string::npos)
 	accreq = 2;
+    else if(req.path.find("/backups")!=std::string::npos && req.path.find("/books/")!=std::string::npos)
+	accreq = 2;
 
     if(!User::AccessCheck(GetUserFromCookie(req),accreq))
     {resp.status = 403;return;}
@@ -409,7 +412,8 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 	return;
     }
 
-    if((std::filesystem::exists(writePath)||!std::filesystem::exists(directory))&&!forcedWrite)
+    bool doOverwrite = std::filesystem::exists(writePath);
+    if((doOverwrite||!std::filesystem::exists(directory))&&!forcedWrite)
     {
 	resp.status=403;
 	resp.set_content("file_exists","text/plain");
@@ -493,6 +497,40 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
     }
     std::cout<<"Uploading file now! File size: "<<req.body.length()<<std::endl;
 
+    if(doOverwrite)
+    {
+	static std::mutex ml;
+	std::lock_guard lck(ml);
+	std::string backupfolder = "web/books/";
+	backupfolder += scanId;
+	backupfolder+="/backups";
+	if(!std::filesystem::exists(backupfolder))
+	    std::filesystem::create_directory(backupfolder);
+
+	std::string newpath = backupfolder;
+	newpath+="/";
+	newpath+=fileName;
+	if(!std::filesystem::exists(newpath))
+	    std::filesystem::create_directory(newpath);
+
+	int version = 0;
+	for(const auto &dirEntry : std::filesystem::directory_iterator(newpath))
+	{
+	    (void)dirEntry;
+	    ++version;
+	}
+
+	std::string finnewpath = newpath;
+	finnewpath+="/";
+
+	std::stringstream ss;
+	ss << std::setw(6) << std::setfill('0') << version;
+	finnewpath+=ss.str();
+	finnewpath+=GetUserFromCookie(req)->GetEmail();
+	finnewpath+="-";
+	finnewpath+=fileName;
+	std::filesystem::rename(writePath,finnewpath);
+    }
     std::ofstream ofs(writePath.c_str(),std::ios::out);
     ofs.write(req.body.c_str(),req.body.length());
     ofs.close();

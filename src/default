@@ -75,6 +75,10 @@ server {
         	proxy_pass         http://localhost:9992;
 	}
 
+	location ~ /books/[a-zA-Z0-9]+/backups {
+	    auth_request /authenticate;
+	}
+
     	location /api {
         	proxy_pass         http://localhost:9992;
 	} 
