@@ -2,7 +2,7 @@
 function DoLogout() {
        document.cookie = "SESSID=;path=/;domain="+window.location.hostname+
 	    ";expires=Thu, 01 Jan 1970 00:00:01 GMT";
-	window.location = "/";
+	window.location = "/search";
 }
 
 function initialise(linkforactive) {
