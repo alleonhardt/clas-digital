@@ -548,6 +548,10 @@ void do_senduserlist(const Request &req, Response &resp)
     resp.set_content(std::move(UserHandler::GetUserTable().toJSON()),"application/json");
 }
 
+std::mutex gGlobalUpdateOperationLock;
+enum class GlobalUpdateOperations { none, update_zotero, restart_server };
+GlobalUpdateOperations gGlobalUpdateOperation = GlobalUpdateOperations::none;
+
 void do_usertableupdate(const Request &req, Response &resp)
 {
     //Check if the user has admin access
@@ -588,6 +592,83 @@ void do_usertableupdate(const Request &req, Response &resp)
 	resp.status = 400;
     }
 
+}
+
+void do_restart_server(const Request &req, Response &resp)
+{
+    if(!User::AccessCheck(GetUserFromCookie(req),AccessRights::USR_WRITE))	
+	{
+	    resp.status = 403;
+	    return;
+	}
+
+
+    std::unique_lock<std::mutex> lock(gGlobalUpdateOperationLock, std::try_to_lock);
+    if(!lock.owns_lock()){
+	    //mutex not locked...
+	    resp.status = 500;
+	    if(gGlobalUpdateOperation == GlobalUpdateOperations::update_zotero)
+		resp.set_content("updateing_zotero_atm","text/plain");
+	    else if(gGlobalUpdateOperation == GlobalUpdateOperations::restart_server)
+		resp.set_content("restarting_server_atm","text/plain");
+	    else
+		resp.set_content("unkown_server_error","text/plain");
+	    return;
+    }
+    gGlobalUpdateOperation = GlobalUpdateOperations::restart_server;
+    resp.status = 200;
+    srv.stop();
+}
+
+void do_update_zotero(const Request &req, Response &resp)
+{
+    std::unique_lock<std::mutex> lock(gGlobalUpdateOperationLock, std::try_to_lock);
+    if(!lock.owns_lock()){
+	    //mutex not locked...
+	    resp.status = 500;
+	    if(gGlobalUpdateOperation == GlobalUpdateOperations::update_zotero)
+		resp.set_content("updateing_zotero_already","text/plain");
+	    else if(gGlobalUpdateOperation == GlobalUpdateOperations::restart_server)
+		resp.set_content("restarting_server_atm","text/plain");
+	    else
+		resp.set_content("unkown_server_error","text/plain");
+	    return;
+    }
+    gGlobalUpdateOperation = GlobalUpdateOperations::update_zotero;
+
+    try
+    {
+	//Check if the user has write access
+	if(!User::AccessCheck(GetUserFromCookie(req),AccessRights::USR_WRITE))	
+	{
+	    resp.status = 403;
+	    return;
+	}
+
+	//Update the pillars first
+	nlohmann::json zot = Zotero::GetPillars();
+	std::ofstream of("web/pillars.json",std::ios::out);
+	of<<zot;
+	of.close();
+
+	nlohmann::json metaData;
+	for(auto &it : zot)
+	{
+	    auto entryjs = nlohmann::json::parse(Zotero::SendRequest(Zotero::Request::GetAllItemsFromCollection(it["key"])));
+	    for(auto &it : entryjs)
+	        metaData.push_back(it);
+	}
+	//Save the collected data as it is the newest data available
+	std::ofstream o("bin/zotero.json",std::ios::out);
+	o<<metaData;
+	o.close();
+	resp.status = 200;
+    }
+    catch(...)
+    {
+	resp.set_content("unkown_server_error","text/plain");
+	resp.status = 500;
+    }
 }
 
 
@@ -712,6 +793,8 @@ int main(int argc, char **argv)
     srv.Get("/searchinbook",[&](const Request &req, Response &resp) { do_searchinbook(req,resp,manager);});
     srv.Get("/createbibliography",[&](const Request &req, Response &resp) { do_createbiblio(req,resp,manager);});
     srv.Get("/api/v1/typeahead/corpus",[&](const Request &req, Response &resp) { get_sugg(req,resp,manager);});
+    srv.Get("/api/v1/shutdown",&do_restart_server);
+    srv.Get("/api/v1/update_zotero",&do_update_zotero);
     srv.Get("/getmetadata", [&](const Request &req, Response &resp) { get_metadata(req,resp,manager);});
     srv.Get(R"(/authenticate.*)",&do_authentification);
     srv.Get("/userlist",&do_senduserlist);
@@ -719,6 +802,9 @@ int main(int argc, char **argv)
     srv.Post("/upload",[&](const Request &req, Response &resp){do_upload(req,resp,manager);});
     std::cout<<"C++ Api server startup successfull!"<<std::endl;
     srv.listen("localhost", startPort);
+    
+    if(gGlobalUpdateOperation == GlobalUpdateOperations::restart_server)
+	return -1;
     return 0;
 }
 
