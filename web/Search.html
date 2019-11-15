@@ -128,7 +128,16 @@
             </div>
         </div>
         <div>
-            <div><ul id="hitList" class="searchResults"></ul></div>
+            <div><ul id="hitList" class="searchResults">
+                    <li id="selAll" style="display:none;"> 
+                        <div class="searchResult"></div>
+                        <div class="tickbox" style="margin-left:-1%;">
+                            <label class="advanceoptsText" style="border:none;margin-right:4%;">Select All</label>
+                            <input type="checkbox" onchange="SelectAll(this.checked);return true;"></input>
+                        </div>
+                    </li>
+                </ul>
+            </div>
             <div><hr id="bottomBorder" style="padding:0;display:none;"></div>
             <div><ul id="linkcontainer" class="linkcontainer"></ul> </div>
             <div id="next_last">
