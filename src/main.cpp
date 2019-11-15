@@ -233,7 +233,7 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
 		debugpill+=";";
 		pillars.push_back(it["key"]);
 	    }
-	    int page = 1;
+	    int list_start = 0;
 	    std::string sort = "relevance";
 
 
@@ -251,9 +251,9 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
 
 	    try{pubafter = std::stoi(req.get_param_value("publicatedafter"));}catch(...){};
 	    try{pubbef = std::stoi(req.get_param_value("publicatedbefore"));}catch(...){};
-	    try{page = std::stoi(req.get_param_value("page"));}catch(...){};
+	    try{list_start= std::stoi(req.get_param_value("start"));}catch(...){};
 	    try{sort = req.get_param_value("sorting",0);}catch(...){};
-	    try{resultsperpage = std::stoi(req.get_param_value("maxresultsperpage",0));}catch(...){};
+	    try{resultsperpage = std::stoi(req.get_param_value("limit",0));}catch(...){};
 
 
 	    std::cout<<"Receveived search request!"<<std::endl;
@@ -270,16 +270,15 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
 
 	    auto &map = manager.getMapOfBooks();
 	    auto iter = bklst->begin();
-	    if(bklst->size()<(static_cast<unsigned int>(page-1)*resultsperpage))
+	    if(bklst->size()<=(static_cast<unsigned int>(list_start)))
 	    {
-		js["max_results"] = 0;
-		js["page"] = page;
-		js["time"] = 0;
+            js["max_results"] = 0;
+            js["time"] = 0;
 	    }
 	    else
 	    {
 
-		std::advance(iter,(page-1)*resultsperpage);
+		std::advance(iter,list_start);
 		int counter = 0;
 		for(;iter!=bklst->end();++iter)
 		{
@@ -297,7 +296,6 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
 		} 
 
 		js["max_results"] = bklst->size();
-		js["page"] = page;
 		std::chrono::duration<double> elapsed_seconds = std::chrono::system_clock::now()-start;
 		js["time"] = elapsed_seconds.count();
 	    }

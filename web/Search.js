@@ -11,9 +11,9 @@ function OpenFilter(x)
 {
 	let retval = x.value;
 	let lnk = window.location.search;
-	if(getParameterByName('page')!=null)
+	if(getParameterByName('start')!=null)
 	{	
-	    lnk = window.location.search.replace("&page="+getParameterByName('page'),"");
+	    lnk = window.location.search.replace("&start="+getParameterByName('start'),"");
 	}
 
 	let val = getParameterByName(x.id);
@@ -98,7 +98,7 @@ function ShowSelectedValues(obj)
 
 
     // *** ADD RESULTS FOOTER *** //
-    json=obj.drawablejson;
+    json = obj.drawablejson;
     document.getElementById("maxResults").innerHTML = json.max_results;
     document.getElementById("searchTime").innerHTML = json.time;
     document.getElementById("ResultBanner").style.display = "block";
@@ -108,7 +108,16 @@ function ShowSelectedValues(obj)
 	
 
     document.getElementById("selAll").style.display="block";
-	for(var i = json.show_from; i < json.show_to; i++)
+    let start = 0;
+    if(getParameterByName('start')!=null)
+        start = parseInt(getParameterByName('start'));
+    let limit = 10;
+    if(getParameterByName("limit") != null)
+        limit = parseInt(getParameterByName("limit"));
+    let to=limit;
+    if(start+limit > json.max_results)
+        to = json.max_results - start;
+	for(var i = 0; i < to; i++)
 	{
 			
 			let newList = document.createElement("li");
@@ -147,53 +156,62 @@ function ShowSelectedValues(obj)
 	
     document.getElementById("bottomBorder").style.display="block";
 
-    let counter = 1;
-    let resultsperpage = 10;
-    if(getParameterByName('maxresultsperpage')!=null)
-	    resultsperpage = parseInt(getParameterByName('maxresultsperpage'));
+    let lastHit = json.max_results - ((json.max_results-start) % limit);
+    let numPages = (json.max_results - (json.max_results % limit))/limit;
+    let counter = numPages+1;
+    if(start%limit != 0) counter++;
+
     let linkcontainer = document.getElementById("linkcontainer");
-    for(let i = 0; i < json.max_results; i+=resultsperpage)
+    for(let i = lastHit; i >= 0; i-=limit)
     {
         let newlst = document.createElement("li");
         newlst.setAttribute("class", "link");
-        let rep = getParameterByName('page');
-        rep = 'page='+rep;
 
         let newlnk='';
-        if(getParameterByName('page')==null)
-            newlnk = window.location.search+"&page="+counter;
+        if(getParameterByName('start')==null)
+            newlnk = window.location.search+"&start="+i;
         else
-            newlnk = window.location.search.replace(rep,"page="+counter);
-        if(json.page==counter)
+            newlnk = window.location.search.replace("start="+start,"start="+i);
+        if(i==start)
             newlst.innerHTML = counter;
         else
             newlst.innerHTML = "<a href='"+newlnk+"'>"+counter+"</a>";
-        linkcontainer.appendChild(newlst);
-        counter++;
+        linkcontainer.insertBefore(newlst, linkcontainer.childNodes[0]);
+        counter--;
     }
+    if(start%limit != 0)
+    {
+        let newlst = document.createElement("li");
+        newlst.setAttribute("class", "link");
 
-    let rep = getParameterByName('page');
-    rep = 'page='+rep;
-    let next_page=json.page+1;
-    let prev_page=json.page-1;
+        let newlnk='';
+        if(getParameterByName('start')==null)
+            newlnk = window.location.search+"&start="+0;
+        else
+            newlnk = window.location.search.replace("start="+start,"start="+0);
+        if(i==start)
+            newlst.innerHTML = counter;
+        else
+            newlst.innerHTML = "<a href='"+newlnk+"'>"+counter+"</a>";
+        linkcontainer.insertBefore(newlst, linkcontainer.childNodes[0]);
+    }
+    
 
-    if(prev_page<1) 
-       prev_page=1;
-    if(next_page>json.max_results/resultsperpage) 
-        next_page=json.page;
+    let inc_start= parseInt(start+limit);
+    let dec_start= parseInt(start-limit);
+    rep = 'start='+start;
 
-    let prevlnk = '';
-    let nextlnk = '';
-    if(getParameterByName('page')==null) {
-	    prevlnk = window.location.search + "&page="+prev_page;
-	    nextlnk = window.location.search + "&page="+next_page;
+    if(dec_start<1) dec_start=0;
+    if(inc_start>json.max_results) inc_start=lastHit;
+
+    if(getParameterByName('start')==null) {
+        document.getElementById("prev").setAttribute("href", window.location.search + "&start="+dec_start);
+	    document.getElementById("next").setAttribute("href", window.location.search + "&start="+inc_start);
     }
     else {
-	    prevlnk=window.location.search.replace(rep,"page="+prev_page);
-	    nextlnk=window.location.search.replace(rep,"page="+next_page);
+        document.getElementById("prev").setAttribute("href", window.location.search.replace(rep,"start="+dec_start));
+        document.getElementById("next").setAttribute("href", window.location.search.replace(rep,"start="+inc_start));
     }
-    document.getElementById("prev").setAttribute("href", prevlnk);
-    document.getElementById("next").setAttribute("href", nextlnk);
     document.getElementById("prev").style.display="inline-block";
     document.getElementById("next").style.display="inline-block";
 }
@@ -255,8 +273,8 @@ function sendToPage(name)
 	    requ += "&publicatedafter="+document.getElementById("publicatedAfter").value;
 	if(document.getElementById("publicatedBefore").value != 2049)
 	    requ +=  "&publicatedbefore="+ document.getElementById("publicatedBefore").value;
-	if(document.getElementById("maxresultsperpage").value != 10)
-	    requ += "&maxresultsperpage="+document.getElementById("maxresultsperpage").value;
+	if(document.getElementById("limit").value != 10)
+	    requ += "&limit="+document.getElementById("limit").value;
 	if(document.getElementById("collections").value != "all")
         requ += "&pillars="+document.getElementById("collections").value;
 	
@@ -353,18 +371,10 @@ function ShowLinks()
 	console.log(ServerDataObj);
 	let obj = document.getElementById("SearchHitList");
 	obj.drawablejson = ServerDataObj.search;
-	let maxResult = 10;
-	if(getParameterByName('maxresultsperpage')!=null)
-	    maxResult = parseInt(getParameterByName('maxresultsperpage'));
-	if(ServerDataObj.search.max_results!=0)
-	{
-	    obj.drawablejson.show_from = 0;
-	    obj.drawablejson.show_to = Math.min(obj.drawablejson.books.length,maxResult);
-	}
 	ShowSelectedValues(obj);
 
 	if(getParameterByName('sorting')!=null) document.getElementById("sorting").value = getParameterByName('sorting');
-	if(getParameterByName('maxresultsperpage')!=null) document.getElementById("maxresultsperpage").value = getParameterByName('maxresultsperpage');
+	if(getParameterByName('limit')!=null) document.getElementById("limit").value = getParameterByName('limit');
 }
 
 
@@ -405,21 +415,26 @@ function ExecuteInitialise()
             document.getElementById("suggs").selec=k;
         }
 
-        let curPage = parseInt(getParameterByName('page'));  
-        let nextPage=curPage;
+        let start = 0;
+        if(getParameterByName("start") != null)
+            start= parseInt(getParameterByName('start'));  
+        let limit = 10;
+        if(getParameterByName("limit") != null)
+            limit = parseInt(getParameterByName('limit'));
+        let rep = "start="+start;
 
         if(event.key == ">") {
-            nextPage = curPage+1;
-            if(getParameterByName('q')!=null && getParameterByName('page')==null)
-                window.location=window.location.search+'&page=2';
+            let newStart=start+limit;
+            if(getParameterByName('q')!=null && getParameterByName('start')==null)
+                window.location=window.location.search+'&start='+limit;
             else
-                window.location=window.location.search.replace('page='+curPage, 'page='+nextPage);
+                window.location=window.location.search.replace(rep, "start="+newStart);
         }
         else if(event.key == "<") {
-            nextPage = curPage-1;
-            if(nextPage < 1)
-                nextPage = 1;
-            window.location=window.location.search.replace('page='+curPage, 'page='+nextPage);
+            let newStart = start-limit;
+            if(newStart < 1)
+                newStart = 0;
+            window.location=window.location.search.replace(rep, 'start='+newStart);
         }
 
         
