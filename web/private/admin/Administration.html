@@ -195,6 +195,44 @@ function DeleteUser(elem)
     }
 }
 
+function ShutdownServer()
+{
+    let xhr = new XMLHttpRequest();
+    xhr.open("GET","/api/v1/shutdown",true);
+    xhr.withCredentials = true;
+    xhr.onload = function() {
+	if(xhr.status==200)
+	{
+	    StateBanner.ChangeBanner("The server will restart in a few seconds!",StateBannerType.success);
+	    window.scrollTo(0,0);
+	    window.setTimeout(function(){window.DoLogout()},1000);
+	    return;
+	}
+	StateBanner.ChangeBanner("Could not restart server, error code: "+xhr.responseText,StateBannerType.danger);
+    }
+    xhr.send();
+}
+
+function UpdateZotero()
+{
+    let xhr = new XMLHttpRequest();
+    xhr.open("GET","/api/v1/update_zotero",true);
+    xhr.withCredentials = true;
+    xhr.onload = function() {
+	if(xhr.status==200)
+	{
+	    StateBanner.ChangeBanner("Zotero has been updated successfully",StateBannerType.success);
+	    window.scrollTo(0,0);
+	    return;
+	}
+	StateBanner.ChangeBanner("Could not update zotero, error code: "+xhr.responseText,StateBannerType.danger);
+    }
+    xhr.send();
+    window.scrollTo(0,0);
+    StateBanner.ChangeBanner("Zotero started to update, this may take half an hour you can close this window safely",StateBannerType.success);
+
+}
+
 function SaveUserList()
 {
   let xhr = new XMLHttpRequest();
@@ -277,5 +315,6 @@ window.addEventListener("load",function(){initialise("administrationlink");OnUse
     </div>
     </li>
 </ul>
-<!--<button class='btn btn-outline-warning my2 my-sm-0' id="SaveUserButton" onclick='SaveUserList()'>Save Changes</button>-->
+<center><button class='btn btn-outline-danger my2 my-sm-0' id="SaveUserButton" onclick='return ShutdownServer();'>Restart server</button>
+    <button class='btn btn-outline-success my2 my-sm-0' id="SaveUserButton" style='margin-left: 2rem;' onclick='return UpdateZotero();'>Update zotero</button></center>
 </body>

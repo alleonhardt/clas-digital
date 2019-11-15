@@ -1,6 +1,7 @@
 function ServerGet(filename, okCallback, errorCallback) {
     let sendRequest = new XMLHttpRequest();
     sendRequest.open("GET", filename, true);
+    sendRequest.withCredentials = true;
     sendRequest.onreadystatechange = function() {
 	if(sendRequest.readyState == 4) {
 	    if(sendRequest.status == 200) {
