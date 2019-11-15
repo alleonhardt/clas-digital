@@ -152,6 +152,7 @@ std::string Zotero::_sendRequest(std::string requestURI)
 
 		//Set the request url
 		curl_easy_setopt(_curl, CURLOPT_URL, st.c_str());
+		curl_easy_setopt(_curl, CURLOPT_TIMEOUT, 30L);
 
 
 		//Do the request, this request is sequential so it will only terminate
