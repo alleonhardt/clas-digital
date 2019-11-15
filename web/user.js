@@ -1,11 +1,7 @@
 //Static because it does not matter which user asks to end his session
 function DoLogout() {
-	//Just tell the server to log the current user out, then reload the page
-	 var now = new Date();
-	var time = now.getTime();
-	var expireTime = time - 10;
-	now.setTime(expireTime);
-	document.cookie = 'SESSID=;expires='+now.toGMTString()+';';
+       document.cookie = "SESSID=;path=/;domain="+window.location.hostname+
+	    ";expires=Thu, 01 Jan 1970 00:00:01 GMT";
 	window.location = "/";
 }
 
