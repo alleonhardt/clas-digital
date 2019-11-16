@@ -140,6 +140,7 @@ function ShowSelectedValues(obj)
 
             let prev = document.createElement("span");
             prev.innerHTML = json.books[i].preview;
+            prev.setAttribute("class", "preview");
             div1.appendChild(prev);
             newList.appendChild(div1);
 

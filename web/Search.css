@@ -54,6 +54,12 @@ mark {
     font-size:1.4rem;
 }
 
+.preview {
+    font-size:13px;
+    color:#50555a;
+
+}
+
 .metadata{
     color:green;
     font-size:small;
