@@ -50,6 +50,9 @@ function SetAdvancedYear(x)
     }
     else
     {
+        let after = parseInt(x.value);
+        document.getElementById("publicatedAfter").value=after;
+        document.getElementById("publicatedBefore").value=after+99;
         document.getElementById("SpecialSID").focus();
     }
 }
