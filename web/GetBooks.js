@@ -7,7 +7,7 @@ function ServerGet(filename, okCallback, errorCallback) {
 	    if(sendRequest.status == 200) {
 		okCallback(sendRequest.responseText);
 	    } else {
-		errorCallback(sendRequest.responseText);
+		errorCallback(sendRequest.responseText,sendRequest.status);
 	    }
 	}
     }
@@ -35,6 +35,8 @@ function HighlightHitsAndConstructLinkList()
 
     if(hitlist && hitlist.books)
     {
+	document.getElementsByClassName("topnav")[0].style.display = "block";
+	document.getElementsByClassName("resizer")[0].style.display = "block";
 	let HighlightList = [];
 	if(hitlist.is_fuzzy==false)
 	    HighlightList = decodeURIComponent(getParameterByName('query')).replace(' ','+').split('+');
@@ -165,22 +167,13 @@ function CreatePageLayout()
 	if(doc==null)
 	{
 	    console.log("Found page without ocr! At : "+gPageLayoutFile.pages[i].pageNumber);
-	    let x = document.createElement("p");
 	    let cont = document.createElement("div");
-	    let ocrcont = document.createElement("div");
 	    let anchor = document.createElement("a");
 	    anchor.id = "page"+gPageLayoutFile.pages[i].pageNumber;
 
-	    ocrcont.classList.add("ocrcontainer");
 
-	    cont.classList.add('pagecontainer');
+	    cont.classList.add('pagecontainerFullImg');
 	    cont.id = "uniquepageid"+gPageLayoutFile.pages[i].pageNumber;
-	    x.innerHTML = "<br/><b style='float: right;'>"+gPageLayoutFile.pages[i].pageNumber+"/"+gPageLayoutFile.maxPageNum+"</b>";
-	    x.id = "uniqueocrpage"+gPageLayoutFile.pages[i].pageNumber;
-	    x.classList.add('ocrpage');
-	    ocrcont.appendChild(anchor);
-	    ocrcont.appendChild(x);
-	    cont.appendChild(ocrcont);
 	    cont.pageNumber = gPageLayoutFile.pages[i].pageNumber;
 
 	    document.body.appendChild(cont);
@@ -286,6 +279,7 @@ function isElementInViewport (el) {
 function loadOCRFileError(errortext)
 {
     gOcrSplittedFile = [];
+
     if(gPageLayoutFile!=null)
 	CreatePageLayout();
 }
@@ -298,9 +292,12 @@ function loadMetadataFile(metadatatxt)
 	document.title = json.data.creators[0].lastName+" ("+json.data.date+"). "+json.data.title;
 }
 
-function loadMetadataFileError(errortxt)
+function loadMetadataFileError(errortxt,state)
 {
-    document.getElementById("bibliography").innerHTML = "Could not load metadata sorry for that :(";
+    if(state==403)
+	document.getElementById("bibliography").innerHTML = "Sorry this book is copyright protected you cannot view this...";
+    else
+	document.getElementById("bibliography").innerHTML = "Could not load metadata sorry for that :(";
 }
 
 function loadPageLayoutFile(layout)

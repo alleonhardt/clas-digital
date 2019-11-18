@@ -1,4 +1,5 @@
 #include "CBook.hpp"
+#include <filesystem>
 
 CBook::CBook () {}
 
@@ -11,6 +12,7 @@ CBook::CBook(nlohmann::json jMetadata) : m_metadata(jMetadata)
 {
     m_sKey = jMetadata["key"];
     m_bOcr = false;
+    m_bhasFiles = false;
 
     //Metadata
     m_sAuthor = m_metadata.getAuthor();
@@ -22,6 +24,7 @@ CBook::CBook(nlohmann::json jMetadata) : m_metadata(jMetadata)
 // **** GETTER **** //
 const std::string& CBook::getKey() { return m_sKey;}
 const std::string& CBook::getPath() {return m_sPath;}
+bool CBook::getHasFiles() const { return m_bhasFiles; }
 
 std::string CBook::getOcrPath() {
     std::string sPath = m_sPath;
@@ -75,6 +78,15 @@ void CBook::createBook(std::string sPath)
 {
     setPath(sPath);
     std::ifstream readOcr(getOcrPath());
+    int counter = 0;
+    for(auto& p: std::filesystem::directory_iterator(sPath))
+    {
+	(void)p;
+	++counter;
+    }
+
+    if(counter>1)
+	m_bhasFiles = true;
 
     //If ocr exists create or load list with words
     if(!readOcr)
