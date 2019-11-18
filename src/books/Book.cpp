@@ -145,7 +145,7 @@ void CBook::createPages()
 
 void CBook::createMapPreview()
 {
-    std::cout << "Create map Prev.\n";
+    std::cout << "Create map Prev." << std::endl;
     for(auto it : m_mapWordsPages) {
         std::get<2>(m_mapWordsPages[it.first]) = getPreviewPosition(it.first);
     }
@@ -157,7 +157,7 @@ void CBook::createMapPreview()
 */
 void CBook::safePages()
 {
-    std::cout << "Saving pages\n";
+    std::cout << "Saving pages" << std::endl;
     std::ofstream write(m_sPath + "/intern/pages.txt");
     write << m_numPages << "\n";
 
@@ -184,13 +184,21 @@ void CBook::safePages()
 */
 void CBook::loadPages()
 {
-    std::cout << m_sKey << "Loading pages.\n";
+    std::cout << m_sKey << "Loading pages." << std::endl;
     //Load map
     std::ifstream read(m_sPath + "/intern/pages.txt");
     std::string sBuffer;
 
     //Read number of pages
     getline(read, sBuffer);
+
+    if(std::isdigit(sBuffer[0]) == false) {
+        createPages();
+        createMapPreview();
+        safePages();
+        return;
+    }
+
     m_numPages = stoi(sBuffer);
 
     //Read words, pages, and relevance, preview-position
