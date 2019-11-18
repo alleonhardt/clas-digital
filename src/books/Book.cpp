@@ -81,8 +81,8 @@ void CBook::createBook(std::string sPath)
     int counter = 0;
     for(auto& p: std::filesystem::directory_iterator(sPath))
     {
-	(void)p;
-	++counter;
+	    (void)p;
+	    ++counter;
     }
 
     if(counter>1)
@@ -96,7 +96,7 @@ void CBook::createBook(std::string sPath)
     writeJson << m_metadata.getMetadata();
     writeJson.close();
 
-    std::ifstream readWords(m_sPath + "/pages_new.txt");
+    std::ifstream readWords(m_sPath + "/intern/pages.txt");
     if(!readWords || readWords.peek() == std::ifstream::traits_type::eof() ) {
         createPages();
         createMapPreview();
@@ -130,7 +130,7 @@ void CBook::createPages()
             pageCounter++;
 
             //Create new page
-            std::ofstream write(m_sPath + "/page" + std::to_string(pageCounter) + ".txt");
+            std::ofstream write(m_sPath + "/intern/page" + std::to_string(pageCounter) + ".txt");
             write << func::returnToLower(sBuffer);
             write.close();
             sBuffer = "";
@@ -158,7 +158,7 @@ void CBook::createMapPreview()
 void CBook::safePages()
 {
     std::cout << "Saving pages\n";
-    std::ofstream write(m_sPath + "/pages_new.txt");
+    std::ofstream write(m_sPath + "/intern/pages.txt");
     write << m_numPages << "\n";
 
     for(auto it : m_mapWordsPages)
@@ -186,7 +186,7 @@ void CBook::loadPages()
 {
     std::cout << m_sKey << "Loading pages.\n";
     //Load map
-    std::ifstream read(m_sPath + "/pages_new.txt");
+    std::ifstream read(m_sPath + "/intern/pages.txt");
     std::string sBuffer;
 
     //Read number of pages
@@ -455,7 +455,7 @@ std::string CBook::getPreviewText(std::string& sWord, size_t& pos, size_t& page)
         return "";
 
     // *** Get Source string *** //
-    std::ifstream read(m_sPath + "/page" + std::to_string(page+1) + ".txt", std::ios::in);
+    std::ifstream read(m_sPath + "/intern/page" + std::to_string(page+1) + ".txt", std::ios::in);
     std::string sSource((std::istreambuf_iterator<char>(read)), std::istreambuf_iterator<char>());
 
     // *** Get Pos *** //
@@ -499,7 +499,7 @@ size_t CBook::getPreviewPosition(std::string sWord)
     for(size_t i=0; i<pages.size(); i++) 
     {
         //Read ocr and kontent
-        std::ifstream read(m_sPath + "/page" + std::to_string(pages[i]+1) + ".txt", std::ios::in);
+        std::ifstream read(m_sPath + "/intern/page" + std::to_string(pages[i]+1) + ".txt", std::ios::in);
         std::string sPage((std::istreambuf_iterator<char>(read)), std::istreambuf_iterator<char>());
 
         //Find match
