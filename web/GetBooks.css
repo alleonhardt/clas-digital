@@ -137,7 +137,8 @@ body {
 
 .pagecontainerFullImg {
     display: grid;
-    width: 100%;
+    width: 98%;
+    margin-left: 1%;
     grid-template-columns: 100%;
     margin-top: 4rem;
 }
