@@ -31,14 +31,25 @@ function LoadMetadata()
 		Server.Get("/getmetadata?scanId="+value,function(content) {
 		let json = JSON.parse(content);
 		document.getElementById("details").innerHTML += json.bib;
-		if(json.data.ISBN == undefined || json.data.ISBN=="")
-		    json.data.ISBN = "unknown";
-		if(json.data.date == undefined || json.data.date=="")
-		    json.data.date = "unkown";
-		if(json.citation == undefined || json.data.citation=="")
-		    json.citation = "No citation exists for this book";
-		if(json.data.title == undefined || json.data.title == "")
-		    json.data.title = "unkown";
+
+		if(json.data.ISBN != undefined && json.data.ISBN != "")
+		    document.getElementById("ISBN").innerHTML += json.data.ISBN;
+
+		if(json.data.date != undefined && json.data.date != "")
+            document.getElementById("date").innerHTML+=json.data.date;
+
+		if(json.data.title != undefined && json.data.title != "")
+            document.getElementById("title").innerHTML += json.data.title;
+
+        if(json.data.itemType != undefined || json.data.itemType != "")
+            document.getElementById("itemType").innerHTML += json.data.itemType;
+
+        if(json.data.place!= undefined && json.data.place != "")
+            document.getElementById("place").innerHTML += json.data.place;
+
+        if(json.data.libraryCatalog != undefined && json.data.libraryCatalog != "")
+            document.getElementById("libraryCatalog").innerHTML += json.data.libraryCatalog;
+
 		if(json.data.creators != undefined)
 		{
 		    let creator_str = "";
@@ -54,29 +65,30 @@ function LoadMetadata()
 		    document.getElementById("author").innerHTML += creator_str;
 		}
 		else
-		    document.getElementById("author").innerHTML = "unkown";
+		    document.getElementById("author").style.display = "none";
 
-		document.getElementById("title").innerHTML += json.data.title;
-		document.getElementById("ISBN").innerHTML += json.data.ISBN;
-		document.getElementById("date").innerHTML += json.data.date;
-		document.getElementById("citation").innerHTML += json.citation;
 		},function(){});
 }
 	</script>
   </head>
 <body style="padding: 5rem;" onload="LoadMetadata();">
-		<h1 style='text-align:center;'>Book details</h1>
-		<p id="title">Title:    </p>
+		<h1 id="details"></h1>
+        <p id="itemType"><b>Item Type:</b> </p>
+        <hr>
+	    <p id="title"><b>Title:</b> </p>
 		<hr>
-		<p id="details">Bibliographie: </p>
+        <p id='author'><b>Author:</b> </p>
 		<hr>
-		<p id="ISBN">ISBN: </p>
+        <p id="place"><b>Place:</b> </p>
+        <hr>
+		<p id="date"><b>Date:</b> </p>
 		<hr>
-		<p id="date">Published date: </p>
-		<hr>
-		<p id='citation'>Citation: </p>
-		<hr>
-		<p id='author'>Author: </p>
-		<hr>
+        <p id="shortTitle"><b>Short Title:</b> </p>
+        <hr>
+        <p id="isbn"><b>ISBN:</b> </p>
+        <hr>
+        <p id="libraryCatalog"><b>Library Catalog:</b> </p>
+        <hr>
+        
 </body>
 </html>
