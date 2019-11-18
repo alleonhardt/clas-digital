@@ -47,16 +47,17 @@
         <div class="betaversion"> This is a Beta version. Report Bugs at <a href="https://github.com/ShadowItaly/clas-digital/issues">clas-digital/issues</a>. Or use E-Mail: <a href="mailto:clas-digital-technik@dlist.server.uni-frankfurt.de">clas-digital-technik@dlist.server.uni-frankfurt.de</a>. </div> 
         <div style='position:relative'>
 
-            <input id="SpecialSID" class="srchbar" onblur='sugg_disapear();return true;' type="text" placeholder="Search here..." required>
+            <input id="SpecialSID" class="srchbar" onblur='sugg_disapear("corpus");return true;' type="text" placeholder="Search here..." required>
                 <button id="srchButton" class='srchbtn' type="button" onclick="sendToPage('SpecialSID');return true;"><i class="fa fa-search"></i></button>
             </input>
 
-            <div id="suggs" class="sugg" align="left"></div>
+            <div id="suggs_corpus" class="sugg" align="left"></div>
+            <div id="suggs_author" class="sugg" style="top:5.7rem;left:26%;" align="left"></div>
         </div>
         
         <div id="ResultBanner" style="display:none; margin-top:2rem;" >
             <span class='advanceoptsText' style="width:45px;">By:</span>
-            <input id='author' onchange="ResetFocus();return true;" class='advanceoptsInput' style="width:130px" type="text" value="" placeholder="All authors"/>
+            <input id='author' onblur='sugg_disapear("author");return true;' onchange="ResetFocus();return true;" class='advanceoptsInput' style="width:130px" type="text" value="" placeholder="All authors"/>
             <div class='selectdiv' style="display:inline-block;">
                 <label>
                 <select id='collections' onchange='ResetFocus();return true;'>

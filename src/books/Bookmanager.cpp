@@ -59,7 +59,6 @@ bool CBookManager::initialize()
     std::cout << "Map words:   " << m_mapWords.size() << "\n";
     std::cout << "Map title:   " << m_mapWordsTitle.size() << "\n";
     std::cout << "Map authors: " << m_mapWordsAuthors.size() << "\n";
-    createListWords();
 
     return true;
 }
@@ -207,6 +206,9 @@ void CBookManager::createMapWords()
         for(auto yt : it->second->getMapWordsPages())
             m_mapWords[yt.first][it->first] = static_cast<double>(std::get<1>(it->second->getMapWordsPages()[yt.first]))/it->second->getNumPages();
     }
+
+    createListWords(m_mapWords, m_listWords);
+    std::cout << "List words: " << m_listWords.size() << "\n";
 } 
 
 /**
@@ -238,16 +240,18 @@ void CBookManager::createMapWordsAuthor()
     //or add book to list of books (if word already exists).
     for(auto it=m_mapBooks.begin(); it!=m_mapBooks.end(); it++)
         m_mapWordsAuthors[it->second->getAuthor()][it->first] = 0.1;
+    createListWords(m_mapWordsAuthors, m_listAuthors);
+    std::cout << "List authors: " << m_listAuthors.size() << "\n";
 }
 
 /**
 * @brief create list of all words and relevance, ordered by relevance
 */
-void CBookManager::createListWords()
+void CBookManager::createListWords(MAPWORDS& mapWords, sortedList& listWords)
 {
-    std::map<std::string, size_t> mapWords;
-    for(auto it = m_mapWords.begin(); it!=m_mapWords.end(); it++) {
-        mapWords[it->first] = it->second.size();
+    std::map<std::string, size_t> mapRel;
+    for(auto it = mapWords.begin(); it!=mapWords.end(); it++) {
+        mapRel[it->first] = it->second.size();
     }
 
 	typedef std::function<bool(std::pair<std::string, double>, std::pair<std::string, double>)> Comp;
@@ -259,23 +263,31 @@ void CBookManager::createListWords()
             return a.second > b.second;
         };
 
-    std::set<std::pair<std::string, size_t>, Comp> sorted(mapWords.begin(), mapWords.end(), compFunctor);
+    std::set<std::pair<std::string, size_t>, Comp> sorted(mapRel.begin(), mapRel.end(), compFunctor);
 
     for(auto elem : sorted)
-        m_listWords.push_back({elem.first, elem.second});
+        listWords.push_back({elem.first, elem.second});
+}
+
+
+std::list<std::string>* CBookManager::getSuggestions(std::string sWord, std::string sWhere)
+{
+    if(sWhere=="corpus") return getSuggestions(sWord, m_listWords);
+    if(sWhere=="author") return getSuggestions(sWord, m_listAuthors);
+    return NULL;
 }
 
 /**
 * @brief return a list of 10 words, fitting search Word, sorted by in how many books they apear
 */
-std::list<std::string>* CBookManager::getSuggestions_fast(std::string sWord)
+std::list<std::string>* CBookManager::getSuggestions(std::string sWord, sortedList& listWords)
 {
     std::cout << sWord << std::endl;
     func::convertToLower(sWord);
     sWord = func::convertStr(sWord);
     std::map<std::string, double>* suggs = new std::map<std::string, double>;
     size_t counter=0;
-    for(auto it=m_listWords.begin(); it!=m_listWords.end() && counter < 10; it++) {
+    for(auto it=listWords.begin(); it!=listWords.end() && counter < 10; it++) {
         double value = fuzzy::fuzzy_cmp(it->first, sWord);
         if(value > 0 && value <= 0.2) {
             (*suggs)[it->first] = value*(-1);
@@ -287,60 +299,4 @@ std::list<std::string>* CBookManager::getSuggestions_fast(std::string sWord)
     return listSuggestions;
 }
             
-/**
-* @brief return a list of 10 words, fitting search Word, sorted by in how many books they apear
-*/
-std::list<std::string>* CBookManager::getSuggestions_acc(std::string sWord, bool t, bool o)
-{
-    func::convertToLower(sWord);
-    std::map<std::string, double>* sugg_1 = new std::map<std::string, double>;
-    std::map<std::string, double>* sugg_2 = new std::map<std::string, double>;
-    
-    //Get suggestions out of map of words
-    if(t==false)
-        sugg_1 = getSuggestions_acc(sWord, m_mapWords);
 
-    //get suggestion out of map of title
-    if(o==false) 
-        sugg_2 = getSuggestions_acc(sWord, m_mapWordsTitle);
-
-    if(t==true) sugg_1 = sugg_2;
-    else if(t==false && o==false) sugg_1->insert(sugg_2->begin(), sugg_2->end());
-
-    std::list<std::string>* results = convertToList(sugg_1, 0);
-    if(results->size() > 10) {
-        auto it = results->begin();
-        for(size_t i=0;i<results->size()-9;i++, it++);
-        results->erase(it, results->end());
-    }
-
-    //delete maps and return results
-    delete sugg_1;
-    delete sugg_2;
-    return results;
-}            
-
-
-std::map<std::string, double>* CBookManager::getSuggestions_acc(std::string sWord, MAPWORDS& mapWords)
-{
-    std::map<std::string, double>* suggs = new std::map<std::string, double>;
-    for(auto it=mapWords.begin(); it!=mapWords.end(); it++) {
-        double val = fuzzy::fuzzy_cmp(it->first, sWord);
-        if(val <= 0.2) {
-            double rel = (1-val)*it->second.size();
-            if(suggs->size() < 10) 
-                (*suggs)[it->first] = rel;
-            else
-            {
-                for(auto yt=suggs->begin(); yt!=suggs->end(); yt++) {
-                    if(yt->second < rel) {
-                        (*suggs)[it->first] = rel;
-                        suggs->erase(yt);
-                        break;
-                     }
-                }
-            }
-        }
-    }
-    return suggs;
-}
