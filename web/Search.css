@@ -16,9 +16,15 @@ mark {
     display:inline-block;
     margin:0.5rem;
 }
+
 .linkcontainer {
     list-style-type:none;
-    margin-left:-3%;
+}
+.linkcontainerDiv {
+    overflow:hidden;
+    text-overflow:ellipsis;
+    width:80%;
+    margin-left:10%;
 }
 
 .prev_next{
@@ -30,7 +36,7 @@ mark {
 
 .selAll{
     float:right;
-    margin-right:12.75%;
+    margin-right:17.9%;
     font-size:13px;
     color:#50555a;
 
@@ -39,13 +45,12 @@ mark {
 .tickbox{
     float:left;
     padding:20px;
-    width:12%;
     box-sizing:border-box;
-    margin-left:4rem;
 }
 
 .searchResults {
 	margin-top: 1rem;
+    margin-left:10%;
     text-align:left;
     list-style-type:none;
     overflow:hidden;
@@ -53,9 +58,8 @@ mark {
 
 .searchResult {
 	margin-bottom:1rem;
-    margin-left:7%;
+    width:80%;
     float:left;
-    width:76%;
     padding:20px 20px;
     box-sizing:border-box;
 }
