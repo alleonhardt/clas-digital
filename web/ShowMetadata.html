@@ -33,7 +33,11 @@ function LoadMetadata()
 		document.getElementById("details").innerHTML += json.bib;
 
 		if(json.data.ISBN != undefined && json.data.ISBN != "")
-		    document.getElementById("ISBN").innerHTML += json.data.ISBN;
+		    document.getElementById("isbn").innerHTML += json.data.ISBN;
+        else{
+		    document.getElementById("isbn").style.display="none";
+		    document.getElementById("isbn2").style.display="none";
+        }
 
 		if(json.data.date != undefined && json.data.date != "")
             document.getElementById("date").innerHTML+=json.data.date;
@@ -49,6 +53,10 @@ function LoadMetadata()
 
         if(json.data.libraryCatalog != undefined && json.data.libraryCatalog != "")
             document.getElementById("libraryCatalog").innerHTML += json.data.libraryCatalog;
+        else {
+            document.getElementById("libraryCatalog").style.display="none";
+            document.getElementById("libraryCatalog2").style.display="none";
+        }
 
 		if(json.data.creators != undefined)
 		{
@@ -83,12 +91,10 @@ function LoadMetadata()
         <hr>
 		<p id="date"><b>Date:</b> </p>
 		<hr>
-        <p id="shortTitle"><b>Short Title:</b> </p>
-        <hr>
         <p id="isbn"><b>ISBN:</b> </p>
-        <hr>
+        <hr id="isbn2">
         <p id="libraryCatalog"><b>Library Catalog:</b> </p>
-        <hr>
+        <hr id="libraryCatalog2">
         
 </body>
 </html>
