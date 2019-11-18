@@ -14,6 +14,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h" //Neeeded for image dimensions
 #include <sstream>
+#include "ocr/tesseract.hpp"
 
 
 
@@ -479,6 +480,9 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 	    std::ofstream writer(pa.c_str(),std::ios::out);
 	    writer<<file_desc;
 	    writer.close();
+	    
+	    OcrCreator c;
+	    std::cout<<"Created OCR: "<<c.CreateOcrFromImage(reinterpret_cast<const unsigned char*>(req.body.c_str()),req.body.length(),"deu_frak");
 	}
 	catch(...)
 	{
