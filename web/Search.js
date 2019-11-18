@@ -111,6 +111,7 @@ function ShowSelectedValues(obj)
 	
 
     document.getElementById("selAll").style.display="block";
+
     let start = 0;
     if(getParameterByName('start')!=null)
         start = parseInt(getParameterByName('start'));

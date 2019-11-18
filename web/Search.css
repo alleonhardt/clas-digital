@@ -28,6 +28,14 @@ mark {
     margin:0em
 }
 
+.selAll{
+    float:right;
+    margin-right:12.75%;
+    font-size:13px;
+    color:#50555a;
+
+}
+
 .tickbox{
     float:left;
     padding:20px;
@@ -42,6 +50,7 @@ mark {
     list-style-type:none;
     overflow:hidden;
 }
+
 .searchResult {
 	margin-bottom:1rem;
     margin-left:7%;
