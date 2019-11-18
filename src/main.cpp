@@ -751,14 +751,14 @@ int main(int argc, char **argv)
 	{
 	    for(auto it : manager.getMapOfBooks())
 	    {
-		if(it.second->getOcr() && (!it.second->getPublic()))
+		if(it.second->getOcr() && (it.second->getPublic()))
 		{
-		    std::cout<<"FOUND NON PUBLIC BOOK: "<<it.first<<std::endl;
-		    std::string loc = "location = /books/";
+		    std::cout<<"FOUND PUBLIC BOOK: "<<it.first<<std::endl;
+		    std::string loc = "location ~ /books/";
 		    loc+=it.first;
-		    loc+="/ {\n";
+		    loc+="/(?!backups).* {\n";
 		    of<<loc;
-		    of<<"auth_request /authenticate;\n";
+		    of<<"try_files $uri $uri/ =404;\n";
 		    of<<"}\n";
 		}
 		std::error_code ec;
