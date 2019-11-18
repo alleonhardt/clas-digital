@@ -286,7 +286,7 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
 		    nlohmann::json entry;
 		    entry["scanId"] = it->getKey();
 		    entry["copyright"] = !it->getPublic();
-		    entry["hasocr"] = it->getOcr();
+		    entry["hasocr"] = it->getHasFiles();
 		    entry["description"] = it->getShow();
 		    entry["bibliography"] = it->getMetadata().getMetadata("bib");
 		    entry["preview"] = it->getPreview(options.getSearchedWord());
@@ -615,6 +615,7 @@ void do_restart_server(const Request &req, Response &resp)
     }
     gGlobalUpdateOperation = GlobalUpdateOperations::restart_server;
     resp.status = 200;
+    std::cout<<"User: "<<GetUserFromCookie(req)->GetEmail()<<" issued restart server!"<<std::endl;
     srv.stop();
 }
 
@@ -642,6 +643,7 @@ void do_update_zotero(const Request &req, Response &resp)
 	    resp.status = 403;
 	    return;
 	}
+	std::cout<<"User: "<<GetUserFromCookie(req)->GetEmail()<<" issued update zotero!"<<std::endl;
 
 	//Update the pillars first
 	nlohmann::json zot = Zotero::GetPillars();
@@ -751,14 +753,14 @@ int main(int argc, char **argv)
 	{
 	    for(auto it : manager.getMapOfBooks())
 	    {
-		if(it.second->getOcr() && (!it.second->getPublic()))
+		if(it.second->getHasFiles() && (it.second->getPublic()))
 		{
-		    std::cout<<"FOUND NON PUBLIC BOOK: "<<it.first<<std::endl;
-		    std::string loc = "location = /books/";
+		    std::cout<<"FOUND PUBLIC BOOK: "<<it.first<<std::endl;
+		    std::string loc = "location ~ /books/";
 		    loc+=it.first;
-		    loc+="/ {\n";
+		    loc+="/(?!backups).* {\n";
 		    of<<loc;
-		    of<<"auth_request /authenticate;\n";
+		    of<<"try_files $uri $uri/ =404;\n";
 		    of<<"}\n";
 		}
 		std::error_code ec;

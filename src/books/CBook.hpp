@@ -16,6 +16,7 @@ private:
     std::string m_sKey;                                 //Key of the book
     std::string m_sPath;                                //Path to book (if exists)
     bool m_bOcr;                                        //Book has ocr path
+    bool m_bhasFiles;
 
     //Metadata
     CMetadata m_metadata;                               //Json with all metadata 
@@ -66,6 +67,12 @@ public:
     * @return Boolean, whether book contains ocr or not 
     */
     bool getOcr();
+
+    /**
+    * @return Boolean, whether book contains files other than the info.json
+    */
+
+    bool getHasFiles() const;
 
     /**
     * @return number of pages

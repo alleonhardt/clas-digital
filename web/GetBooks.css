@@ -29,6 +29,7 @@ body {
 
 .topnav {
     left: 0;
+    display: none;
     position: fixed;
     height: 2rem;
     min-height: 2rem;
@@ -41,6 +42,7 @@ body {
 }
 
 .resizer {
+    display: none;
     position: fixed;
     z-index: 2;
     left: 0;
@@ -130,6 +132,14 @@ body {
     width: 100%;
     grid-template-columns: 58% 40%;
     grid-column-gap: 2%;
+    margin-top: 4rem;
+}
+
+.pagecontainerFullImg {
+    display: grid;
+    width: 98%;
+    margin-left: 1%;
+    grid-template-columns: 100%;
     margin-top: 4rem;
 }
 
