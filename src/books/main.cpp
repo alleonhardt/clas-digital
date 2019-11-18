@@ -70,7 +70,7 @@ int main()
         else
             fuzzy = false;
 
-        CSearchOptions* searchOpts = new CSearchOptions(sInput, fuzzy, {"RFWJC42V", "XCFFDRQC", "RBB8DW5B", "WIXP3DS3"}, false, true, "", 0 , 2019, 1, "relevance");
+        CSearchOptions* searchOpts = new CSearchOptions(sInput, fuzzy, {"RFWJC42V", "XCFFDRQC", "RBB8DW5B", "WIXP3DS3"}, "all", "", 0 , 2019, 1, "relevance");
 
         sInput = searchOpts->getSearchedWord();
 

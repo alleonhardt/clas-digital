@@ -16,9 +16,15 @@ mark {
     display:inline-block;
     margin:0.5rem;
 }
+
 .linkcontainer {
     list-style-type:none;
-    margin-left:-3%;
+}
+.linkcontainerDiv {
+    overflow:hidden;
+    text-overflow:ellipsis;
+    width:80%;
+    margin-left:10%;
 }
 
 .prev_next{
@@ -28,30 +34,43 @@ mark {
     margin:0em
 }
 
+.selAll{
+    float:right;
+    margin-right:17.9%;
+    font-size:13px;
+    color:#50555a;
+
+}
+
 .tickbox{
     float:left;
     padding:20px;
-    width:12%;
     box-sizing:border-box;
-    margin-left:4rem;
 }
 
 .searchResults {
 	margin-top: 1rem;
+    margin-left:10%;
     text-align:left;
     list-style-type:none;
     overflow:hidden;
 }
+
 .searchResult {
 	margin-bottom:1rem;
-    margin-left:7%;
+    width:80%;
     float:left;
-    width:76%;
     padding:20px 20px;
     box-sizing:border-box;
 }
 .desc{
     font-size:1.4rem;
+}
+
+.preview {
+    font-size:13px;
+    color:#50555a;
+
 }
 
 .metadata{
@@ -230,10 +249,10 @@ select::-ms-expand {
 }
 
 .sugg {
-    display:none;
+    display:block;
     position:absolute;
     left:38%;
-    top:2.4rem;
+    top:2.2rem;
     background-color: #f1f1f1;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     z-index: 1;

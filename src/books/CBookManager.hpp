@@ -33,7 +33,9 @@ private:
     typedef std::unordered_map<std::string, std::set<std::string>> dict;
     dict m_dict;
 
-    std::list<std::pair<std::string, size_t>> m_listWords;
+    typedef std::list<std::pair<std::string, size_t>> sortedList;
+    sortedList m_listWords;
+    sortedList m_listAuthors;
 
     std::shared_mutex m_searchLock;
 
@@ -94,14 +96,13 @@ public:
     */
     void createMapWordsAuthor();
 
-    void createListWords();
+    void createListWords(MAPWORDS& mapWords, sortedList& listWords);
 
     /**
     * @brief return a list of 10 words, fitting search Word, sorted by in how many books they apear
     */
-    std::list<std::string>* getSuggestions_fast(std::string sWord);
-    std::list<std::string>* getSuggestions_acc(std::string sWord, bool t, bool o);
-    std::map<std::string, double>* getSuggestions_acc(std::string sWord, MAPWORDS& mapWords);
+    std::list<std::string>* getSuggestions(std::string sWord, std::string sWhere);
+    std::list<std::string>* getSuggestions(std::string sWord, sortedList& listWords);
 }; 
 
 

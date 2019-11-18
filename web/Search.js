@@ -50,6 +50,9 @@ function SetAdvancedYear(x)
     }
     else
     {
+        let after = parseInt(x.value);
+        document.getElementById("publicatedAfter").value=after;
+        document.getElementById("publicatedBefore").value=after+99;
         document.getElementById("SpecialSID").focus();
     }
 }
@@ -108,6 +111,7 @@ function ShowSelectedValues(obj)
 	
 
     document.getElementById("selAll").style.display="block";
+
     let start = 0;
     if(getParameterByName('start')!=null)
         start = parseInt(getParameterByName('start'));
@@ -140,6 +144,7 @@ function ShowSelectedValues(obj)
 
             let prev = document.createElement("span");
             prev.innerHTML = json.books[i].preview;
+            prev.setAttribute("class", "preview");
             div1.appendChild(prev);
             newList.appendChild(div1);
 
@@ -216,18 +221,19 @@ function ShowSelectedValues(obj)
     document.getElementById("next").style.display="inline-block";
 }
 
-function sendSugg(input)
+function sendSugg(input, type)
 {
+    console.log(input, type);
     var n = input.indexOf(" ");
     var str;
     if(n!=-1)
         str = input.substr(n+1);
     else
         str=input;
-    let requ = "/api/v1/typeahead/corpus?q="+encodeURIComponent(str);
+    let requ = "/api/v1/typeahead/"+type+"?q="+encodeURIComponent(str);
 
     var xhttp = new XMLHttpRequest();
-    var suggs = document.getElementById("suggs");
+    var suggs = document.getElementById("suggs_"+type);
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
            // Typical action to be performed when the document is ready:
@@ -238,8 +244,8 @@ function sendSugg(input)
            for(let i=0;i<obj.length;i++)
            {
                var node = document.createElement("a");
-               node.onclick=function(){sugg_func(this);};
-               node.onmousedown=function(){sugg_func(this);};
+               node.onclick=function(){sugg_func(this, type);};
+               node.onmousedown=function(){sugg_func(this, type);};
                var textNode = document.createTextNode(obj[i]);
                node.appendChild(textNode);
                suggs.appendChild(node);
@@ -260,7 +266,6 @@ function sendToPage(name)
 	let input = inputObj.value;
 	//Form the request for the server
 	let requ = "/search?q="+encodeURIComponent(input).replace(/%20/g, "+");
-	console.log(requ);
 
 	//Create the json file with the advanced search options
 	if(document.getElementById("fuzzyness").value=="1")
@@ -281,28 +286,27 @@ function sendToPage(name)
     window.location = requ;
 }
 
-function sugg_func(x) 
+function sugg_func(x, type) 
 {
-    let searchBox = document.getElementById("SpecialSID");
-    var r = searchBox.value.indexOf(" ");
-    if(r != -1)
-        searchBox.value= searchBox.value.substring(0,r+1) + x.textContent;
-    else
-        searchBox.value=x.textContent;
-    searchBox.focus();
+    if(type=="corpus")
+    {
+        let searchBox = document.getElementById("SpecialSID");
+        var r = searchBox.value.indexOf(" ");
+        if(r != -1)
+            searchBox.value= searchBox.value.substring(0,r+1) + x.textContent;
+        else
+            searchBox.value=x.textContent;
+        searchBox.focus();
+    }
+    else if(type=="author")
+    {
+        document.getElementById("author").value=x.textContent;
+    }
 }
 
-function sugg_appear(x) 
+function sugg_disapear(type)
 {
-    console.log(x.textContent);
-    let searchBox = document.getElementById("SpecialSID");
-    searchBox.value=x.textContent;
-    searchBox.focus();
-}
-
-function sugg_disapear()
-{
-    document.getElementById("suggs").style.display="none";
+    document.getElementById("suggs_"+type).style.display="none";
 }
 
 function SelectAll(y)
@@ -380,26 +384,24 @@ function ShowLinks()
 
 function ExecuteInitialise()
     {
-    let inp = document.getElementById("SpecialSID");
-    inp.focus();
-    inp.addEventListener("input",function(event){
-            sendSugg(document.getElementById("SpecialSID").value);
-    });
-    inp.addEventListener("keydown",function(event){
 
-        let k = document.getElementById("suggs").selec;
+    let ath = document.getElementById("author");
+    ath.addEventListener("input", function(event){
+        sendSugg(document.getElementById("author").value, "author");
+    });
+    ath.addEventListener("keydown", function(event){
+        let k = document.getElementById("suggs_author").selec;
         if(k==undefined)
             k=-1;
         if(event.key == "Enter") {
             if(k!=-1) {
-                let lst = document.getElementById("suggs").children;
+                let lst = document.getElementById("suggs_author").children;
                 lst[k].click();
             }
-            document.getElementById("srchButton").click();
         }
-
-        else if(event.key=="ArrowUp" || event.key=="ArrowDown") {
-            let lst = document.getElementById("suggs").children;
+        if(event.key=="ArrowUp" || event.key=="ArrowDown") {
+            
+            let lst = document.getElementById("suggs_author").children;
             if(k!=-1)
                 lst[k].style.background="";
             if(event.key=="ArrowUp") {
@@ -412,7 +414,43 @@ function ExecuteInitialise()
             k=k%lst.length;
             lst[k].style.background = "#ddd";
             event.preventDefault();
-            document.getElementById("suggs").selec=k;
+            document.getElementById("suggs_author").selec=k;
+        }
+    });
+
+    let inp = document.getElementById("SpecialSID");
+    inp.focus();
+    inp.addEventListener("input",function(event){
+            sendSugg(document.getElementById("SpecialSID").value, "corpus");
+    });
+    inp.addEventListener("keydown",function(event){
+
+        let k = document.getElementById("suggs_corpus").selec;
+        if(k==undefined)
+            k=-1;
+        if(event.key == "Enter") {
+            if(k!=-1) {
+                let lst = document.getElementById("suggs_corpus").children;
+                lst[k].click();
+            }
+            document.getElementById("srchButton").click();
+        }
+
+        else if(event.key=="ArrowUp" || event.key=="ArrowDown") {
+            let lst = document.getElementById("suggs_corpus").children;
+            if(k!=-1)
+                lst[k].style.background="";
+            if(event.key=="ArrowUp") {
+                k-=1;
+                if(k<0)
+                    k=lst.length-1;
+            }
+            else
+                k+=1;
+            k=k%lst.length;
+            lst[k].style.background = "#ddd";
+            event.preventDefault();
+            document.getElementById("suggs_corpus").selec=k;
         }
 
         let start = 0;

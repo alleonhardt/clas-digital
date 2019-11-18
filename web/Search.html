@@ -47,16 +47,17 @@
         <div class="betaversion"> This is a Beta version. Report Bugs at <a href="https://github.com/ShadowItaly/clas-digital/issues">clas-digital/issues</a>. Or use E-Mail: <a href="mailto:clas-digital-technik@dlist.server.uni-frankfurt.de">clas-digital-technik@dlist.server.uni-frankfurt.de</a>. </div> 
         <div style='position:relative'>
 
-            <input id="SpecialSID" class="srchbar" onblur='sugg_disapear();return true;' type="text" placeholder="Search here..." required>
+            <input id="SpecialSID" class="srchbar" onblur='sugg_disapear("corpus");return true;' type="text" placeholder="Search here..." required>
                 <button id="srchButton" class='srchbtn' type="button" onclick="sendToPage('SpecialSID');return true;"><i class="fa fa-search"></i></button>
             </input>
 
-            <div id="suggs" class="sugg" align="left"></div>
+            <div id="suggs_corpus" class="sugg" align="left"></div>
+            <div id="suggs_author" class="sugg" style="top:5.7rem;left:26%;" align="left"></div>
         </div>
         
         <div id="ResultBanner" style="display:none; margin-top:2rem;" >
             <span class='advanceoptsText' style="width:45px;">By:</span>
-            <input id='author' onchange="ResetFocus();return true;" class='advanceoptsInput' style="width:130px" type="text" value="" placeholder="All authors"/>
+            <input id='author' onblur='sugg_disapear("author");return true;' onchange="ResetFocus();return true;" class='advanceoptsInput' style="width:130px" type="text" value="" placeholder="All authors"/>
             <div class='selectdiv' style="display:inline-block;">
                 <label>
                 <select id='collections' onchange='ResetFocus();return true;'>
@@ -103,6 +104,7 @@
 
 
             <div id="ResultBannerFooter" style="margin-top: 2rem; margin-bottom:0;">
+            <div style="width:80%;margin-left:18.8%;">
                 <div class='selectdiv' style="display:inline-block;">
                 <label>
                 <select id='limit' onchange='OpenFilter(this);return true;' style='background:white;'>
@@ -113,8 +115,8 @@
                </select>
                <label>
                </div>
-                <div class='selectdiv' style="display:inline-block;">
-                <label>
+               <div class='selectdiv' style="display:inline-block;">
+               <label>
                <select id='sorting' onchange='OpenFilter(this);return true;' onclick='return true;' style='background:white;'>
                    <option value='relevance'>Sort by relevance</option>
                    <option value='alphabetically'>Sort alphabetically</option>
@@ -123,23 +125,21 @@
                </label>
                </div>
                <button class='advanceopts' onclick='CreateBibliography();return true;'>Create Bibliography</button>
+
+                <div id="selAll" class="selAll" >
+                    Select All <input type="checkbox" onchange="SelectAll(this.checked);return true;"></input>
+                </div>
+
+           </div> 
+
                <hr style='padding: 0;'>
                <span style='color: grey;font-size:13px;'><span id="maxResults"></span> Ergebnisse gefunden in <span id="searchTime"></span></span>
             </div>
         </div>
         <div>
-            <div><ul id="hitList" class="searchResults">
-                    <li id="selAll" style="display:none;"> 
-                        <div class="searchResult"></div>
-                        <div class="tickbox" style="margin-left:-1%;">
-                            <label class="advanceoptsText" style="border:none;margin-right:4%;">Select All</label>
-                            <input type="checkbox" onchange="SelectAll(this.checked);return true;"></input>
-                        </div>
-                    </li>
-                </ul>
-            </div>
+            <div ><ul id="hitList" class="searchResults"> </ul> </div>
             <div><hr id="bottomBorder" style="padding:0;display:none;"></div>
-            <div><ul id="linkcontainer" class="linkcontainer"></ul> </div>
+            <div class="linkcontainerDiv"><ul id="linkcontainer" class="linkcontainer"></ul> </div>
             <div id="next_last">
                 <a id="prev" class="prev_next">prev</a>
                 <a id="next" class="prev_next">next</a>
