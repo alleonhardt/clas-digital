@@ -457,7 +457,7 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 	    if(std::regex_match(fileName,cm,reg))
 	    {
 		if(cm.size()<2)
-		    throw "malformed_img_naming";
+		    throw std::runtime_error("malformed_img_naming");
 		entry["pageNumber"]=std::stoi(cm[1]);
 		maxPageNum = std::max(maxPageNum,std::stoi(cm[1]));
 	    }
@@ -489,13 +489,16 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 	    if(ocr_create=="true")
 	    {
 		OcrCreator c;
-		book->addPage(c.CreateOcrFromImage(reinterpret_cast<const unsigned char*>(req.body.c_str()),req.body.length(),ocr_lang.c_str()),entry["pageNumber"],std::to_string(maxPageNum));
+		int what = entry["pageNumber"];
+		book->addPage(c.CreateOcrFromImage(reinterpret_cast<const unsigned char*>(req.body.c_str()),req.body.length(),ocr_lang.c_str()),std::to_string(what),std::to_string(maxPageNum));
 	    }
 	}
-	catch(...)
+	catch(std::exception &e)
 	{
 	    resp.status = 403;
-	    resp.set_content("Error while creating readerInfo.json","text/plain");
+	    std::string error = "Error while creating readerInfo.json: ";
+	    error+=e.what();
+	    resp.set_content(error.c_str(),"text/plain");
 	    return;
 	}
     }
