@@ -229,6 +229,7 @@ select::-ms-expand {
     width:25%;
     border-radius:25px;
     padding:1px 10px;
+    margin-left:4rem;
 }
 .srchbtn {
     border: none;         /* Remove borders */
