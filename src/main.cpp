@@ -404,9 +404,10 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
     writePath+="/";
     writePath+=fileName;
 
+    CBook *book;
     try
     {
-	manager.getMapOfBooks().at(scanId);
+	book = manager.getMapOfBooks().at(scanId);
     }
     catch(...)
     {
@@ -488,7 +489,7 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 	    if(ocr_create=="true")
 	    {
 		OcrCreator c;
-		std::cout<<"Created OCR: "<<c.CreateOcrFromImage(reinterpret_cast<const unsigned char*>(req.body.c_str()),req.body.length(),ocr_lang.c_str());
+		book->addPage(c.CreateOcrFromImage(reinterpret_cast<const unsigned char*>(req.body.c_str()),req.body.length(),ocr_lang.c_str()),entry["pageNumber"],std::to_string(maxPageNum));
 	    }
 	}
 	catch(...)
