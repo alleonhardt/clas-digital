@@ -547,6 +547,8 @@ void CBook::shortenPreview(std::string& str)
 
 void CBook::addPage(std::string sInput, std::string sPage, std::string sMaxPage)
 {
+    std::cout << sInput << std::endl;
+
     sInput.insert(0, "\n----- "+sPage+" / "+ sMaxPage +" -----\n"); 
 
     std::cout << sInput << std::endl;
