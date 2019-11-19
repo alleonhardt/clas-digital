@@ -21,7 +21,8 @@
 	<div class='searchbox'>
 	    <center>
 	    <input id='srchbox' style='width:25%;border-radius: 20px;padding-left: 0.5rem;padding-right: 0.5rem;margin-left: 1rem;margin-top: 0.5rem;height: 1.4rem;text-align: center;' type='text' placeholder="search this book"><i class="fa fa-search searchstyler" onclick='doCompleteNewSearch();return true;'></i></input>
-		<div style='position: relative;width: 25%;padding-left: 0.5rem;'>
+		<button class="btn" onclick="read_mode(this);" style='float: right;margin:0.2rem;' title="Toggle full screen read mode"><i class="fa fa-bars"></i></button>
+		<div style='position: relative;left:-2rem;width: 25%;padding-left: 0.5rem;'>
 		    <div id='fuzzysuggestions' style='visibility:hidden;z-index: 5;position: absolute;top:0;left: 1rem;background:white;border: 2px solid black;width: 55vw;'></div>
 		</div>
 	    </center>

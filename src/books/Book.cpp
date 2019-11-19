@@ -1,5 +1,6 @@
 #include "CBook.hpp"
-#include <filesystem>
+
+namespace fs = std::filesystem;
 
 CBook::CBook () {}
 
@@ -11,6 +12,7 @@ CBook::CBook () {}
 CBook::CBook(nlohmann::json jMetadata) : m_metadata(jMetadata)
 {
     m_sKey = jMetadata["key"];
+    m_sPath = "web/books/"+m_sKey;
     m_bOcr = false;
     m_bhasFiles = false;
 
@@ -76,7 +78,6 @@ void CBook::setPath(std::string sPath) { m_sPath = sPath; }
 */
 void CBook::createBook(std::string sPath)
 {
-    setPath(sPath);
     std::ifstream readOcr(getOcrPath());
     int counter = 0;
     for(auto& p: std::filesystem::directory_iterator(sPath))
@@ -85,7 +86,7 @@ void CBook::createBook(std::string sPath)
 	    ++counter;
     }
 
-    if(counter>1)
+    if(counter>2)
 	m_bhasFiles = true;
 
     //If ocr exists create or load list with words
@@ -138,6 +139,19 @@ void CBook::createPages()
 
         else
             sBuffer += " " + sLine;
+    }
+    if(sBuffer.length() !=0)
+    {
+        for(auto it : func::extractWordsFromString(sBuffer)) {
+            std::get<0>(m_mapWordsPages[it.first]).push_back(pageCounter);
+            std::get<1>(m_mapWordsPages[it.first]) += it.second*(it.second+1) / 2;
+        } 
+        pageCounter++;
+
+        //Create new page
+        std::ofstream write(m_sPath + "/intern/page" + std::to_string(pageCounter) + ".txt");
+        write << func::returnToLower(sBuffer);
+        write.close();
     }
     read.close();
     m_numPages = pageCounter;
@@ -543,4 +557,45 @@ void CBook::shortenPreview(std::string& str)
         if(str[i-1] == '<' && str[i] != 'm' && str[i] != '/')
             str.erase(i-1, 1);
     }
+}
+
+void CBook::addPage(std::string sInput, std::string sPage, std::string sMaxPage)
+{
+    std::ofstream writePage(m_sPath+"/intern/add"+sPage+".txt");
+    writePage << sInput;
+    writePage.close();
+
+    fs::path p = getOcrPath();
+    fs::exists(p);
+    std::string sSource;
+    if(fs::exists(p) == false) {
+        std::cout << "create new ocr..." << std::endl;
+        sInput.insert(0, "\n----- "+sPage+" / "+ sMaxPage +" -----\n"); 
+        sSource = sInput;
+    }
+
+    else {
+        std::map<int, std::string> orderMap;
+        std::cout << "Adding to existing ocr ... " << std::endl;
+        for(auto& p : fs::directory_iterator(m_sPath+"/intern")) {
+            std::string filename=p.path().filename();
+            if(filename.find("add")!=std::string::npos) {
+                std::string num = filename.substr(3, filename.length()-2-filename.find("."));
+                orderMap[stoi(num)] = p.path();
+            }
+        }
+
+        for(auto it : orderMap) {
+            sSource.append("\n\n----- "+std::to_string(it.first)+" / "+ sMaxPage +" -----\n");
+            std::ifstream r2(it.second);
+            std::string str((std::istreambuf_iterator<char>(r2)), std::istreambuf_iterator<char>());
+            sSource.append(str);
+        }
+    }
+
+    std::cout << sSource << std::endl;
+    
+    std::ofstream writeOcr(m_sPath + "/ocr.txt");
+    writeOcr << sSource;
+    writeOcr.close();
 }

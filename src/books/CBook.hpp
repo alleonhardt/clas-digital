@@ -1,5 +1,6 @@
 #include <iostream> 
 #include <fstream>
+#include <filesystem>
 #include <map>
 #include <list>
 #include <string>
@@ -183,4 +184,7 @@ public:
     size_t getPreviewPosition(std::string sWord);
 
     void shortenPreview(std::string& finalResult);
+
+    //Teseract
+    void addPage(std::string sInput, std::string sPage, std::string sMaxPage);
 };

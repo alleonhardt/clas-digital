@@ -14,6 +14,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h" //Neeeded for image dimensions
 #include <sstream>
+#include "ocr/tesseract.hpp"
 
 
 
@@ -377,10 +378,14 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
     std::string writePath = "web/books/";
     std::string scanId = "";
     std::string fileName = "";
+    std::string ocr_create = "";
+    std::string ocr_lang = "";
 
     try{forcedWrite = req.get_param_value("forced")=="true";}catch(...){};
     try{scanId = req.get_param_value("scanid");}catch(...){};
     try{fileName = req.get_param_value("filename");}catch(...){};
+    try{ocr_create = req.get_param_value("create_ocr");}catch(...){};
+    try{ocr_lang = req.get_param_value("language");}catch(...){};
 
     std::cout<<"Authorized request to upload files"<<std::endl;
     std::cout<<"Parsed fileName: "<<fileName<<std::endl;
@@ -399,9 +404,10 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
     writePath+="/";
     writePath+=fileName;
 
+    CBook *book;
     try
     {
-	manager.getMapOfBooks().at(scanId);
+	book = manager.getMapOfBooks().at(scanId);
     }
     catch(...)
     {
@@ -451,7 +457,7 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 	    if(std::regex_match(fileName,cm,reg))
 	    {
 		if(cm.size()<2)
-		    throw "malformed_img_naming";
+		    throw std::runtime_error("malformed_img_naming");
 		entry["pageNumber"]=std::stoi(cm[1]);
 		maxPageNum = std::max(maxPageNum,std::stoi(cm[1]));
 	    }
@@ -473,17 +479,26 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 		}
 	    }
 	    file_desc["maxPageNum"] = maxPageNum;
+	    int what = entry["pageNumber"];
 	    if(!replace)
 		file_desc["pages"].push_back(std::move(entry));
 
 	    std::ofstream writer(pa.c_str(),std::ios::out);
 	    writer<<file_desc;
 	    writer.close();
+	    
+	    if(ocr_create=="true")
+	    {
+		OcrCreator c;
+		book->addPage(c.CreateOcrFromImage(reinterpret_cast<const unsigned char*>(req.body.c_str()),req.body.length(),ocr_lang.c_str()),std::to_string(what),std::to_string(maxPageNum));
+	    }
 	}
-	catch(...)
+	catch(std::exception &e)
 	{
 	    resp.status = 403;
-	    resp.set_content("Error while creating readerInfo.json","text/plain");
+	    std::string error = "Error while creating readerInfo.json: ";
+	    error+=e.what();
+	    resp.set_content(error.c_str(),"text/plain");
 	    return;
 	}
     }

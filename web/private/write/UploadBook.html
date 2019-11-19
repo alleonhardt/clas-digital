@@ -19,6 +19,10 @@ body {
     margin:0;
 }
 
+h2 {
+    margin-top: 2rem;
+}
+
 .biggerPageClass {
     padding-left: 10%;
     padding-right: 10%;
@@ -185,10 +189,12 @@ function ShowStatus(x,color)
 function Upload(x,key)
 {
     let xhr = new XMLHttpRequest();
+    let create_ocr = document.getElementById("languageoptenabled").checked;
+    let language_ocr = document.getElementById("languageopt").value;
     if(x.force_overwrite == true)
-	xhr.open("POST","/upload?scanid="+key+"&filename="+x.file.name+"&forced=true",true);
+	xhr.open("POST","/upload?scanid="+key+"&create_ocr="+create_ocr+"&language="+language_ocr+"&filename="+x.file.name+"&forced=true",true);
     else
-	xhr.open("POST","/upload?scanid="+key+"&filename="+x.file.name,true);
+	xhr.open("POST","/upload?scanid="+key+"&create_ocr="+create_ocr+"&language="+language_ocr+"&filename="+x.file.name,true);
 
     x.progentry.value = 0;
     xhr.onload = function() {
@@ -384,7 +390,7 @@ function ShowImageSlide(fl,key)
 function ShowBookContentLink()
 {
     let lnk = ExtractKey();
-    document.getElementById("BookContentLink").innerHTML = "<a href='/books/"+lnk+"/' target='_blank'>Book File List Index</a>";
+    document.getElementById("BookContentLink").innerHTML = "<a href='/books/"+lnk+"/' target='_blank'>Book File List Index</a><a style='margin-left: 4rem;' href='/ShowMetadata.html?scanId="+lnk+"' target='_blank'> Book Metadata</a>";
 }
 
 function UploadAll()
@@ -411,6 +417,18 @@ function UploadAll()
     ShowStatus("Uploaded all files successfully! In order to find results in the new book you have to restart the server!","green");
 }
 
+function show_language(x)
+{
+    if(x.checked)
+    {
+	document.getElementById("languageopt").style.display = "inline-block";
+    }
+    else
+    {
+	document.getElementById("languageopt").style.display = "none";
+    }
+}
+
 
 window.addEventListener("load",function(){initialise("uploadbooklink");init_events();},false);
     </script>
@@ -422,7 +440,6 @@ window.addEventListener("load",function(){initialise("uploadbooklink");init_even
 	<a id='searchlink' href='/search'>Search</a>
 	<a id='administrationlink' class='classifiedContent' href='/private/admin/Administration.html' data-acc=4>Administration</a>
 	<a id='uploadbooklink' class='classifiedContent active' href='/private/write/UploadBook.html' data-acc=2>Upload Books</a>
-	<a id='managebookslink' class='classifiedContent' href='/private/write/ManageBooks.html' data-acc=2>Manage Books</a>
 
 	<div class='topnav-right-in' id='loggedintopnav'>
 	    <span id='LoggedInAs'>Logged in</span>
@@ -465,7 +482,18 @@ window.addEventListener("load",function(){initialise("uploadbooklink");init_even
 	<div id="BookContentLink" style='display:inline-block;margin-left: 2rem;'></div>
 	</input>
 	<br>
-	<h2><span>4.</span>Speichern!</h2>
+	<h2><span>4.</span>Ocr Options</h2>
+	<p>Es ist moeglich eine OCR vom Server erstellen zu lassen. Um diese Option zu benutzen setzten sie bitte ein Haekchen in der Checkbox unten. <b>Dieser Vorgang dauert sehr lange benuzten Sie diese Funktion nur wenn sie wenige Dateien hochladen!</b></p>
+	<div>
+	    <span>Der Server soll eine computergenerierte OCR erstellen: </span>
+	    <input id='languageoptenabled' onclick='show_language(this);' type='checkbox'/>
+	    <select id='languageopt' style='display: none;margin-left: 2rem;'>
+		<option value='deu_frak' selected>Deutsch Fraktur</option>
+		<option value='deu'>Deutsch</option>
+		<option value='eng'>Englisch</option>
+	    </select>
+	</div>
+	<h2><span>5.</span>Speichern!</h2>
 	<div class="saver" id="saver">
 	    <p>Speichere diesen Volltext auf dem Projektserver!</p>
 	    <button id="SaveNow" class="saveButton" onclick="UploadAll();return true;">Speichern!</button>
