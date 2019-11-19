@@ -11,6 +11,7 @@ CBook::CBook () {}
 CBook::CBook(nlohmann::json jMetadata) : m_metadata(jMetadata)
 {
     m_sKey = jMetadata["key"];
+    m_sPath = "web/book/"+m_sKey;
     m_bOcr = false;
     m_bhasFiles = false;
 
@@ -76,7 +77,6 @@ void CBook::setPath(std::string sPath) { m_sPath = sPath; }
 */
 void CBook::createBook(std::string sPath)
 {
-    setPath(sPath);
     std::ifstream readOcr(getOcrPath());
     int counter = 0;
     for(auto& p: std::filesystem::directory_iterator(sPath))
@@ -547,17 +547,21 @@ void CBook::shortenPreview(std::string& str)
 
 void CBook::addPage(std::string sInput, std::string sPage, std::string sMaxPage)
 {
-    sInput.insert(0, "----- "+sPage+" / "+ sMaxPage +" -----"); 
-    std::ifstream read(getOcrPath());
-    if(!read)
-    {
-       std::ofstream write(m_sPath + "/ocr.txt");
-       write << sInput;
-       write.close();
-    }
+    sInput.insert(0, "\n----- "+sPage+" / "+ sMaxPage +" -----\n"); 
 
-    else
-    {
-         
+    std::cout << sInput << std::endl;
+
+    std::ifstream read(getOcrPath());
+    std::string sSource;
+    if(!read)
+        sSource = sInput;
+
+    else {
+        std::string sSource((std::istreambuf_iterator<char>(read)), std::istreambuf_iterator<char>());
+        sSource.append(sInput);
     }
+    
+    std::ofstream write(m_sPath + "/ocr.txt");
+    write << sSource;
+    write.close();
 }
