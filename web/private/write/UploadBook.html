@@ -189,10 +189,12 @@ function ShowStatus(x,color)
 function Upload(x,key)
 {
     let xhr = new XMLHttpRequest();
+    let create_ocr = document.getElementById("languageoptenabled").checked;
+    let language_ocr = document.getElementById("languageopt").value;
     if(x.force_overwrite == true)
-	xhr.open("POST","/upload?scanid="+key+"&filename="+x.file.name+"&forced=true",true);
+	xhr.open("POST","/upload?scanid="+key+"&create_ocr="+create_ocr+"&language="+language_ocr+"&filename="+x.file.name+"&forced=true",true);
     else
-	xhr.open("POST","/upload?scanid="+key+"&filename="+x.file.name,true);
+	xhr.open("POST","/upload?scanid="+key+"&create_ocr="+create_ocr+"&language="+language_ocr+"&filename="+x.file.name,true);
 
     x.progentry.value = 0;
     xhr.onload = function() {
@@ -415,11 +417,11 @@ function UploadAll()
     ShowStatus("Uploaded all files successfully! In order to find results in the new book you have to restart the server!","green");
 }
 
-function show_language()
+function show_language(x)
 {
-    if(this.checked)
+    if(x.checked)
     {
-	document.getElementById("languageopt").style.display = "inherit";
+	document.getElementById("languageopt").style.display = "inline-block";
     }
     else
     {
@@ -482,10 +484,10 @@ window.addEventListener("load",function(){initialise("uploadbooklink");init_even
 	</input>
 	<br>
 	<h2><span>4.</span>Ocr Options</h2>
-	<p>Es ist moeglich eine OCR vom Server erstellen zu lassen um diese Option zu benutzen setzten sie bitte ein Haekchen in der Checkbox unten. <mark>Dieser Vorgang dauert sehr lange wenn sie diese Option nutzen laden sie nicht viele Dateien auf einmal hoch!</mark></p>
+	<p>Es ist moeglich eine OCR vom Server erstellen zu lassen. Um diese Option zu benutzen setzten sie bitte ein Haekchen in der Checkbox unten. <b>Dieser Vorgang dauert sehr lange benuzten Sie diese Funktion nur wenn sie wenige Dateien hochladen!</b></p>
 	<div>
 	    <span>Der Server soll eine computergenerierte OCR erstellen: </span>
-	    <input onchange='show_language();' type='checkbox'/>
+	    <input id='languageoptenabled' onclick='show_language(this);' type='checkbox'/>
 	    <select id='languageopt' style='display: none;margin-left: 2rem;'>
 		<option value='deu_frak' selected>Deutsch Fraktur</option>
 		<option value='deu'>Deutsch</option>
