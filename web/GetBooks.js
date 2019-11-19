@@ -38,8 +38,6 @@ function HighlightHitsAndConstructLinkList()
 	document.getElementsByClassName("topnav")[0].style.display = "block";
 	document.getElementsByClassName("resizer")[0].style.display = "block";
 	let HighlightList = [];
-	if(hitlist.is_fuzzy==false)
-	    HighlightList = decodeURIComponent(getParameterByName('query')).replace(' ','+').split('+');
 
 	for(let i = 0; i < hitlist.books.length; i++)
 	{
@@ -62,14 +60,12 @@ function HighlightHitsAndConstructLinkList()
 
 	    ulhitlst.appendChild(link);
 
-	    if(hitlist.is_fuzzy)
-	    {
-		HighlightList = hitlist.books[i].words.split(",");
-	    }
+	    HighlightList = hitlist.books[i].words.split(",");
 
 	    for(let x = 0; x < HighlightList.length; x++)
 	    {
 		let thpage = document.getElementById("uniqueocrpage"+hitlist.books[i].page);
+		console.log(HighlightList);
 		if(thpage!=null)
 		    thpage.innerHTML=thpage.innerHTML.replace(new RegExp('('+HighlightList[x].replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')+')','gi'),'<mark>$1</mark>');
 	    }
