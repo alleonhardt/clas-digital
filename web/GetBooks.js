@@ -212,6 +212,8 @@ function CreatePageLayout()
 	    if(window.history.replaceState)
 	    {
 		let kk = isPageVisible('pagecontainer');
+		if(kk.length==0)
+		    kk = isPageVisible('pagecontainerFullImg');
 		if(kk.length>0)
 		{
 		    let newurl = window.location.search;
@@ -454,6 +456,29 @@ function SelectHit(direction)
 	//We are at the last hit so jump to the first one
 	lnks[0].click();
     }
+}
+
+function read_mode(x)
+{
+    if(x.is_full_read)
+    {
+	let vals = document.getElementsByClassName("pagecontainerFullImg");
+	for(let i = vals.length-1; i > -1; i--)
+	{
+	    vals[i].classList.replace("pagecontainerFullImg","pagecontainer");
+	}
+	x.is_full_read = false;
+    }
+    else
+    {
+	let vals = document.getElementsByClassName("pagecontainer");
+	for(let i = vals.length-1; i > -1; i--)
+	{
+	    vals[i].classList.replace("pagecontainer","pagecontainerFullImg");
+	}
+	x.is_full_read = true;
+    }
+    CorrectedScrollIntoView(document.getElementById("uniquepageid"+location.hash.substr(5)));
 }
 
 
