@@ -18,8 +18,8 @@ std::string OcrCreator::CreateOcrFromImage(const unsigned char *data, unsigned i
 	// Open input image with leptonica library
 	Pix *image = pixReadMem(data,size);
 	
-	Pix *image2 = pixConvertTo1(image,0x22);
-	api->SetImage(image2);
+//	Pix *image2 = pixConvertTo1(image,0x22);
+	api->SetImage(image);
 	// Get OCR result
 	outText = api->GetUTF8Text();
 	// Destroy used object and release memory
@@ -27,7 +27,7 @@ std::string OcrCreator::CreateOcrFromImage(const unsigned char *data, unsigned i
 	std::string ret = outText;
 	delete [] outText;
 	pixDestroy(&image);
-	pixDestroy(&image2);
+//	pixDestroy(&image2);
 	return ret;
     }
     catch(...)
