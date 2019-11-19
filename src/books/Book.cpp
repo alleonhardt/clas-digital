@@ -11,7 +11,7 @@ CBook::CBook () {}
 CBook::CBook(nlohmann::json jMetadata) : m_metadata(jMetadata)
 {
     m_sKey = jMetadata["key"];
-    m_sPath = "web/book/"+m_sKey;
+    m_sPath = "web/books/"+m_sKey;
     m_bOcr = false;
     m_bhasFiles = false;
 
@@ -547,6 +547,8 @@ void CBook::shortenPreview(std::string& str)
 
 void CBook::addPage(std::string sInput, std::string sPage, std::string sMaxPage)
 {
+    std::cout << sInput << std::endl;
+
     sInput.insert(0, "\n----- "+sPage+" / "+ sMaxPage +" -----\n"); 
 
     std::cout << sInput << std::endl;
