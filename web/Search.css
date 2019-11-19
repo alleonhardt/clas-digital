@@ -33,7 +33,7 @@ mark {
 
 .selAll{
     float:right;
-    margin-right:17.9%;
+    margin-right:15.55%;
     font-size:13px;
     color:#50555a;
 
@@ -54,7 +54,6 @@ mark {
 }
 
 .searchResult {
-	margin-bottom:1rem;
     width:80%;
     float:left;
     padding:20px 20px;

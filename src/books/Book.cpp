@@ -125,8 +125,6 @@ void CBook::createPages()
         getline(read, sLine);
 
         if(func::checkPage(sLine) == true) {
-            std::string num = sLine.substr(6, sLine.find("/")-7);
-            page = stoi(num);
             for(auto it : func::extractWordsFromString(sBuffer)) {
                 std::get<0>(m_mapWordsPages[it.first]).push_back(page);
                 std::get<1>(m_mapWordsPages[it.first]) += it.second*(it.second+1) / 2;
@@ -138,6 +136,9 @@ void CBook::createPages()
             write << func::returnToLower(sBuffer);
             write.close();
             sBuffer = "";
+
+            std::string num = sLine.substr(6, sLine.find("/")-7);
+            page = stoi(num);
         }
 
         else
@@ -479,7 +480,7 @@ std::string CBook::getPreviewText(std::string& sWord, size_t& pos, size_t& page)
         return "";
 
     // *** Get Source string *** //
-    std::ifstream read(m_sPath + "/intern/page" + std::to_string(page+1) + ".txt", std::ios::in);
+    std::ifstream read(m_sPath + "/intern/page" + std::to_string(page) + ".txt", std::ios::in);
     std::string sSource((std::istreambuf_iterator<char>(read)), std::istreambuf_iterator<char>());
 
     // *** Get Pos *** //
@@ -523,7 +524,7 @@ size_t CBook::getPreviewPosition(std::string sWord)
     for(size_t i=0; i<pages.size(); i++) 
     {
         //Read ocr and kontent
-        std::ifstream read(m_sPath + "/intern/page" + std::to_string(pages[i]+1) + ".txt", std::ios::in);
+        std::ifstream read(m_sPath + "/intern/page" + std::to_string(pages[i]) + ".txt", std::ios::in);
         std::string sPage((std::istreambuf_iterator<char>(read)), std::istreambuf_iterator<char>());
 
         //Find match
