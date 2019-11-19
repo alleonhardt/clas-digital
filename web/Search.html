@@ -104,7 +104,6 @@
 
 
             <div id="ResultBannerFooter" style="margin-top: 2rem; margin-bottom:0;">
-            <div style="width:80%;margin-left:18.8%;">
                 <div class='selectdiv' style="display:inline-block;">
                 <label>
                 <select id='limit' onchange='OpenFilter(this);return true;' style='background:white;'>
@@ -126,14 +125,12 @@
                </div>
                <button class='advanceopts' onclick='CreateBibliography();return true;'>Create Bibliography</button>
 
-                <div id="selAll" class="selAll" >
-                    Select All <input type="checkbox" onchange="SelectAll(this.checked);return true;"></input>
-                </div>
-
-           </div> 
-
+                
                <hr style='padding: 0;'>
-               <span style='color: grey;font-size:13px;'><span id="maxResults"></span> Ergebnisse gefunden in <span id="searchTime"></span></span>
+               <span style='color: grey;font-size:13px;margin-left:20%;'><span id="maxResults"></span> Ergebnisse gefunden in <span id="searchTime"></span></span>
+               <div id="selAll" class="selAll" >
+                   Select All <input type="checkbox" onchange="SelectAll(this.checked);return true;"></input>
+               </div>
             </div>
         </div>
         <div>
