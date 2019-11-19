@@ -78,19 +78,19 @@ void get_sugg(const Request &req, Response &resp, CBookManager &manager, std::st
 {
     try
     {
-        std::string sInput = req.get_param_value("q");
-        auto start = std::chrono::system_clock::now();
-        std::list<std::string>* listSugg = manager.getSuggestions(sInput, sType);
-        std::chrono::duration<double> elapsed_seconds = std::chrono::system_clock::now()-start;
-        nlohmann::json responseJson;
-        for(auto it=listSugg->begin(); it!=listSugg->end();it++)
-            responseJson.push_back((*it)); 
-        delete listSugg;
-        resp.set_content(responseJson.dump(),"application/json");
+	std::string sInput = req.get_param_value("q");
+	auto start = std::chrono::system_clock::now();
+	std::list<std::string>* listSugg = manager.getSuggestions(sInput, sType);
+	std::chrono::duration<double> elapsed_seconds = std::chrono::system_clock::now()-start;
+	nlohmann::json responseJson;
+	for(auto it=listSugg->begin(); it!=listSugg->end();it++)
+	    responseJson.push_back((*it)); 
+	delete listSugg;
+	resp.set_content(responseJson.dump(),"application/json");
     }
 
     catch(...) {
-	    resp.set_content("{}","application/json");
+	resp.set_content("{}","application/json");
     }
 }
 void get_metadata(const Request &req, Response &resp, CBookManager &manager)
@@ -179,28 +179,19 @@ void do_searchinbook(const Request& req, Response &resp, CBookManager &manager)
 	auto glambda = [](std::string const &str, std::string const &from,std::string const &to) -> std::string {return std::regex_replace(str,std::regex(from),to);};
 	for(auto const &it : *mapPtr)
 	{
-	    if(Fuzzyness==0)
-	    {
-		nlohmann::json entry;
-		entry["page"] = it.first;
-		js["books"].push_back(std::move(entry));
-	    }
-	    else
-	    {
-		nlohmann::json entry;
-		entry["page"] = it.first;
-		std::string val = "";
+	    nlohmann::json entry;
+	    entry["page"] = it.first;
+	    std::string val = "";
 
-		for(auto const &inner : it.second)
-		{
-		    if(val!="")
-			val+=",";
-		    val += glambda(inner,"\"","\\\"");
-		}
-
-		entry["words"] = val;
-		js["books"].push_back(std::move(entry));	
+	    for(auto const &inner : it.second)
+	    {
+		if(val!="")
+		    val+=",";
+		val += glambda(inner,"\"","\\\"");
 	    }
+
+	    entry["words"] = val;
+	    js["books"].push_back(std::move(entry));	
 	}
 	resp.set_content(js.dump(),"application/json");
     }
@@ -273,8 +264,8 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
 	    auto iter = bklst->begin();
 	    if(bklst->size()<=(static_cast<unsigned int>(list_start)))
 	    {
-            js["max_results"] = 0;
-            js["time"] = 0;
+		js["max_results"] = 0;
+		js["time"] = 0;
 	    }
 	    else
 	    {
@@ -486,7 +477,7 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 	    std::ofstream writer(pa.c_str(),std::ios::out);
 	    writer<<file_desc;
 	    writer.close();
-	    
+
 	    if(ocr_create=="true")
 	    {
 		OcrCreator c;
@@ -610,23 +601,23 @@ void do_usertableupdate(const Request &req, Response &resp)
 void do_restart_server(const Request &req, Response &resp)
 {
     if(!User::AccessCheck(GetUserFromCookie(req),AccessRights::USR_WRITE))	
-	{
-	    resp.status = 403;
-	    return;
-	}
+    {
+	resp.status = 403;
+	return;
+    }
 
 
     std::unique_lock<std::mutex> lock(gGlobalUpdateOperationLock, std::try_to_lock);
     if(!lock.owns_lock()){
-	    //mutex not locked...
-	    resp.status = 500;
-	    if(gGlobalUpdateOperation == GlobalUpdateOperations::update_zotero)
-		resp.set_content("updateing_zotero_atm","text/plain");
-	    else if(gGlobalUpdateOperation == GlobalUpdateOperations::restart_server)
-		resp.set_content("restarting_server_atm","text/plain");
-	    else
-		resp.set_content("unkown_server_error","text/plain");
-	    return;
+	//mutex not locked...
+	resp.status = 500;
+	if(gGlobalUpdateOperation == GlobalUpdateOperations::update_zotero)
+	    resp.set_content("updateing_zotero_atm","text/plain");
+	else if(gGlobalUpdateOperation == GlobalUpdateOperations::restart_server)
+	    resp.set_content("restarting_server_atm","text/plain");
+	else
+	    resp.set_content("unkown_server_error","text/plain");
+	return;
     }
     gGlobalUpdateOperation = GlobalUpdateOperations::restart_server;
     resp.status = 200;
@@ -638,15 +629,15 @@ void do_update_zotero(const Request &req, Response &resp)
 {
     std::unique_lock<std::mutex> lock(gGlobalUpdateOperationLock, std::try_to_lock);
     if(!lock.owns_lock()){
-	    //mutex not locked...
-	    resp.status = 500;
-	    if(gGlobalUpdateOperation == GlobalUpdateOperations::update_zotero)
-		resp.set_content("updateing_zotero_already","text/plain");
-	    else if(gGlobalUpdateOperation == GlobalUpdateOperations::restart_server)
-		resp.set_content("restarting_server_atm","text/plain");
-	    else
-		resp.set_content("unkown_server_error","text/plain");
-	    return;
+	//mutex not locked...
+	resp.status = 500;
+	if(gGlobalUpdateOperation == GlobalUpdateOperations::update_zotero)
+	    resp.set_content("updateing_zotero_already","text/plain");
+	else if(gGlobalUpdateOperation == GlobalUpdateOperations::restart_server)
+	    resp.set_content("restarting_server_atm","text/plain");
+	else
+	    resp.set_content("unkown_server_error","text/plain");
+	return;
     }
     gGlobalUpdateOperation = GlobalUpdateOperations::update_zotero;
 
@@ -671,7 +662,7 @@ void do_update_zotero(const Request &req, Response &resp)
 	{
 	    auto entryjs = nlohmann::json::parse(Zotero::SendRequest(Zotero::Request::GetAllItemsFromCollection(it["key"])));
 	    for(auto &it : entryjs)
-	        metaData.push_back(it);
+		metaData.push_back(it);
 	}
 	//Save the collected data as it is the newest data available
 	std::ofstream o("bin/zotero.json",std::ios::out);
@@ -818,7 +809,7 @@ int main(int argc, char **argv)
     srv.Post("/upload",[&](const Request &req, Response &resp){do_upload(req,resp,manager);});
     std::cout<<"C++ Api server startup successfull!"<<std::endl;
     srv.listen("localhost", startPort);
-    
+
     if(gGlobalUpdateOperation == GlobalUpdateOperations::restart_server)
 	return -1;
     return 0;
