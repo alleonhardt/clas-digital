@@ -575,21 +575,21 @@ void CBook::addPage(std::string sInput, std::string sPage, std::string sMaxPage)
     }
 
     else {
-        std::map<std::string, std::string> orderMap;
+        std::map<int, std::string> orderMap;
         std::cout << "Adding to existing ocr ... " << std::endl;
-        for(auto& p : fs::directory_iterator(m_sPath+"/intern"))
-            orderMap[p.path().filename()] = p.path();
+        for(auto& p : fs::directory_iterator(m_sPath+"/intern")) {
+            std::string filename=p.path().filename();
+            if(filename.find("add")!=std::string::npos) {
+                std::string num = filename.substr(3, filename.length()-2-filename.find("."));
+                orderMap[stoi(num)] = p.path();
+            }
+        }
 
         for(auto it : orderMap) {
-            std::string filename = it.first;
-            if(filename.find("add")!=std::string::npos)
-            {
-                std::string num = filename.substr(3, filename.length()-2-filename.find("."));
-                sSource.append("\n\n----- "+num+" / "+ sMaxPage +" -----\n");
-                std::ifstream r2(it.second);
-                std::string str((std::istreambuf_iterator<char>(r2)), std::istreambuf_iterator<char>());
-                sSource.append(str);
-            }
+            sSource.append("\n\n----- "+std::to_string(it.first)+" / "+ sMaxPage +" -----\n");
+            std::ifstream r2(it.second);
+            std::string str((std::istreambuf_iterator<char>(r2)), std::istreambuf_iterator<char>());
+            sSource.append(str);
         }
     }
 
