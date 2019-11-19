@@ -544,3 +544,20 @@ void CBook::shortenPreview(std::string& str)
             str.erase(i-1, 1);
     }
 }
+
+void CBook::addPage(std::string sInput, std::string sPage, std::string sMaxPage)
+{
+    sInput.insert(0, "----- "+sPage+" / "+ sMaxPage +" -----"); 
+    std::ifstream read(getOcrPath());
+    if(!read)
+    {
+       std::ofstream write(m_sPath + "/ocr.txt");
+       write << sInput;
+       write.close();
+    }
+
+    else
+    {
+         
+    }
+}

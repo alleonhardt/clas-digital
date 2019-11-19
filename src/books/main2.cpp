@@ -4,6 +4,11 @@ namespace fs = std::filesystem;
 
 int main()
 {
+
+    fs::path p = "../../web/books/XUA36SSS/ocr2.txt";
+    if(fs::exists(p)) std::cout << "yes\n";
+    else std::cout << "no\n";
+    /*
     for (auto& p : fs::directory_iterator("web/books")) {
 
         if(p.path().filename() == "whatever.txt")
@@ -24,5 +29,5 @@ int main()
                 std::cout << p2.path() << std::endl; 
             }
         }
-    }
+    }*/
 }

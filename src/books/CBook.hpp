@@ -183,4 +183,7 @@ public:
     size_t getPreviewPosition(std::string sWord);
 
     void shortenPreview(std::string& finalResult);
+
+    //Teseract
+    void addPage(std::string sInput, std::string sPage, std::string sMaxPage);
 };
