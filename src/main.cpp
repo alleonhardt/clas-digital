@@ -378,10 +378,14 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
     std::string writePath = "web/books/";
     std::string scanId = "";
     std::string fileName = "";
+    std::string ocr_create = "";
+    std::string ocr_lang = "";
 
     try{forcedWrite = req.get_param_value("forced")=="true";}catch(...){};
     try{scanId = req.get_param_value("scanid");}catch(...){};
     try{fileName = req.get_param_value("filename");}catch(...){};
+    try{ocr_create = req.get_param_value("create_ocr");}catch(...){};
+    try{ocr_lang = req.get_param_value("language");}catch(...){};
 
     std::cout<<"Authorized request to upload files"<<std::endl;
     std::cout<<"Parsed fileName: "<<fileName<<std::endl;
@@ -400,9 +404,10 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
     writePath+="/";
     writePath+=fileName;
 
+    CBook *book;
     try
     {
-	manager.getMapOfBooks().at(scanId);
+	book = manager.getMapOfBooks().at(scanId);
     }
     catch(...)
     {
@@ -481,8 +486,11 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 	    writer<<file_desc;
 	    writer.close();
 	    
-	    OcrCreator c;
-	    std::cout<<"Created OCR: "<<c.CreateOcrFromImage(reinterpret_cast<const unsigned char*>(req.body.c_str()),req.body.length(),"deu_frak");
+	    if(ocr_create=="true")
+	    {
+		OcrCreator c;
+		book->addPage(c.CreateOcrFromImage(reinterpret_cast<const unsigned char*>(req.body.c_str()),req.body.length(),ocr_lang.c_str()),entry["pageNumber"],std::to_string(maxPageNum));
+	    }
 	}
 	catch(...)
 	{

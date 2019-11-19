@@ -85,7 +85,7 @@ void CBook::createBook(std::string sPath)
 	    ++counter;
     }
 
-    if(counter>1)
+    if(counter>2)
 	m_bhasFiles = true;
 
     //If ocr exists create or load list with words
