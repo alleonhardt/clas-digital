@@ -1,3 +1,8 @@
+body {
+    margin:0;
+    font-family: arial,sans-serif;
+}
+
 .topnav {
 	top:0;
 	left:0;

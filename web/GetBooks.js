@@ -125,10 +125,23 @@ function loadOCRFile(ocrtxt)
     ocrtxt = ocrtxt.replace(new RegExp("<",'g'),"&lt;");
     ocrtxt = ocrtxt.replace(new RegExp(">",'g'),"&gt;");
 
-    let RegSrch = /-----\s\d+\s.\s\d+\s-----/g;
-    gOcrSplittedFile = ocrtxt.split(RegSrch);
-    gOcrSplittedFile.shift();
-    console.log("SPLIT length: "+gOcrSplittedFile.length);
+    let RegSrch = /-----\s(\d+)\s.\s\d+\s-----/g;
+    let match;
+    gOcrSplittedFile = [];
+    gOcrSplittedFile.pageNum = [];
+    let maxNum = 0;
+    while(match = RegSrch.exec(ocrtxt))
+    {
+	let vl = parseInt(match[1]);
+	gOcrSplittedFile.pageNum.push(vl);
+	if( vl > maxNum)
+	    maxNum = vl;
+    }
+    gOcrSplittedFile.maxPageNum = maxNum;
+    let RegSrchSplit = /-----\s\d+\s.\s\d+\s-----/g;
+    gOcrSplittedFile.arr = ocrtxt.split(RegSrchSplit);
+    gOcrSplittedFile.arr.shift();
+    console.log("SPLIT length: "+gOcrSplittedFile.arr.length);
     //Pagelayout file loaded yet? Then construct the pages
     if(gPageLayoutFile!=null)
 	CreatePageLayout();
@@ -136,27 +149,27 @@ function loadOCRFile(ocrtxt)
 
 function CreatePageLayout()
 {
-    console.log("OCR size: "+gOcrSplittedFile.length);
+    console.log("OCR size: "+gOcrSplittedFile.arr.length);
     console.log("Pages size: "+gPageLayoutFile.pages.length);
-    for(let i = 0; i < gOcrSplittedFile.length; i++)
+    for(let i = 0; i < gOcrSplittedFile.arr.length; i++)
     {
 	let x = document.createElement("p");
 	let cont = document.createElement("div");
 	let ocrcont = document.createElement("div");
 	let anchor = document.createElement("a");
-	anchor.id = "page"+(i+1);
+	anchor.id = "page"+gOcrSplittedFile.pageNum[i];
 
 	ocrcont.classList.add("ocrcontainer");
 
 	cont.classList.add('pagecontainer');
-	cont.id = "uniquepageid"+(i+1);
-	x.innerHTML = gOcrSplittedFile[i]+"<br/><b style='float: right;'>"+(i+1)+"/"+gOcrSplittedFile.length+"</b>";
-	x.id = "uniqueocrpage"+(i+1);
+	cont.id = "uniquepageid"+gOcrSplittedFile.pageNum[i];
+	x.innerHTML = gOcrSplittedFile.arr[i]+"<br/><b style='float: right;'>"+gOcrSplittedFile.pageNum[i]+"/"+gOcrSplittedFile.maxPageNum+"</b>";
+	x.id = "uniqueocrpage"+gOcrSplittedFile.pageNum[i];
 	x.classList.add('ocrpage');
 	ocrcont.appendChild(anchor);
 	ocrcont.appendChild(x);
 	cont.appendChild(ocrcont);
-	cont.pageNumber = (i+1);
+	cont.pageNumber = gOcrSplittedFile.pageNum[i];
 
 	document.body.appendChild(cont);
     }
@@ -212,6 +225,8 @@ function CreatePageLayout()
 	    if(window.history.replaceState)
 	    {
 		let kk = isPageVisible('pagecontainer');
+		if(kk.length==0)
+		    kk = isPageVisible('pagecontainerFullImg');
 		if(kk.length>0)
 		{
 		    let newurl = window.location.search;
@@ -454,6 +469,29 @@ function SelectHit(direction)
 	//We are at the last hit so jump to the first one
 	lnks[0].click();
     }
+}
+
+function read_mode(x)
+{
+    if(x.is_full_read)
+    {
+	let vals = document.getElementsByClassName("pagecontainerFullImg");
+	for(let i = vals.length-1; i > -1; i--)
+	{
+	    vals[i].classList.replace("pagecontainerFullImg","pagecontainer");
+	}
+	x.is_full_read = false;
+    }
+    else
+    {
+	let vals = document.getElementsByClassName("pagecontainer");
+	for(let i = vals.length-1; i > -1; i--)
+	{
+	    vals[i].classList.replace("pagecontainer","pagecontainerFullImg");
+	}
+	x.is_full_read = true;
+    }
+    CorrectedScrollIntoView(document.getElementById("uniquepageid"+location.hash.substr(5)));
 }
 
 

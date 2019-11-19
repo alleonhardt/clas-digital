@@ -143,6 +143,10 @@ body {
     margin-top: 4rem;
 }
 
+.pagecontainerFullImg div {
+    display: none;
+}
+
 .ocrcontainer {
     position: relative;
     background: white;
