@@ -10,7 +10,7 @@ std::string OcrCreator::CreateOcrFromImage(const unsigned char *data, unsigned i
 
 	tesseract::TessBaseAPI *api = new tesseract::TessBaseAPI();
 	// Initialize tesseract-ocr with English, without specifying tessdata path
-	if (api->Init("bin/trainingdata/", language.c_str())) {
+	if (api->Init("trainingdata/", language.c_str())) {
 	    fprintf(stderr, "Could not initialize tesseract.\n");
 	    throw 0;
 	}
