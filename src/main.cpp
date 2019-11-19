@@ -479,6 +479,7 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 		}
 	    }
 	    file_desc["maxPageNum"] = maxPageNum;
+	    int what = entry["pageNumber"];
 	    if(!replace)
 		file_desc["pages"].push_back(std::move(entry));
 
@@ -489,7 +490,6 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 	    if(ocr_create=="true")
 	    {
 		OcrCreator c;
-		int what = entry["pageNumber"];
 		book->addPage(c.CreateOcrFromImage(reinterpret_cast<const unsigned char*>(req.body.c_str()),req.body.length(),ocr_lang.c_str()),std::to_string(what),std::to_string(maxPageNum));
 	    }
 	}
