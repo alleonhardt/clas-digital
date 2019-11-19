@@ -1,5 +1,6 @@
 #include "CBook.hpp"
-#include <filesystem>
+
+namespace fs = std::filesystem;
 
 CBook::CBook () {}
 
@@ -138,6 +139,19 @@ void CBook::createPages()
 
         else
             sBuffer += " " + sLine;
+    }
+    if(sBuffer.length() !=0)
+    {
+        for(auto it : func::extractWordsFromString(sBuffer)) {
+            std::get<0>(m_mapWordsPages[it.first]).push_back(pageCounter);
+            std::get<1>(m_mapWordsPages[it.first]) += it.second*(it.second+1) / 2;
+        } 
+        pageCounter++;
+
+        //Create new page
+        std::ofstream write(m_sPath + "/intern/page" + std::to_string(pageCounter) + ".txt");
+        write << func::returnToLower(sBuffer);
+        write.close();
     }
     read.close();
     m_numPages = pageCounter;
@@ -547,23 +561,41 @@ void CBook::shortenPreview(std::string& str)
 
 void CBook::addPage(std::string sInput, std::string sPage, std::string sMaxPage)
 {
-    std::cout << sInput << std::endl;
+    std::ofstream writePage(m_sPath+"/intern/add"+sPage+".txt");
+    writePage << sInput;
+    writePage.close();
 
-    sInput.insert(0, "\n----- "+sPage+" / "+ sMaxPage +" -----\n"); 
-
-    std::cout << sInput << std::endl;
-
-    std::ifstream read(getOcrPath());
+    fs::path p = getOcrPath();
+    fs::exists(p);
     std::string sSource;
-    if(!read)
+    if(fs::exists(p) == false) {
+        std::cout << "create new ocr..." << std::endl;
+        sInput.insert(0, "\n----- "+sPage+" / "+ sMaxPage +" -----\n"); 
         sSource = sInput;
+    }
 
     else {
-        std::string sSource((std::istreambuf_iterator<char>(read)), std::istreambuf_iterator<char>());
-        sSource.append(sInput);
+        std::map<std::string, std::string> orderMap;
+        std::cout << "Adding to existing ocr ... " << std::endl;
+        for(auto& p : fs::directory_iterator(m_sPath+"/intern"))
+            orderMap[p.path().filename()] = p.path();
+
+        for(auto it : orderMap) {
+            std::string filename = it.first;
+            if(filename.find("add")!=std::string::npos)
+            {
+                std::string num = filename.substr(3, filename.length()-2-filename.find("."));
+                sSource.append("\n\n----- "+num+" / "+ sMaxPage +" -----\n");
+                std::ifstream r2(it.second);
+                std::string str((std::istreambuf_iterator<char>(r2)), std::istreambuf_iterator<char>());
+                sSource.append(str);
+            }
+        }
     }
+
+    std::cout << sSource << std::endl;
     
-    std::ofstream write(m_sPath + "/ocr.txt");
-    write << sSource;
-    write.close();
+    std::ofstream writeOcr(m_sPath + "/ocr.txt");
+    writeOcr << sSource;
+    writeOcr.close();
 }
