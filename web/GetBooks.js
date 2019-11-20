@@ -116,6 +116,25 @@ function UpdateLinkPrev()
     }
 }
 
+function UpdateViewMode()
+{
+	let var_arr;
+	let var_class = 'pagecontainer';
+	let var_class_old = 'pagecontainerFullImg';
+
+	if(document.getElementById("tooglebut").is_full_read)
+	{
+	    var_arr = isPageAlmostVisible('pagecontainer');
+	    var_class = 'pagecontainerFullImg';
+	    var_class_old = 'pagecontainer';
+	}
+	else
+	    var_arr = isPageAlmostVisible('pagecontainerFullImg');
+	
+	for(let i = 0; i < var_arr.length; i++)
+	    var_arr[i].classList.replace(var_class_old,var_class);
+}
+
 function loadOCRFile(ocrtxt)
 {
     ocrtxt = ocrtxt.replace(new RegExp("<",'g'),"&lt;");
@@ -209,6 +228,7 @@ function CreatePageLayout()
 		lst[i].style.top = (gNewSize+17)+"px";
 	    currentSize = gNewSize;
 	}
+	UpdateViewMode();
 
 	if(timer)
 	{
@@ -270,6 +290,30 @@ function isPageVisible(whatisvis)
 	}
     }
     return(visiblePages);
+}
+
+function isPageAlmostVisible(whatisvis)
+{
+    let allPages = document.getElementsByClassName(whatisvis);
+
+    let visiblePages = new Array();
+    for(let i = 0; i < allPages.length; i++) {
+	if(isElementNearViewport(allPages[i])) {
+	    visiblePages.push(allPages[i]);
+	}
+    }
+    return(visiblePages);
+}
+
+function isElementNearViewport(el) {
+    var rect = el.getBoundingClientRect();
+
+    if(rect.bottom <= -2000)
+	return(false);
+    if(rect.top > (window.innerHeight+2000))
+	return(false);
+    return(true);
+
 }
 
 function isElementInViewport (el) {
@@ -471,23 +515,32 @@ function read_mode(x)
 {
     if(x.is_full_read)
     {
-	let vals = document.getElementsByClassName("pagecontainerFullImg");
-	for(let i = vals.length-1; i > -1; i--)
-	{
-	    vals[i].classList.replace("pagecontainerFullImg","pagecontainer");
-	}
 	x.is_full_read = false;
+	x.innerHTML = "Page View";
     }
     else
     {
-	let vals = document.getElementsByClassName("pagecontainer");
-	for(let i = vals.length-1; i > -1; i--)
-	{
-	    vals[i].classList.replace("pagecontainer","pagecontainerFullImg");
-	}
 	x.is_full_read = true;
+	x.innerHTML = "Split View";
     }
-    CorrectedScrollIntoView(document.getElementById("uniquepageid"+location.hash.substr(5)));
+    UpdateViewMode();
+  //  CorrectedScrollIntoView(document.getElementById("uniquepageid"+location.hash.substr(5)));
+}
+
+function tooglefullscreen(x)
+{
+    if(x.is_full)
+    {
+	closeFullscreen(document.documentElement);	
+	x.is_full = false;
+	x.innerHTML = "Fullscreen";
+    }
+    else
+    {
+	openFullscreen(document.documentElement);	
+	x.innerHTML = "Normal";
+	x.is_full = true;
+    }
 }
 
 

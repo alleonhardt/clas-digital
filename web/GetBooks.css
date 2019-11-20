@@ -2,6 +2,7 @@ body {
     background: grey;
     padding: 0.5rem;
     font-family: arial,sans-serif;
+    overflow-x: hidden;
 }
 
 .searchbox {
@@ -137,14 +138,10 @@ body {
 
 .pagecontainerFullImg {
     display: grid;
-    width: 98%;
-    margin-left: 1%;
-    grid-template-columns: 100%;
+    width: 100%;
+    grid-template-columns: 100% 40%;
+    grid-column-gap: 4%;
     margin-top: 4rem;
-}
-
-.pagecontainerFullImg div {
-    display: none;
 }
 
 .ocrcontainer {
