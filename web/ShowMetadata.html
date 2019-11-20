@@ -31,6 +31,7 @@ function LoadMetadata()
 		Server.Get("/getmetadata?scanId="+value,function(content) {
 		let json = JSON.parse(content);
 		document.getElementById("details").innerHTML += json.bib;
+		document.getElementById("bookcontentlinklist").innerHTML += "<li><a href='/GetBooks.html?scanId="+value+"'>View Book</a></li>";
 
 		if(json.data.ISBN != undefined && json.data.ISBN != "")
 		    document.getElementById("isbn").innerHTML += json.data.ISBN;
@@ -80,7 +81,12 @@ function LoadMetadata()
 	</script>
   </head>
 <body style="padding: 5rem;" onload="LoadMetadata();">
-		<h1 id="details"></h1>
+	<h1 id="details"></h1>
+	<nav id='booklcontentlink'>
+	    <ul id='bookcontentlinklist'>
+		<li><a href="/books/">View all books</a></li>
+	    </ul>
+	</nav>
         <p id="itemType"><b>Item Type:</b> </p>
         <hr>
 	    <p id="title"><b>Title:</b> </p>
