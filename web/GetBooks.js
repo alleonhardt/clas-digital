@@ -467,6 +467,14 @@ function initialise()
 	topnav.style["overflow-y"] = "scroll";
 	document.removeEventListener("mousemove", resize, false);
     }, false);
+
+    document.addEventListener("fullscreenchange", function (event) {
+    if (document.fullscreenElement) {
+	document.getElementById("fullbut").src = "/static/GetBooks/fullscreen_exit-24px.svg";
+    } else {
+	document.getElementById("fullbut").src = "/static/GetBooks/fullscreen-24px.svg";
+    }
+});
 }
 
 
@@ -516,15 +524,15 @@ function read_mode(x)
     if(x.is_full_read)
     {
 	x.is_full_read = false;
-	x.innerHTML = "Page View";
+	x.src = "/static/GetBooks/chrome_reader_mode-24px.svg";
     }
     else
     {
 	x.is_full_read = true;
-	x.innerHTML = "Split View";
+	x.src = "/static/GetBooks/vertical_split-24px.svg";
     }
     UpdateViewMode();
-  //  CorrectedScrollIntoView(document.getElementById("uniquepageid"+location.hash.substr(5)));
+    CorrectedScrollIntoView(document.getElementById("uniquepageid"+location.hash.substr(5)));
 }
 
 function tooglefullscreen(x)
@@ -533,12 +541,10 @@ function tooglefullscreen(x)
     {
 	closeFullscreen(document.documentElement);	
 	x.is_full = false;
-	x.innerHTML = "Fullscreen";
     }
     else
     {
 	openFullscreen(document.documentElement);	
-	x.innerHTML = "Normal";
 	x.is_full = true;
     }
 }

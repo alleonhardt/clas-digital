@@ -5,6 +5,21 @@ body {
     overflow-x: hidden;
 }
 
+.fullscreen {
+    cursor: pointer;
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 0;
+}
+
+.fullscreen:hover {
+    background-color: #ddd;
+}
+
+.fullscreen:active {
+    background-color: #444;
+}
+
 .searchbox {
     position: fixed;
     width: 100%;
@@ -14,6 +29,7 @@ body {
     min-height: 2rem;
     z-index: 3;
     background: white;
+    border-bottom: 2px solid black;
 }
 
 .searchstyler {
@@ -121,6 +137,9 @@ body {
     padding-top: 0.2rem;
     font-size: small;
     color: green;
+    height: 1.2rem;
+    line-height: 1.5rem;
+    overflow: auto;
     -webkit-touch-callout: all; /* iOS Safari */
     -webkit-user-select: all; /* Safari */
     -moz-user-select: all; /* Firefox */

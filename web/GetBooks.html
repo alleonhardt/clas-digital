@@ -21,8 +21,8 @@
 	<div class='searchbox'>
 	    <center>
 	    <input id='srchbox' style='width:25%;border-radius: 20px;padding-left: 0.5rem;padding-right: 0.5rem;margin-left: 1rem;margin-top: 0.5rem;text-align: center;' type='text' placeholder="search this book"><i class="fa fa-search searchstyler" onclick='doCompleteNewSearch();return true;'></i></input>
-		<button id='tooglebut' onclick="read_mode(this);" style='float: right;margin:0.4rem;' title="Toggle full screen read mode">Page View</button>
-		<button id='fullbut' onclick='tooglefullscreen(this);' style='float: right; margin:0.4rem'>Fullscreen</button>
+	    <img id='fullbut' onclick='tooglefullscreen(this);' class='fullscreen' title='Toogle fullscreen mode' style='float: right; margin:0.5rem' src="/static/GetBooks/fullscreen-24px.svg"/>
+	    <img id='tooglebut' onclick="read_mode(this);" class='fullscreen' style='float: right;margin:0.5rem;' title="Toggle image reader and split reader mode" src="/static/GetBooks/chrome_reader_mode-24px.svg"></img>
 		<div style='position: relative;left:-2rem;width: 25%;padding-left: 0.5rem;'>
 		    <div id='fuzzysuggestions' style='visibility:hidden;z-index: 5;position: absolute;top:0;left: 1rem;background:white;border: 2px solid black;width: 55vw;'></div>
 		</div>
