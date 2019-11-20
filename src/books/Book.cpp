@@ -97,14 +97,14 @@ void CBook::createBook(std::string sPath)
     writeJson << m_metadata.getMetadata();
     writeJson.close();
 
-    //std::ifstream readWords(m_sPath + "/intern/pages.txt");
-    //if(!readWords || readWords.peek() == std::ifstream::traits_type::eof() ) {
+    std::ifstream readWords(m_sPath + "/intern/pages.txt");
+    if(!readWords || readWords.peek() == std::ifstream::traits_type::eof() ) {
         createPages();
         createMapPreview();
         safePages();
-    //}
+    }
 
-    //else
+    else
         loadPages();
 
     m_bOcr = true;
