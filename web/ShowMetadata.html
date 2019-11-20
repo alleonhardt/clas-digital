@@ -52,13 +52,6 @@ function LoadMetadata()
         if(json.data.place!= undefined && json.data.place != "")
             document.getElementById("place").innerHTML += json.data.place;
 
-        if(json.data.libraryCatalog != undefined && json.data.libraryCatalog != "")
-            document.getElementById("libraryCatalog").innerHTML += json.data.libraryCatalog;
-        else {
-            document.getElementById("libraryCatalog").style.display="none";
-            document.getElementById("libraryCatalog2").style.display="none";
-        }
-
 		if(json.data.creators != undefined)
 		{
 		    let creator_str = "";
@@ -99,8 +92,6 @@ function LoadMetadata()
 		<hr>
         <p id="isbn"><b>ISBN:</b> </p>
         <hr id="isbn2">
-        <p id="libraryCatalog"><b>Library Catalog:</b> </p>
-        <hr id="libraryCatalog2">
         
 </body>
 </html>
