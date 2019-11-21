@@ -188,17 +188,24 @@ function CreatePageLayout()
 	let cont = document.createElement("div");
 	let ocrcont = document.createElement("div");
 	let anchor = document.createElement("a");
+	let pagenumshow = document.createElement("b");
 	anchor.id = "page"+gOcrSplittedFile.pageNum[i];
 
 	ocrcont.classList.add("ocrcontainer");
 
 	cont.classList.add('pagecontainer');
 	cont.id = "uniquepageid"+gOcrSplittedFile.pageNum[i];
-	x.innerHTML = gOcrSplittedFile.arr[i]+"<br/><b style='float: right;'>"+gOcrSplittedFile.pageNum[i]+"/"+gOcrSplittedFile.maxPageNum+"</b>";
+	x.innerHTML = gOcrSplittedFile.arr[i];
+	pagenumshow.innerHTML = gOcrSplittedFile.pageNum[i]+"/"+gOcrSplittedFile.maxPageNum;
+	pagenumshow.style.position = "absolute";
+	pagenumshow.style.bottom = "0.5rem";
+	pagenumshow.style.right = "0.5rem";
+	pagenumshow.style["font-size"] = 'small';
 	x.id = "uniqueocrpage"+gOcrSplittedFile.pageNum[i];
 	x.classList.add('ocrpage');
 	ocrcont.appendChild(anchor);
 	ocrcont.appendChild(x);
+	ocrcont.appendChild(pagenumshow);
 	cont.appendChild(ocrcont);
 	cont.pageNumber = gOcrSplittedFile.pageNum[i];
 
@@ -224,7 +231,7 @@ function CreatePageLayout()
 	    doc = cont;
 	}
 
-	let svgcode = "<svg class='svgpage' data-width='"+gPageLayoutFile.pages[i].width+"' data-height='"+gPageLayoutFile.pages[i].height+"' data-path='"+"/books/"+getParameterByName('scanId')+ "/" + gPageLayoutFile.pages[i].file.substr(gPageLayoutFile.pages[i].file.search("page"))+"' viewBox='0 0 "+gPageLayoutFile.pages[i].width+" "+gPageLayoutFile.pages[i].height+"'><rect x='0' y='0' width='100%' height='100%'/></svg>";
+	let svgcode = "<svg class='svgpage' data-width='"+gPageLayoutFile.pages[i].width+"' data-height='"+gPageLayoutFile.pages[i].height+"' data-path='"+"/books/"+getParameterByName('scanId')+ "/" + gPageLayoutFile.pages[i].file.substr(gPageLayoutFile.pages[i].file.search("page"))+"' viewBox='0 0 "+gPageLayoutFile.pages[i].width+" "+gPageLayoutFile.pages[i].height+"'></svg>";
 
 	doc.innerHTML +=svgcode;
     }
@@ -366,7 +373,10 @@ function loadMetadataFile(metadatatxt)
 function loadMetadataFileError(errortxt,state)
 {
     if(state==403)
+    {
 	document.getElementById("bibliography").innerHTML = "Sorry this book is copyright protected you cannot view this...";
+	document.getElementById("bibliography").style.color = "red";
+    }
     else
 	document.getElementById("bibliography").innerHTML = "Could not load metadata sorry for that :(";
 }
@@ -455,6 +465,7 @@ function initialise()
 		k+=1;
 	    k = k%lst.length;
 	    lst[k].style.background = "#ddd";
+	    lst[k].scrollIntoView();
 	    event.preventDefault();
 	    document.getElementById("fuzzysuggestions").selec = k;
 	}
@@ -550,36 +561,54 @@ function SelectNextHit()
 
 function DoFuzzyMatching(x)
 {
-    if(x=="")
+    let suggestions = document.getElementById("fuzzysuggestions");
+    suggestions.innerHTML = '';
+
+    if(x==""||x.length==1)
+    {
+	suggestions.style.visibility = 'hidden';
 	return;
+    }
 
     let value = document.getElementsByClassName("ocrpage");
     let results = 0;
-    let suggestions = document.getElementById("fuzzysuggestions");
-    suggestions.style.visibility = 'visible';
-    suggestions.innerHTML = '';
 
     for(let i = 0; i < value.length; i++)
     {
+	x = x.replace(' ','+');
 	let strval = value[i].innerHTML;
-	let res = strval.match(new RegExp('.{0,30}('+x+').{0,30}','gi'));
+	let arr = x.split('+');
+	let matchstring = new RegExp('((\r\n|\r|\n|.){0,30}('+x+')(.|\r\n|\r|\n){0,30})','gi');
+	if(arr.length > 1&&arr[1].length>1)
+	{
+	    matchstring = new RegExp('('+arr[0]+'(\r\n|\r|\n|.){0,80}'+arr[1]+'.*\\b)|('+arr[1]+'(\r\n|\r|\n|.){0,80}'+arr[0]+'.*\\b)','gi');
+	}
+	else
+	{
+	    x = x.replace('+','');
+	    x = arr[0];
+	    arr = [x];
+	}
+	let res = strval.match(matchstring);
 	if(res==null)
 	    continue;
 	for(let i2 = 0; i2 < res.length; i2++)
 	{
 	    results+=1;
-	    res[i2] = res[i2].replace(new RegExp('('+x+')','gi'),'<mark>$1</mark>');
+	    for(let i3 = 0; i3 < arr.length; i3++)
+		res[i2] = res[i2].replace(new RegExp('('+arr[i3]+')','gi'),'<mark>$1</mark>');
 
 	    let a = document.createElement("a");
 	    a.innerHTML = res[i2]+"<span style='font-weight: bold;float:right;margin-left: 0.8rem;'> S."+(i+1)+"</span>";
 	    a.page = i+1;
-	    a.word = x;
+	    a.word = arr;
 	    a.result = results-1;
 	    a.tabIndex = 0;
 	    a.classList.add("fuzzysugslink");
 	    a.onclick = function(){
 		let page = document.getElementById("uniqueocrpage"+this.page);
-		page.innerHTML = page.innerHTML.replace(new RegExp('('+this.word+')','gi'),'<mark>$1</mark>');
+		for(let i4 = 0; i4< this.word.length; i4++)
+		    page.innerHTML = page.innerHTML.replace(new RegExp('('+this.word[i4]+')','gi'),'<mark>$1</mark>');
 		CorrectedScrollIntoView(document.getElementById("uniquepageid"+this.page));
 		UpdateViewMode();
 		CorrectedScrollIntoView(document.getElementById("uniquepageid"+this.page));
@@ -587,15 +616,15 @@ function DoFuzzyMatching(x)
 	    }
 
 	    suggestions.appendChild(a);
-	    if(results>9)
-	    {
-		console.log(results);
-		return;
-	    }
+	    //if(results>100)
+	    //{
+	//	console.log(results);
+	//	return;
+	  //  }
 	}
     }
-    if(results==0)
-	suggestions.style.visibility = 'hidden';
+    if(results!=0)
+	suggestions.style.visibility = 'visible';
 
 }
 
