@@ -149,6 +149,10 @@ body {
     user-select: all; /* Chrome and Opera */
 }
 
+.tmphit {
+    background-color: violet;
+}
+
 .pagecontainer {
     display: grid;
     width: 100%;
@@ -188,6 +192,11 @@ body {
 }
 
 .svgpage {
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-color: lightgrey;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'  viewBox='0 0 100 150'%3E%3Ccircle cx='50' cy='50' fill='none' stroke='darkgrey' stroke-width='6' r='25'/%3E%3Ccircle cx='50' cy='50' fill='none' stroke='steelblue' stroke-width='6' r='25' stroke-dasharray='40px 200px'%3E%3CanimateTransform attributeName='transform' type='rotate' calcMode='linear' values='0 50 50;360 50 50' keyTimes='0;1' dur='3s' begin='0s' repeatCount='indefinite'%3E%3C/animateTransform%3E%3C/circle%3E%3C/svg%3E");
+    background-size: 200px 200px;
     grid-row: 1 /span 1;
     grid-column: 1 /span 1;
 }
@@ -208,18 +217,20 @@ div .fuzzysugslink {
     text-decoration: none;
     text-align: left;
     cursor: pointer;
+    border-bottom: 1px solid grey;
+    overflow-wrap: anywhere;
 }
 
 .fuzzysugslink mark {
     color: black;
-    background: yellow;
+    background: violet;
     margin: 0;
     padding: 0;
 }
 
 mark {
     color: black;
-    background: yellow;
+    background: violet;
 }
 
 div .fuzzysugslink:hover {
