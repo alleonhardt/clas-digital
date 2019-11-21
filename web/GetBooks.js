@@ -22,7 +22,7 @@ let gPageLayoutFile = null;
 
 function CorrectedScrollIntoView(elem)
 {
-    let rect = document.getElementsByClassName("topnav")[0].getBoundingClientRect();
+    let rect = document.getElementsByClassName("searchbox")[0].getBoundingClientRect();
     window.scrollTo(0,elem.offsetTop-(rect.bottom+50));
 }
 
@@ -35,8 +35,8 @@ function HighlightHitsAndConstructLinkList()
 
     if(hitlist && hitlist.books)
     {
-	document.getElementsByClassName("topnav")[0].style.display = "block";
-	document.getElementsByClassName("resizer")[0].style.display = "block";
+	//document.getElementsByClassName("topnav")[0].style.display = "block";
+	//document.getElementsByClassName("resizer")[0].style.display = "block";
 	let HighlightList = [];
 
 	for(let i = 0; i < hitlist.books.length; i++)
@@ -214,9 +214,9 @@ function CreatePageLayout()
     }
 
     let timer = null;
-    let currentSize = document.getElementsByClassName("topnav")[0].getBoundingClientRect().bottom;
+    let currentSize = document.getElementsByClassName("searchbox")[0].getBoundingClientRect().bottom;
     document.body.onscroll = function() {
-	let gNewSize = document.getElementsByClassName("topnav")[0].getBoundingClientRect().bottom;
+	let gNewSize = document.getElementsByClassName("searchbox")[0].getBoundingClientRect().bottom;
 	if(currentSize!=gNewSize)
 	{
 	    console.log("Resizing ocrs top value!");
@@ -318,7 +318,7 @@ function isElementNearViewport(el) {
 
 function isElementInViewport (el) {
     var rect = el.getBoundingClientRect();
-    var optsrect = document.getElementsByClassName("topnav")[0].getBoundingClientRect();
+    var optsrect = document.getElementsByClassName("searchbox")[0].getBoundingClientRect();
 
     // it's definitely outside if bottom < 0
     if(rect.bottom <= 0)
@@ -444,29 +444,6 @@ function initialise()
 	}
     });
 
-
-    let kk;
-    function resize(e) {
-	const d_y = e.y-kk;
-	kk = e.y;
-	let topnav = document.getElementsByClassName("topnav")[0];
-	let resizer = document.getElementsByClassName("resizer")[0];
-	topnav.style["overflow-y"] = "hidden";
-
-	topnav.style.height = (parseInt(getComputedStyle(topnav, '').height) + d_y) + "px";
-	resizer.style.top = topnav.getBoundingClientRect().bottom + "px";
-    }
-
-
-    document.getElementsByClassName("resizer")[0].addEventListener("mousedown",function(e) {
-	document.addEventListener("mousemove",resize,false);
-	kk = e.y;
-    }, false);
-    document.addEventListener("mouseup", function(){
-	let topnav = document.getElementsByClassName("topnav")[0];
-	topnav.style["overflow-y"] = "scroll";
-	document.removeEventListener("mousemove", resize, false);
-    }, false);
 
     document.addEventListener("fullscreenchange", function (event) {
     if (document.fullscreenElement) {
