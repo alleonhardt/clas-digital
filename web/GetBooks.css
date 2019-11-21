@@ -174,7 +174,7 @@ body {
     grid-column: 2 /span 1;
     grid-row: 1 /span 1;
     border: 1px solid black;
-    padding: 2.5rem;
+    padding: 0.5rem;
 }
 
 .ocrpage {

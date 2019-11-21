@@ -1,37 +1,54 @@
 #include "ocr/tesseract.hpp"
 
 
+TesseractInterface::TesseractInterface(const char *language)
+{
+    _api = new tesseract::TessBaseAPI();
+    if(_api->Init("trainingdata/",language))
+    {
+	_api = nullptr;
+    }
+}
+
+TesseractInterface::~TesseractInterface()
+{
+    if(_api)
+    {
+	_api->End();
+	delete _api;
+	_api = nullptr;
+    }
+}
+
+std::string TesseractInterface::recognizeOCRTxt(const unsigned char *data, unsigned int size)
+{
+    if(_api)
+    {
+	char *outTxt;
+	Pix *image = pixReadMem(data,size);
+	_api->SetImage(image);
+	outTxt = _api->GetUTF8Text();
+	std::string outstr = outTxt;
+	delete [] outTxt;
+	pixDestroy(&image);
+	return outstr;
+    }
+    else
+	return "";
+}
+
+
+
 std::string OcrCreator::CreateOcrFromImage(const unsigned char *data, unsigned int size, std::string language)
 {
+    TesseractInterface *inter;
     try
     {
-
-	char *outText;
-
-	tesseract::TessBaseAPI *api = new tesseract::TessBaseAPI();
-	// Initialize tesseract-ocr with English, without specifying tessdata path
-	if (api->Init("trainingdata/", language.c_str())) {
-	    fprintf(stderr, "Could not initialize tesseract.\n");
-	    throw 0;
-	}
-
-	// Open input image with leptonica library
-	Pix *image = pixReadMem(data,size);
-	
-//	Pix *image2 = pixConvertTo1(image,0x22);
-	api->SetImage(image);
-	// Get OCR result
-	outText = api->GetUTF8Text();
-	// Destroy used object and release memory
-	api->End();
-	std::string ret = outText;
-	delete [] outText;
-	pixDestroy(&image);
-//	pixDestroy(&image2);
-	return ret;
+	inter = _tessInter.at(language);
     }
     catch(...)
     {
-	return "ERROR";
+	inter = _tessInter.at("deu");
     }
+    return inter->recognizeOCRTxt(data,size);
 }

@@ -22,6 +22,7 @@ using namespace httplib;
 
 //Defining the srv global to stop the execution once the SIGTERM signal is caught.
 Server srv;
+OcrCreator ocr_reader;
 
 void sig_handler(int)
 {
@@ -480,8 +481,7 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 
 	    if(ocr_create=="true")
 	    {
-		OcrCreator c;
-		book->addPage(c.CreateOcrFromImage(reinterpret_cast<const unsigned char*>(req.body.c_str()),req.body.length(),ocr_lang.c_str()),std::to_string(what),std::to_string(maxPageNum));
+		book->addPage(ocr_reader.CreateOcrFromImage(reinterpret_cast<const unsigned char*>(req.body.c_str()),req.body.length(),ocr_lang.c_str()),std::to_string(what),std::to_string(maxPageNum));
 	    }
 	}
 	catch(std::exception &e)

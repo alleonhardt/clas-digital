@@ -55,6 +55,8 @@ function HighlightHitsAndConstructLinkList()
 	    link.classList.add('hitlinkstyle');
 	    link.onclick = function() {
 		CorrectedScrollIntoView(document.getElementById("uniquepageid"+hitlist.books[i].page));
+		UpdateViewMode();
+		CorrectedScrollIntoView(document.getElementById("uniquepageid"+hitlist.books[i].page));
 		link.style.color = "purple";
 	    }
 
@@ -87,8 +89,8 @@ function HighlightHitsAndConstructLinkList()
     {
 	if(location.hash=="#page1")
 	{
-	     let elem = document.getElementsByClassName("svgpage");
-	     if(elem.length>0)
+	    let elem = document.getElementsByClassName("svgpage");
+	    if(elem.length>0)
 		LoadImageFromSVG(elem[0]);
 	}
 	else
@@ -118,21 +120,35 @@ function UpdateLinkPrev()
 
 function UpdateViewMode()
 {
-	let var_arr;
-	let var_class = 'pagecontainer';
-	let var_class_old = 'pagecontainerFullImg';
+    let var_arr;
+    let var_class = 'pagecontainer';
+    let var_class_old = 'pagecontainerFullImg';
 
-	if(document.getElementById("tooglebut").is_full_read)
-	{
-	    var_arr = isPageAlmostVisible('pagecontainer');
-	    var_class = 'pagecontainerFullImg';
-	    var_class_old = 'pagecontainer';
-	}
-	else
-	    var_arr = isPageAlmostVisible('pagecontainerFullImg');
-	
-	for(let i = 0; i < var_arr.length; i++)
-	    var_arr[i].classList.replace(var_class_old,var_class);
+    if(document.getElementById("tooglebut").is_full_read)
+    {
+	var_arr = isPageAlmostVisible('pagecontainer');
+	var_class = 'pagecontainerFullImg';
+	var_class_old = 'pagecontainer';
+    }
+    else
+	var_arr = isPageAlmostVisible('pagecontainerFullImg');
+
+    for(let i = 0; i < var_arr.length; i++)
+	var_arr[i].classList.replace(var_class_old,var_class);
+}
+
+function UpdateOneViewMode(elem)
+{
+    let var_class = 'pagecontainer';
+    let var_class_old = 'pagecontainerFullImg';
+
+    if(document.getElementById("tooglebut").is_full_read)
+    {
+	var_class = 'pagecontainerFullImg';
+	var_class_old = 'pagecontainer';
+    }
+
+    elem.classList.replace(var_class_old,var_class);
 }
 
 function loadOCRFile(ocrtxt)
@@ -446,12 +462,12 @@ function initialise()
 
 
     document.addEventListener("fullscreenchange", function (event) {
-    if (document.fullscreenElement) {
-	document.getElementById("fullbut").src = "/static/GetBooks/fullscreen_exit-24px.svg";
-    } else {
-	document.getElementById("fullbut").src = "/static/GetBooks/fullscreen-24px.svg";
-    }
-});
+	if (document.fullscreenElement) {
+	    document.getElementById("fullbut").src = "/static/GetBooks/fullscreen_exit-24px.svg";
+	} else {
+	    document.getElementById("fullbut").src = "/static/GetBooks/fullscreen-24px.svg";
+	}
+    });
 }
 
 
@@ -564,6 +580,8 @@ function DoFuzzyMatching(x)
 	    a.onclick = function(){
 		let page = document.getElementById("uniqueocrpage"+this.page);
 		page.innerHTML = page.innerHTML.replace(new RegExp('('+this.word+')','gi'),'<mark>$1</mark>');
+		CorrectedScrollIntoView(document.getElementById("uniquepageid"+this.page));
+		UpdateViewMode();
 		CorrectedScrollIntoView(document.getElementById("uniquepageid"+this.page));
 		document.getElementById("fuzzysuggestions").style.visibility = 'hidden';
 	    }
