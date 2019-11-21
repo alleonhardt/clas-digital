@@ -149,6 +149,10 @@ body {
     user-select: all; /* Chrome and Opera */
 }
 
+.tmphit {
+    background-color: violet;
+}
+
 .pagecontainer {
     display: grid;
     width: 100%;
@@ -219,14 +223,14 @@ div .fuzzysugslink {
 
 .fuzzysugslink mark {
     color: black;
-    background: yellow;
+    background: violet;
     margin: 0;
     padding: 0;
 }
 
 mark {
     color: black;
-    background: yellow;
+    background: violet;
 }
 
 div .fuzzysugslink:hover {

@@ -561,14 +561,24 @@ function SelectNextHit()
 
 function DoFuzzyMatching(x)
 {
+    let tmphits = document.getElementsByClassName("tmphit");
+    for(let i = 0; i < tmphits.length; i++)
+    {
+	tmphits[i].parentNode.insertBefore(tmphits[i].firstChild,tmphits[i]);
+	tmphits[i].parentNode.removeChild(tmphits[i]);
+    }
     let suggestions = document.getElementById("fuzzysuggestions");
     suggestions.innerHTML = '';
+    suggestions.selec = undefined;
 
-    if(x==""||x.length==1)
+    let earlyleave = false;
+    if(x=="")
     {
 	suggestions.style.visibility = 'hidden';
 	return;
     }
+    if(x.length < 3)
+	earlyleave = true;
 
     let value = document.getElementsByClassName("ocrpage");
     let results = 0;
@@ -579,12 +589,15 @@ function DoFuzzyMatching(x)
 	let strval = value[i].innerHTML;
 	let arr = x.split('+');
 	let matchstring = new RegExp('((\r\n|\r|\n|.){0,30}('+x+')(.|\r\n|\r|\n){0,30})','gi');
-	if(arr.length > 1&&arr[1].length>1)
+	if(arr.length > 1&&arr[1].length>0)
 	{
+	    if(arr[1].length==1)
+		earlyleave = true;
 	    matchstring = new RegExp('('+arr[0]+'(\r\n|\r|\n|.){0,80}'+arr[1]+'.*\\b)|('+arr[1]+'(\r\n|\r|\n|.){0,80}'+arr[0]+'.*\\b)','gi');
 	}
 	else
 	{
+	    
 	    x = x.replace('+','');
 	    x = arr[0];
 	    arr = [x];
@@ -608,7 +621,7 @@ function DoFuzzyMatching(x)
 	    a.onclick = function(){
 		let page = document.getElementById("uniqueocrpage"+this.page);
 		for(let i4 = 0; i4< this.word.length; i4++)
-		    page.innerHTML = page.innerHTML.replace(new RegExp('('+this.word[i4]+')','gi'),'<mark>$1</mark>');
+		    page.innerHTML = page.innerHTML.replace(new RegExp('('+this.word[i4]+')','gi'),'<span class="tmphit">$1</span>');
 		CorrectedScrollIntoView(document.getElementById("uniquepageid"+this.page));
 		UpdateViewMode();
 		CorrectedScrollIntoView(document.getElementById("uniquepageid"+this.page));
@@ -616,11 +629,10 @@ function DoFuzzyMatching(x)
 	    }
 
 	    suggestions.appendChild(a);
-	    //if(results>100)
-	    //{
-	//	console.log(results);
-	//	return;
-	  //  }
+	    if(results>20&&earlyleave) {
+		suggestions.style.visibility = 'visible';
+		return;
+	    }
 	}
     }
     if(results!=0)
