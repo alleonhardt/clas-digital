@@ -25,8 +25,6 @@ body {
     width: 100%;
     left: 0;
     top: 0;
-    height: 4rem;
-    min-height: 2rem;
     z-index: 3;
     background: white;
     border-bottom: 2px solid black;
@@ -42,20 +40,6 @@ body {
 
 .searchstyler:hover {
     background-color: #ddd;
-}
-
-.topnav {
-    left: 0;
-    display: none;
-    position: fixed;
-    height: 2rem;
-    min-height: 2rem;
-    top: 4rem;
-    width: 100%;
-    overflow: auto;
-    z-index: 2;
-    background: white;
-    overflow-y: scroll;
 }
 
 .resizer {
@@ -81,7 +65,11 @@ body {
 
 .linknav {
     display: grid;
-    grid-template-columns: 7% 86% 7%;
+    grid-template-columns: 3rem calc(100% - 6rem) 3rem;
+    height: 2rem;
+    overflow: auto;
+    resize: vertical;
+    text-align: center;
 }
 
 .lastbutcont {
@@ -91,6 +79,9 @@ body {
 .lastbut {
     position: sticky;
     top: 0.2rem;
+    float: left;
+    width: 1.5rem;
+    height: 1.5rem;
     margin-left: 1rem;
     padding: 0.1rem;
     cursor: pointer;
@@ -102,10 +93,21 @@ body {
 
 .nextbut {
     position: sticky;
+    float: right;
     top: 0.2rem;
-    margin: auto;
+    margin-right: 1rem;
     padding: 0.1rem;
+    width: 1.5rem;
+    height: 1.5rem;
     cursor: pointer;
+}
+
+.nextbut:hover,.lastbut:hover {
+    background-color: #ddd;
+}
+
+.nextbut:focus,.nextbut:active,.lastbut:focus,.lastbut:active {
+    background-color: #333;
 }
 
 #fullsearchhitlist {
@@ -113,6 +115,7 @@ body {
     font-size: small;
     line-height: 2rem;
     overflow-wrap: break-word;
+    text-align: center;
 }
 
 #fullsearchhitlist a {
@@ -137,8 +140,7 @@ body {
     padding-top: 0.2rem;
     font-size: small;
     color: green;
-    height: 1.2rem;
-    line-height: 1.5rem;
+    overflow-wrap: anywhere;
     overflow: auto;
     -webkit-touch-callout: all; /* iOS Safari */
     -webkit-user-select: all; /* Safari */
@@ -158,9 +160,12 @@ body {
 .pagecontainerFullImg {
     display: grid;
     width: 100%;
-    grid-template-columns: 100% 40%;
-    grid-column-gap: 4%;
+    grid-template-columns: 100%;
     margin-top: 4rem;
+}
+
+.pagecontainerFullImg div {
+    display: none;
 }
 
 .ocrcontainer {
@@ -177,6 +182,8 @@ body {
     top: 7rem;
     font-size: small;
     text-align: justify;
+    overflow-wrap: anywhere;
+    overflow: hidden;
     min-height: 350px;
 }
 
