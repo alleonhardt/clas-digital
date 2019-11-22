@@ -425,6 +425,7 @@ function initialise()
     ServerGet("/books/"+scanId+"/info.json",loadMetadataFile,loadMetadataFileError);
     ServerGet("/books/"+scanId+"/readerInfo.json",loadPageLayoutFile,loadMetadataFileError);
     ServerGet("/searchinbook?scanId="+scanId+'&query='+query+'&fuzzyness='+fuzzyness,highlightHitsAndLoadHitlist,highlightHitsAndLoadHitlistError);
+    ServerGet("/books/"+scanId+"/intern/pages.txt",LoadPreindexingOfPages,LoadPreindexingOfPagesError);
 
     document.getElementById("srchbox").oninput = function() {
 	DoFuzzyMatching(this.value);
@@ -559,50 +560,97 @@ function SelectNextHit()
     SelectHit(true);
 }
 
-function DoFuzzyMatching(x)
+let gFuzzyPreindexing = null;
+function LoadPreindexingOfPages(txt)
 {
-    let tmphits = document.getElementsByClassName("tmphit");
-    for(let i = 0; i < tmphits.length; i++)
+    let obj = {};
+    let varl = txt.split(/\r?\n/);
+    for(let i = 1; i < varl.length; i++)
     {
-	tmphits[i].parentNode.insertBefore(tmphits[i].firstChild,tmphits[i]);
-	tmphits[i].parentNode.removeChild(tmphits[i]);
+	let wharl = varl[i].split(";");
+	if(wharl.length>1)
+	{
+	    let kk = wharl[1].split(',');
+	    obj[wharl[0]] = [];
+	    for(let i2 = 0; i2 < kk.length; i2++)
+		if(kk[i2]!='')
+		    obj[wharl[0]].push(parseInt(kk[i2]));
+	}
     }
-    let suggestions = document.getElementById("fuzzysuggestions");
-    suggestions.innerHTML = '';
-    suggestions.selec = undefined;
+    gFuzzyPreindexing = obj;
+}
 
-    let earlyleave = false;
+function LoadPreindexingOfPagesError(err)
+{
+    console.log("No preindexed speed up of the search");
+}
+
+function DoFuzzyMatching(x,iterator)
+{
+    var t0 = performance.now();
+
+    let suggestions = document.getElementById("fuzzysuggestions");
+    let results = 0;
+    if(iterator==undefined || suggestions.search_done)
+    {
+	let tmphits = document.getElementsByClassName("tmphit");
+	for(let i = 0; i < tmphits.length; i++)
+	{
+	    tmphits[i].parentNode.insertBefore(tmphits[i].firstChild,tmphits[i]);
+	    tmphits[i].parentNode.removeChild(tmphits[i]);
+	}
+	suggestions.innerHTML = '';
+	suggestions.selec = undefined;
+	iterator = 0;
+	suggestions.results = 0;
+    }
+    else
+    {
+	results = suggestions.results;
+    }
+
     if(x=="")
     {
 	suggestions.style.visibility = 'hidden';
 	return;
     }
-    if(x.length < 3)
-	earlyleave = true;
 
     let value = document.getElementsByClassName("ocrpage");
-    let results = 0;
 
-    for(let i = 0; i < value.length; i++)
+    x = x.replace(' ','+');
+    let arr = x.split('+');
+    let matchstring = new RegExp('((\r\n|\r|\n|.){0,30}('+x+')(.|\r\n|\r|\n){0,30})','gi');
+    if(arr.length > 1&&arr[1].length>0)
     {
-	x = x.replace(' ','+');
-	let strval = value[i].innerHTML;
-	let arr = x.split('+');
-	let matchstring = new RegExp('((\r\n|\r|\n|.){0,30}('+x+')(.|\r\n|\r|\n){0,30})','gi');
-	if(arr.length > 1&&arr[1].length>0)
+	matchstring = new RegExp('('+arr[0]+'(\r\n|\r|\n|.){0,80}'+arr[1]+'.*\\b)|('+arr[1]+'(\r\n|\r|\n|.){0,80}'+arr[0]+'.*\\b)','gi');
+    }
+    else
+    {
+
+	x = x.replace('+','');
+	x = arr[0];
+	arr = [x];
+    }
+
+    if(gFuzzyPreindexing!=null)
+    {
+	let lkarr = arr[0].toLowerCase();
+	let tmpobj = [];
+	for(var key in gFuzzyPreindexing)
 	{
-	    if(arr[1].length==1)
-		earlyleave = true;
-	    matchstring = new RegExp('('+arr[0]+'(\r\n|\r|\n|.){0,80}'+arr[1]+'.*\\b)|('+arr[1]+'(\r\n|\r|\n|.){0,80}'+arr[0]+'.*\\b)','gi');
+	    if(key.search(lkarr)!=-1)
+		tmpobj = tmpobj.concat(gFuzzyPreindexing[key]);
 	}
-	else
-	{
-	    
-	    x = x.replace('+','');
-	    x = arr[0];
-	    arr = [x];
-	}
-	let res = strval.match(matchstring);
+	tmpobj = Array.from(new Set(tmpobj));
+	tmpobj.sort(function(a,b){return a-b});
+	for(let i = 0; i < tmpobj.length; i++)
+	    tmpobj[i] = value[tmpobj[i]];
+	value = tmpobj;
+    }
+
+    for(let i = iterator; i < value.length; i++)
+    {
+	let res = value[i].innerHTML.match(matchstring);
 	if(res==null)
 	    continue;
 	for(let i2 = 0; i2 < res.length; i2++)
@@ -612,8 +660,9 @@ function DoFuzzyMatching(x)
 		res[i2] = res[i2].replace(new RegExp('('+arr[i3]+')','gi'),'<mark>$1</mark>');
 
 	    let a = document.createElement("a");
-	    a.innerHTML = res[i2]+"<span style='font-weight: bold;float:right;margin-left: 0.8rem;'> S."+(i+1)+"</span>";
-	    a.page = i+1;
+	    a.innerHTML = res[i2]+"<span style='font-weight: bold;float:right;margin-left: 0.8rem;'> S."+value[i].parentNode.parentNode.pageNumber+"</span>";
+
+	    a.page = value[i].parentNode.parentNode.pageNumber;
 	    a.word = arr;
 	    a.result = results-1;
 	    a.tabIndex = 0;
@@ -629,15 +678,28 @@ function DoFuzzyMatching(x)
 	    }
 
 	    suggestions.appendChild(a);
-	    if(results>20&&earlyleave) {
-		suggestions.style.visibility = 'visible';
-		return;
+	}
+	if((suggestions.results+20)<results) {
+	    suggestions.hits_found = results;
+	    suggestions.iterator_i = i;
+	    suggestions.search_done = false;
+	    suggestions.style.visibility = 'visible';
+	    suggestions.onscroll = function(){
+		DoFuzzyMatching(x,i);
 	    }
+
+	    var t1 = performance.now();
+	    console.log("Call to doSomething took " + (t1 - t0) + " milliseconds.");
+	    return;
 	}
     }
     if(results!=0)
 	suggestions.style.visibility = 'visible';
 
+    suggestions.search_done = true;
+    suggestions.onscroll = null;
+    var t1 = performance.now();
+    console.log("Call to doSomething took " + (t1 - t0) + " milliseconds.");
 }
 
 function doCompleteNewSearch()
