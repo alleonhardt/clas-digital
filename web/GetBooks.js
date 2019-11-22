@@ -571,7 +571,10 @@ function LoadPreindexingOfPages(txt)
 	if(wharl.length>1)
 	{
 	    let kk = wharl[1].split(',');
-	    obj[wharl[0]] = [];
+	    if(obj[wharl[0]] == undefined)
+		obj[wharl[0]] = [];
+	    if(wharl[0]=='sees')
+		console.log("FOUND IT!!!!!!!");
 	    for(let i2 = 0; i2 < kk.length; i2++)
 		if(kk[i2]!='')
 		    obj[wharl[0]].push(parseInt(kk[i2]));
@@ -583,6 +586,18 @@ function LoadPreindexingOfPages(txt)
 function LoadPreindexingOfPagesError(err)
 {
     console.log("No preindexed speed up of the search");
+}
+
+function sort_unique(arr) {
+  if (arr.length === 0) return arr;
+  arr = arr.sort(function (a, b) { return a*1 - b*1; });
+  var ret = [arr[0]];
+  for (var i = 1; i < arr.length; i++) { //Start loop at 1: arr[0] can never be a duplicate
+    if (arr[i-1] !== arr[i]) {
+      ret.push(arr[i]);
+    }
+  }
+  return ret;
 }
 
 function DoFuzzyMatching(x,iterator)
@@ -603,6 +618,7 @@ function DoFuzzyMatching(x,iterator)
 	suggestions.selec = undefined;
 	iterator = 0;
 	suggestions.results = 0;
+	suggestions.is_fuzzy = true;
     }
     else
     {
@@ -617,7 +633,10 @@ function DoFuzzyMatching(x,iterator)
 
     let value = document.getElementsByClassName("ocrpage");
 
-    x = x.replace(' ','+');
+    x = x.replace(new RegExp(' ','g'),'+');
+    x = x.replace(new RegExp('o','g'),'[oö]');
+    x = x.replace(new RegExp('u','g'),'[uü]');
+    x = x.replace(new RegExp('a','g'),'[aä]');
     let arr = x.split('+');
     let matchstring = new RegExp('((\r\n|\r|\n|.){0,30}('+x+')(.|\r\n|\r|\n){0,30})','gi');
     if(arr.length > 1&&arr[1].length>0)
@@ -632,21 +651,36 @@ function DoFuzzyMatching(x,iterator)
 	arr = [x];
     }
 
-    if(gFuzzyPreindexing!=null)
+    if(gFuzzyPreindexing!=null&&suggestions.is_fuzzy&&arr[0].length>2)
     {
 	let lkarr = arr[0].toLowerCase();
+	console.log("SEARCH FOR: "+lkarr);
 	let tmpobj = [];
 	for(var key in gFuzzyPreindexing)
 	{
+	    if(key=='verdammt')
+		console.log("FOUND IT!!!!!!!");
+
 	    if(key.search(lkarr)!=-1)
+	    {
+		if(key=='verdammt')
+		{
+		    console.log("AND MATCHED IT!!!!!!!");
+		    console.log(gFuzzyPreindexing[key]);
+		}
+
 		tmpobj = tmpobj.concat(gFuzzyPreindexing[key]);
+	    }
 	}
-	tmpobj = Array.from(new Set(tmpobj));
-	tmpobj.sort(function(a,b){return a-b});
+	tmpobj = sort_unique(tmpobj);
 	for(let i = 0; i < tmpobj.length; i++)
-	    tmpobj[i] = value[tmpobj[i]];
+	{
+	    tmpobj[i] = document.getElementById("uniqueocrpage"+tmpobj[i]);
+	}
 	value = tmpobj;
     }
+    else
+	suggestions.is_fuzzy = false;
 
     for(let i = iterator; i < value.length; i++)
     {
@@ -695,6 +729,8 @@ function DoFuzzyMatching(x,iterator)
     }
     if(results!=0)
 	suggestions.style.visibility = 'visible';
+    else
+	suggestions.style.visibility = 'hidden';
 
     suggestions.search_done = true;
     suggestions.onscroll = null;
