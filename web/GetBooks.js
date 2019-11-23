@@ -420,6 +420,9 @@ function initialise()
     let scanId = getParameterByName('scanId');
     let query = decodeURIComponent(getParameterByName('query')).replace(' ','+');
     let fuzzyness = getParameterByName('fuzzyness');
+    
+    if(!hasFullscreen(document.documentElement))
+	document.getElementById("fullbut").style.display = 'none';
 
     ServerGet("/books/"+scanId+"/ocr.txt", loadOCRFile,loadOCRFileError);
     ServerGet("/books/"+scanId+"/info.json",loadMetadataFile,loadMetadataFileError);
@@ -573,8 +576,6 @@ function LoadPreindexingOfPages(txt)
 	    let kk = wharl[1].split(',');
 	    if(obj[wharl[0]] == undefined)
 		obj[wharl[0]] = [];
-	    if(wharl[0]=='sees')
-		console.log("FOUND IT!!!!!!!");
 	    for(let i2 = 0; i2 < kk.length; i2++)
 		if(kk[i2]!='')
 		    obj[wharl[0]].push(parseInt(kk[i2]));
@@ -600,7 +601,25 @@ function sort_unique(arr) {
   return ret;
 }
 
-function DoFuzzyMatching(x,iterator)
+function perm(xs) {
+    //COPYRIGHT TO: https://stackoverflow.com/questions/37579994/generate-permutations-of-javascript-array chacmololvm
+  let ret = [];
+
+  for (let i = 0; i < xs.length; i = i + 1) {
+    let rest = perm(xs.slice(0, i).concat(xs.slice(i + 1)));
+
+    if(!rest.length) {
+      ret.push([xs[i]])
+    } else {
+      for(let j = 0; j < rest.length; j = j + 1) {
+        ret.push([xs[i]].concat(rest[j]))
+      }
+    }
+  }
+  return ret;
+}
+
+function DoFuzzyMatching(x,iterator,maxHitsPerIteration)
 {
     var t0 = performance.now();
 
@@ -619,6 +638,7 @@ function DoFuzzyMatching(x,iterator)
 	iterator = 0;
 	suggestions.results = 0;
 	suggestions.is_fuzzy = true;
+	maxHitsPerIteration = 15;
     }
     else
     {
@@ -633,15 +653,48 @@ function DoFuzzyMatching(x,iterator)
 
     let value = document.getElementsByClassName("ocrpage");
 
-    x = x.replace(new RegExp(' ','g'),'+');
-    x = x.replace(new RegExp('o','g'),'[oö]');
-    x = x.replace(new RegExp('u','g'),'[uü]');
-    x = x.replace(new RegExp('a','g'),'[aä]');
+    x = x.toLowerCase();
     let arr = x.split('+');
-    let matchstring = new RegExp('((\r\n|\r|\n|.){0,30}('+x+')(.|\r\n|\r|\n){0,30})','gi');
+    let stringlengthbeforeRegex = arr[0].length;
+    let original = arr[0];
+    for(let i = 0; i < arr.length; i++)
+    {
+	arr[i] = arr[i].replace(new RegExp(' ','g'),'+');
+	arr[i] = arr[i].replace(new RegExp('o','g'),'[oö]');
+	arr[i] = arr[i].replace(new RegExp('u','g'),'[uü]');
+	arr[i] = arr[i].replace(new RegExp('a','g'),'[aä]');
+	arr[i] = arr[i].replace(new RegExp('s','g'),'[sß]');
+    }
+    let new_arr = []
+    for(let i = 0; i < arr.length; i++)
+	if(arr[i]!='')
+	    new_arr.push(arr[i]);
+    arr = new_arr;
+
+    let matchstring = new RegExp('((\r\n|\r|\n|.){0,30}('+arr[0]+')(.|\r\n|\r|\n){0,30})','gi');
     if(arr.length > 1&&arr[1].length>0)
     {
-	matchstring = new RegExp('('+arr[0]+'(\r\n|\r|\n|.){0,80}'+arr[1]+'.*\\b)|('+arr[1]+'(\r\n|\r|\n|.){0,80}'+arr[0]+'.*\\b)','gi');
+	let match = '';
+	let index_arr = [];
+	for(let i = 0; i < arr.length; i++)
+	    index_arr.push(i);
+	index_arr = perm(index_arr);
+
+	for(let i = 0; i < index_arr.length; i++)
+	{
+	    if(match=='')
+		match='(';
+	    else
+		match+='|(';
+	    for(let i2 = 0; i2 < index_arr[i].length; i2++)
+	    {
+		if(i2!=0)
+		    match+='(\r\n|\r|\n|.){0,80}';
+		match+=arr[index_arr[i][i2]];
+	    }
+	    match+='.*\\b)';
+	}
+	matchstring = new RegExp(match,'gi');
     }
     else
     {
@@ -651,9 +704,9 @@ function DoFuzzyMatching(x,iterator)
 	arr = [x];
     }
 
-    if(gFuzzyPreindexing!=null&&suggestions.is_fuzzy&&arr[0].length>2)
+    if(gFuzzyPreindexing!=null&&suggestions.is_fuzzy&&stringlengthbeforeRegex>2)
     {
-	let lkarr = arr[0].toLowerCase();
+	let lkarr = original;
 	console.log("SEARCH FOR: "+lkarr);
 	let tmpobj = [];
 	for(var key in gFuzzyPreindexing)
@@ -673,6 +726,7 @@ function DoFuzzyMatching(x,iterator)
 	    }
 	}
 	tmpobj = sort_unique(tmpobj);
+	console.log(tmpobj);
 	for(let i = 0; i < tmpobj.length; i++)
 	{
 	    tmpobj[i] = document.getElementById("uniqueocrpage"+tmpobj[i]);
@@ -691,7 +745,8 @@ function DoFuzzyMatching(x,iterator)
 	{
 	    results+=1;
 	    for(let i3 = 0; i3 < arr.length; i3++)
-		res[i2] = res[i2].replace(new RegExp('('+arr[i3]+')','gi'),'<mark>$1</mark>');
+		if(arr[i3]!='')
+		    res[i2] = res[i2].replace(new RegExp('('+arr[i3]+')(?![^<>]*>)','gi'),'<mark>$1</mark>');
 
 	    let a = document.createElement("a");
 	    a.innerHTML = res[i2]+"<span style='font-weight: bold;float:right;margin-left: 0.8rem;'> S."+value[i].parentNode.parentNode.pageNumber+"</span>";
@@ -704,7 +759,8 @@ function DoFuzzyMatching(x,iterator)
 	    a.onclick = function(){
 		let page = document.getElementById("uniqueocrpage"+this.page);
 		for(let i4 = 0; i4< this.word.length; i4++)
-		    page.innerHTML = page.innerHTML.replace(new RegExp('('+this.word[i4]+')','gi'),'<span class="tmphit">$1</span>');
+		    if(this.word[i4]!='')
+			page.innerHTML = page.innerHTML.replace(new RegExp('('+this.word[i4]+')(?![^<>]*>)','gi'),'<span class="tmphit">$1</span>');
 		CorrectedScrollIntoView(document.getElementById("uniquepageid"+this.page));
 		UpdateViewMode();
 		CorrectedScrollIntoView(document.getElementById("uniquepageid"+this.page));
@@ -713,13 +769,13 @@ function DoFuzzyMatching(x,iterator)
 
 	    suggestions.appendChild(a);
 	}
-	if((suggestions.results+20)<results) {
+	if((suggestions.results+maxHitsPerIteration)<results) {
 	    suggestions.hits_found = results;
 	    suggestions.iterator_i = i;
 	    suggestions.search_done = false;
 	    suggestions.style.visibility = 'visible';
 	    suggestions.onscroll = function(){
-		DoFuzzyMatching(x,i);
+		DoFuzzyMatching(document.getElementById("srchbox").value,i,40);
 	    }
 
 	    var t1 = performance.now();
