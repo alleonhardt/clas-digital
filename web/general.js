@@ -23,6 +23,20 @@ function openFullscreen(elem) {
   }
 }
 
+function hasFullscreen(elem) {
+    let hasfull = false;
+    if (elem.requestFullscreen) {
+	hasfull = true;
+  } else if (elem.mozRequestFullScreen) { /* Firefox */
+	hasfull = true;
+  } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+	hasfull = true;
+  } else if (elem.msRequestFullscreen) { /* IE/Edge */
+	hasfull = true;
+  }
+    return hasfull;
+}
+
 /* Close fullscreen */
 function closeFullscreen(elem) {
   if (document.exitFullscreen) {
