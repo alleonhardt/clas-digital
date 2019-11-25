@@ -42,7 +42,6 @@ endif()
 
 install(FILES src/clas-digital.service DESTINATION /etc/systemd/system)
 install(FILES src/clas-digital-devel.service DESTINATION /etc/systemd/system)
-install(FILES bin/cert.pem bin/key.pem DESTINATION ${INSTALL_DIRS}/bin)
 install(FILES src/default DESTINATION /etc/nginx/sites-available)
 install(FILES bin/forbiddenfiles DESTINATION ${INSTALL_DIRS}/bin)
 install(PROGRAMS bin/clas-digital.o DESTINATION ${INSTALL_DIRS})
