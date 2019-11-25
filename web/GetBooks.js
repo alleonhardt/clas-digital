@@ -658,10 +658,10 @@ function DoFuzzyMatching(x,iterator,maxHitsPerIteration)
 
     x = x.toLowerCase();
     x = x.replace(new RegExp(' ','g'),'+');
-    x = x.replace(new RegExp('o','g'),'[oö]');
-    x = x.replace(new RegExp('u','g'),'[uü]');
-    x = x.replace(new RegExp('a','g'),'[aä]');
-    x = x.replace(new RegExp('s','g'),'[sß]');
+    x = x.replace(new RegExp('ö','g'),'o');
+    x = x.replace(new RegExp('ü','g'),'u');
+    x = x.replace(new RegExp('ä','g'),'a');
+    x = x.replace(new RegExp('ß','g'),'s');
 
     let arr = x.split('+');
     let stringlengthbeforeRegex = arr[0].length;
