@@ -662,6 +662,7 @@ function DoFuzzyMatching(x,iterator,maxHitsPerIteration)
     x = x.replace(new RegExp('ü','g'),'u');
     x = x.replace(new RegExp('ä','g'),'a');
     x = x.replace(new RegExp('ß','g'),'s');
+    x = x.replace(new RegExp('ſ','g'),'s');
 
     let arr = x.split('+');
     let stringlengthbeforeRegex = arr[0].length;
@@ -671,7 +672,7 @@ function DoFuzzyMatching(x,iterator,maxHitsPerIteration)
 	arr[i] = arr[i].replace(new RegExp('o','g'),'[oö]');
 	arr[i] = arr[i].replace(new RegExp('u','g'),'[uü]');
 	arr[i] = arr[i].replace(new RegExp('a','g'),'[aä]');
-	arr[i] = arr[i].replace(new RegExp('s','g'),'[sß]');
+	arr[i] = arr[i].replace(new RegExp('s','g'),'[sßſ]');
     }
     let new_arr = []
     for(let i = 0; i < arr.length; i++)
