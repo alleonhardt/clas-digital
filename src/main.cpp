@@ -24,9 +24,69 @@ using namespace httplib;
 Server srv;
 OcrCreator ocr_reader;
 
+std::mutex gGlobalUpdateOperationLock;
+enum class GlobalUpdateOperations { none, update_zotero, restart_server };
+GlobalUpdateOperations gGlobalUpdateOperation = GlobalUpdateOperations::none;
+
+
+
 void sig_handler(int)
 {
     //Just stop the server when systemd wants to exit us.
+    srv.stop();
+}
+
+void update_and_restart()
+{
+    using std::chrono::system_clock;
+    std::time_t tt = system_clock::to_time_t (system_clock::now());
+
+    struct std::tm * ptm = std::localtime(&tt);
+    ptm->tm_min = 59;
+    ptm->tm_sec = 30;
+    ptm->tm_hour = 23;
+    std::this_thread::sleep_until (system_clock::from_time_t (mktime(ptm)));
+
+    std::cout << "Current time: " << std::put_time(ptm,"%X") << ".\nUpdating zotero now."<<std::endl;;
+    std::cout << "Scheduled update is going to be performed." << std::endl;
+
+
+    std::unique_lock<std::mutex> lock(gGlobalUpdateOperationLock, std::try_to_lock);
+    if(!lock.owns_lock()){
+	std::cout<<"Did not update zotero because the server either restarts at the moment, or zotero is being updated!"<<std::endl;
+	return;
+    }
+
+    gGlobalUpdateOperation = GlobalUpdateOperations::update_zotero;
+
+    try
+    {
+	//Update the pillars first
+	nlohmann::json zot = Zotero::GetPillars();
+	std::ofstream of("web/pillars.json",std::ios::out);
+	of<<zot;
+	of.close();
+
+	nlohmann::json metaData;
+	for(auto &it : zot)
+	{
+	    auto entryjs = nlohmann::json::parse(Zotero::SendRequest(Zotero::Request::GetAllItemsFromCollection(it["key"])));
+	    for(auto &it : entryjs)
+		metaData.push_back(it);
+	}
+	//Save the collected data as it is the newest data available
+	std::ofstream o("bin/zotero.json",std::ios::out);
+	o<<metaData;
+	o.close();
+	std::cout << "Updated zotero successfully." << std::endl;
+    }
+    catch(...)
+    {
+	std::cerr<<"[Server error] Could update zotero, maybe no internet connection?"<<std::endl;
+    }
+
+    std::cout<<"Restarting server now!"<<std::endl;
+    gGlobalUpdateOperation = GlobalUpdateOperations::restart_server;
     srv.stop();
 }
 
@@ -552,10 +612,6 @@ void do_senduserlist(const Request &req, Response &resp)
     resp.set_content(std::move(UserHandler::GetUserTable().toJSON()),"application/json");
 }
 
-std::mutex gGlobalUpdateOperationLock;
-enum class GlobalUpdateOperations { none, update_zotero, restart_server };
-GlobalUpdateOperations gGlobalUpdateOperation = GlobalUpdateOperations::none;
-
 void do_usertableupdate(const Request &req, Response &resp)
 {
     //Check if the user has admin access
@@ -808,6 +864,8 @@ int main(int argc, char **argv)
     srv.Post("/userlist",&do_usertableupdate);
     srv.Post("/upload",[&](const Request &req, Response &resp){do_upload(req,resp,manager);});
     std::cout<<"C++ Api server startup successfull!"<<std::endl;
+    std::thread restart_thread(&update_and_restart);
+    restart_thread.detach();
     srv.listen("localhost", startPort);
 
     if(gGlobalUpdateOperation == GlobalUpdateOperations::restart_server)

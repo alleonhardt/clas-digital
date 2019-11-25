@@ -635,14 +635,17 @@ function DoFuzzyMatching(x,iterator,maxHitsPerIteration)
 	}
 	suggestions.innerHTML = '';
 	suggestions.selec = undefined;
+	suggestions.scrollTop = 0;
 	iterator = 0;
 	suggestions.results = 0;
 	suggestions.is_fuzzy = true;
-	maxHitsPerIteration = 15;
+	maxHitsPerIteration = 30;
+	console.log("New search started");
     }
     else
     {
 	results = suggestions.results;
+	console.log("Scroll update started");
     }
 
     if(x=="")
@@ -654,12 +657,12 @@ function DoFuzzyMatching(x,iterator,maxHitsPerIteration)
     let value = document.getElementsByClassName("ocrpage");
 
     x = x.toLowerCase();
+    x = x.replace(new RegExp(' ','g'),'+');
     let arr = x.split('+');
     let stringlengthbeforeRegex = arr[0].length;
     let original = arr[0];
     for(let i = 0; i < arr.length; i++)
     {
-	arr[i] = arr[i].replace(new RegExp(' ','g'),'+');
 	arr[i] = arr[i].replace(new RegExp('o','g'),'[oö]');
 	arr[i] = arr[i].replace(new RegExp('u','g'),'[uü]');
 	arr[i] = arr[i].replace(new RegExp('a','g'),'[aä]');
@@ -698,8 +701,6 @@ function DoFuzzyMatching(x,iterator,maxHitsPerIteration)
     }
     else
     {
-
-	x = x.replace('+','');
 	x = arr[0];
 	arr = [x];
     }
@@ -711,17 +712,8 @@ function DoFuzzyMatching(x,iterator,maxHitsPerIteration)
 	let tmpobj = [];
 	for(var key in gFuzzyPreindexing)
 	{
-	    if(key=='verdammt')
-		console.log("FOUND IT!!!!!!!");
-
 	    if(key.search(lkarr)!=-1)
 	    {
-		if(key=='verdammt')
-		{
-		    console.log("AND MATCHED IT!!!!!!!");
-		    console.log(gFuzzyPreindexing[key]);
-		}
-
 		tmpobj = tmpobj.concat(gFuzzyPreindexing[key]);
 	    }
 	}
@@ -736,6 +728,8 @@ function DoFuzzyMatching(x,iterator,maxHitsPerIteration)
     else
 	suggestions.is_fuzzy = false;
 
+    console.log(value.length);
+    console.log(matchstring);
     for(let i = iterator; i < value.length; i++)
     {
 	let res = value[i].innerHTML.match(matchstring);
