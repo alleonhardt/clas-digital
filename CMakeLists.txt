@@ -26,6 +26,11 @@ add_executable(clas-digital.o ${SRC_FILES} ${SRC_FILES_BOOKS})
 target_link_libraries(clas-digital.o stdc++fs ${CURL_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${Tesseract_LIBRARIES})
 target_link_libraries(books.o stdc++fs ${CURL_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
+message("STABLE_INSTALL=${STABLE_INSTALL}")
+if( STABLE_INSTALL ) 
+	message("Warning you are installing to the stable version!")
+endif()
+
 if(NOT STABLE_INSTALL)
     set(INSTALL_DIRS /etc/clas-digital-devel)
     set(SERVICE_TARGET clas-digital-devel)
