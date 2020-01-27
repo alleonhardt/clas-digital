@@ -69,7 +69,13 @@ function HighlightHitsAndConstructLinkList()
 		let thpage = document.getElementById("uniqueocrpage"+hitlist.books[i].page);
 		console.log(HighlightList);
 		if(thpage!=null)
-		    thpage.innerHTML=thpage.innerHTML.replace(new RegExp('('+HighlightList[x].replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')+')','gi'),'<mark>$1</mark>');
+		{
+			HighlightList[x] = HighlightList[x].replace(new RegExp('o','g'),'[oö]');
+			HighlightList[x] = HighlightList[x].replace(new RegExp('u','g'),'[uü]');
+			HighlightList[x] = HighlightList[x].replace(new RegExp('a','g'),'[aä]');
+			HighlightList[x] = HighlightList[x].replace(new RegExp('s','g'),'[sßſ]');
+		       thpage.innerHTML=thpage.innerHTML.replace(new RegExp('('+HighlightList[x]+')','gi'),'<mark>$1</mark>');
+		}
 	    }
 	}
     }
