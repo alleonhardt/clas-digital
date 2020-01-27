@@ -1,7 +1,7 @@
 //Static because it does not matter which user asks to end his session
 function DoLogout() {
 	document.cookie = "SESSID=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-	window.setTimeout(1000,function(){window.location = "/";});
+	window.setTimeout(function(){window.location = "/";},1000);
 }
 
 function initialise(linkforactive) {
