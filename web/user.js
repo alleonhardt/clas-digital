@@ -1,23 +1,7 @@
 //Static because it does not matter which user asks to end his session
 function DoLogout() {
-	removeCookie();
-}
-
-function onRemoved(cookie) {
-  console.log(`Removed: ${cookie}`);
-  window.location = '/';
-}
-
-function onError(error) {
-  console.log(`Error removing cookie: ${error}`);
-}
-
-function removeCookie() {
-  var removing = browser.cookies.remove({
-    url: "/",
-    name: "SESSID"
-  });
-  removing.then(onRemoved, onError);
+	document.cookie = "SESSID=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+	window.setTimeout(1000,function(){window.location = "/";});
 }
 
 function initialise(linkforactive) {
