@@ -1,0 +1,125 @@
+html {
+    margin:0;
+}
+body {
+    margin:0;
+}
+
+h2 {
+    margin-top: 2rem;
+}
+
+.biggerPageClass {
+    padding-left: 10%;
+    padding-right: 10%;
+    padding-top: 0.5rem;
+    padding-bottom: 2rem;
+}
+
+.filesList {
+    list-style-type: none;
+    width: 100%;
+    color: white;
+    padding: 0;
+}
+
+.filesList>li {
+    display: block;
+    padding: 2rem;
+    background-color: #4682b4;
+    border-bottom: 1px solid white;
+}
+
+.filesList li p div {
+    display: block;
+    padding-left: 3rem;
+    padding-right: 3rem;
+    font-size: large;
+    vertical-align: center;
+    line-height: 1rem;
+    color: black;
+}
+
+.filesList li button {
+    margin: auto;
+    margin-left: 1rem;
+    background-color: red;
+    color: black;
+    padding: 0.5rem;
+}
+
+.filesList li button:hover{
+    background-color: black;
+    color: white;
+    transition: all 0.4s ease;
+}
+
+.filesList p progress{
+    margin: auto;
+    margin-right: 3rem;
+}
+
+.filesList>li {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-2 -2 104 168'><polygon stroke='white' stroke-width='2' fill='none' points='0,0 0,162 100,162 100,40 60,0' /><path stroke='white' stroke-width='2' fill='none' d='M60,0 L60,40 L100,40' /></svg>");
+    background-repeat: no-repeat;
+    background-size: 2.2rem;
+    background-position: 1rem center;
+    padding-left:4rem;
+
+}
+
+.filesList>li:first-child {
+    background-color: #ccd7ff;
+    height: 8rem;
+    line-height: 4rem;
+    vertical-align: middle;
+    text-align: center;
+    color: grey;
+    border-bottom: none;
+    transition: font 0.2s ease;
+}
+
+.filesList>li:not(:first-child):hover {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-2 -2 104 168'><polygon stroke='white' stroke-width='2' fill='none' points='0,0 0,162 100,162 100,40 60,0' /><path stroke='white' stroke-width='2' fill='none' d='M60,0 L60,40 L100,40' /></svg>"),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-2 -2 104 168'><path stroke='white' stroke-width='2' fill='none' d='M0,20 L100,20'/><polygon stroke='white' stroke-width='2' fill='none' points='10,20 20,162 80,162 90,20'/><path stroke='white' stroke-width='2' fill='none' d='M25,30 L33,155'/><path stroke='white' stroke-width='2' fill='none' d='M42.5,30 L45,155'/><path stroke='white' stroke-width='2' fill='none' d='M58.5,30 L55,155'/><path stroke='white' stroke-width='2' fill='none' d='M75,30 L67,155'/><path stroke='white' stroke-width='2' fill='none' d='M30,20 L35,0 L65,0 70,20'/></svg>");
+background-position: 1rem center, right 1rem center;
+}
+
+.saveButton {
+    display: block;
+    margin: 0 auto;
+    height: 4.8rem;
+    width: 25rem;
+    line-height: 2rem;
+
+}
+
+.pagesRange {
+    color: white;
+    padding: 1.5rem;
+    padding-left: 5rem;
+    background-color: #4682b4;
+    margin-bottom: 2rem;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-2 -2 154 186'><polygon stroke='white' stroke-width='2' fill='none' points='50,0  50,50 60,50 100,90 100,132 150,132 150,40 110,0' /><path stroke='white' stroke-width='2' fill='none' d='M110,0 L110,40 L150,40' /><polygon stroke='white' stroke-width='2' stroke-linejoin='bevel' fill='none' points='0,50 0,182 100,182 100,90 60,50' /><path stroke='white' stroke-width='2' fill='none' d='M60,50 L60,90 L100,90' /></svg>");
+    background-repeat: no-repeat;
+    background-size: 3rem;
+    background-position: 1rem center;
+}
+
+.hasText {
+    color: white;
+    padding: 1.5rem;
+    padding-left: 5rem;
+    background-color: #4682b4;
+    margin-bottom: 2rem;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-2 -2 154 156'><circle cx='50' cy='50' r='50' stroke='white' stroke-width='2' fill='none' /><path stroke='white' stroke-width='2' fill='none' d='M20,30 L80,30'/><path stroke='white' stroke-width='2' fill='none' d='M20,50 L80,50'/><path stroke='white' stroke-width='2' fill='none' d='M20,70 L80,70'/><path stroke='white' stroke-width='2' fill='none' d='M85.0903524534,85.0903524534 L150,150'/></svg>");
+    background-repeat: no-repeat;
+    background-size: 3rem;
+    background-position: 1rem center;
+}
+
+.inputStyle {
+    width: 80%;
+    height: 5vh;
+    opacity: 0;
+}
