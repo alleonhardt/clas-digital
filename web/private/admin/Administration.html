@@ -205,7 +205,7 @@ function ShutdownServer()
 	{
 	    StateBanner.ChangeBanner("The server will restart in a few seconds!",StateBannerType.success);
 	    window.scrollTo(0,0);
-	    window.setTimeout(function(){window.DoLogout()},1000);
+	    window.setTimeout(function(){DoLogout()},1000);
 	    return;
 	}
 	StateBanner.ChangeBanner("Could not restart server, error code: "+xhr.responseText,StateBannerType.danger);
