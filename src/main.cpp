@@ -27,13 +27,14 @@ OcrCreator ocr_reader;
 std::mutex gGlobalUpdateOperationLock;
 enum class GlobalUpdateOperations { none, update_zotero, restart_server };
 GlobalUpdateOperations gGlobalUpdateOperation = GlobalUpdateOperations::none;
-
+bool gGlobalSigShutdown = false;
 
 
 void sig_handler(int)
 {
     //Just stop the server when systemd wants to exit us.
     srv.stop();
+    gGlobalSigShutdown = true;
 }
 
 void update_and_restart()
@@ -815,6 +816,8 @@ int main(int argc, char **argv)
 	{
 	    for(auto it : manager.getMapOfBooks())
 	    {
+		if(gGlobalSigShutdown)
+			return 0;
 		if(it.second->getHasFiles() && (it.second->getPublic()))
 		{
 		    std::cout<<"FOUND PUBLIC BOOK: "<<it.first<<std::endl;
