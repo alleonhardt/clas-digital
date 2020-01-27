@@ -73,6 +73,11 @@ function SetCustom()
     document.getElementById("SpecialSID").focus();
 }
 
+function changeColor(x)
+{
+    x.style.color="#8B008B";
+}
+
 function callMetadata(x)
 {
     window.location = "/ShowMetadata.html?scanId="+x.dataset.scanid;
@@ -134,7 +139,7 @@ function ShowSelectedValues(obj)
             if(!json.books[i].hasocr || (json.books[i].hasocr == undefined))
 				desc.innerHTML = json.books[i].description;
 			else
-                desc.innerHTML = "<a href='/GetBooks.html?query="+document.getElementById("SpecialSID").value+"&scanId="+json.books[i].scanId+"&fuzzyness="+document.getElementById("fuzzyness").value+"'>"+json.books[i].description+"</a>";
+                desc.innerHTML = "<a onclick='changeColor(this);return true;' href='/GetBooks.html?query="+document.getElementById("SpecialSID").value+"&scanId="+json.books[i].scanId+"&fuzzyness="+document.getElementById("fuzzyness").value+"'>"+json.books[i].description+"</a>";
             desc.setAttribute("class", "desc");
             div1.appendChild(desc);
 
