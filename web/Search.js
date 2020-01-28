@@ -73,6 +73,11 @@ function SetCustom()
     document.getElementById("SpecialSID").focus();
 }
 
+function changeColor(x)
+{
+    x.style.color="#8B008B";
+}
+
 function callMetadata(x)
 {
     window.location = "/books/"+x.dataset.scanid+"/meta.html";
@@ -134,7 +139,7 @@ function ShowSelectedValues(obj)
             if(!json.books[i].hasocr || (json.books[i].hasocr == undefined))
 				desc.innerHTML = json.books[i].description;
 			else
-                desc.innerHTML = "<a href='/books/"+json.books[i].scanId+"/view.html?highlight="+document.getElementById("SpecialSID").value+"&fuzzyness="+document.getElementById("fuzzyness").value+"'>"+json.books[i].description+"</a>";
+            desc.innerHTML = "<a honclick='changeColor(this);return true;' ref='/books/"+json.books[i].scanId+"/view.html?highlight="+document.getElementById("SpecialSID").value+"&fuzzyness="+document.getElementById("fuzzyness").value+"'>"+json.books[i].description+"</a>";
             desc.setAttribute("class", "desc");
             div1.appendChild(desc);
 
