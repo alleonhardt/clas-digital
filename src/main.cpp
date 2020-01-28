@@ -91,10 +91,6 @@ void update_and_restart()
     srv.stop();
 }
 
-void send_all_books(const Request &req, Response &resp, CBookManager &manager, nlohmann::json &response)
-{
-
-}
 
 
 void do_createbiblio(const Request &req,Response &resp,CBookManager &manager)
