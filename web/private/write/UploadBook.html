@@ -7,431 +7,14 @@
     <title>Upload book - clas digital</title>
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
-    <script src="/user.js"></script>
     <link href="/topnav.css" rel="stylesheet" type="text/css">
+    <link href="UploadBook.css" rel="stylesheet">
+
 	<link rel=”canonical” href=”https://www.clas-digital.uni-frankfurt.de/private/write/UploadBook.html” />
-    <style>
 
-html {
-    margin:0;
-}
-body {
-    margin:0;
-}
+    <script src="/user.js"></script>
+    <script src="UploadBook.js"></script>
 
-h2 {
-    margin-top: 2rem;
-}
-
-.biggerPageClass {
-    padding-left: 10%;
-    padding-right: 10%;
-    padding-top: 0.5rem;
-    padding-bottom: 2rem;
-}
-
-.filesList {
-    list-style-type: none;
-    width: 100%;
-    color: white;
-    padding: 0;
-}
-
-.filesList>li {
-    display: block;
-    padding: 2rem;
-    background-color: #4682b4;
-    border-bottom: 1px solid white;
-}
-
-.filesList li p div {
-    display: block;
-    padding-left: 3rem;
-    padding-right: 3rem;
-    font-size: large;
-    vertical-align: center;
-    line-height: 1rem;
-    color: black;
-}
-
-.filesList li button {
-    margin: auto;
-    margin-left: 1rem;
-    background-color: red;
-    color: black;
-    padding: 0.5rem;
-}
-
-.filesList li button:hover{
-    background-color: black;
-    color: white;
-    transition: all 0.4s ease;
-}
-
-.filesList p progress{
-    margin: auto;
-    margin-right: 3rem;
-}
-
-.filesList>li {
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-2 -2 104 168'><polygon stroke='white' stroke-width='2' fill='none' points='0,0 0,162 100,162 100,40 60,0' /><path stroke='white' stroke-width='2' fill='none' d='M60,0 L60,40 L100,40' /></svg>");
-    background-repeat: no-repeat;
-    background-size: 2.2rem;
-    background-position: 1rem center;
-    padding-left:4rem;
-
-}
-
-.filesList>li:first-child {
-    background-color: #ccd7ff;
-    height: 8rem;
-    line-height: 4rem;
-    vertical-align: middle;
-    text-align: center;
-    color: grey;
-    border-bottom: none;
-    transition: font 0.2s ease;
-}
-
-.filesList>li:not(:first-child):hover {
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-2 -2 104 168'><polygon stroke='white' stroke-width='2' fill='none' points='0,0 0,162 100,162 100,40 60,0' /><path stroke='white' stroke-width='2' fill='none' d='M60,0 L60,40 L100,40' /></svg>"),
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-2 -2 104 168'><path stroke='white' stroke-width='2' fill='none' d='M0,20 L100,20'/><polygon stroke='white' stroke-width='2' fill='none' points='10,20 20,162 80,162 90,20'/><path stroke='white' stroke-width='2' fill='none' d='M25,30 L33,155'/><path stroke='white' stroke-width='2' fill='none' d='M42.5,30 L45,155'/><path stroke='white' stroke-width='2' fill='none' d='M58.5,30 L55,155'/><path stroke='white' stroke-width='2' fill='none' d='M75,30 L67,155'/><path stroke='white' stroke-width='2' fill='none' d='M30,20 L35,0 L65,0 70,20'/></svg>");
-background-position: 1rem center, right 1rem center;
-}
-
-.saveButton {
-    display: block;
-    margin: 0 auto;
-    height: 4.8rem;
-    width: 25rem;
-    line-height: 2rem;
-
-}
-
-.pagesRange {
-    color: white;
-    padding: 1.5rem;
-    padding-left: 5rem;
-    background-color: #4682b4;
-    margin-bottom: 2rem;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-2 -2 154 186'><polygon stroke='white' stroke-width='2' fill='none' points='50,0  50,50 60,50 100,90 100,132 150,132 150,40 110,0' /><path stroke='white' stroke-width='2' fill='none' d='M110,0 L110,40 L150,40' /><polygon stroke='white' stroke-width='2' stroke-linejoin='bevel' fill='none' points='0,50 0,182 100,182 100,90 60,50' /><path stroke='white' stroke-width='2' fill='none' d='M60,50 L60,90 L100,90' /></svg>");
-    background-repeat: no-repeat;
-    background-size: 3rem;
-    background-position: 1rem center;
-}
-
-.hasText {
-    color: white;
-    padding: 1.5rem;
-    padding-left: 5rem;
-    background-color: #4682b4;
-    margin-bottom: 2rem;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-2 -2 154 156'><circle cx='50' cy='50' r='50' stroke='white' stroke-width='2' fill='none' /><path stroke='white' stroke-width='2' fill='none' d='M20,30 L80,30'/><path stroke='white' stroke-width='2' fill='none' d='M20,50 L80,50'/><path stroke='white' stroke-width='2' fill='none' d='M20,70 L80,70'/><path stroke='white' stroke-width='2' fill='none' d='M85.0903524534,85.0903524534 L150,150'/></svg>");
-    background-repeat: no-repeat;
-    background-size: 3rem;
-    background-position: 1rem center;
-}
-
-.inputStyle {
-    width: 80%;
-    height: 5vh;
-    opacity: 0;
-}
-    </style>
-
-    <script>
-	function init_events()
-{
-    document.getElementById("fileUpID").addEventListener("change",eventoninput,false);
-}
-
-function eventoninput(e) {
-    console.log(e.target.files.length);
-    document.getElementById("FileDropList").innerHTML = "<li onclick='document.getElementById("+"\"fileUpID\""+").click()'>Hier klicken um andere Dateien auszuwaehlen</li>";
-
-    for(let i = 0; i < e.target.files.length; i++)
-    {
-	let list = document.createElement("li");
-
-	let p = document.createElement("p");
-	p.innerHTML = "<div>File selected: "+e.target.files[i].name+"</div>";
-
-	let prog = document.createElement("progress");
-	let span = document.createElement("span");
-	prog.style["float"] = "right";
-	prog.style["display"] = "inline-block";
-	prog["max"] = "100";
-
-	span.innerHTML = "0%";
-	span.style["float"] = "right";
-	span.style["margin-right"] = "2rem";
-
-	p.appendChild(prog);
-	p.appendChild(span);
-	list.appendChild(p);
-	list.onclick = function(){this.parentNode.removeChild(this);};
-	document.getElementById("FileDropList").appendChild(list);
-	list.progentry = prog;
-	list.spanentry = span;
-	list.file = e.target.files[i];
-    }
-
-}
-
-function ShowStatus(x,color)
-{
-    let ban = document.getElementById("status_banner");
-    ban.innerHTML = x;
-    ban.style.color = color;
-    window.scrollTo(0,0);
-}
-
-function Upload(x,key)
-{
-    let xhr = new XMLHttpRequest();
-    let create_ocr = document.getElementById("languageoptenabled").checked;
-    let language_ocr = document.getElementById("languageopt").value;
-    if(x.force_overwrite == true)
-	xhr.open("POST","/upload?scanid="+key+"&create_ocr="+create_ocr+"&language="+language_ocr+"&filename="+x.file.name+"&forced=true",true);
-    else
-	xhr.open("POST","/upload?scanid="+key+"&create_ocr="+create_ocr+"&language="+language_ocr+"&filename="+x.file.name,true);
-
-    x.progentry.value = 0;
-    xhr.onload = function() {
-	if(xhr.status == 403)
-	{
-	    if(xhr.responseText == "file_exists" && x.force_overwrite!=true) //File exists go for overwrite
-	    {
-		x.style.background = "yellow";
-		x.children[0].children[0].innerHTML = "File already exists: "+x.file.name+", overwrite?";
-		let butt = document.createElement("compare");
-		butt.innerHTML = "Compare Files";
-		butt.style.background = "blue";
-		butt.style.float = "right";
-		butt.style.padding = "0.5rem";
-		butt.style.cursor = "pointer";
-		butt.onclick = function() {
-		    OpenModal(x.file,key);
-		}
-		x.children[0].children[0].appendChild(butt);
-		x.children[0].children[1].style.display = "none";
-		x.children[0].children[2].style.display = "none";
-		document.getElementById("nobut").onclick = function() {
-		    HideModal();
-		    x.innerHTML = "<p><div>Canceled upload of: "+x.file.name+"</div></p>";
-		    x.style.background = "red";
-		    x.upload_finished = true;
-		    UploadAll();
-		}
-
-		document.getElementById("yesbut").onclick = function() {
-		    HideModal();
-		    x.force_overwrite = true;
-		    x.style.background = "";
-		    x.children[0].children[1].style.display = "";
-		    x.children[0].children[2].style.display = "";
-		    butt.parentNode.removeChild(butt);
-		    Upload(x,key);
-		}
-		return;
-
-		let yes = document.createElement("button");
-		let no = document.createElement("button");
-		yes.style.background = "red";
-		yes.innerHTML = "Yes";
-		no.style.background = "green";
-		no.innerHTML = "No";
-		x.children[0].children[0].appendChild(yes);
-		x.children[0].children[0].appendChild(no);
-		x.children[0].children[1].style.display = "none";
-		x.children[0].children[2].style.display = "none";
-
-		yes.onclick = function() {
-		 		}
-
-		no.onclick = function() {
-		}
-	    }
-	    else
-	    {
-		return ShowStatus("Server returned error: "+xhr.responseText,"red");
-	    }
-	    //File exists already ask for override permission
-	}
-	else if(xhr.status==200)
-	{
-	    x.style.background = "green";
-	    x.upload_finished = true;
-	    x.progentry.value = 100;
-	    x.spanentry.innerHTML = 100+"%";
-	    UploadAll();	//Recursivly upload rest of the files
-	}
-	else
-	    return ShowStatus("Unknown error while uploading please dont try again and show this message to the server administrators","red");
-    }
-
-    xhr.onprogress = function (event) {
-	if(event.lengthComputable)
-	{
-	    let xval = Math.round(event.loaded/event.total*100);
-	    x.progentry.value = xval;
-	    x.spanentry.innerHTML = xval+"%";
-	}
-    };
-
-    xhr.send(x.file);
-}
-
-function ExtractKey()
-{
-    let permalink = document.getElementById("Permalink").value;
-    if(permalink=="")
-	return "";
-
-    let arr = permalink.split("/");
-    let finalKey = "";
-    for(var i = 0; i < arr.length; i++)
-    {
-	if(arr[i]=="itemKey")
-	{
-	    finalKey = arr[i+1];
-	    break;
-	}
-    }
-    if(finalKey=="" && (arr.length==1))
-	finalKey = permalink;
-    return finalKey;
-}
-
-function HideModal()
-{
-    document.getElementById("modal").style.display = "none";
-}
-
-function OpenModal(fl,key)
-{
-    let ending = fl.name.substr(fl.name.lastIndexOf(".")+1);
-
-    if(ending == 'jpg'||ending=='JPG'||ending=='png'||ending=='PNG')
-	ShowImageSlide(fl,key);
-    else
-	ShowOCRSlide(fl,key);
-}
-
-function ShowOCRSlide(fl,key)
-{
-    document.getElementById("modal").style.display = "block";
-    let oldf = document.getElementById("oldfile");
-    let newf = document.getElementById("newfile");
-    let oldfileparagraph = document.createElement("p");
-    let newfileparagraph = document.createElement("p");
-    oldfileparagraph.style.background = "white";
-    newfileparagraph.style.background = "white";
-    oldf.appendChild(oldfileparagraph);
-    newf.appendChild(newfileparagraph);
-
-    let xhr = new XMLHttpRequest();
-    xhr.open("GET","/books/"+key+"/"+fl.name,true);
-    xhr.onload = function() {
-	if(xhr.status!=200)
-	{
-	    oldfileparagraph.innerHTML = "Could not load file sorry for that :(";
-	}
-	else
-	{
-	    oldfileparagraph.innerHTML = xhr.responseText;
-	}
-    }
-    xhr.send();
-
-    if (FileReader) {
-	var fr = new FileReader();
-	fr.onload = function () {
-	    newfileparagraph.innerHTML = fr.result;
-	}
-	fr.readAsText(fl);
-    }
-    else
-    {
-	newfileparagraph.innerHTML = "Could not load file sorry for that :(";
-    }
-}
-
-function ShowImageSlide(fl,key)
-{
-    document.getElementById("modal").style.display = "block";
-    let kk = document.getElementById("oldfile");
-    kk.innerHTML = "";
-    document.getElementById("newfile").innerHTML = "";
-
-    let val = document.createElement("img");
-    val.src = "/books/"+key+"/"+fl.name;
-    val.style["max-height"] = "100%";
-    val.style["max-width"] = "100%";
-    val.style.margin = "auto";
-    val.style.display = "inherit";
-    kk.appendChild(val);
-
-    if (FileReader) {
-	var fr = new FileReader();
-	fr.onload = function () {
-	    let valnew = document.createElement("img");
-	    valnew.src = fr.result;
-	    valnew.style["max-height"] = "100%";
-	    valnew.style["max-width"] = "100%";
-	    valnew.style.margin = "auto";
-	    valnew.style.display = "inherit";
-	    document.getElementById("newfile").appendChild(valnew);
-	}
-	fr.readAsDataURL(fl);
-    }
-}
-
-function ShowBookContentLink()
-{
-    let lnk = ExtractKey();
-    document.getElementById("BookContentLink").innerHTML = "<a href='/books/"+lnk+"/' target='_blank'>Book File List Index</a><a style='margin-left: 4rem;' href='/ShowMetadata.html?scanId="+lnk+"' target='_blank'> Book Metadata</a>";
-}
-
-function UploadAll()
-{
-    let elem = document.getElementById("fileUpID");
-    elem.onclick = function(){return false;};
-
-    let finalKey = ExtractKey();
-    if(finalKey=="")
-	return ShowStatus("Either you forgot to type in the item key or the permalink is in the wrong format!","red");
-
-
-
-    let val = document.getElementById("FileDropList").children;
-    for(let i = 1; i < val.length; i++)
-    {
-	if(val[i].upload_finished==undefined || val[i].upload_finished == null)
-	{
-	    val[i].onclick = function() { };
-	    Upload(val[i],finalKey);
-	    return;
-	}
-    }
-    ShowStatus("Uploaded all files successfully! In order to find results in the new book you have to restart the server!","green");
-}
-
-function show_language(x)
-{
-    if(x.checked)
-    {
-	document.getElementById("languageopt").style.display = "inline-block";
-    }
-    else
-    {
-	document.getElementById("languageopt").style.display = "none";
-    }
-}
-
-
-window.addEventListener("load",function(){initialise("uploadbooklink");init_events();},false);
-    </script>
 </head>
 <body>
     <!-- The navigation bar config -->
@@ -461,30 +44,38 @@ window.addEventListener("load",function(){initialise("uploadbooklink");init_even
 	<h1>Volltexte hochladen</h1>
 	<input class="inputStyle" type="file" id="fileUpID" multiple/>
 
-	<h2><span>1.</span>Wo sind die Dateien?</h2>
-	<p>Die Dateien (nur .jpg und .txt hochladen!) der Staatsbibliothek müssen zuerst einmal auf den Projekt-Server gelangen. Lade sie von der Bibliothek auf deinen PC und nutze das Feld unten, um sie wieder auszuwählen. Sie werden dann auf den Projekt-Server übertragen.</p>
-	<p><strong>Wichtig:</strong> Schließe diesen Tab nicht, während der Upload läuft!</p>
-	<h3>Zum Format der Dateien</h3>
-	<p>Jede Bilddatei muss in diesem Format benannt sein: page$NUMBER$.jpg NUMBER bezieht sich hier auf die Seitennummer im Buch. Die OCRs muessen zur Seitentrennung dieses Format verwenden ----- $PAGENUMBER$ / $MAXPAGENUMBER$ -----\n. Es wurden nur Dateien im JPG,PNG und TXT Format angenommen. Falls das Buch von der BSB stammen sollte muss man sich darum keine Sorgen machen, die formatieren ihre Buecher bereits in diesem Format.</p>
+    <h2><span>1.</span> Vorbereitung</h2>
+    <p>Was brauche ich, um ein Buch hochzuladen? Wenn Sie ein Buch hochladen wollen, sollten im Vorfeld folgende Dinge am besten auf Ihrem PC vorliegen: </p>
+    <p>1. Alle zu dem Buch vorhandenen Dateien (Scans der einzelnen Seiten und ggf. die OCR-Datei). </p>
+    <img src="/static/examples/buchDateien.png" alt="Beispiel Dateien" class="exampleImg"> 
+    <p>2. Das Buch muss bereits einen Eintrag in Zotero haben. Liegt ein Buch in Zotero vor, dann besitzt es einen sogenannten "Item-Key", der zum Hochladen des Buches auf dem clas-digital Server notwendig ist. Es reicht allerdings, wenn sie die URL des Buches kennen, die in ihrem Browserfenster angezeigt weird, wenn Sie in Zotero das entsprechende Buch ausgewählt haben. Der Uploader sucht sich den Item-Key selbstständig heraus. </p>
+    <img src="/static/examples/ItemKey.png" alt="Beispiel Item-Key" class="exampleImg"> 
+    <h4>Zum Format der Dateien</h4>
+	<p>Jede Bilddatei/ jeder Scan muss nach folgendem Format benannt sein: page[Seitennummer].jpg. "Seitennummer" bezieht sich hier auf die Seitennummer im Buch (das Deckblatt wäre z.B. mit page001.jpg benannt). Die OCRs müssen zur Seitentrennung folgendes Format verwenden ----- [Seitennummer] / [maximale Seitenzahl] -----. Es werden nur Dateien im JPG, PNG und TXT Format angenommen. (Falls das Buch von der BSB stammen sollte müssen Sie sich darum keine Sorgen machen, sie sollten bereits in genau diesem Format vorliegen.)</p>
+
+	<h2><span>2.</span> Auswählen der Dateien</h2>
+	<p>Es kann immer nur ein Buch hochgeladen werden. Ein "Buch" besteht aus Scans der einzelnen Seiten des Buches und ggf. einer .ocr Datei. Diese Datei sollten auf Ihrem PC vorliegen. Falls das hochzuladene Buch von der Staatsbibliothek kommt, laden Sie dieses also zunächst auf ihren PC (zu empfehlen: ein Ordner pro Buch, in dem sich alle Datei (Scans und ggf. ocr) befinden. Nutze sie dann das untenstehende Feld, um sie wieder auszuwählen. Die Dateien werden dann auf den Projekt-Server übertragen.</p>
+	<p><strong>Wichtig:</strong> Schließen Sie diesen Tab nicht, während der Upload läuft!</p>
 	<ul class="list-group" id="CurrentUploads">
 	</ul>
 	<ul id="FileDropList" class="filesList">
 	    <li onclick='document.getElementById("fileUpID").click()'>Hier klicken um eine Datei auszuwaehlen</li>
 	</ul>
 	<br>
-	<h2><span>2.</span>Ist alles korrekt?</h2>
+	<h2><span>3.</span> Ist alles korrekt?</h2>
 	<div aria-label="Vorhandene Scans" class="pagesRange">Noch keine Scans hochgeladen</div>
 	<div aria-label="Durchsuchbarer Text?" class="hasText">Nein, es wurde kein durchsuchbarer Text hochgeladen</div>
 
 	<br>
-	<h2><span>3.</span>Welches Werk ist das?</h2>
-	<p>Fuege noch den Link zu Zotero ein um das Item spaeter immer korrekt zuordnen zu koennen:</p>
-	<input id="Permalink" class="description" type="text" placeholder="Permalink hier einfügen" oninput="ShowBookContentLink();">
+	<h2><span>4.</span> Welches Werk ist das?</h2>
+	<p>Fügen Sie noch den Link zu Zotero ein (die URL die oben in ihrem Browserfenster angezeigt wird, wenn Sie in Zotero das entsprechende Buch ausgewählt haben), damit der Projektserver das Buch später immer korrekt zuordnen kann (dies ist der zuvor erwähnte "Item-Key"):</p>
+	<input id="Permalink" class="description" type="text" placeholder="Item-Key hier einfügen" oninput="ShowBookContentLink();">
 	<div id="BookContentLink" style='display:inline-block;margin-left: 2rem;'></div>
 	</input>
+    <p> Nachdem sie den Item-Link (bzw. die URL) eingetragen haben, erscheinen zwei links. Der erste führt Sie zu einer Übersicht der bereits für dieses Buch existierenden Dateien auf dem Server. Der zweite Link führt Sie zu den Metadaten des Buches (so können Sie nochmlas sichergehen, ob Sie das richtige Buch ausgewählt haben.</p>
 	<br>
-	<h2><span>4.</span>Ocr Options</h2>
-	<p>Es ist moeglich eine OCR vom Server erstellen zu lassen. Um diese Option zu benutzen setzten sie bitte ein Haekchen in der Checkbox unten. <b>Dieser Vorgang dauert sehr lange benuzten Sie diese Funktion nur wenn sie wenige Dateien hochladen!</b></p>
+	<h2><span>5.</span> Option: Erstellen einer OCR</h2>
+	<p>Es ist möglich eine OCR vom Server erstellen zu lassen. Um diese Option zu benutzen setzten Sie bitte ein Häkchen in der Checkbox unten. <b>Dieser Vorgang dauert sehr lange benuzten Sie diese Funktion nur wenn sie wenige Dateien hochladen!</b></p>
 	<div>
 	    <span>Der Server soll eine computergenerierte OCR erstellen: </span>
 	    <input id='languageoptenabled' onclick='show_language(this);' type='checkbox'/>
@@ -494,12 +85,23 @@ window.addEventListener("load",function(){initialise("uploadbooklink");init_even
 		<option value='eng'>Englisch</option>
 	    </select>
 	</div>
-	<h2><span>5.</span>Speichern!</h2>
+	<h2><span>6.</span> Hochladen beginnen!</h2>
 	<div class="saver" id="saver">
 	    <p>Speichere diesen Volltext auf dem Projektserver!</p>
 	    <button id="SaveNow" class="saveButton" onclick="UploadAll();return true;">Speichern!</button>
 	</div>
-    </div>
+
+    <h2><span>7.</span> Etwas Schiefgelaufen? Dateien schon auf dem Server vorhanden?</h2>
+    <p>Ist etwas schief gelaufen? Machen sie sich keine Sorgen! Sollte die Internetverbindung abgebrochen sein, oder das Hochladen aus einem anderen Grund nicht funktioniert haben, ist das kein Grund zur Sorge! Alle Datein, die bis zum dem Abruch hochgeladen worden sind befinden sich sicher auf dem Server. Wiederholen Sie einfach den Vorgang, wählen Sie nochmals alle Dateien aus, die Sie hochladen wollten. Es wird Ihnen dann angezeigt, welche Dateien, bereist vorhanden sind. Sie können selbst auswählen, welche Dateien Sie hochladen wollen. Drücken Sie dafür auf "Compare Files", um die Dateien zu vergleichen und dann auszuwählen.</p>
+    <img src="/static/examples/überschreiben1.png" alt="Dateien Überschreiben1" class="exampleImg">
+    <p>Generell wird Ihnen immer angeziegt, wenn zu dem Buch, dass Sie hochladen wollen bereits Dateien auf dem Server existieren. Sie können stets auswählen, welche Dateien Sie überschreiben, oder vielleicht lieber doch nicht hinzufügen wollen.</p>
+    <img src="/static/examples/überschreiben2.png" alt="Dateien Überschreiben2" class="exampleImg">
+    <p>Sie müssen für jedes Buch einzelnd diese Wahl treffen. Es wird Ihnen angezeigt, welches Datein sie überschreiben und für welche Dateien Sie den Upload abgebrochen haben.</p>
+    <img src="/static/examples/überschreiben3.png" alt="Dateien Überschreiben3" class="exampleImg">
+    <p>Wenn Sie für alle Dateien eine Aswahl getroffen haben wird der Upload automatisch fertig gestellt. Es sollte eine grüne Bestätigungsnachricht erscheinen.</p>
+
+    </div> 
+
     <div id="modal" style="display: none;position: fixed; top: 10vh;left: 10vw; width: 80vw; padding: 1rem; height: 80vh; z-index: 3;background:grey;">
 	<div style='display: grid; grid-template-columns: 48% 48%;grid-template-rows: 2.5rem calc(100% - 5rem) 2.5rem;height:100%;width:100%;grid-column-gap: 2%;'>
 	    <p style="grid-column: 1 /span 1;grid-row: 1 /span 1;margin:auto;background:white;">Old File</p>
