@@ -80,7 +80,7 @@ function changeColor(x)
 
 function callMetadata(x)
 {
-    window.location = "/ShowMetadata.html?scanId="+x.dataset.scanid;
+    window.location = "/books/"+x.dataset.scanid+"/meta.html";
 }
 
 function ShowSelectedValues(obj)
@@ -139,12 +139,15 @@ function ShowSelectedValues(obj)
             if(!json.books[i].hasocr || (json.books[i].hasocr == undefined))
 				desc.innerHTML = json.books[i].description;
 			else
-                desc.innerHTML = "<a onclick='changeColor(this);return true;' href='/GetBooks.html?query="+document.getElementById("SpecialSID").value+"&scanId="+json.books[i].scanId+"&fuzzyness="+document.getElementById("fuzzyness").value+"'>"+json.books[i].description+"</a>";
+	    			if(document.getElementById("fuzzyness").value!=0)
+            				desc.innerHTML = "<a onclick='changeColor(this);return true;' href='/books/"+json.books[i].scanId+"/view?highlight="+document.getElementById("SpecialSID").value+"&fuzzyness="+document.getElementById("fuzzyness").value+"'>"+json.books[i].description+"</a>";
+				else
+            				desc.innerHTML = "<a onclick='changeColor(this);return true;' href='/books/"+json.books[i].scanId+"/view?highlight="+document.getElementById("SpecialSID").value+"'>"+json.books[i].description+"</a>";
             desc.setAttribute("class", "desc");
             div1.appendChild(desc);
 
             let bib = document.createElement("span");
-            bib.innerHTML = "<a class='metadata' href='/ShowMetadata.html?scanId=" + json.books[i].scanId+"'>"+json.books[i].bibliography +"</a>";
+            bib.innerHTML = "<a class='metadata' href='/books/"+json.books[i].scanId+"/meta'>"+json.books[i].bibliography +"</a>";
             div1.appendChild(bib);
 
             let prev = document.createElement("span");

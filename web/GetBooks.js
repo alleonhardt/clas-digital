@@ -19,6 +19,8 @@ let gOCRLoaded = false;
 let gHitsLoaded = false;
 let gOcrSplittedFile = null;
 let gPageLayoutFile = null;
+let scanId = '';
+let fuzzyness = 0;
 
 function CorrectedScrollIntoView(elem)
 {
@@ -237,7 +239,7 @@ function CreatePageLayout()
 	    doc = cont;
 	}
 
-	let svgcode = "<svg class='svgpage' data-width='"+gPageLayoutFile.pages[i].width+"' data-height='"+gPageLayoutFile.pages[i].height+"' data-path='"+"/books/"+getParameterByName('scanId')+ "/" + gPageLayoutFile.pages[i].file.substr(gPageLayoutFile.pages[i].file.search("page"))+"' viewBox='0 0 "+gPageLayoutFile.pages[i].width+" "+gPageLayoutFile.pages[i].height+"'></svg>";
+	let svgcode = "<svg class='svgpage' data-width='"+gPageLayoutFile.pages[i].width+"' data-height='"+gPageLayoutFile.pages[i].height+"' data-path='"+"/books/"+scanId+ "/" + gPageLayoutFile.pages[i].file.substr(gPageLayoutFile.pages[i].file.search("page"))+"' viewBox='0 0 "+gPageLayoutFile.pages[i].width+" "+gPageLayoutFile.pages[i].height+"'></svg>";
 
 	doc.innerHTML +=svgcode;
     }
@@ -368,13 +370,6 @@ function loadOCRFileError(errortext)
 	CreatePageLayout();
 }
 
-function loadMetadataFile(metadatatxt)
-{
-    let json = JSON.parse(metadatatxt);
-    document.getElementById("bibliography").innerHTML = json.bib;
-    if(json.data.creators.length>0)
-	document.title = json.data.creators[0].lastName+" ("+json.data.date+"). "+json.data.title;
-}
 
 function loadMetadataFileError(errortxt,state)
 {
@@ -423,15 +418,20 @@ function highlightHitsAndLoadHitlist(hits)
 
 function initialise()
 {
-    let scanId = getParameterByName('scanId');
-    let query = decodeURIComponent(getParameterByName('query')).replace(' ','+');
-    let fuzzyness = getParameterByName('fuzzyness');
-    
+    if(gGlobalBookId!=undefined)
+	scanId = gGlobalBookId;
+    else
+    	scanId = getParameterByName('scanId');
+
+    let query = decodeURIComponent(getParameterByName('highlight')).replace(' ','+');
+    fuzzyness = getParameterByName('fuzzyness');
+    if(fuzzyness==null)
+	fuzzyness = 0;
+
     if(!hasFullscreen(document.documentElement))
 	document.getElementById("fullbut").style.display = 'none';
 
     ServerGet("/books/"+scanId+"/ocr.txt", loadOCRFile,loadOCRFileError);
-    ServerGet("/books/"+scanId+"/info.json",loadMetadataFile,loadMetadataFileError);
     ServerGet("/books/"+scanId+"/readerInfo.json",loadPageLayoutFile,loadMetadataFileError);
     ServerGet("/searchinbook?scanId="+scanId+'&query='+query+'&fuzzyness='+fuzzyness,highlightHitsAndLoadHitlist,highlightHitsAndLoadHitlistError);
     ServerGet("/books/"+scanId+"/intern/pages.txt",LoadPreindexingOfPages,LoadPreindexingOfPagesError);
@@ -802,7 +802,11 @@ function DoFuzzyMatching(x,iterator,maxHitsPerIteration)
 
 function doCompleteNewSearch()
 {
-    let newurl = "/GetBooks.html?query="+document.getElementById("srchbox").value+"&scanId="+getParameterByName("scanId")+"&fuzzyness="+getParameterByName('fuzzyness');
+	let newurl='';
+	if(fuzzyness>0)
+    		newurl = "/books/"+scanId+"/view?highlight="+document.getElementById("srchbox").value+"&fuzzyness="+fuzzyness;
+	else
+    		newurl = "/books/"+scanId+"/view?highlight="+document.getElementById("srchbox").value;
     window.location = newurl;
 }
 

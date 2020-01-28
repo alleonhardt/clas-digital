@@ -234,7 +234,10 @@ std::string CMetadata::getZit(size_t page)
 std::string CMetadata::getShow2()
 {
     // *** Add Author *** //
-    std::string sResult = getAuthor() + ", \"";
+    std::string sResult = getAuthor() + " (";
+    if(getDate() != -1)
+        sResult += std::to_string(getDate());
+    sResult+="), ";
 
     // *** Add first [num] words of title *** //
     std::vector<std::string> vStrs;
@@ -247,8 +250,6 @@ std::string CMetadata::getShow2()
     else
         sResult += "\"";
 
-    if(getDate() != -1)
-        sResult += ", " + getDate();
 
     sResult += ".";
 
