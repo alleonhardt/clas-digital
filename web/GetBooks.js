@@ -802,7 +802,11 @@ function DoFuzzyMatching(x,iterator,maxHitsPerIteration)
 
 function doCompleteNewSearch()
 {
-    let newurl = "/books/"+scanId+"/view.html?highlight="+document.getElementById("srchbox").value+"&fuzzyness="+fuzzyness;
+	let newurl='';
+	if(fuzzyness>0)
+    		newurl = "/books/"+scanId+"/view.html?highlight="+document.getElementById("srchbox").value+"&fuzzyness="+fuzzyness;
+	else
+    		newurl = "/books/"+scanId+"/view.html?highlight="+document.getElementById("srchbox").value;
     window.location = newurl;
 }
 
