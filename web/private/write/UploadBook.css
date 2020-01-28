@@ -9,6 +9,14 @@ h2 {
     margin-top: 2rem;
 }
 
+.exampleImg {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 2rem;
+    width: 50%;
+}
+
 .biggerPageClass {
     padding-left: 10%;
     padding-right: 10%;
@@ -85,12 +93,16 @@ h2 {
 background-position: 1rem center, right 1rem center;
 }
 
+.description{
+    margin-bottom: 2rem;
+}
 .saveButton {
     display: block;
     margin: 0 auto;
+    margin-bottom: 2rem;
     height: 4.8rem;
     width: 25rem;
-    line-height: 2rem;
+    line-height: 3rem;
 
 }
 

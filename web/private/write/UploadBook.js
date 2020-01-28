@@ -76,7 +76,7 @@ function Upload(x,key)
 		x.children[0].children[2].style.display = "none";
 		document.getElementById("nobut").onclick = function() {
 		    HideModal();
-		    x.innerHTML = "<p><div>Canceled upload of: "+x.file.name+"</div></p>";
+		    x.innerHTML = "<p><div>Canceled upload of: "+x.file.name+" Keeping existing file</div></p>";
 		    x.style.background = "red";
 		    x.upload_finished = true;
 		    UploadAll();
@@ -88,6 +88,7 @@ function Upload(x,key)
 		    x.style.background = "";
 		    x.children[0].children[1].style.display = "";
 		    x.children[0].children[2].style.display = "";
+            x.innerHTML = "<p><div>Overwriting existing file with: " +x.file.name+"</div></p>";
 		    butt.parentNode.removeChild(butt);
 		    Upload(x,key);
 		}
@@ -269,10 +270,10 @@ function UploadAll()
 	{
 	    val[i].onclick = function() { };
 	    Upload(val[i],finalKey);
-	    return;
+	    return ShowStatus("There are files that already exist, you may select whether to overwrite or not for each file", "red");
 	}
     }
-    ShowStatus("Uploaded all files successfully! In order to find results in the new book you have to restart the server!","green");
+    ShowStatus("Uploaded all files successfully! In order to find results in the new book you have to restart the server! (The Server automatically restarts over night)","green");
 }
 
 function show_language(x)
