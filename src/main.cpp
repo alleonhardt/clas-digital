@@ -15,7 +15,7 @@
 #include "stb_image.h" //Neeeded for image dimensions
 #include <sstream>
 #include "ocr/tesseract.hpp"
-
+#include "util/StaticWebpageCreator.hpp"
 
 
 using namespace httplib;
@@ -832,6 +832,8 @@ int main(int argc, char **argv)
 		std::string dir = "web/books/";
 		dir+=it.first;
 
+		StaticWebpageCreator webpage(it.second);
+		webpage.createWebpage();
 		auto last_mod_file = std::filesystem::last_write_time(dir,ec);
 		if(!ec && last_mod_file >= last_mod)
 		    continue;

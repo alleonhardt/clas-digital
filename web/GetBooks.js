@@ -19,6 +19,7 @@ let gOCRLoaded = false;
 let gHitsLoaded = false;
 let gOcrSplittedFile = null;
 let gPageLayoutFile = null;
+let scanId = '';
 
 function CorrectedScrollIntoView(elem)
 {
@@ -237,7 +238,7 @@ function CreatePageLayout()
 	    doc = cont;
 	}
 
-	let svgcode = "<svg class='svgpage' data-width='"+gPageLayoutFile.pages[i].width+"' data-height='"+gPageLayoutFile.pages[i].height+"' data-path='"+"/books/"+getParameterByName('scanId')+ "/" + gPageLayoutFile.pages[i].file.substr(gPageLayoutFile.pages[i].file.search("page"))+"' viewBox='0 0 "+gPageLayoutFile.pages[i].width+" "+gPageLayoutFile.pages[i].height+"'></svg>";
+	let svgcode = "<svg class='svgpage' data-width='"+gPageLayoutFile.pages[i].width+"' data-height='"+gPageLayoutFile.pages[i].height+"' data-path='"+"/books/"+scanId+ "/" + gPageLayoutFile.pages[i].file.substr(gPageLayoutFile.pages[i].file.search("page"))+"' viewBox='0 0 "+gPageLayoutFile.pages[i].width+" "+gPageLayoutFile.pages[i].height+"'></svg>";
 
 	doc.innerHTML +=svgcode;
     }
@@ -423,8 +424,12 @@ function highlightHitsAndLoadHitlist(hits)
 
 function initialise()
 {
-    let scanId = getParameterByName('scanId');
-    let query = decodeURIComponent(getParameterByName('query')).replace(' ','+');
+    if(gGlobalBookId!=undefined)
+	scanId = gGlobalBookId;
+    else
+    	scanId = getParameterByName('scanId');
+
+    let query = decodeURIComponent(getParameterByName('highlight')).replace(' ','+');
     let fuzzyness = getParameterByName('fuzzyness');
     
     if(!hasFullscreen(document.documentElement))
@@ -802,7 +807,7 @@ function DoFuzzyMatching(x,iterator,maxHitsPerIteration)
 
 function doCompleteNewSearch()
 {
-    let newurl = "/GetBooks.html?query="+document.getElementById("srchbox").value+"&scanId="+getParameterByName("scanId")+"&fuzzyness="+getParameterByName('fuzzyness');
+    let newurl = "/books/"+scanId+"/view.html?highlight="+document.getElementById("srchbox").value+"&fuzzyness="+getParameterByName('fuzzyness');
     window.location = newurl;
 }
 
