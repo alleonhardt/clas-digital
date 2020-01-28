@@ -92,6 +92,7 @@ void update_and_restart()
 }
 
 
+
 void do_createbiblio(const Request &req,Response &resp,CBookManager &manager)
 {
     try
@@ -811,11 +812,25 @@ int main(int argc, char **argv)
 
     {
 	auto last_mod = std::filesystem::last_write_time("bin/zotero.json");
+	int managedBooks = 0;
+
 	std::ofstream of("bin/forbiddenfiles",std::ios::out);
 	if(of.is_open())
 	{
 	    for(auto it : manager.getMapOfBooks())
 	    {
+		++managedBooks;
+		for(auto &it2 : zoteroPillars)
+		{
+			if(func::in(it2["key"],it.second->getMetadata().getCollections()))
+			{
+				if(it2.count("books_managed")>0)
+					it2["books_managed"] = it2["books_managed"].get<int>()+1;
+				else
+					it2["books_managed"]=1;
+			}
+		}
+
 		if(gGlobalSigShutdown)
 			return 0;
 		if(it.second->getHasFiles() && (it.second->getPublic()))
