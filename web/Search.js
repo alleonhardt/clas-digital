@@ -140,14 +140,14 @@ function ShowSelectedValues(obj)
 				desc.innerHTML = json.books[i].description;
 			else
 	    			if(document.getElementById("fuzzyness").value!=0)
-            				desc.innerHTML = "<a onclick='changeColor(this);return true;' href='/books/"+json.books[i].scanId+"/view.html?highlight="+document.getElementById("SpecialSID").value+"&fuzzyness="+document.getElementById("fuzzyness").value+"'>"+json.books[i].description+"</a>";
+            				desc.innerHTML = "<a onclick='changeColor(this);return true;' href='/books/"+json.books[i].scanId+"/view?highlight="+document.getElementById("SpecialSID").value+"&fuzzyness="+document.getElementById("fuzzyness").value+"'>"+json.books[i].description+"</a>";
 				else
-            				desc.innerHTML = "<a onclick='changeColor(this);return true;' href='/books/"+json.books[i].scanId+"/view.html?highlight="+document.getElementById("SpecialSID").value+"'>"+json.books[i].description+"</a>";
+            				desc.innerHTML = "<a onclick='changeColor(this);return true;' href='/books/"+json.books[i].scanId+"/view?highlight="+document.getElementById("SpecialSID").value+"'>"+json.books[i].description+"</a>";
             desc.setAttribute("class", "desc");
             div1.appendChild(desc);
 
             let bib = document.createElement("span");
-            bib.innerHTML = "<a class='metadata' href='/books/"+json.books[i].scanId+"/meta.html'>"+json.books[i].bibliography +"</a>";
+            bib.innerHTML = "<a class='metadata' href='/books/"+json.books[i].scanId+"/meta'>"+json.books[i].bibliography +"</a>";
             div1.appendChild(bib);
 
             let prev = document.createElement("span");

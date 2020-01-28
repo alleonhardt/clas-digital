@@ -831,6 +831,7 @@ int main(int argc, char **argv)
 		std::error_code ec;
 		std::string dir = "web/books/";
 		dir+=it.first;
+		
 
 		auto last_mod_file = std::filesystem::last_write_time(dir,ec);
 		if(!ec && last_mod_file >= last_mod)

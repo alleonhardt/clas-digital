@@ -21,6 +21,7 @@ class StaticWebpageCreator
 		bool createWebpage()
 		{
 			std::string webpath = "/books/"+m_bookID;
+			std::error_code ec;
 			if(std::filesystem::exists(m_path+"/readerInfo.json"))
 			{
 				//Full blown webpage
@@ -36,8 +37,12 @@ class StaticWebpageCreator
 				content+="\";</script><script src=\"/general.js\"></script><script src=\"/GetBooks.js\"></script></head><body><nav class='searchbox'><center><input id='srchbox' style='width:25%;border-radius: 20px;padding-left: 0.5rem;padding-right: 0.5rem;margin-left: 1rem;min-width: 10rem;margin-top: 0.5rem;text-align: center;' type='text' placeholder=\"search this book\"><i class=\"fa fa-search searchstyler\" onclick='doCompleteNewSearch();return true;'></i></input><img id='fullbut' onclick='tooglefullscreen(this);' class='fullscreen' title='Toogle fullscreen mode' style='float: right; margin:0.5rem' src=\"/static/GetBooks/fullscreen-24px.svg\"/><img id='tooglebut' onclick=\"read_mode(this);\" class='fullscreen' style='float: right;margin:0.5rem;' title=\"Toggle image reader and split reader mode\" src=\"/static/GetBooks/chrome_reader_mode-24px.svg\"></img><div style='position: relative;width:90%;height: 1px;'><div id='fuzzysuggestions' style='visibility:hidden;overflow-y:scroll;z-index: 5;position: absolute;top:0;left: 0;right:0;margin-left: auto;margin-right:auto;max-height:80vh;background:white;border: 1px solid black;'></div></div></center><center><span id=\"bibliography\" class=\"bibliostyle\">";
 				content+=m_info["bib"];
 				content+="</span></center><div class='linknav'><div class='lastbutcont'><img class='lastbut' onclick='SelectLastHit();' src='/next.svg'></img></div><div id=\"fullsearchhitlist\"></div><div class='nextbutcont'><img class='nextbut' onclick='SelectNextHit();' src='/last.svg'></img></div></div></nav></body></html>";
+				
 				std::string pathcopy = m_path;
-				pathcopy+="/view.html";
+				pathcopy+="/view";
+				std::filesystem::create_directory(pathcopy,ec);
+				pathcopy+="/index.html";
+
 				std::ofstream ofs(pathcopy.c_str(), std::ios::out);
 				ofs<<content;
 				ofs.close();
@@ -75,9 +80,13 @@ class StaticWebpageCreator
 					content+="</p><hr>";
 				}
 				content+="</body></html>";
-				m_path+="/meta.html";
-				std::cout<<"Created following page: "<<m_path<<std::endl;
-				std::ofstream ofs(m_path.c_str(), std::ios::out);
+				
+				std::string pathcopy = m_path;
+				pathcopy+="/meta";
+				std::filesystem::create_directory(pathcopy,ec);
+				pathcopy+="/index.html";
+
+				std::ofstream ofs(pathcopy.c_str(), std::ios::out);
 				ofs<<content;
 				ofs.close();
 			}

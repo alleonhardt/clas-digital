@@ -804,9 +804,9 @@ function doCompleteNewSearch()
 {
 	let newurl='';
 	if(fuzzyness>0)
-    		newurl = "/books/"+scanId+"/view.html?highlight="+document.getElementById("srchbox").value+"&fuzzyness="+fuzzyness;
+    		newurl = "/books/"+scanId+"/view?highlight="+document.getElementById("srchbox").value+"&fuzzyness="+fuzzyness;
 	else
-    		newurl = "/books/"+scanId+"/view.html?highlight="+document.getElementById("srchbox").value;
+    		newurl = "/books/"+scanId+"/view?highlight="+document.getElementById("srchbox").value;
     window.location = newurl;
 }
 
