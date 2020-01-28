@@ -369,13 +369,6 @@ function loadOCRFileError(errortext)
 	CreatePageLayout();
 }
 
-function loadMetadataFile(metadatatxt)
-{
-    let json = JSON.parse(metadatatxt);
-    document.getElementById("bibliography").innerHTML = json.bib;
-    if(json.data.creators.length>0)
-	document.title = json.data.creators[0].lastName+" ("+json.data.date+"). "+json.data.title;
-}
 
 function loadMetadataFileError(errortxt,state)
 {
@@ -436,7 +429,6 @@ function initialise()
 	document.getElementById("fullbut").style.display = 'none';
 
     ServerGet("/books/"+scanId+"/ocr.txt", loadOCRFile,loadOCRFileError);
-    ServerGet("/books/"+scanId+"/info.json",loadMetadataFile,loadMetadataFileError);
     ServerGet("/books/"+scanId+"/readerInfo.json",loadPageLayoutFile,loadMetadataFileError);
     ServerGet("/searchinbook?scanId="+scanId+'&query='+query+'&fuzzyness='+fuzzyness,highlightHitsAndLoadHitlist,highlightHitsAndLoadHitlistError);
     ServerGet("/books/"+scanId+"/intern/pages.txt",LoadPreindexingOfPages,LoadPreindexingOfPagesError);

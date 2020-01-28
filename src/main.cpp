@@ -832,8 +832,6 @@ int main(int argc, char **argv)
 		std::string dir = "web/books/";
 		dir+=it.first;
 
-		StaticWebpageCreator webpage(it.second);
-		webpage.createWebpage();
 		auto last_mod_file = std::filesystem::last_write_time(dir,ec);
 		if(!ec && last_mod_file >= last_mod)
 		    continue;
@@ -846,6 +844,9 @@ int main(int argc, char **argv)
 		std::ofstream json_write(dir.c_str(),std::ios::out);
 		if(json_write.is_open())
 		    json_write<<it.second->getMetadata().getMetadata();
+
+		StaticWebpageCreator webpage(it.second);
+		webpage.createWebpage();
 	    }
 	}
 	of.close();
