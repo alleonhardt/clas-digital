@@ -20,6 +20,7 @@ let gHitsLoaded = false;
 let gOcrSplittedFile = null;
 let gPageLayoutFile = null;
 let scanId = '';
+let fuzzyness = 0;
 
 function CorrectedScrollIntoView(elem)
 {
@@ -423,8 +424,10 @@ function initialise()
     	scanId = getParameterByName('scanId');
 
     let query = decodeURIComponent(getParameterByName('highlight')).replace(' ','+');
-    let fuzzyness = getParameterByName('fuzzyness');
-    
+    fuzzyness = getParameterByName('fuzzyness');
+    if(fuzzyness==null)
+	fuzzyness = 0;
+
     if(!hasFullscreen(document.documentElement))
 	document.getElementById("fullbut").style.display = 'none';
 
@@ -799,7 +802,7 @@ function DoFuzzyMatching(x,iterator,maxHitsPerIteration)
 
 function doCompleteNewSearch()
 {
-    let newurl = "/books/"+scanId+"/view.html?highlight="+document.getElementById("srchbox").value+"&fuzzyness="+getParameterByName('fuzzyness');
+    let newurl = "/books/"+scanId+"/view.html?highlight="+document.getElementById("srchbox").value+"&fuzzyness="+fuzzyness;
     window.location = newurl;
 }
 
