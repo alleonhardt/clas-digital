@@ -51,6 +51,8 @@ public:
     */
     std::unordered_map<std::string, CBook*>& getMapOfBooks();
 
+    void writeListofBooksWithBSB();
+
     /**
     * @brief load all books.
     * @return boolean for successful of not

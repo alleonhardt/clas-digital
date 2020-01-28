@@ -26,6 +26,25 @@ std::unordered_map<std::string, CBook*>& CBookManager::getMapOfBooks() {
     return m_mapBooks;
 }
 
+void CBookManager::writeListofBooksWithBSB() {    
+    
+    std::string sBuffer;
+    size_t counter=0;
+    for(auto it : m_mapBooks)
+    {
+        if(it.second->getMetadata().getMetadata("archiveLocation", "data") != "" && it.second->getOcr() == false)
+        {
+            sBuffer+=it.second->getAuthor() + ", " + it.second->getMetadata().getTitle() + ", " + std::to_string(it.second->getDate()) + ". Link: " + it.second->getMetadata().getMetadata("archiveLocation", "data") + "\n";
+            counter++;
+        }
+    }
+
+    std::string str = "Number of books with bsb-link: " + std::to_string(counter) + "\n\n";
+    sBuffer.insert(0, str);
+    std::ofstream write("inbsb.txt");
+    write << sBuffer;
+    write.close();
+}
 
 /**
 * @brief load all books.
@@ -33,6 +52,8 @@ std::unordered_map<std::string, CBook*>& CBookManager::getMapOfBooks() {
 bool CBookManager::initialize()
 {
     std::cout << "Starting initualizeing..." << std::endl;
+
+    
 
     //Load directory of all books 
     DIR *dir_allItems;
@@ -60,6 +81,7 @@ bool CBookManager::initialize()
     std::cout << "Map title:   " << m_mapWordsTitle.size() << "\n";
     std::cout << "Map authors: " << m_mapWordsAuthors.size() << "\n";
 
+    writeListofBooksWithBSB();
     return true;
 }
 
