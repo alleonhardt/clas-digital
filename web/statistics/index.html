@@ -44,7 +44,11 @@ html {
 </style>
 <link href="/topnav.css" rel="stylesheet" type="text/css">
 <script>
-window.addEventListener("load",function(){initialise("homelink");},false);
+function receive_stats()
+{
+
+}
+window.addEventListener("load",function(){initialise("homelink");receive_stats();},false);
 </script>
   </head>
 <body>
@@ -67,5 +71,10 @@ window.addEventListener("load",function(){initialise("homelink");},false);
         </div>
     </div>
 	<h1>Statistics page - work in progress</h1>
+	<p id='statisticsinfo'></p>
+	<h2>Book index</h2>
+	<hr>
+	<div id='bookindex'>
+	</div>
 </body>
 </html>
