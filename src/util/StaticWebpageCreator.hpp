@@ -20,7 +20,7 @@ class StaticWebpageCreator
 
 		bool createWebpage()
 		{
-			std::string webpath = "/books/"+m_bookID;
+			std::string webpath = "/books/"+m_bookID+"/view";
 			std::error_code ec;
 			if(std::filesystem::exists(m_path+"/readerInfo.json"))
 			{
