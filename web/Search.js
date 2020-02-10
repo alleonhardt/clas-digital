@@ -278,8 +278,6 @@ function sendToPage(name)
 	//Create the json file with the advanced search options
 	if(document.getElementById("fuzzyness").value=="1")
 	    requ += "&fuzzyness=1";
-	if(document.getElementById("scope").value != "all")
-	    requ += "&scope="+document.getElementById("scope").value;
 	if(document.getElementById("author").value != "")
 		requ += "&author="+document.getElementById("author").value;
 	if(document.getElementById("publicatedAfter").value != 1700)
@@ -365,8 +363,6 @@ function getParameterByName(name, url) {
 
 function ShowLinks()
 {
-    if(getParameterByName('scope') != null)     
-        document.getElementById("scope").value = getParameterByName("scope");
 	if(getParameterByName('fuzzyness')!=null)   
         document.getElementById("fuzzyness").value = 1;
 	if(getParameterByName('author')!=null) 
