@@ -1,6 +1,7 @@
 #include "books/CBookManager.hpp"
 #include "json.hpp"
 #include <filesystem>
+#include <cxx_cmd_tools/cmd_color.hpp>
 
 class StaticWebpageCreator
 {
@@ -22,6 +23,24 @@ class StaticWebpageCreator
 		{
 			std::string webpath = "/books/"+m_bookID+"/pages";
 			std::error_code ec;
+			//MOVE all jps from web/books/BOOKID/*.jpg to web/books/BOOKID/pages/*.jpg
+			/*
+			for(auto &it : std::filesystem::directory_iterator(m_path))
+			{
+				auto pos = it.path().string().find(".jpg");
+
+				if(pos!=std::string::npos && pos == it.path().string().length()-4)
+				{
+					std::filesystem::rename(it.path(),m_path+"/pages/"+it.path().filename().string(),ec);
+					if(ec)
+					{
+						std::cout<<cmd::colors::fg_red<<"Could not rename "<<it.path()<<cmd::colors::cli_reset<<std::endl;
+						break;
+					}
+				}
+			}*/
+
+			//Remove the old folder structure
 			//std::filesystem::remove_all(m_path+"/view",ec);
 			//std::filesystem::remove_all(m_path+"/meta",ec);
 			if(std::filesystem::exists(m_path+"/readerInfo.json"))

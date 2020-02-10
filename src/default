@@ -84,7 +84,7 @@ server {
 
 	include /etc/clas-digital-devel/bin/forbiddenfiles;
 	
-	location ~ /books/[a-zA-Z0-9]+/(?!info.json). {
+	location ~ /books/[a-zA-Z0-9]+/(view|pages|intern)/.* {
 	    auth_request /authenticate;
 	}
 
