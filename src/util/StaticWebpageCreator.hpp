@@ -20,8 +20,10 @@ class StaticWebpageCreator
 
 		bool createWebpage()
 		{
-			std::string webpath = "/books/"+m_bookID+"/view";
+			std::string webpath = "/books/"+m_bookID+"/pages";
 			std::error_code ec;
+			//std::filesystem::remove_all(m_path+"/view",ec);
+			//std::filesystem::remove_all(m_path+"/meta",ec);
 			if(std::filesystem::exists(m_path+"/readerInfo.json"))
 			{
 				//Full blown webpage
@@ -39,7 +41,7 @@ class StaticWebpageCreator
 				content+="</span></center><div class='linknav'><div class='lastbutcont'><img class='lastbut' onclick='SelectLastHit();' src='/next.svg'></img></div><div id=\"fullsearchhitlist\"></div><div class='nextbutcont'><img class='nextbut' onclick='SelectNextHit();' src='/last.svg'></img></div></div></nav></body></html>";
 				
 				std::string pathcopy = m_path;
-				pathcopy+="/view";
+				pathcopy+="/pages";
 				std::filesystem::create_directory(pathcopy,ec);
 				pathcopy+="/index.html";
 
@@ -80,10 +82,7 @@ class StaticWebpageCreator
 					content+="</p><hr>";
 				}
 				content+="</body></html>";
-				
 				std::string pathcopy = m_path;
-				pathcopy+="/meta";
-				std::filesystem::create_directory(pathcopy,ec);
 				pathcopy+="/index.html";
 
 				std::ofstream ofs(pathcopy.c_str(), std::ios::out);
