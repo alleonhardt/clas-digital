@@ -471,6 +471,7 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
     }
 
     bool doOverwrite = std::filesystem::exists(writePath);
+    doOverwrite |= std::filesystem::exists(directory+"/pages/"+fileName);
     if((doOverwrite||!std::filesystem::exists(directory))&&!forcedWrite)
     {
 	resp.status=403;
@@ -554,6 +555,9 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 	    resp.set_content(error.c_str(),"text/plain");
 	    return;
 	}
+	writePath = directory;
+	writePath += "/pages/";
+	writePath += fileName;
     }
     else if((fileEnd!="txt")&&(fileEnd!="TXT"))
     {
