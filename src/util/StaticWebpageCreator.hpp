@@ -1,7 +1,6 @@
 #include "books/CBookManager.hpp"
 #include "json.hpp"
 #include <filesystem>
-#include <cxx_cmd_tools/cmd_color.hpp>
 
 class StaticWebpageCreator
 {
