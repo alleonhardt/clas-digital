@@ -210,8 +210,46 @@ server {
         ssl_certificate     /etc/clas-digital/bin/cert.pem;
         ssl_certificate_key /etc/clas-digital/bin/key.pem;
 	server_name www.clas-digital.uni-frankfurt.de;
+	
+	autoindex on;
+	autoindex_exact_size off;
+	autoindex_format html;
+	autoindex_localtime on;
 
 	include /etc/clas-digital/bin/forbiddenfiles;
+	location = /GetBooks.html {
+		set $new_url https://$host/books/$arg_scanId/pages;
+		
+		if ($arg_query) {
+			set $new_url $new_url?highlight=$arg_query;
+		}
+
+		if ($arg_fuzzyness) {
+			set $new_url $new_url&fuzzyness=$arg_fuzzyness;
+		}
+		
+		if ($arg_scanId) {
+			return 301 $new_url;
+		}
+		return 404;
+	}
+	
+	location = /ShowMetadata.html {
+		if ($arg_scanId) {
+			return 301 https://$host:$server_port/books/$arg_scanId;
+		}
+		return 404;
+	}
+
+	location ~ /books/[a-zA-Z0-9]+/(view|pages|intern)/.* {
+	    auth_request /authenticate;
+	}
+
+	location /upload {
+		client_max_body_size 10M;
+        	proxy_pass         http://localhost:9000;
+	}
+
 
     	location /api {
         	proxy_pass         http://localhost:9000;
@@ -241,18 +279,12 @@ server {
         	proxy_pass         http://localhost:9000;
 	}
 	
-	location /books/ {
-	    autoindex on;
-	    autoindex_exact_size off;
-	    autoindex_format html;
-	    autoindex_localtime on;
-	    try_files $uri $uri/ =404;
-	}
 	location /information/ {
 	    disable_symlinks off;
 	    index index.html index.de.html;
 	    try_files $uri $uri/ =404;
 	}
+
 
 	location /search {
         	proxy_pass         http://localhost:9000;
@@ -270,43 +302,14 @@ location /getsugg {
 
 	location /authenticate {
 		internal;
-        	proxy_pass         http://localhost:9000;
+        	proxy_pass         http://localhost:9000/authenticate$request_uri;
 	}
 	
-#	location = / {
-#        	proxy_pass         http://localhost:9000/search;
-#		proxy_redirect 	http://localhost:9000/ http://localhost:9000/search;
-#		proxy_cache_key $uri$is_args$args;
-#		proxy_buffering        on;
-#            	proxy_cache            STATIC;
-#            	proxy_cache_valid      200  1d;
-#            	proxy_cache_use_stale  error timeout invalid_header updating
-#                                   http_500 http_502 http_503 http_504;
-#	}
-
 	location / {
 		# First attempt to serve request as file, then
 		# as directory, then fall back to displaying a 404.
 		try_files $uri $uri/ =404;
 	}
-	
-	# pass PHP scripts to FastCGI server
-	#
-	#location ~ \.php$ {
-	#	include snippets/fastcgi-php.conf;
-	#
-	#	# With php-fpm (or other unix sockets):
-	#	fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;
-	#	# With php-cgi (or other tcp sockets):
-	#	fastcgi_pass 127.0.0.1:9000;
-	#}
-
-	# deny access to .htaccess files, if Apache's document root
-	# concurs with nginx's one
-	#
-	#location ~ /\.ht {
-	#	deny all;
-	#}
 }
 
 
