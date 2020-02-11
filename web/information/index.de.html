@@ -16,10 +16,13 @@
 
     <script src='../user.js'></script>
 <style>
+
 body {
-    background: linear-gradient(rgba(255,255,255,.1), rgba(255,255,255,.1)), url("/clasdigital.png");;
+    /* background: linear-gradient(rgba(255,255,255,.1), rgba(255,255,255,.1)), url("/clasdigital.png"); 
     background-repeat: no-repeat;
     background-position: right;
+    */
+    
 }
 
 body {
@@ -30,16 +33,25 @@ html {
     margin:0;
 }
 
+div.sideimage {
+    float: right;
+}
+div.sideimage img{
+    width: 20em;
+}
+div.sideimage img#clasdog {
+    transform: scaleX(-1);
+}
+
 .GeneralPageLayout {
     margin-top: 4rem;
     width: 100%;
+    margin-right: 2rem;
+    padding-left: 2rem;
 }
 
 .GeneralPageLayout p {
-    width: 40%;
-    margin-left: 7%;
-    margin-right: 50%;
-    margin-top: 2rem;
+    max-width: 60em;
 }
 
 .GeneralPageLayout p abbr {
@@ -57,7 +69,6 @@ window.addEventListener("load",function(){initialise("homelink");},false);
     <nav id='tpnav' class="topnav">
         <a id='homelink' class="active" href='/information/'>Information</a>
         <a id='searchlink' href='/search'>Search</a>
-	<a id='statisticslink' href='/statistics/'>Statistics</a>
         <a id='administrationlink' class='classifiedContent' href='/private/admin/Administration.html' data-acc=4>Administration</a>
         <a id='uploadbooklink' class='classifiedContent' href='/private/write/UploadBook.html' data-acc=2>Upload Books</a>
         <div class='topnav-right-in' id='loggedintopnav'>
@@ -74,6 +85,8 @@ window.addEventListener("load",function(){initialise("homelink");},false);
     </nav>
 
  <div class="GeneralPageLayout">
+    <div class="sideimage" > <img id="clasdog" src="/clasdigital.png"/> </div>
+    <h1>Informationen zu CLAS digital</h1>
      <p>
    Die <span lang="en">Cultural and Literary Animal Studies</span> (<abbr lang="en" title="Cultural and Literary Animal Studies">CLAS</abbr>) widmen sich unter einer kultur-, literatur- und wissensgeschichtlichen Perspektive dem Fragefeld der Tiere.
 <abbr lang="en" title="Cultural and Literary Animal Studies">CLAS</abbr> digital bietet eine Forschungsbibliographie zu den <span lang="en">Cultural and Literary Animal Studies</span> sowie Volltexte aus der Geschichte des Tierwissens, mit Konzentration auf die Naturkunde/Zoologie zwischen 1750 und 1850.
