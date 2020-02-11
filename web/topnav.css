@@ -8,12 +8,14 @@ body {
 	left:0;
 	width: 100%;
 	position: sticky;
+	display: flex;
 	padding: 0;
 	margin: 0;
 	background-color: #C8C6C5;
 	color: black;
-	overflow: hidden;
+	overflow: visible;
 	border-bottom: 1px solid black;
+	z-index: 2;
 }
 
 .classifiedContent {
@@ -46,12 +48,14 @@ body {
 
 /* Right-aligned section inside the top navigation */
 .topnav-right-in {
-	float: right;
+    float: right;
     display: none;
+    margin-left: auto;
 }
 .topnav-right-out {
-	float: right;
+    float: right;
     display: none;
+    margin-left: auto;
 }
 
 .topnav-right-in button{
@@ -66,4 +70,37 @@ body {
 
 .topnav-right-out form {
 	padding: 0.3em 0.8em;
+}
+
+.topnav .dropdown {
+    position: relative;
+    left: 0;
+    display: inline-block;
+}
+
+.topnav .dropdown .dropdown-content {
+    position: absolute;
+    left: 0;
+    top: 100%;
+    display: none;
+    background-color: #C8C6C5;
+}
+
+.topnav .dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.topnav .dropdown:hover {
+    background-color: #48A9DA;
+}
+
+.topnav .dropdown .dropdown-banner {
+    padding-left: 1.45em;
+    padding-right: 1.45em;
+}
+.topnav .dropdown .dropdown-content a {
+    display: block;
+    width: 100%;
+    cursor: pointer;
+    border-top: 1px solid black;
 }
