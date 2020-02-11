@@ -83,7 +83,30 @@ server {
 	autoindex_localtime on;
 
 	include /etc/clas-digital-devel/bin/forbiddenfiles;
+	location = /GetBooks.html {
+		set $new_url https://$host:$server_port/books/$arg_scanId/pages;
+		
+		if ($arg_query) {
+			set $new_url $new_url?highlight=$arg_query;
+		}
+
+		if ($arg_fuzzyness) {
+			set $new_url $new_url&fuzzyness=$arg_fuzzyness;
+		}
+		
+		if ($arg_scanId) {
+			return 301 $new_url;
+		}
+		return 404;
+	}
 	
+	location = /ShowMetadata.html {
+		if ($arg_scanId) {
+			return 301 https://$host:$server_port/books/$arg_scanId;
+		}
+		return 404;
+	}
+
 	location ~ /books/[a-zA-Z0-9]+/(view|pages|intern)/.* {
 	    auth_request /authenticate;
 	}

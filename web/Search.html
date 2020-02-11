@@ -25,11 +25,11 @@
 
 
 
-<body style='width: 100%; height: 100%;'>
+<body>
     <nav id='tpnav' class="topnav">
         <a id='homelink' href='/information/'>Information</a>
-        <a id='searchlink' class="active" href='/search'>Search</a>
-	<div class='dropdown'>
+        <a id='searchlink' class='active' href='/search'>Search</a>
+	<!--<div class='dropdown'>
 		<a id='statisticslink' class='dropdown-banner' href='/catalogue'>Catalogue  </a>
 		<div class='dropdown-content'>
 			<a href="/catalogue/books">Books</a>
@@ -37,7 +37,7 @@
 			<a href="/catalogue/collections">Collections</a>
 			<a href="/catalogue/years">Years</a>
 		</div>
-	</div>
+	</div>-->
         <a id='administrationlink' class='classifiedContent' href='/private/admin/Administration.html' data-acc=4>Administration</a>
         <a id='uploadbooklink' class='classifiedContent' href='/private/write/UploadBook.html' data-acc=2>Upload Books</a>
 
@@ -65,7 +65,7 @@
             <input id="SpecialSID" class="srchbar" onblur='sugg_disapear("corpus");return true;' type="text" placeholder="Search here..." required>
                 <button id="srchButton" class='srchbtn' type="button" onclick="sendToPage('SpecialSID');return true;"><i class="fa fa-search"></i></button>
             </input>
-            <a style="margin-left:2rem;" href="Usermanuel_Search.pdf" target="_blank">help</a>
+            <a style="margin-left:2rem;" href="/information/help">help</a>
 
             <div id="suggs_corpus" class="sugg" align="left"></div>
             <div id="suggs_author" class="sugg" style="top:5.7rem;left:26%;" align="left"></div>

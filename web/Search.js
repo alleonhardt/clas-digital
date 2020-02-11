@@ -348,7 +348,7 @@ function CreateBibliography()
 }
 
 
-window.addEventListener("load",function(){initialise('searchlink');ExecuteInitialise();ShowLinks();},false);
+window.addEventListener("load",function(){ExecuteInitialise();ShowLinks();},false);
 
 function getParameterByName(name, url) {
 //COPYRIGHT TO https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
