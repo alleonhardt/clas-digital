@@ -818,6 +818,8 @@ int main(int argc, char **argv)
 	auto last_mod = std::filesystem::last_write_time("bin/zotero.json");
 	int managedBooks = 0;
 
+	//StaticCatalogueCreator ct;
+	//ct.CreateCatalogue();
 	std::ofstream of("bin/forbiddenfiles",std::ios::out);
 	if(of.is_open())
 	{
@@ -851,9 +853,10 @@ int main(int argc, char **argv)
 		std::string dir = "web/books/";
 		dir+=it.first;
 		
+
 		StaticWebpageCreator webpage(it.second);
 		webpage.createWebpage();
-
+		
 		auto last_mod_file = std::filesystem::last_write_time(dir,ec);
 		if(!ec && last_mod_file >= last_mod)
 		    continue;

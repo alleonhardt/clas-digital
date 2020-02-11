@@ -54,3 +54,5 @@ function initialise(linkforactive) {
 		}
 	}
 }
+
+window.addEventListener("load",function(){initialise('searchlink')},false);
