@@ -1,0 +1,94 @@
+<html>
+<head>
+    <title>Using the clas-digital search</title>
+    
+</head>
+
+<body>
+    <h2>Using the Search-Function</h2>
+    <p>A normal search searches in all text body's (ocrs), titles and author names. Thus the search results
+may include books, that aren’t scanned yet, or there will be no preview, as the searched word only
+matches the name of the author of a book. All search results are sorted by relevance 1 . The search
+presents the first ten results showing [Author, title], which is a link to the scan and ocr of the book
+(if exists), the bibliography, which links to further details, and a preview presenting a first peep into
+the text and where the searched word occurs.</p>
+
+    <h3>Using Advanced Options</h3>
+    <p>Using the advanced options allows the user to achieve more accurate results, by choosing a specific
+author, date of publication are selecting fuzzy search. I will give a short introduction to the different
+use cases. The advanced options will stay selected until the users goes back to the home page
+(clicking on “Search”). The search options only apply after redoing the search (clicking the search-
+symbol).</p>
+
+    <ul>
+    <li>By author:
+        <ul>
+        <li>Enter an author to only show books by this author.</li>
+        </ul>
+    </li>
+    <li>Collections
+        <ul>
+        <li>The metadata and all books rely on the zotero database, which is sorted in different
+collections.</li>
+        <li>The default use case is to search in all collections.</li>
+        <li>With the drop-down-menu the user can change this option a search only in “Forschung
+Clas” or “Geschichte des Tierwissens” </li>
+        </ul>
+    </li>
+    <li>Date of publication
+        <ul>
+        <li>Default case is searching books between 1700 and 2049. The URL mirroring the selected
+date, only shows, when one of the values (publicized after or publicized before) differs from
+the default. </li>
+        <li>The user can select with the drop-down to choose from 1700s, 1800s, etc. but also enter a
+custom date (f.e. 1730 – 1750)</li>
+        </ul>
+    </li>
+    <li>Show everything
+        <ul>
+        <li>The default user case is to show all results. Which means, books with and books without
+ocr.
+        <li>The user then has the option to select for example only books with text. This might be useful,
+if the user plans to do additional research with the text on our website.</li>
+        </ul>
+    </li>j
+    <li>Exact/ Fuzzy Matching
+        <ul>
+        <li>The standard search is doing a full search, which means it does not match “Jagdhund” when
+searching for “Hund” or “Philofophie” (due to bad text detection) when searching for
+“Philosophie”. It does however match all other cases and plural/ singular.</li>
+        <li>Selecting Fuzzy-Search will find all words containing the searched word and words with a
+certain difference to the searched word (using the levenhstein distance).</li>
+        </ul>
+    </li>
+    </ul>
+
+    <p>Note, that the typeahead suggestions ignore the selected advanced options. You might become a
+word as a suggestion, but the search returns 0 results, as the advanced options filter all matches.</p>
+
+    <h3>Using view Options</h3>
+    <p>With the view options the users can change the way the results are viewed, by selecting the amount
+of results per page and selecting the way the results are sorted.</p>
+
+    <ul>
+    <li>Results per page
+        <ul>
+        <li>Using the drop-down menu the user can decide between showing 10, 20, 50 or all results.</li>
+        <li>Using the URL the user can change it to show results starting from a certain result and
+custom set the amount of results per page (f.e. start=30 limit=40)</li>
+        </ul>
+    </li>
+    <li>Sorting
+        <ul>
+        <li>The user can select between sorting by relevance (default), alphabetically (name of author)
+or chronologically.</li>
+        </ul>
+    </li>
+    </ul>
+
+    <h3>Searching for several words</h3>
+    <p>By entering f.e. “Nachtigall+Gesang” or “Nachtigall Gesang” it will be searched for both words and
+only results are presented where the word occurs on the same page.</p>
+</body>
+</html>
+    
