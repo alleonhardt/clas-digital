@@ -58,7 +58,7 @@ class StaticWebpageCreator
 						std::filesystem::rename(it.path(),m_path+"/pages/"+it.path().filename().string(),ec);
 						if(ec)
 						{
-							std::cout<<cmd::colors::fg_red<<"Could not rename "<<it.path()<<cmd::colors::cli_reset<<std::endl;
+							std::cout<<"Could not rename "<<it.path()<<std::endl;
 							break;
 						}
 					}
