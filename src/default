@@ -217,28 +217,22 @@ server {
 	autoindex_localtime on;
 
 	include /etc/clas-digital/bin/forbiddenfiles;
-	location = /GetBooks.html {
-		set $new_url https://$host/books/$arg_scanId/pages;
-		
-		if ($arg_query) {
-			set $new_url $new_url?highlight=$arg_query;
-		}
-
-		if ($arg_fuzzyness) {
-			set $new_url $new_url&fuzzyness=$arg_fuzzyness;
-		}
-		
-		if ($arg_scanId) {
-			return 301 $new_url;
-		}
-		return 404;
+	if ($host = ".*:1409") {
+		return 301 https://www.clas-digital.uni-frankfurt.de$request_uri;
 	}
-	
-	location = /ShowMetadata.html {
-		if ($arg_scanId) {
-			return 301 https://$host:$server_port/books/$arg_scanId;
-		}
-		return 404;
+
+	if ($arg_query) {
+		set $query_args ?highlight=$arg_query;
+	}
+	if ($arg_fuzzyness) {
+		set $query_args $query_args&fuzzyness=$arg_fuzzyness;
+	}
+	if ($uri = "/GetBooks.html") {
+		return 301 https://$host/books/$arg_scanId/pages$query_args;
+	}
+
+	if ($uri = "/ShowMetadata.html") {
+		return 301 https://$host/books/$arg_scanId;
 	}
 
 	location ~ /books/[a-zA-Z0-9]+/(view|pages|intern)/.* {

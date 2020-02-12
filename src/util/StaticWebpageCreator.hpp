@@ -35,7 +35,9 @@ class StaticWebpageCreator
 				content+="</title><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\">";
 				content+="<link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css\" integrity=\"sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB\" crossorigin=\"anonymous\">";
 				content+="<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css\">";
-				content+="<link rel=\"canonical\" href=\"https://www.clas-digital.uni-frankfurt.de/GetBooks.html\"><link rel=\"shortcut icon\" href=\"static/fav/hand-top-right-16+32+48.ico\"/>";
+				content+="<link rel=\"canonical\" href=\"https://www.clas-digital.uni-frankfurt.de/books/";
+				content+=m_book->getKey();
+				content+="/pages\"><link rel=\"shortcut icon\" href=\"static/fav/hand-top-right-16+32+48.ico\"/>";
 				content+="<link rel=\"stylesheet\" href=\"/GetBooks.css\">";
 				content+="<script>let gGlobalBookId=\"";
 				content+=m_book->getKey();
