@@ -802,11 +802,14 @@ function DoFuzzyMatching(x,iterator,maxHitsPerIteration)
 
 function doCompleteNewSearch()
 {
+	/* ideally use the existing window.location; see:
+	   https://github.com/ShadowItaly/clas-digital/issues/172
+	*/
 	let newurl='';
 	if(fuzzyness>0)
-    		newurl = "/books/"+scanId+"/view?highlight="+document.getElementById("srchbox").value+"&fuzzyness="+fuzzyness;
+    		newurl = "/books/"+scanId+"/pages?highlight="+document.getElementById("srchbox").value+"&fuzzyness="+fuzzyness;
 	else
-    		newurl = "/books/"+scanId+"/view?highlight="+document.getElementById("srchbox").value;
+    		newurl = "/books/"+scanId+"/pages?highlight="+document.getElementById("srchbox").value;
     window.location = newurl;
 }
 
