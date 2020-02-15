@@ -217,6 +217,9 @@ server {
 	autoindex_localtime on;
 
 	include /etc/clas-digital/bin/forbiddenfiles;
+
+	# https://github.com/ShadowItaly/clas-digital/issues/168
+	port_in_redirect off;
 	if ($host = ".*:1409") {
 		return 301 https://www.clas-digital.uni-frankfurt.de$request_uri;
 	}
