@@ -150,7 +150,7 @@ body {
 }
 
 .tmphit {
-    background-color: violet;
+    background-color: yellow;
 }
 
 .pagecontainer {
@@ -223,7 +223,7 @@ div .fuzzysugslink {
 
 .fuzzysugslink mark {
     color: black;
-    background: violet;
+    background-color: yellow;
     margin: 0;
     padding: 0;
 }
