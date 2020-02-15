@@ -374,8 +374,11 @@ function ShowLinks()
 	if(getParameterByName('pillars')!=null)
         document.getElementById("collections").value=getParameterByName("pillars");
 	
-	
-	document.getElementById("SpecialSID").value = getParameterByName('q');
+	let q = getParameterByName('q');
+	document.getElementById("SpecialSID").value = q;
+	document.title = q + " ‒ CLAS digital book search";
+	let description = "Search results for \"" + q + "\" from the CLAS digital book search collection of over 100,000 pages.";
+	document.querySelector('meta[name="description"]').setAttribute("content", description);
 	console.log(ServerDataObj);
 	let obj = document.getElementById("SearchHitList");
 	obj.drawablejson = ServerDataObj.search;
