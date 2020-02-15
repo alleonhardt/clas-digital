@@ -844,10 +844,10 @@ int main(int argc, char **argv)
 		    std::cout<<"FOUND PUBLIC BOOK: "<<it.first<<std::endl;
 		    std::string loc = "location ~ /books/";
 		    loc+=it.first;
-		    loc+="/(?!backups).* {\n";
+		    loc+="/(?!backups).* {\n\ttry_files $uri $uri/ =404;\n}\n";
+		    // single write to reduce likelyhood of breaking webserver
+		    // https://github.com/ShadowItaly/clas-digital/issues/175
 		    of<<loc;
-		    of<<"try_files $uri $uri/ =404;\n";
-		    of<<"}\n";
 		}
 		std::error_code ec;
 		std::string dir = "web/books/";
