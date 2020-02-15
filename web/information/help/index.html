@@ -1,94 +1,77 @@
 <html>
 <head>
-    <title>Using the clas-digital search</title>
+    <title>Using the clas-digital book search</title>
     
 </head>
 
 <body>
-    <h2>Using the Search-Function</h2>
-    <p>A normal search searches in all text body's (ocrs), titles and author names. Thus the search results
-may include books, that aren’t scanned yet, or there will be no preview, as the searched word only
-matches the name of the author of a book. All search results are sorted by relevance 1 . The search
-presents the first ten results showing [Author, title], which is a link to the scan and ocr of the book
-(if exists), the bibliography, which links to further details, and a preview presenting a first peep into
-the text and where the searched word occurs.</p>
+    <h2>Searching</h2>
+    <p>Searching is possible at <a href="https://www.clas-digital.uni-frankfurt.de/search">www.clas-digital.uni-frankfurt.de/search</a>.  Basic search results use a combination of text bodies (<abbr title="Optical character recognition">OCRs</abbr>, if available), titles and author names.
+      All search results are sorted by relevance, most relevant first.
+      Search results may include books which have not yet been scanned, where a preview is not possible, and only the title or author match.
+      By default pages of ten results at a time, with:
+      <ul>
+      <li>Author + Title, with a link to the scanned pages and <abbr title="Optical character recognition">OCR</abbr> of the book (if available)</li>
+      <li>Bibliography, with links to further details about the book,</li>
+      <li>A preview snippet presenting a first look into the text and in which context the searched words occur.</li></ul>
+    </p>
 
-    <h3>Using Advanced Options</h3>
-    <p>Using the advanced options allows the user to achieve more accurate results, by choosing a specific
-author, date of publication are selecting fuzzy search. I will give a short introduction to the different
-use cases. The advanced options will stay selected until the users goes back to the home page
-(clicking on “Search”). The search options only apply after redoing the search (clicking the search-
-symbol).</p>
+    <h3>Advanced search options</h3>
+    <p>Advanced search allows restricting to a specific author, date of publication, and fuzzy search.  Advanced options can be reset by performing a brand new search or by clicking on “Search”.  Advanced search options are:</p>
 
     <ul>
-    <li>By author:
+    <li>Author
         <ul>
-        <li>Enter an author to only show books by this author.</li>
+          <li>Only show books by an author(s) with a particular name.</li>
         </ul>
     </li>
     <li>Collections
         <ul>
-        <li>The metadata and all books rely on the zotero database, which is sorted in different
-collections.</li>
-        <li>The default use case is to search in all collections.</li>
-        <li>With the drop-down-menu the user can change this option a search only in “Forschung
-Clas” or “Geschichte des Tierwissens” </li>
+        <li>Collections are curated sets of books by research subject area.</li>
+        <li>By default all books in collections are searched.</li>
+        <li>The drop-down-menu allows selecting a single collection; for example <span lang="de">“Forschung
+	    Clas”</span> or <span lang="de">“Geschichte des Tierwissens”</span></li>
         </ul>
     </li>
-    <li>Date of publication
+    <li>Year of publication
         <ul>
-        <li>Default case is searching books between 1700 and 2049. The URL mirroring the selected
-date, only shows, when one of the values (publicized after or publicized before) differs from
-the default. </li>
-        <li>The user can select with the drop-down to choose from 1700s, 1800s, etc. but also enter a
-custom date (f.e. 1730 – 1750)</li>
+          <li>By default all books are searched (ie. between <time datetime="1700/2049">1700 and 2049</time>).</li>
+        <li>Individual links to 1700s, 1800s, are selectable with the drop-down, or an exact range can be entered manually, eg. 1730–1750.</li>
         </ul>
     </li>
     <li>Show everything
         <ul>
-        <li>The default user case is to show all results. Which means, books with and books without
-ocr.
-        <li>The user then has the option to select for example only books with text. This might be useful,
-if the user plans to do additional research with the text on our website.</li>
+        <li>By default all results are shown; including books with, and books without scanned page images or <abbr title="Optical character recognition">OCR</abbr> texts.
+        <li>It is possible to restrict results to other scanned books with full-text search; to allow additional research within the full texts available via the CLAS-digital book search.</li>
         </ul>
-    </li>j
-    <li>Exact/ Fuzzy Matching
+    </li>
+    <li>Exact/Fuzzy Matching
         <ul>
-        <li>The standard search is doing a full search, which means it does not match “Jagdhund” when
-searching for “Hund” or “Philofophie” (due to bad text detection) when searching for
-“Philosophie”. It does however match all other cases and plural/ singular.</li>
-        <li>Selecting Fuzzy-Search will find all words containing the searched word and words with a
-certain difference to the searched word (using the levenhstein distance).</li>
+          <li><strong>Basic search</strong> is restricted to exact partial matches: a search for <span lang="de">“Hund”</span> will match <span lang="de">“Jagdhund”</span>, but <span lang="de">“Philofophie”</span> will not match <span lang="de">“Philosophie”</span>.   Basic search will attempt to match singular/plural and case variations in German-language texts.</li>
+          <li><strong>Fuzzy search</strong> will show partial word matches or similiar spelling (using <a href="https://en.wikipedia.org/wiki/Levenshtein_distance">Levenhstein distance</a>).  These fuzzy search results may take longer to display.</li>
         </ul>
     </li>
     </ul>
 
-    <p>Note, that the typeahead suggestions ignore the selected advanced options. You might become a
-word as a suggestion, but the search returns 0 results, as the advanced options filter all matches.</p>
+    <p>Typeahead suggestions ignore any selected advanced options. This can result in a typehead suggestion showing, but the search itself returnng zero results.  Reset the advanced search options to show more results.</p>
 
-    <h3>Using view Options</h3>
-    <p>With the view options the users can change the way the results are viewed, by selecting the amount
-of results per page and selecting the way the results are sorted.</p>
+    <h3>More than 10 results per page</h3>
+    <p>By default 10 search results are shown at a time; this can be increased by selecting a larger number of results per page.</p>
 
     <ul>
     <li>Results per page
-        <ul>
-        <li>Using the drop-down menu the user can decide between showing 10, 20, 50 or all results.</li>
-        <li>Using the URL the user can change it to show results starting from a certain result and
-custom set the amount of results per page (f.e. start=30 limit=40)</li>
-        </ul>
+        <ol type="a">
+        <li>Results of 10, 20, 50 results per page can be selected with the drop-down menu.</li>
+        <li>Manually editing the URL allows any combination of results to be shown; eg. <code><var>start</var>=100</code> and <code><var>limit</var>=42</code> will show 42 results per page, starting from result 100 onwards.</li>
+        </ol>
     </li>
     <li>Sorting
-        <ul>
-        <li>The user can select between sorting by relevance (default), alphabetically (name of author)
-or chronologically.</li>
-        </ul>
+        <p>Choices to order search results by relevance (default), alphabetically using surname of author, or chronologically by year.</p>
     </li>
     </ul>
 
     <h3>Searching for several words</h3>
-    <p>By entering f.e. “Nachtigall+Gesang” or “Nachtigall Gesang” it will be searched for both words and
-only results are presented where the word occurs on the same page.</p>
+    <p>By entering eg. “<code lang="de">Nachtigall+Gesang</code>” or “<code lang="de">Nachtigall Gesang</code>” multiple word or phrases can be searched for at once.  Snippets preview results are only shown where all words occurs on the same page.</p>
 </body>
 </html>
     
