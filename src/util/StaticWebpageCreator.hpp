@@ -37,7 +37,12 @@ class StaticWebpageCreator
 				content+="<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css\">";
 				content+="<link rel=\"canonical\" href=\"https://www.clas-digital.uni-frankfurt.de/books/";
 				content+=m_book->getKey();
-				content+="/pages\"><link rel=\"shortcut icon\" href=\"static/fav/hand-top-right-16+32+48.ico\"/>";
+				content+="/pages\" />\n";
+				content+="<link rel=\"up\" href=\"https://www.clas-digital.uni-frankfurt.de/books/";
+				content+=m_book->getKey();
+				content+="\" />\n";
+				content+="<link rel=\"top\" href=\"https://www.clas-digital.uni-frankfurt.de/\"/>\n";
+				content+="<link rel=\"shortcut icon\" href=\"/static/fav/hand-top-right-16+32+48.ico\"/>";
 				content+="<link rel=\"stylesheet\" href=\"/GetBooks.css\">";
 				content+="<script>let gGlobalBookId=\"";
 				content+=m_book->getKey();
@@ -82,13 +87,13 @@ class StaticWebpageCreator
 				auto isbn = m_info["data"].value("isbn","");
 				
 				//Metadata page only
-				std::string content = "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\"><link rel=\"shortcut icon\" href=\"static/fav/hand-top-right-16+32+48.ico\"/><title>";
+				std::string content = "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\"/>\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\">\n<link rel=\"shortcut icon\" href=\"/static/fav/hand-top-right-16+32+48.ico\"/><title>";
 				content+=m_book->getMetadata().getShow2();
 				content+="</title>\n";
 				content+="<link rel=\"canonical\" href=\"https://www.clas-digital.uni-frankfurt.de/books/";
 				content+=m_book->getKey();
                                 content+="\"/>\n";
-                                content+="</head><body style=\"padding: 5rem;\"><h1>";
+                                content+="</head>\n<body style=\"padding: 5rem;\"><h1>\n";
 				content+=m_info["bib"];
 				content+="</h1><nav id='booklcontentlink'><ul><li><a href=\"";
 				content+=webpath;
