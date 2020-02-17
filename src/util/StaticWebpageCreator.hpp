@@ -97,7 +97,7 @@ class StaticWebpageCreator
 				content+=m_info["bib"];
 				content+="</h1><nav id='booklcontentlink'><ul><li><a href=\"";
 				content+=webpath;
-				content+="\">Pages in this book</a><li><a href=\"/books/\">Other books in catalogue</a></li></ul></nav>\n";
+				content+="\" rel=\"search\">Pages in this book</a><li><a href=\"/books/\">Other books in catalogue</a></li></ul></nav>\n";
 				content+="<p id=\"itemType\"><b>Item Type:</b> ";
 			       	content+=itemType;
 				content+="</p><hr><p id=\"title\"><b>Title:</b> ";
