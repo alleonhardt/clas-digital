@@ -50,6 +50,11 @@ public:
     * @return map of all book
     */
     std::unordered_map<std::string, CBook*>& getMapOfBooks();
+    
+    /**
+    * @return unordered dicionary of authors
+    */
+    MAPWORDS& getMapofAuthors(); 
 
     void writeListofBooksWithBSB();
 

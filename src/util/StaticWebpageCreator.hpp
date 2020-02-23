@@ -153,4 +153,19 @@ class StaticCatalogueCreator
 			ofs<<result;
 			ofs.close();
 		}
+
+        void CreateCatalogueAuthors(CBookManager& manager)
+		{
+			nlohmann::json js;
+            for(auto &it : manager.getMapofAuthors)
+                js["author"].push_back(it.first);
+
+			std::cout<<js.dump()<<std::endl;
+			inja::Environment env;
+			inja::Template temp = env.parse_template("web/catalogue/authors/template.html");
+			std::string result = env.render(temp, js);
+			std::ofstream ofs("web/catalogue/authors/index.html",std::ios::out);
+			ofs<<result;
+			ofs.close();
+		}
 };

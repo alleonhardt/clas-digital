@@ -876,6 +876,7 @@ int main(int argc, char **argv)
     }
    StaticCatalogueCreator ct;
    ct.CreateCatalogue(); 
+    ct.CreateCatalogueAuthors(manager);
 
     int y = system("systemctl restart nginx");
     y+=1;

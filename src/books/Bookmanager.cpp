@@ -26,6 +26,10 @@ std::unordered_map<std::string, CBook*>& CBookManager::getMapOfBooks() {
     return m_mapBooks;
 }
 
+CBookManager::MAPWORDS& CBookManager::getMapofAuthors() {
+    return m_mapWordsAuthors;
+}
+
 void CBookManager::writeListofBooksWithBSB() {    
     
     std::string sBuffer;
