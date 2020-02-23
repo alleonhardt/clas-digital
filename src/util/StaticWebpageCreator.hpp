@@ -155,6 +155,19 @@ class StaticCatalogueCreator
 			ofs.close();
 		}
 
+		void CreateCatalogueBooks(nlohmann::json &zotero)
+		{
+			nlohmann::json js2;
+			js2["books"] = zotero;
+			inja::Environment env;
+			inja::Template temp = env.parse_template("web/catalogue/books/template.html");
+			std::string result = env.render(temp, js2);
+			std::ofstream ofs("web/catalogue/books/index.html",std::ios::out);
+			ofs<<result;
+			ofs.close();
+		}
+
+
         void CreateCatalogueAuthors(CBookManager& manager)
 		{
 			nlohmann::json js;

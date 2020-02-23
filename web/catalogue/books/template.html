@@ -25,6 +25,15 @@
 <body>
 	{% include "../template_navbar.html" %}	
 	<h1>Catalogue all books</h1>
+	<center><p>{{ length(books) }} categories</p></center>
+	
+	<ul>
+	{% for pg in books %}
+	<li> <a href="/books/{{ pg.data.key }}/">{{ pg.bib }}</a></li>
+	{% endfor %}
+	</ul>
+
 </body>
+
 
 

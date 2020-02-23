@@ -822,6 +822,7 @@ int main(int argc, char **argv)
    ct.CreateCatalogue(); 
     ct.CreateCatalogueAuthors(manager);
     ct.CreateCatalogueCollections(zoteroPillars);
+    ct.CreateCatalogueBooks(metaData);
 
 	/*std::ofstream of("bin/forbiddenfiles",std::ios::out);
 	if(of.is_open())
