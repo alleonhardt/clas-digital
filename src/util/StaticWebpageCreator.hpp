@@ -158,8 +158,8 @@ class StaticCatalogueCreator
         void CreateCatalogueAuthors(CBookManager& manager)
 		{
 			nlohmann::json js;
-            for(auto &it : manager.getMapofAuthors)
-                js["author"].push_back(it.first);
+            for(auto &it : manager.getMapofAuthors())
+                js["authors"].push_back(it.first);
 
 			std::cout<<js.dump()<<std::endl;
 			inja::Environment env;
