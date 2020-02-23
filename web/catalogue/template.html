@@ -17,13 +17,16 @@
     <!-- Provide more sutable information show in google search -->
     <title>Cultural and Literary Animal Studies: catalogue</title>
     <meta name="description" lang="en" content="The CLAS Digital searchable book archive catalogue"/>
+    <link href="catalogue.css" rel="stylesheet" type="text/css">
 
     <script src="/user.js"></script>
 </head>
 
 <body>
 	{% include "template_navbar.html" %}
-       	<h1>Catalogue categories</h1> 
+	<center><h1>Catalogue categories</h1></center>
+	<center><p>{{ length(pages) }} categories</p></center>
+	
 	<ul>
 	{% for pg in pages %}
 	<li> <a href="/catalogue/{{ pg }}/">{{ pg }}</a></li>
