@@ -192,6 +192,43 @@ class StaticCatalogueCreator
 			ofs<<result;
 			ofs.close();
 		}
+
+        void CreateCatalogueAuthor(CBookManager& manager)
+        {
+            inja::Environment env;
+            inja::Template temp = env.parse_template("web/catalogue/authors/template_author.html");
+
+            for(auto &it : manager.getMapOfBooks()) {
+                std::string lastName = it.second->getMetadata().getAuthor();
+                std::string firstName = it.second->getMetadata().getMetadata("firstName", "data", "creators", 0);
+                std::string key = lastName + "_" + firstName;
+                std::string val = lastName + ", " + firstName;
+
+                if(lastName.size() == 0)
+                    continue;
+
+                //Create directory
+                std::error_code ec;
+                std::filesystem::create_directory("web/catalogue/authors/"+key+"/", ec);
+
+                nlohmann::json js;
+                //Create json with all books
+                for(auto &jt : manager.getMapofAuthors()[func::returnToLower(lastName)]) {
+                    js["name"] = lastName;
+                    js["books"].push_back({ 
+                        {"id", jt.first},
+                        { "show", manager.getMapOfBooks()[jt.first]->getMetadata().getMetadata("bib")}
+                                          });
+                }
+
+			    std::cout<<js.dump()<<std::endl;
+
+                std::string result = env.render(temp, js);
+                std::ofstream ofs("web/catalogue/authors/"+key+"/index.html",std::ios::out);
+                ofs<<result;
+                ofs.close();
+            }
+        }
     
         void CreateCatalogueCollections(nlohmann::json pillars)
         {

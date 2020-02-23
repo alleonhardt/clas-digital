@@ -821,6 +821,7 @@ int main(int argc, char **argv)
    StaticCatalogueCreator ct;
    ct.CreateCatalogue(); 
     ct.CreateCatalogueAuthors(manager);
+    ct.CreateCatalogueAuthor(manager);
     ct.CreateCatalogueCollections(zoteroPillars);
     ct.CreateCatalogueBooks(metaData);
 
