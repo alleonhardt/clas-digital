@@ -145,6 +145,7 @@ class StaticCatalogueCreator
 					js["pages"].push_back(it.path().filename().string());
 				}
 			}
+			js["world"] = "hallo";
 			std::cout<<js.dump()<<std::endl;
 			inja::Environment env;
 			inja::Template temp = env.parse_template("web/catalogue/template.html");

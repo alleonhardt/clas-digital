@@ -52,9 +52,9 @@
     </nav>
 
 	<ul>
-	## for subpages in pages
-	<li><a href="/catalogue/{{ subpages }}/">{{ subpages }}</a></li>
-	## endfor
+	{% for pg in pages %}
+	<li> <a href="/catalogue/{{ pg }}/">{{ pg }}</a></li>
+	{% endfor %}
 	</ul>
 </body>
 
