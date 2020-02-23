@@ -157,9 +157,15 @@ class StaticCatalogueCreator
 
         void CreateCatalogueAuthors(CBookManager& manager)
 		{
+            std::map<std::string, int> mapAuthors;
+            for(auto &it : manager.getMapOfBooks())
+                mapAuthors[it.second->getMetadata().getAuthor()] = 0;
+
 			nlohmann::json js;
-            for(auto &it : manager.getMapofAuthors())
-                js["authors"].push_back(it.first);
+            for(auto &it : mapAuthors) {
+                if(it.first.length() > 0)
+                    js["authors"].push_back(it.first);
+            }
 
 			std::cout<<js.dump()<<std::endl;
 			inja::Environment env;
