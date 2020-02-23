@@ -146,7 +146,6 @@ class StaticCatalogueCreator
 				}
 			}
 			js["world"] = "hallo";
-			std::cout<<js.dump()<<std::endl;
 			inja::Environment env;
 			inja::Template temp = env.parse_template("web/catalogue/template.html");
 			std::string result = env.render(temp, js);
@@ -184,7 +183,6 @@ class StaticCatalogueCreator
                 js["authors"].push_back(it.second);
             
 
-			std::cout<<js.dump()<<std::endl;
 			inja::Environment env;
 			inja::Template temp = env.parse_template("web/catalogue/authors/template.html");
 			std::string result = env.render(temp, js);
@@ -221,8 +219,6 @@ class StaticCatalogueCreator
                                           });
                 }
 
-			    std::cout<<js.dump()<<std::endl;
-
                 std::string result = env.render(temp, js);
                 std::ofstream ofs("web/catalogue/authors/"+key+"/index.html",std::ios::out);
                 ofs<<result;
@@ -236,7 +232,6 @@ class StaticCatalogueCreator
             for(auto &it : pillars)
                 js["pillars"].push_back(it);
             
-			std::cout<<js.dump()<<std::endl;
 			inja::Environment env;
 			inja::Template temp = env.parse_template("web/catalogue/collections/template.html");
 			std::string result = env.render(temp, js);
@@ -244,4 +239,38 @@ class StaticCatalogueCreator
 			ofs<<result;
 			ofs.close();
 		}
+
+        void CreateCatalogueCollection(CBookManager& manager, nlohmann::json pillars)
+        {
+            inja::Environment env;
+            inja::Template temp = env.parse_template("web/catalogue/collections/template_collection.html");
+            for(auto& it : pillars)
+            {
+                nlohmann::json js;
+                js["pillar"] = it;
+                std::string key = it["key"];
+
+                //Create directory
+                std::error_code ec;
+                std::filesystem::create_directory("web/catalogue/collections/"+key+"/", ec);
+
+                //Create books for this collection
+                for(auto &jt : manager.getMapOfBooks()) {
+                    std::vector<std::string> collections = jt.second->getMetadata().getCollections();
+
+                    if(collections.size() == 0 || func::in(key, collections) == false)
+                        continue;
+
+                    js["books"].push_back({ 
+                        {"id", jt.first},
+                        { "show", jt.second->getMetadata().getMetadata("bib")} });
+                }
+
+                std::cout<<js.dump()<<std::endl;
+                std::string result = env.render(temp, js);
+                std::ofstream ofs("web/catalogue/collections/"+key+"/index.html",std::ios::out);
+                ofs<<result;
+                ofs.close();
+            }
+        }
 };
