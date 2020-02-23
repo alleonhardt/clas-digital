@@ -23,34 +23,7 @@
 </head>
 
 <body>
-	<nav id='tpnav' class="topnav">
-        <a id='homelink' href='/information/'>Information</a>
-        <a id='searchlink' href='/search'>Search</a>
-	<div class='dropdown'>
-		<a id='statisticslink' class='dropdown-banner active' href='/catalogue'>Catalogue - collections</a>
-		<div class='dropdown-content'>
-			<a href="/catalogue/books">Books</a>
-			<a href="/catalogue/authors">Authors</a>
-			<a href="/catalogue/collections">Collections</a>
-			<a href="/catalogue/years">Years</a>
-		</div>
-	</div>
-        <a id='administrationlink' class='classifiedContent' href='/private/admin/Administration.html' data-acc=4>Administration</a>
-        <a id='uploadbooklink' class='classifiedContent' href='/private/write/UploadBook.html' data-acc=2>Upload Books</a>
-
-        <div class='topnav-right-in' id='loggedintopnav'>
-            <span id='LoggedInAs'>Logged in</span>
-            <button id='logoutBut' onclick='DoLogout()'>Logout</button>
-        </div>
-        <div class='topnav-right-out' id='loggedouttopnav'>
-            <form id ="LoginForm" action="/login" method="post">
-                <input id="EmailType" type="email" name="email" placeholder="Email" aria-label="Email" required>
-                <input id="PasswordType" type="password" name="password" placeholder="Password" aria-label="Password" required>
-                <input type="submit" value="Log In"/>
-            </form>
-        </div>
-
-    </nav>
+	{% include "../template_navbar.html" %}	
 	<h1>Catalogue collection</h1>
 </body>
 
