@@ -25,6 +25,11 @@
 <body>
 	{% include "../template_navbar.html" %}	
 	<h1>Catalogue collection</h1>
+    <ul>
+    {% for pillar in pillars %}
+    <li><a href="/catalogue/collections/{{ pillar.key }}/">{{ pillar.name}}<a></li>
+    {% endfor %}
+    </ul>
 </body>
 
 

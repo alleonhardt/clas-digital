@@ -179,4 +179,19 @@ class StaticCatalogueCreator
 			ofs<<result;
 			ofs.close();
 		}
+    
+        void CreateCatalogueCollections(nlohmann::json pillars)
+        {
+			nlohmann::json js;
+            for(auto &it : pillars)
+                js["pillars"].push_back(it);
+            
+			std::cout<<js.dump()<<std::endl;
+			inja::Environment env;
+			inja::Template temp = env.parse_template("web/catalogue/collections/template.html");
+			std::string result = env.render(temp, js);
+			std::ofstream ofs("web/catalogue/collections/index.html",std::ios::out);
+			ofs<<result;
+			ofs.close();
+		}
 };
