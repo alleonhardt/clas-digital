@@ -874,6 +874,8 @@ int main(int argc, char **argv)
 	}
 	of.close();
     }
+   StaticCatalogueCreator ct;
+   ct.CreateCatalogue(); 
 
     int y = system("systemctl restart nginx");
     y+=1;
