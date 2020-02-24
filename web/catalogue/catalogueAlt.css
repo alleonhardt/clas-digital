@@ -1,8 +1,13 @@
 
+body{
+  font-family: -apple-system, BlinkMacSystemFont, Helvetica, Arial, Ubuntu, sans-serif;
+}
+
 ul {
   counter-reset: index;  
   padding: 0;
-  max-width: 300px;
+  padding-left: 4em;
+  padding-right: 4em;
 }
 
 /* List element */
@@ -25,8 +30,8 @@ li::before {
   padding-right: 12px;
   font-variant-numeric: tabular-nums;
   align-self: flex-start;
-  background-image: linear-gradient(to bottom, aquamarine, orangered);
-  -webkit-background-clip: text;
+  background-image: linear-gradient(to bottom, black, black); 
+  -webkit-background-clip: text; 
   -webkit-text-fill-color: transparent;
 }
 
