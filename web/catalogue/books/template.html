@@ -17,6 +17,7 @@
     <!-- Provide more sutable information show in google search -->
     <title>Cultural and Literary Animal Studies: catalogue</title>
     <meta name="description" lang="en" content="The CLAS Digital searchable book archive catalogue"/>
+    <link href="/catalogue/catalogue.css" rel="stylesheet" type="text/css">
 
     <script src="/Search.js"></script>
     <script src="/user.js"></script>
@@ -24,12 +25,17 @@
 
 <body>
 	{% include "../template_navbar.html" %}	
-	<h1>Catalogue all books</h1>
+	<center><h1>Index of all books</h1></center>
 	<center><p>{{ length(books) }} categories</p></center>
+	<hr>
 	
 	<ul>
 	{% for pg in books %}
-	<li> <a href="/books/{{ pg.data.key }}/">{{ pg.bib }}</a></li>
+		{% if pg.has_ocr %}
+		<li> <a href="/books/{{ pg.key }}/"><span style="display:inline-block;">{{ pg.bib }}</span><img style="float: right; display:inline-block;" src="/static/GetBooks/chrome_reader_mode-24px.svg"></img></a></li>
+		{% else %}
+			<li> <a href="/books/{{ pg.key }}/">{{ pg.bib }}</a></li>
+		{% endif %}
 	{% endfor %}
 	</ul>
 

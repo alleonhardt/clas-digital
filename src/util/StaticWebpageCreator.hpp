@@ -155,13 +155,20 @@ class StaticCatalogueCreator
 			ofs.close();
 		}
 
-		void CreateCatalogueBooks(nlohmann::json &zotero)
+		void CreateCatalogueBooks(CBookManager &mng)
 		{
-			nlohmann::json js2;
-			js2["books"] = zotero;
+			nlohmann::json books;
+			for(auto &it : mng.getMapOfBooks())
+			{
+				nlohmann::json entry;
+				entry["key"] = it.second->getMetadata().getMetadata()["data"]["key"];
+				entry["bib"] = it.second->getMetadata().getMetadata()["bib"];
+				entry["has_ocr"] = it.second->getOcr();
+				books["books"].push_back(std::move(entry));
+			}
 			inja::Environment env;
 			inja::Template temp = env.parse_template("web/catalogue/books/template.html");
-			std::string result = env.render(temp, js2);
+			std::string result = env.render(temp, books);
 			std::ofstream ofs("web/catalogue/books/index.html",std::ios::out);
 			ofs<<result;
 			ofs.close();

@@ -821,7 +821,7 @@ int main(int argc, char **argv)
    StaticCatalogueCreator ct;
    ct.CreateCatalogue(); 
     ct.CreateCatalogueAuthors(manager);
-    ct.CreateCatalogueBooks(metaData);
+    ct.CreateCatalogueBooks(manager);
 	/*std::ofstream of("bin/forbiddenfiles",std::ios::out);
 	if(of.is_open())
 	{
