@@ -241,7 +241,7 @@ std::string CMetadata::getShow2()
 
     // *** Add first [num] words of title *** //
     std::vector<std::string> vStrs;
-    func::split(getShortTitle(), " ", vStrs);
+    func::split(getTitle(), " ", vStrs);
     for(unsigned int i=0; i<10 && i<vStrs.size(); i++)
         sResult += vStrs[i] + " ";
 
