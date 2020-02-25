@@ -146,13 +146,39 @@ class StaticCatalogueCreator
 				}
 			}
 			js["world"] = "hallo";
-			std::cout<<js.dump()<<std::endl;
 			inja::Environment env;
 			inja::Template temp = env.parse_template("web/catalogue/template.html");
 			std::string result = env.render(temp, js);
 			std::ofstream ofs("web/catalogue/index.html",std::ios::out);
 			ofs<<result;
 			ofs.close();
+		}
+
+		void CreateCatlogueYears(CBookManager &mng)
+		{
+			nlohmann::json rend;
+			std::map<std::string,int> _map;
+			for(auto &book : mng.getMapOfBooks())
+			{
+				if(_map.count(std::to_string(book.second->getDate())) > 0 )
+					_map[std::to_string(book.second->getDate())]++;
+				else
+					_map[std::to_string(book.second->getDate())]=1;
+			}
+			for(auto &x : _map)
+			{
+				nlohmann::json ks;
+				ks["year"] = x.first;
+				ks["count"] = x.second;
+				rend["years"].push_back(ks);
+			}
+			inja::Environment env;
+			inja::Template temp = env.parse_template("web/catalogue/years/template.html");
+			std::string result = env.render(temp, rend);
+			std::ofstream ofs("web/catalogue/years/index.html",std::ios::out);
+			ofs<<result;
+			ofs.close();
+
 		}
 
 		void CreateCatalogueBooks(CBookManager &mng)
@@ -162,7 +188,7 @@ class StaticCatalogueCreator
 			{
 				nlohmann::json entry;
 				entry["key"] = it.second->getMetadata().getMetadata()["data"]["key"];
-				entry["bib"] = it.second->getMetadata().getMetadata()["bib"];
+				entry["title"] = it.second->getMetadata().getShow2();
 				entry["has_ocr"] = it.second->getOcr();
 				books["books"].push_back(std::move(entry));
 			}
@@ -191,7 +217,6 @@ class StaticCatalogueCreator
                 js["authors"].push_back(it.second);
             
 
-			std::cout<<js.dump()<<std::endl;
 			inja::Environment env;
 			inja::Template temp = env.parse_template("web/catalogue/authors/template.html");
 			std::string result = env.render(temp, js);
@@ -199,4 +224,87 @@ class StaticCatalogueCreator
 			ofs<<result;
 			ofs.close();
 		}
+
+        void CreateCatalogueAuthor(CBookManager& manager)
+        {
+            inja::Environment env;
+            inja::Template temp = env.parse_template("web/catalogue/authors/template_author.html");
+
+            for(auto &it : manager.getMapOfBooks()) {
+                std::string lastName = it.second->getMetadata().getAuthor();
+                std::string firstName = it.second->getMetadata().getMetadata("firstName", "data", "creators", 0);
+                std::string key = lastName + "_" + firstName;
+                std::string val = lastName + ", " + firstName;
+
+                if(lastName.size() == 0)
+                    continue;
+
+                //Create directory
+                std::error_code ec;
+                std::filesystem::create_directory("web/catalogue/authors/"+key+"/", ec);
+
+                nlohmann::json js;
+                //Create json with all books
+                for(auto &jt : manager.getMapofAuthors()[func::returnToLower(lastName)]) {
+                    js["name"] = lastName;
+                    js["books"].push_back({ 
+                        {"id", jt.first},
+                        { "show", manager.getMapOfBooks()[jt.first]->getMetadata().getMetadata("bib")}
+                                          });
+                }
+
+                std::string result = env.render(temp, js);
+                std::ofstream ofs("web/catalogue/authors/"+key+"/index.html",std::ios::out);
+                ofs<<result;
+                ofs.close();
+            }
+        }
+    
+        void CreateCatalogueCollections(nlohmann::json pillars)
+        {
+			nlohmann::json js;
+            for(auto &it : pillars)
+                js["pillars"].push_back(it);
+            
+			inja::Environment env;
+			inja::Template temp = env.parse_template("web/catalogue/collections/template.html");
+			std::string result = env.render(temp, js);
+			std::ofstream ofs("web/catalogue/collections/index.html",std::ios::out);
+			ofs<<result;
+			ofs.close();
+		}
+
+        void CreateCatalogueCollection(CBookManager& manager, nlohmann::json pillars)
+        {
+            inja::Environment env;
+            inja::Template temp = env.parse_template("web/catalogue/collections/template_collection.html");
+            for(auto& it : pillars)
+            {
+                nlohmann::json js;
+                js["pillar"] = it;
+                std::string key = it["key"];
+
+                //Create directory
+                std::error_code ec;
+                std::filesystem::create_directory("web/catalogue/collections/"+key+"/", ec);
+
+                //Create books for this collection
+                for(auto &jt : manager.getMapOfBooks()) {
+                    std::vector<std::string> collections = jt.second->getMetadata().getCollections();
+
+                    if(collections.size() == 0 || func::in(key, collections) == false)
+                        continue;
+
+                    js["books"].push_back({ 
+                        {"id", jt.first},
+                        { "show", jt.second->getMetadata().getMetadata("bib")} });
+                }
+
+                std::cout<<js.dump()<<std::endl;
+                std::string result = env.render(temp, js);
+                std::ofstream ofs("web/catalogue/collections/"+key+"/index.html",std::ios::out);
+                ofs<<result;
+                ofs.close();
+            }
+        }
 };

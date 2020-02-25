@@ -25,6 +25,15 @@
 <body>
 	{% include "../template_navbar.html" %}	
 	<h1>Catalogue year</h1>
+	<ul>
+		{% for year in years %}
+		{% if year.year < 0 %}
+		<li><a href="/catalogue/years/unkown">Year unknown ({{ year.count }} books)</a></li>
+		{% else %}
+		<li><a href="/catalogue/years/{{ year.year }}">{{ year.year }} ({{ year.count }} books)</a></li>
+		{% endif %}
+		{% endfor %}
+	</ul>
 </body>
 
 

@@ -32,9 +32,10 @@
 	<ul>
 	{% for pg in books %}
 		{% if pg.has_ocr %}
-		<li> <a href="/books/{{ pg.key }}/"><span style="display:inline-block;">{{ pg.bib }}</span><img style="float: right; display:inline-block;" src="/static/GetBooks/chrome_reader_mode-24px.svg"></img></a></li>
+		<!-- Change img inline code to css style class !-->
+			<li> <a href="/books/{{ pg.key }}/">{{ pg.title }}</a></li>
 		{% else %}
-			<li> <a href="/books/{{ pg.key }}/">{{ pg.bib }}</a></li>
+			<li> <a href="/books/{{ pg.key }}/">{{ pg.title }}</a></li>
 		{% endif %}
 	{% endfor %}
 	</ul>

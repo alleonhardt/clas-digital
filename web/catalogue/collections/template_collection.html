@@ -24,12 +24,10 @@
 
 <body>
 	{% include "../template_navbar.html" %}	
-	<h1>Catalogue collection</h1>
+	<h1>Catalogue collection: {{pillar.name}}</h1>
     <ul>
-    {% for pillar in pillars %}
-    <li><a href="/catalogue/collections/{{ pillar.key }}/">{{ pillar.name}}<a></li>
+    {% for book in books %}
+    <li><a href="/books/{{ book.id}}/">{{ book.show }}<a></li>
     {% endfor %}
     </ul>
 </body>
-
-
