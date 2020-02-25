@@ -228,16 +228,18 @@ std::string CMetadata::getZit(size_t page)
 
     return sZit;
 }
+
 /**
 * @return string with Auhtor + first 6 words 15 words of title + date
 */
 std::string CMetadata::getShow2()
 {
     // *** Add Author *** //
-    std::string sResult = getAuthor() + " (";
-    if(getDate() != -1)
-        sResult += std::to_string(getDate());
-    sResult+="), ";
+    std::string sResult = getAuthor();
+    if(sResult == "") sResult = "Unknown author";
+
+    if(getTitle() != "")
+        sResult += ", <i>";
 
     // *** Add first [num] words of title *** //
     std::vector<std::string> vStrs;
@@ -246,10 +248,13 @@ std::string CMetadata::getShow2()
         sResult += vStrs[i] + " ";
 
     if(vStrs.size() > 10)
-        sResult += "...\"";
+        sResult += "...</i>";
     else
-        sResult += "\"";
+        sResult += "</i>";
 
+
+    if(getDate() != -1)
+        sResult += ", " + std::to_string(getDate());
 
     sResult += ".";
 
