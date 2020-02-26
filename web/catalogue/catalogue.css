@@ -3,6 +3,13 @@ ol {
 	width: 80%;
 }
 
+
+ul {
+	margin-left: 10%;
+	width: 80%;
+}
+
+
 li {
   font: 200 20px/1.5 Helvetica, Verdana, sans-serif;
   min-height: 5%;

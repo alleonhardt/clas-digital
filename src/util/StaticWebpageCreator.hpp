@@ -154,19 +154,24 @@ class StaticCatalogueCreator
 		void CreateCatlogueYears(CBookManager &mng)
 		{
 			nlohmann::json rend;
-			std::map<std::string,int> _map;
+			std::map<std::string,std::pair<int,std::list<CBook*>>> _map;
 			for(auto &book : mng.getMapOfBooks())
 			{
-				if(_map.count(std::to_string(book.second->getDate())) > 0 )
-					_map[std::to_string(book.second->getDate())]++;
+				std::string name = std::to_string(book.second->getDate());
+				if(name=="-1")
+					name="unknown";
+
+				if(_map.count(name) > 0 )
+					_map[name].first++;
 				else
-					_map[std::to_string(book.second->getDate())]=1;
+					_map[name].first=1;
+				_map[name].second.push_back(book.second);
 			}
 			for(auto &x : _map)
 			{
 				nlohmann::json ks;
 				ks["year"] = x.first;
-				ks["count"] = x.second;
+				ks["count"] = x.second.first;
 				rend["years"].push_back(ks);
 			}
 			inja::Environment env;
@@ -176,6 +181,28 @@ class StaticCatalogueCreator
 			ofs<<result;
 			ofs.close();
 
+			inja::Environment env2;
+			inja::Template temp2 = env2.parse_template("web/catalogue/years/template_year.html");
+			for(auto &x : _map)
+			{
+				std::error_code ec;
+				std::filesystem::create_directory("web/catalogue/years/"+x.first,ec);
+				nlohmann::json js;
+				for(auto y : x.second.second)
+				{
+					nlohmann::json js_k;
+					js_k["key"] = y->getMetadata().getMetadata()["data"]["key"];
+					js_k["title"] = y->getMetadata().getShow2();
+					js_k["bib"] = y->getMetadata().getMetadata()["bib"];
+					js["books"].push_back(std::move(js_k));
+				}
+				js["year"] = x.first;
+
+				std::string result = env2.render(temp2, js);
+				std::ofstream ofs("web/catalogue/years/"+x.first+"/index.html",std::ios::out);
+				ofs<<result;
+				ofs.close();
+			}
 		}
 
 		void CreateCatalogueBooks(CBookManager &mng)
