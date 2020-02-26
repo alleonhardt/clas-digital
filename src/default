@@ -22,7 +22,7 @@ proxy_cache_path  /etc/nginx/cache  levels=1:2    keys_zone=STATIC:10m
     inactive=24h  max_size=1g;
 
 server {
-    listen 1408 default_server;
+    listen 80 default_server;
 
     server_name _;
 
@@ -37,8 +37,8 @@ server {
 }
 
 server {
-	listen 1409 ssl;
-	listen [::]:1409 ssl;
+	listen 443 ssl;
+	listen [::]:443 ssl;
 	server_name clas-digital.uni-frankfurt.de;
 	return 301 https://www.clas-digital.uni-frankfurt.de$request_uri;
 }
@@ -181,8 +181,8 @@ location /getsugg {
 }
 
 server {
-	listen 1409 ssl default_server;
-	listen [::]:1409 ssl default_server;
+	listen 443 ssl default_server;
+	listen [::]:443 ssl default_server;
 
 	# SSL configuration
 	#

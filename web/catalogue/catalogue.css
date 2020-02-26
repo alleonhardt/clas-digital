@@ -1,35 +1,18 @@
-ul {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
+ol {
+	margin-left: 10%;
+	width: 80%;
 }
- 
+
 li {
   font: 200 20px/1.5 Helvetica, Verdana, sans-serif;
-  border-bottom: 1px solid grey;
-  width: 100%;
-  margin: auto;
   min-height: 5%;
+  margin-top: 1.6rem;
 }
  
 li a {
   text-decoration: none;
   color: #000;
-  padding-top: 5px;
-  width: 80%;
-  margin: auto;
 
   display: block;
   overflow: hidden;
-
- 
-  -webkit-transition: font-size 0.3s ease, background-color 0.3s ease;
-  -moz-transition: font-size 0.3s ease, background-color 0.3s ease;
-  -o-transition: font-size 0.3s ease, background-color 0.3s ease;
-  -ms-transition: font-size 0.3s ease, background-color 0.3s ease;
-  transition: font-size 0.3s ease, background-color 0.3s ease;
-}
- 
-li a:hover {
-  background: lightgrey;
 }

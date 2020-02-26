@@ -21,24 +21,25 @@
 
     <script src="/Search.js"></script>
     <script src="/user.js"></script>
+    <script src="/catalogue/catalogue.js"></script>
 </head>
 
 <body>
 	{% include "../template_navbar.html" %}	
 	<center><h1>Index of all books</h1></center>
-	<center><p>{{ length(books) }} categories</p></center>
+	<center><p>{{ length(books) }} books</p></center>
+	<center><input placeholder="Search for categories..." oninput="on_search(this,2);"></input></center>
+	<center><p id='filteropts' style='display:none;color: grey;'></p></center>
 	<hr>
 	
-	<ul>
+	<ol>
 	{% for pg in books %}
-		{% if pg.has_ocr %}
-		<!-- Change img inline code to css style class !-->
-			<li> <a href="/books/{{ pg.key }}/">{{ pg.title }}</a></li>
-		{% else %}
-			<li> <a href="/books/{{ pg.key }}/">{{ pg.title }}</a></li>
-		{% endif %}
+	<li> 
+		<a class="searchable_item" href="/books/{{ pg.key }}/">{{ pg.title }}</a>
+		<a class="searchable_item" style="display: none">{{ lower(pg.bib) }}</a>
+	</li>
 	{% endfor %}
-	</ul>
+	</ol>
 
 </body>
 

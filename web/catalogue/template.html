@@ -20,19 +20,22 @@
     <link href="catalogue.css" rel="stylesheet" type="text/css">
 
     <script src="/user.js"></script>
+    <script src="catalogue.js"></script>
 </head>
 
 <body>
 	{% include "template_navbar.html" %}
 	<center><h1>Catalogue categories</h1></center>
 	<center><p>{{ length(pages) }} categories</p></center>
+	<center><input placeholder="Search for categories..." oninput="on_search(this);"></input></center>
+	<center><p id='filteropts' style='display:none;color: grey;'></p></center>
 	<hr>
 	
-	<ul>
+	<ol>
 	{% for pg in pages %}
-	<li> <a href="/catalogue/{{ pg }}/">{{ pg }}</a></li>
+	<li> <a href="/catalogue/{{ pg }}/" class="searchable_item">{{ pg }}</a></li>
 	{% endfor %}
-	</ul>
+	</ol>
 </body>
 
 

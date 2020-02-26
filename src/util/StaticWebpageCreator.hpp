@@ -138,13 +138,10 @@ class StaticCatalogueCreator
 		void CreateCatalogue()
 		{
 			nlohmann::json js;
-			for(auto &it : std::filesystem::directory_iterator("web/catalogue"))
-			{
-				if(it.is_directory())
-				{
-					js["pages"].push_back(it.path().filename().string());
-				}
-			}
+			js["pages"].push_back("books");
+			js["pages"].push_back("authors");
+			js["pages"].push_back("collections");
+			js["pages"].push_back("years");
 			js["world"] = "hallo";
 			inja::Environment env;
 			inja::Template temp = env.parse_template("web/catalogue/template.html");
@@ -189,6 +186,7 @@ class StaticCatalogueCreator
 				nlohmann::json entry;
 				entry["key"] = it.second->getMetadata().getMetadata()["data"]["key"];
 				entry["title"] = it.second->getMetadata().getShow2();
+				entry["bib"] = it.second->getMetadata().getMetadata()["bib"];
 				entry["has_ocr"] = it.second->getOcr();
 				books["books"].push_back(std::move(entry));
 			}
@@ -297,7 +295,7 @@ class StaticCatalogueCreator
 
                     js["books"].push_back({ 
                         {"id", jt.first},
-                        { "show", jt.second->getMetadata().getMetadata("bib")} });
+                        { "show", jt.second->getMetadata().getShow2()} });
                 }
 
                 std::cout<<js.dump()<<std::endl;
