@@ -815,8 +815,8 @@ int main(int argc, char **argv)
 
 
     {
-//	auto last_mod = std::filesystem::last_write_time("bin/zotero.json");
-//	int managedBooks = 0;
+	auto last_mod = std::filesystem::last_write_time("bin/zotero.json");
+	int managedBooks = 0;
 
    StaticCatalogueCreator ct;
    ct.CreateCatalogue(); 
