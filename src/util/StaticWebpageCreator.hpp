@@ -129,7 +129,7 @@ class StaticWebpageCreator
 
 				if(isbn!="")
 				{
-					content+="<dt id=\"isbn\">ISBN:</dt><dd itemprop="isbn">";
+					content+="<dt id=\"isbn\">ISBN:</dt><dd itemprop=\"isbn\">";
 					content+=isbn;
 					content+="</dd>\n";
 				}
