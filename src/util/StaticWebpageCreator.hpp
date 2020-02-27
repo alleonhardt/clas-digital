@@ -144,9 +144,9 @@ class StaticCatalogueCreator
 			js["pages"].push_back("years");
 			js["world"] = "hallo";
 			inja::Environment env;
-			inja::Template temp = env.parse_template("web/catalogue/template.html");
+			inja::Template temp = env.parse_template("web/catalog/template.html");
 			std::string result = env.render(temp, js);
-			std::ofstream ofs("web/catalogue/index.html",std::ios::out);
+			std::ofstream ofs("web/catalog/index.html",std::ios::out);
 			ofs<<result;
 			ofs.close();
 		}
@@ -175,18 +175,18 @@ class StaticCatalogueCreator
 				rend["years"].push_back(ks);
 			}
 			inja::Environment env;
-			inja::Template temp = env.parse_template("web/catalogue/years/template.html");
+			inja::Template temp = env.parse_template("web/catalog/years/template.html");
 			std::string result = env.render(temp, rend);
-			std::ofstream ofs("web/catalogue/years/index.html",std::ios::out);
+			std::ofstream ofs("web/catalog/years/index.html",std::ios::out);
 			ofs<<result;
 			ofs.close();
 
 			inja::Environment env2;
-			inja::Template temp2 = env2.parse_template("web/catalogue/years/template_year.html");
+			inja::Template temp2 = env2.parse_template("web/catalog/years/template_year.html");
 			for(auto &x : _map)
 			{
 				std::error_code ec;
-				std::filesystem::create_directory("web/catalogue/years/"+x.first,ec);
+				std::filesystem::create_directory("web/catalog/years/"+x.first,ec);
 				nlohmann::json js;
 				for(auto y : x.second.second)
 				{
@@ -199,7 +199,7 @@ class StaticCatalogueCreator
 				js["year"] = x.first;
 
 				std::string result = env2.render(temp2, js);
-				std::ofstream ofs("web/catalogue/years/"+x.first+"/index.html",std::ios::out);
+				std::ofstream ofs("web/catalog/years/"+x.first+"/index.html",std::ios::out);
 				ofs<<result;
 				ofs.close();
 			}
@@ -218,9 +218,9 @@ class StaticCatalogueCreator
 				books["books"].push_back(std::move(entry));
 			}
 			inja::Environment env;
-			inja::Template temp = env.parse_template("web/catalogue/books/template.html");
+			inja::Template temp = env.parse_template("web/catalog/books/template.html");
 			std::string result = env.render(temp, books);
-			std::ofstream ofs("web/catalogue/books/index.html",std::ios::out);
+			std::ofstream ofs("web/catalog/books/index.html",std::ios::out);
 			ofs<<result;
 			ofs.close();
 		}
@@ -243,9 +243,9 @@ class StaticCatalogueCreator
             
 
 			inja::Environment env;
-			inja::Template temp = env.parse_template("web/catalogue/authors/template.html");
+			inja::Template temp = env.parse_template("web/catalog/authors/template.html");
 			std::string result = env.render(temp, js);
-			std::ofstream ofs("web/catalogue/authors/index.html",std::ios::out);
+			std::ofstream ofs("web/catalog/authors/index.html",std::ios::out);
 			ofs<<result;
 			ofs.close();
 		}
@@ -253,7 +253,7 @@ class StaticCatalogueCreator
         void CreateCatalogueAuthor(CBookManager& manager)
         {
             inja::Environment env;
-            inja::Template temp = env.parse_template("web/catalogue/authors/template_author.html");
+            inja::Template temp = env.parse_template("web/catalog/authors/template_author.html");
 
             for(auto &it : manager.getMapOfBooks()) {
                 std::string lastName = it.second->getMetadata().getAuthor();
@@ -266,7 +266,7 @@ class StaticCatalogueCreator
 
                 //Create directory
                 std::error_code ec;
-                std::filesystem::create_directory("web/catalogue/authors/"+key+"/", ec);
+                std::filesystem::create_directory("web/catalog/authors/"+key+"/", ec);
 
                 nlohmann::json js;
                 //Create json with all books
@@ -279,7 +279,7 @@ class StaticCatalogueCreator
                 }
 
                 std::string result = env.render(temp, js);
-                std::ofstream ofs("web/catalogue/authors/"+key+"/index.html",std::ios::out);
+                std::ofstream ofs("web/catalog/authors/"+key+"/index.html",std::ios::out);
                 ofs<<result;
                 ofs.close();
             }
@@ -292,9 +292,9 @@ class StaticCatalogueCreator
                 js["pillars"].push_back(it);
             
 			inja::Environment env;
-			inja::Template temp = env.parse_template("web/catalogue/collections/template.html");
+			inja::Template temp = env.parse_template("web/catalog/collections/template.html");
 			std::string result = env.render(temp, js);
-			std::ofstream ofs("web/catalogue/collections/index.html",std::ios::out);
+			std::ofstream ofs("web/catalog/collections/index.html",std::ios::out);
 			ofs<<result;
 			ofs.close();
 		}
@@ -302,7 +302,7 @@ class StaticCatalogueCreator
         void CreateCatalogueCollection(CBookManager& manager, nlohmann::json pillars)
         {
             inja::Environment env;
-            inja::Template temp = env.parse_template("web/catalogue/collections/template_collection.html");
+            inja::Template temp = env.parse_template("web/catalog/collections/template_collection.html");
             for(auto& it : pillars)
             {
                 nlohmann::json js;
@@ -311,7 +311,7 @@ class StaticCatalogueCreator
 
                 //Create directory
                 std::error_code ec;
-                std::filesystem::create_directory("web/catalogue/collections/"+key+"/", ec);
+                std::filesystem::create_directory("web/catalog/collections/"+key+"/", ec);
 
                 //Create books for this collection
                 for(auto &jt : manager.getMapOfBooks()) {
@@ -327,7 +327,7 @@ class StaticCatalogueCreator
 
                 std::cout<<js.dump()<<std::endl;
                 std::string result = env.render(temp, js);
-                std::ofstream ofs("web/catalogue/collections/"+key+"/index.html",std::ios::out);
+                std::ofstream ofs("web/catalog/collections/"+key+"/index.html",std::ios::out);
                 ofs<<result;
                 ofs.close();
             }

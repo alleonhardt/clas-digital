@@ -20,22 +20,26 @@
 
     <script src="/Search.js"></script>
     <script src="/user.js"></script>
-    <link href="/catalogue/catalogue.css" rel="stylesheet" type="text/css">
-    <script src="/catalogue/catalogue.js"></script>
+    <link href="/catalog/catalogue.css" rel="stylesheet" type="text/css">
+    <script src="/catalog/catalogue.js"></script>
 </head>
 
 <body>
 	{% include "../template_navbar.html" %}	
-	<center><h1>Catalogue years</h1></center>
-	<center><p>Found books from {{ length(years) }} distinct years</p></center>
-	<center><input placeholder="Search for categories..." oninput="on_search(this);"></input></center>
+	<center><h1>Catalogue year {{ year }}</h1></center>
+	<center><p>Found {{ length(books) }} books from the year {{ year }}</p></center>
+	<center><input placeholder="Search for books..." oninput="on_search(this,2);"></input></center>
 	<center><p id='filteropts' style='display:none;color: grey;'></p></center>
 	<hr/>
-	<ul>
-		{% for year in years %}
-		<li><a class="searchable_item" href="/catalogue/years/{{ year.year }}">{{ year.year }} (books: {{ year.count }})</a></li>
+	<ol>
+		{% for book in books %}
+		<li>
+			<a class="searchable_item" href="/books/{{ book.key }}/">{{ book.title }}</a>
+			<a class="searchable_item" style="display: none">{{ lower(book.bib) }}</a>
+
+		</li>
 		{% endfor %}
-	</ul>
+	</ol>
 </body>
 
 

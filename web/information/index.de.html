@@ -71,6 +71,15 @@ window.addEventListener("load",function(){initialise("homelink");},false);
     <nav id='tpnav' class="topnav">
         <a id='homelink' class="active" href='/information/'>Information</a>
         <a id='searchlink' href='/search'>Search</a>
+	<div class='dropdown'>
+		<a id='statisticslink' class='dropdown-banner' href='/catalog'>Catalog  </a>
+		<div class='dropdown-content'>
+			<a href="/catalog/books">Books</a>
+			<a href="/catalog/authors">Authors</a>
+			<a href="/catalog/collections">Collections</a>
+			<a href="/catalog/years">Years</a>
+		</div>
+	</div>
         <a id='administrationlink' class='classifiedContent' href='/private/admin/Administration.html' data-acc=4>Administration</a>
         <a id='uploadbooklink' class='classifiedContent' href='/private/write/UploadBook.html' data-acc=2>Upload Books</a>
         <div class='topnav-right-in' id='loggedintopnav'>
