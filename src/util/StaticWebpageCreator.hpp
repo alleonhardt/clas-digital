@@ -93,7 +93,7 @@ class StaticWebpageCreator
 				content+="<link rel=\"canonical\" href=\"https://www.clas-digital.uni-frankfurt.de/books/";
 				content+=m_book->getKey();
                                 content+="\"/>\n";
-                                content+="</head>\n<body style=\"padding: 5rem;\"><h1>\n";
+                                content+="</head>\n<body style=\"padding: 5rem;\" itemscope itemtype=\"http://schema.org/Book\"><h1>\n";
 				content+=m_info["bib"];
 				content+="</h1><nav id='booklcontentlink'>\n<ul>\n";
 				if(m_book->getHasFiles()) {
@@ -103,24 +103,38 @@ class StaticWebpageCreator
 				}
 				content+="<li><a href=\"/books/\">Other books in catalogue</a></li>\n";
 				content+="</ul>\n</nav>\n";
-				content+="<p id=\"itemType\"><b>Item Type:</b> ";
+
+				content+="<section>\n";
+				content+="<dl>\n";
+
+				content+="<dt id=\"itemType\">Item Type:</dt>\n<dd>";
 			       	content+=itemType;
-				content+="</p><hr><p id=\"title\"><b>Title:</b> ";
+				content+="</dd>\n";
+
+				content+="<dt id=\"title\">Title:</dt>\n<dd itemprop=\"name\">";
 			       	content+=title;
-				content+="</p><hr><p id='author'><b>Author:</b> ";
+				content+="</dd>\n";
+
+				content+="<dt id='author'>Author:</dt>\n<dd itemprop=\"author\" itemscope itemtype=\"http://schema.org/Person\"><span itemprop=\"name\">";
 				content+=m_book->getAuthor();
-				content+="</p><hr><p id=\"place\"><b>Place:</b> ";
+				content+="</span></dd>\n";
+
+				content+="<dt id=\"place\">Place:</dt>\n<dd itemscope itemtype=\"http://schema.org/Place\"><span itemprop=\"name\">";
 				content+=m_info["data"].value("place","");
-				content+="</p><hr><p id=\"date\"><b>Date:</b> ";
+				content+="</span></dd>\n";
+
+				content+="<dt id=\"date\">Date:</dt>\n<dd itemprop=\"datePublished\">";
 				content+=m_info["data"].value("date","");
-				content+="</p><hr>";
+				content+="</dd>\n";
+
 				if(isbn!="")
 				{
-					content+="<p id=\"isbn\"><b>ISBN:</b> ";
+					content+="<dt id=\"isbn\">ISBN:</dt><dd itemprop=\"isbn\">";
 					content+=isbn;
-					content+="</p><hr>";
+					content+="</dd>\n";
 				}
-				content+="</body></html>";
+				content+="</dl>\n</section>\n";
+				content+="</body>\n</html>\n";
 				std::string pathcopy = m_path;
 				pathcopy+="/index.html";
 
