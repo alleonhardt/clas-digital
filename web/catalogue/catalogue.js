@@ -20,17 +20,12 @@ function on_search_async(it,divide=1)
 			break;
 		}
 		let htm = lst[i+global_start].innerHTML;
-		htm = htm.toLowerCase();
 		if(htm.search(it.value) == -1)
 			lst[i+global_start].parentNode.style.display = "none";
 		else
 		{
 			lst[i+global_start].parentNode.style.display = "";
 			global_count++;
-			if(((i+global_start)%2 == 0) && (divide == 2))
-			{
-				++i;
-			}
 		}
 	}
 	if(it.value=="")
