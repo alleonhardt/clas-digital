@@ -827,9 +827,12 @@ int main(int argc, char **argv)
     ct.CreateCatalogueCollection(manager, zoteroPillars);
     ct.CreateCatlogueYears(manager);
 
-	/*std::ofstream of("bin/forbiddenfiles",std::ios::out);
+#define WRITE_FORBIDDEN_FILES 0
+#ifdef WRITE_FORBIDDEN_FILES
+	std::ofstream of("bin/forbiddenfiles",std::ios::out);
 	if(of.is_open())
 	{
+#endif
 	    for(auto it : manager.getMapOfBooks())
 	    {
 		++managedBooks;
@@ -852,9 +855,11 @@ int main(int argc, char **argv)
 		    std::string loc = "location ~ /books/";
 		    loc+=it.first;
 		    loc+="/(?!backups).* {\n\ttry_files $uri $uri/ =404;\n}\n";
+#ifdef WRITE_FORBIDDEN_FILES
 		    // single write to reduce likelyhood of breaking webserver
 		    // https://github.com/ShadowItaly/clas-digital/issues/175
 		    of<<loc;
+#endif
 		}
 		std::error_code ec;
 		std::string dir = "web/books/";
@@ -879,8 +884,10 @@ int main(int argc, char **argv)
 
 	    }
 	}
-	of.close();*/
+#ifdef WRITE_FORBIDDEN_FILES
+	of.close();
     }
+#endif
 
     int y = system("systemctl restart nginx");
     y+=1;
