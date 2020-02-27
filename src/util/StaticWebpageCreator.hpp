@@ -115,13 +115,13 @@ class StaticWebpageCreator
 			       	content+=title;
 				content+="</dd>\n";
 
-				content+="<dt id='author'>Author:</dt>\n<dd itemprop=\"author\" itemscope itemtype=\"http://schema.org/Person\">";
+				content+="<dt id='author'>Author:</dt>\n<dd itemprop=\"author\" itemscope itemtype=\"http://schema.org/Person\"><span itemprop=\"name\">";
 				content+=m_book->getAuthor();
-				content+="</dd>\n";
+				content+="</span></dd>\n";
 
-				content+="<dt id=\"place\">Place:</dt>\n<dd>";
+				content+="<dt id=\"place\">Place:</dt>\n<dd itemscope itemtype=\"http://schema.org/Place\"><span itemprop=\"name\">";
 				content+=m_info["data"].value("place","");
-				content+="</dd>\n";
+				content+="</span></dd>\n";
 
 				content+="<dt id=\"date\">Date:</dt>\n<dd itemprop=\"datePublished\">";
 				content+=m_info["data"].value("date","");
