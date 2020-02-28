@@ -97,7 +97,7 @@ class StaticWebpageCreator
 
 				content+="<link rel=\"stylesheet\" type=\"text/css\" href=\"/static/books.css\"/>\n";
 				
-                                content+="</head>\n<body style=\"padding: 5rem;\" itemscope itemtype=\"http://schema.org/Book\"><h1>\n";
+                                content+="</head>\n<body itemscope itemtype=\"http://schema.org/Book\"><h1>\n";
 				content+=m_info["bib"];
 				content+="</h1><nav id='booklcontentlink'>\n<ul>\n";
 				if(m_book->getHasFiles()) {
