@@ -90,9 +90,13 @@ class StaticWebpageCreator
 				std::string content = "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\"/>\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\">\n<link rel=\"shortcut icon\" href=\"/static/fav/hand-top-right-16+32+48.ico\"/><title>";
 				content+=m_book->getMetadata().getShow2();
 				content+="</title>\n";
+
 				content+="<link rel=\"canonical\" href=\"https://www.clas-digital.uni-frankfurt.de/books/";
 				content+=m_book->getKey();
                                 content+="\"/>\n";
+
+				content+="<link rel=\"stylesheet\" type=\"text/css\" href=\"/static/books.css\"/>\n";
+				
                                 content+="</head>\n<body style=\"padding: 5rem;\" itemscope itemtype=\"http://schema.org/Book\"><h1>\n";
 				content+=m_info["bib"];
 				content+="</h1><nav id='booklcontentlink'>\n<ul>\n";
