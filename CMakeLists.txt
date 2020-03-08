@@ -26,9 +26,10 @@ add_executable(clas-digital.o ${SRC_FILES} ${SRC_FILES_BOOKS})
 target_link_libraries(clas-digital.o stdc++fs ${CURL_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${Tesseract_LIBRARIES})
 target_link_libraries(books.o stdc++fs ${CURL_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
-message("STABLE_INSTALL=${STABLE_INSTALL}")
-if( STABLE_INSTALL ) 
-	message("Warning you are installing to the stable version!")
+if(STABLE_INSTALL) 
+	message("Installing to the stable version!")
+else()
+	message("Installing to development version")
 endif()
 
 if(NOT STABLE_INSTALL)
@@ -39,6 +40,14 @@ else()
     set(SERVICE_TARGET clas-digital)
 endif()
 
+ADD_CUSTOM_TARGET(install_stable
+  COMMAND ${CMAKE_COMMAND} -DSTABLE_INSTALL=TRUE ${CMAKE_SOURCE_DIR}
+  COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}
+  COMMENT "Installing to stable version"
+  COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target install
+  COMMAND rm ${CMAKE_BINARY_DIR}/CMakeCache.txt
+  COMMAND ${CMAKE_COMMAND} ${CMAKE_SOURCE_DIR}
+)
 
 install(FILES src/clas-digital.service DESTINATION /etc/systemd/system)
 install(FILES src/clas-digital-devel.service DESTINATION /etc/systemd/system)
