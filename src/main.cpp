@@ -37,6 +37,100 @@ void sig_handler(int)
     gGlobalSigShutdown = true;
 }
 
+void update_all_files(CBookManager *m, nlohmann::json *zot)
+{
+	auto &manager = *m;
+	auto &zoteroPillars = *zot;
+
+	auto last_mod = std::filesystem::last_write_time("bin/zotero.json");
+	int managedBooks = 0;
+
+	StaticCatalogueCreator ct;
+	ct.CreateCatalogue(); 
+	ct.CreateCatalogueAuthors(manager);
+	ct.CreateCatalogueBooks(manager);
+	ct.CreateCatalogueAuthor(manager);
+	ct.CreateCatalogueCollections(zoteroPillars);
+	ct.CreateCatalogueCollection(manager, zoteroPillars);
+	ct.CreateCatlogueYears(manager);
+
+#define WRITE_FORBIDDEN_FILES 0
+#ifdef WRITE_FORBIDDEN_FILES
+	std::ofstream of("bin/tmpforbiddenfiles",std::ios::out);
+	std::string file_content = "";
+	std::cout<<"Processed: "<<managedBooks<<"/"<<manager.getMapOfBooks().size()<<std::endl;
+	if(of.is_open())
+	{
+#endif
+		for(auto it : manager.getMapOfBooks())
+		{
+			++managedBooks;
+			if(managedBooks%200 == 0)
+				std::cout<<"Processed: "<<managedBooks<<"/"<<manager.getMapOfBooks().size()<<std::endl;
+			for(auto &it2 : zoteroPillars)
+			{
+				if(func::in(it2["key"],it.second->getMetadata().getCollections()))
+				{
+					if(it2.count("books_managed")>0)
+						it2["books_managed"] = it2["books_managed"].get<int>()+1;
+					else
+						it2["books_managed"]=1;
+				}
+			}
+
+			if(gGlobalSigShutdown)
+				return;
+
+			if(it.second->getHasFiles() && (it.second->getPublic()))
+			{
+				std::string loc = "location ~ /books/";
+				loc+=it.first;
+				loc+="/(?!backups).* {\n\ttry_files $uri $uri/ =404;\n}\n";
+#ifdef WRITE_FORBIDDEN_FILES
+				// single write to reduce likelyhood of breaking webserver
+				// https://github.com/ShadowItaly/clas-digital/issues/175
+				file_content+=loc;
+#endif
+			}
+			std::error_code ec;
+			std::string dir = "web/books/";
+			dir+=it.first;
+
+			auto last_mod_file = std::filesystem::last_write_time(dir,ec);
+			if(!ec && last_mod_file >= last_mod)
+				continue;
+
+			StaticWebpageCreator webpage(it.second);
+			webpage.createWebpage();
+			
+			std::string command = "mkdir -p ";
+			command+=dir;
+			int x = system(command.c_str());
+			x+=1;
+			dir+="/info.json";
+			std::ofstream json_write(dir.c_str(),std::ios::out);
+			if(json_write.is_open())
+				json_write<<it.second->getMetadata().getMetadata();
+
+		}
+	}
+#ifdef WRITE_FORBIDDEN_FILES
+	of<<file_content;
+	of.close();
+	std::error_code ec;
+	std::filesystem::remove("bin/forbiddenfiles",ec);
+	std::filesystem::create_symlink("tmpforbiddenfiles","bin/forbiddenfiles",ec);
+	if(ec)
+	{
+		std::cout<<"Could not create symlink from the tmpfile to the forbiddenfiles nginx file"<<std::endl;
+	}
+	else
+		std::cout<<"Update finished all pages are updated now!"<<std::endl;
+	int y =system("systemctl restart nginx");
+	y++;
+#endif
+}
+
 void update_and_restart()
 {
     using std::chrono::system_clock;
@@ -814,85 +908,6 @@ int main(int argc, char **argv)
     srchFile.close();
 
 
-    {
-	auto last_mod = std::filesystem::last_write_time("bin/zotero.json");
-	int managedBooks = 0;
-
-   StaticCatalogueCreator ct;
-   ct.CreateCatalogue(); 
-    ct.CreateCatalogueAuthors(manager);
-    ct.CreateCatalogueBooks(manager);
-    ct.CreateCatalogueAuthor(manager);
-    ct.CreateCatalogueCollections(zoteroPillars);
-    ct.CreateCatalogueCollection(manager, zoteroPillars);
-    ct.CreateCatlogueYears(manager);
-
-#define WRITE_FORBIDDEN_FILES 0
-#ifdef WRITE_FORBIDDEN_FILES
-	std::ofstream of("bin/forbiddenfiles",std::ios::out);
-	if(of.is_open())
-	{
-#endif
-	    for(auto it : manager.getMapOfBooks())
-	    {
-		++managedBooks;
-		for(auto &it2 : zoteroPillars)
-		{
-			if(func::in(it2["key"],it.second->getMetadata().getCollections()))
-			{
-				if(it2.count("books_managed")>0)
-					it2["books_managed"] = it2["books_managed"].get<int>()+1;
-				else
-					it2["books_managed"]=1;
-			}
-		}
-
-		if(gGlobalSigShutdown)
-			return 0;
-		if(it.second->getHasFiles() && (it.second->getPublic()))
-		{
-		    std::cout<<"FOUND PUBLIC BOOK: "<<it.first<<std::endl;
-		    std::string loc = "location ~ /books/";
-		    loc+=it.first;
-		    loc+="/(?!backups).* {\n\ttry_files $uri $uri/ =404;\n}\n";
-#ifdef WRITE_FORBIDDEN_FILES
-		    // single write to reduce likelyhood of breaking webserver
-		    // https://github.com/ShadowItaly/clas-digital/issues/175
-		    of<<loc;
-#endif
-		}
-		std::error_code ec;
-		std::string dir = "web/books/";
-		dir+=it.first;
-		
-
-		StaticWebpageCreator webpage(it.second);
-		webpage.createWebpage();
-		
-		auto last_mod_file = std::filesystem::last_write_time(dir,ec);
-		if(!ec && last_mod_file >= last_mod)
-		    continue;
-
-		std::string command = "mkdir -p ";
-		command+=dir;
-		int x = system(command.c_str());
-		x+=1;
-		dir+="/info.json";
-		std::ofstream json_write(dir.c_str(),std::ios::out);
-		if(json_write.is_open())
-		    json_write<<it.second->getMetadata().getMetadata();
-
-	    }
-	}
-#ifdef WRITE_FORBIDDEN_FILES
-	of.close();
-    }
-#endif
-
-    int y = system("systemctl restart nginx");
-    y+=1;
-
-
     srv.Post("/login",&do_login);
     srv.Get("/search",[&](const Request &req, Response &resp) { do_search(req,resp,fileSearchHtml,zoteroPillars,manager);});
     srv.Get("/searchinbook",[&](const Request &req, Response &resp) { do_searchinbook(req,resp,manager);});
@@ -907,10 +922,13 @@ int main(int argc, char **argv)
     srv.Post("/userlist",&do_usertableupdate);
     srv.Post("/upload",[&](const Request &req, Response &resp){do_upload(req,resp,manager);});
     std::cout<<"C++ Api server startup successfull!"<<std::endl;
+
     std::thread restart_thread(&update_and_restart);
     restart_thread.detach();
+    
+    std::thread update_files(&update_all_files,&manager,&zoteroPillars);
     srv.listen("localhost", startPort);
-
+    update_files.join();
     if(gGlobalUpdateOperation == GlobalUpdateOperations::restart_server)
 	return -1;
     return 0;
