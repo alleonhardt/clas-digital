@@ -343,7 +343,6 @@ class StaticCatalogueCreator
                         { "show", jt.second->getMetadata().getShow2()} });
                 }
 
-                std::cout<<js.dump()<<std::endl;
                 std::string result = env.render(temp, js);
                 std::ofstream ofs("web/catalogue/collections/"+key+"/index.html",std::ios::out);
                 ofs<<result;

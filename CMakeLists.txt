@@ -52,7 +52,6 @@ ADD_CUSTOM_TARGET(install_stable
 install(FILES src/clas-digital.service DESTINATION /etc/systemd/system)
 install(FILES src/clas-digital-devel.service DESTINATION /etc/systemd/system)
 install(FILES src/default DESTINATION /etc/nginx/sites-available)
-install(FILES bin/forbiddenfiles DESTINATION ${INSTALL_DIRS}/bin)
 install(PROGRAMS bin/clas-digital.o DESTINATION ${INSTALL_DIRS})
 install(DIRECTORY web DESTINATION ${INSTALL_DIRS} PATTERN "web/books/*" EXCLUDE)
 install(DIRECTORY bin/trainingdata DESTINATION ${INSTALL_DIRS})
