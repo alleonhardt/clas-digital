@@ -39,13 +39,14 @@ void sig_handler(int)
 
 void update_all_files(CBookManager *m, nlohmann::json *zot)
 {
-	if(!std::filesystem::is_regular_file("updated.txt"))
-	{
+	
 		auto &manager = *m;
 		auto &zoteroPillars = *zot;
 
 		int managedBooks = 0;
 
+	if(!std::filesystem::is_regular_file("updated_catalogue.txt"))
+	{
 		StaticCatalogueCreator ct;
 		ct.CreateCatalogue(); 
 		ct.CreateCatalogueAuthors(manager);
@@ -54,6 +55,12 @@ void update_all_files(CBookManager *m, nlohmann::json *zot)
 		ct.CreateCatalogueCollections(zoteroPillars);
 		ct.CreateCatalogueCollection(manager, zoteroPillars);
 		ct.CreateCatlogueYears(manager);
+		std::ofstream ofs("updated_catalogue.txt");
+		ofs<<"0";
+		ofs.close();
+	}
+	if(!std::filesystem::is_regular_file("updated_static_books.txt"))
+	{
 #define WRITE_FORBIDDEN_FILES 0
 #ifdef WRITE_FORBIDDEN_FILES
 		std::string file_content = "";
@@ -122,7 +129,7 @@ void update_all_files(CBookManager *m, nlohmann::json *zot)
 		int y =system("systemctl restart nginx");
 		y++;
 #endif
-		std::ofstream is_updated("updated.txt");
+		std::ofstream is_updated("updated_static_books.txt");
 		is_updated<<"0";
 		is_updated.close();
 	}
@@ -185,7 +192,8 @@ void update_and_restart()
 	gGlobalUpdateOperation = GlobalUpdateOperations::restart_server;
 	srv.stop();
 	std::error_code ec;
-	std::filesystem::remove("updated.txt",ec);
+	std::filesystem::remove("updated_static_books.txt",ec);
+	std::filesystem::remove("updated_catalogue.txt",ec);
 }
 
 
