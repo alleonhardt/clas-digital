@@ -120,7 +120,9 @@ class StaticWebpageCreator
 				content+="</dd>\n";
 
 				content+="<dt id='author'>Author:</dt>\n<dd itemprop=\"author\" itemscope itemtype=\"http://schema.org/Person\"><span itemprop=\"name\">";
-				content+=m_book->getAuthor();
+                for(const auto &it : m_book->getMetadata().getAuthors())
+				    content+=it + "; ";
+                content.erase(content.end()-2);
 				content+="</span></dd>\n";
 
 				content+="<dt id=\"place\">Place:</dt>\n<dd itemscope itemtype=\"http://schema.org/Place\"><span itemprop=\"name\">";
