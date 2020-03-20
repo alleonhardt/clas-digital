@@ -101,6 +101,7 @@ void update_all_files(CBookManager *m, nlohmann::json *zot)
 			dir+=it.first;
 
 			StaticWebpageCreator webpage(it.second);
+            std::cout << "CREATE WEBPAGE!!!\n";
 			webpage.createWebpage();
 
 			std::string command = "mkdir -p ";
