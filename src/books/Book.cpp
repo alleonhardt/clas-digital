@@ -79,15 +79,12 @@ void CBook::setPath(std::string sPath) { m_sPath = sPath; }
 void CBook::createBook(std::string sPath)
 {
     std::ifstream readOcr(getOcrPath());
-    int counter = 0;
     for(auto& p: std::filesystem::directory_iterator(sPath))
     {
 	    (void)p;
-	    ++counter;
+        if(p.path().extension() == ".jpg")
+            m_bhasFiles = true; 
     }
-
-    if(counter>2)
-	m_bhasFiles = true;
 
     //If ocr exists create or load list with words
     if(!readOcr)
