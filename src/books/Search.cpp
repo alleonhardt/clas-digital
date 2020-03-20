@@ -174,7 +174,7 @@ void CSearch::myInsert(std::map<std::string, double>& found, std::string sMatch,
         (*m_mapSR)[it->first] += it->second*(1-value*5);
 
         //Add match to map
-        if(mapBooks[it->first]->getOcr() == false)
+        if(mapBooks[it->first]->hasOcr() == false)
             continue;
         if (mapBooks[it->first]->getMapFuzzy()[m_sWord].front().second > value)
             mapBooks[it->first]->getMapFuzzy()[m_sWord].push_front({sMatch, value});
@@ -196,7 +196,7 @@ void CSearch::myInsert(std::map<std::string, double>& found, std::string sMatch,
         (*m_mapSR)[it->first] += it->second;
 
         //Add match to map
-        if(mapBooks[it->first]->getOcr() == false)
+        if(mapBooks[it->first]->hasOcr() == false)
             continue;
         mapBooks[it->first]->getMapFull()[m_sWord].push_back(sMatch);
     }
@@ -224,7 +224,7 @@ void CSearch::removeBooks(map_books& mapBooks)
 bool CSearch::checkSearchOptions(CBook* book)
 {
     //*** check ocr ***//
-    if(m_sOpts->getOnlyOcr() == true && book->getOcr() == false)
+    if(m_sOpts->getOnlyOcr() == true && book->hasOcr() == false)
         return false;
 
     //*** check author ***//

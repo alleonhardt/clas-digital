@@ -36,7 +36,7 @@ void CBookManager::writeListofBooksWithBSB() {
     size_t counter=0;
     for(auto it : m_mapBooks)
     {
-        if(it.second->getMetadata().getMetadata("archiveLocation", "data") != "" && it.second->getOcr() == false)
+        if(it.second->getMetadata().getMetadata("archiveLocation", "data") != "" && it.second->hasOcr() == false)
         {
             sBuffer+=it.second->getAuthor() + ", " + it.second->getMetadata().getTitle() + ", " + std::to_string(it.second->getDate()) + ". Link: " + it.second->getMetadata().getMetadata("archiveLocation", "data") + "\n";
             counter++;
@@ -144,7 +144,7 @@ std::list<std::string>* CBookManager::search(CSearchOptions* searchOpts)
         for(auto it=results->begin(); it!=results->end();) {
             if(results2->count(it->first) == 0)
                  it = results->erase(it);
-            else if(m_mapBooks[it->first]->getOcr() == true && m_mapBooks[it->first]->onSamePage(sWords)==false)
+            else if(m_mapBooks[it->first]->hasOcr() == true && m_mapBooks[it->first]->onSamePage(sWords)==false)
                  it = results->erase(it);
             else
                 ++it;
@@ -225,7 +225,7 @@ void CBookManager::createMapWords()
     for(auto it=m_mapBooks.begin(); it!=m_mapBooks.end(); it++)
     {
         //Check whether book has ocr
-        if(it->second->getOcr() == false)
+        if(it->second->hasOcr() == false)
             continue;
 
         //Iterate over all words in this book. Check whether word already exists in list off all words.

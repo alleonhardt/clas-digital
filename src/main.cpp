@@ -85,7 +85,7 @@ void update_all_files(CBookManager *m, nlohmann::json *zot)
 			if(gGlobalSigShutdown)
 				return;
 
-			if(it.second->getHasFiles() && (it.second->getPublic()))
+			if(it.second->hasContent() && (it.second->getPublic()))
 			{
 				std::string loc = "location ~ /books/";
 				loc+=it.first;
@@ -269,7 +269,7 @@ void get_metadata(const Request &req, Response &resp, CBookManager &manager)
 		std::string scanId = req.get_param_value("scanId");
 		CBook *b = manager.getMapOfBooks().at(scanId);
 		nlohmann::json js = b->getMetadata().getMetadata();
-		js["has_ocr"] = b->getOcr();
+		js["has_ocr"] = b->hasOcr();
 		resp.set_content(std::move(js.dump()),"application/json");
 	}
 	catch(...)
@@ -447,7 +447,7 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
 					nlohmann::json entry;
 					entry["scanId"] = it->getKey();
 					entry["copyright"] = !it->getPublic();
-					entry["hasocr"] = it->getHasFiles();
+					entry["hasocr"] = it->hasContent();
 					entry["description"] = it->getShow();
 					entry["bibliography"] = it->getMetadata().getMetadata("bib");
 					entry["preview"] = it->getPreview(options.getSearchedWord());

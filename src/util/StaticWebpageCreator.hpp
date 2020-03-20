@@ -100,7 +100,7 @@ class StaticWebpageCreator
                                 content+="</head>\n<body itemscope itemtype=\"http://schema.org/Book\"><h1>\n";
 				content+=m_info["bib"];
 				content+="</h1><nav id='booklcontentlink'>\n<ul>\n";
-				if(m_book->getHasFiles()) {
+				if(m_book->hasContent()) {
 				content+="<li><a href=\"";
 				content+=webpath;
 				content+="\" rel=\"search\">Pages in this book</a></li>\n";
@@ -232,7 +232,7 @@ class StaticCatalogueCreator
 				entry["key"] = it.second->getMetadata().getMetadata()["data"]["key"];
 				entry["title"] = it.second->getMetadata().getShow2();
 				entry["bib"] = it.second->getMetadata().getMetadata()["bib"];
-				entry["has_ocr"] = it.second->getOcr();
+				entry["has_ocr"] = it.second->hasOcr();
 				books["books"].push_back(std::move(entry));
 			}
 			inja::Environment env;
