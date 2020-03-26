@@ -23,3 +23,14 @@ li a {
   display: block;
   overflow: hidden;
 }
+
+.metadata {
+	font-size: 30%;
+	text-color: grey;
+}
+
+
+header {
+	text-align: center;
+	border-bottom: 1px solid grey;
+}

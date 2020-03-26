@@ -26,17 +26,18 @@
 
 <body>
 	{% include "../template_navbar.html" %}	
-	<center><h1>Index of all books</h1></center>
-	<center><p>{{ length(books) }} books</p></center>
-	<center><input placeholder="Search for categories..." oninput="on_search(this,2);"></input></center>
-	<center><p id='filteropts' style='display:none;color: grey;'></p></center>
-	<hr>
+	<header>
+	<h1>Index of all books</h1>
+	<p>{{ length(books) }} books</p>
+	<input placeholder="Search for categories..." oninput="on_search(this,2);"></input>
+	<span id='filteropts' style='display:none;color: grey;'></span>
+	</header>
 	
 	<ol>
 	{% for pg in books %}
 	<li> 
 		<a class="searchable_item" href="/books/{{ pg.key }}/">{{ pg.title }}</a>
-		<a class="searchable_item" style="display: none">{{ lower(pg.bib) }}</a>
+		<a class="searchable_item" class="metadata">{{ lower(pg.bib) }}</a>
 	</li>
 	{% endfor %}
 	</ol>

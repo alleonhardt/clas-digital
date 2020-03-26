@@ -24,16 +24,18 @@
     <script src="/catalogue/catalogue.js"></script>
 </head>
 
+
 <body>
 	{% include "../template_navbar.html" %}	
-	<center><h1>Catalogue collection: {{pillar.name}}</h1></center>
-	<center><p>{{ length(books) }} books in this collection</p></center>
-	<center><input placeholder="Search for categories..." oninput="on_search(this);"></input></center>
-	<center><p id='filteropts' style='display:none;color: grey;'></p></center>
-	<hr/>
+	<header>
+	<h1>Catalogue collection: {{pillar.name}}</h1>
+	<p>{{ length(books) }} books in this collection</p>
+	<input placeholder="Search for categories..." oninput="on_search(this);"></input>
+	<p id='filteropts' style='display:none;color: grey;'></p>
+	</header>
     <ol>
     {% for book in books %}
-    <li><a class="searchable_item" href="/books/{{ book.id}}/">{{ book.show }}<a></li>
+    <li><a class="searchable_item" href="/books/{{ book.id}}/">{{ book.show }}</a></li>
     {% endfor %}
     </ol>
 </body>

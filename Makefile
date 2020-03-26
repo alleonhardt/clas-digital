@@ -14,7 +14,13 @@ reset_static_books_stable:
 reset_static_catalogue_stable:
 	rm /etc/clas-digital/updated_catalogue.txt
 
+log:
+	sudo journalctl -f -u clas-digital-devel
 
+log_stable:
+	sudo journalctl -f -u clas-digital
+
+.PHONY: log log_stable
 
 install:
 	cd build && cmake --build . --target install
