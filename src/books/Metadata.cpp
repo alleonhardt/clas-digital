@@ -157,6 +157,21 @@ std::string CMetadata::getAuthor()
     return sAuthor;
 }
 
+std::vector<std::string> CMetadata::getAuthors()
+{
+    std::vector<nlohmann::json> v_jAuthors = m_metadata["data"]["creators"];
+    std::vector<std::string> v_sAuthors;
+    for(const auto &it : v_jAuthors)
+    {
+        std::string sAuthor = it.value("lastName", it.value("name", ""));
+        if(it.value("firstName", "") != "")
+            sAuthor += ", " + it.value("firstName", "");
+        v_sAuthors.push_back(sAuthor);
+    }
+
+    return v_sAuthors;
+}
+
 /**
 * @return title of book
 */

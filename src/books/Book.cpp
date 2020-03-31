@@ -13,8 +13,8 @@ CBook::CBook(nlohmann::json jMetadata) : m_metadata(jMetadata)
 {
     m_sKey = jMetadata["key"];
     m_sPath = "web/books/"+m_sKey;
-    m_bOcr = false;
-    m_bhasFiles = false;
+    m_hasOcr = false;
+    m_hasImages = false;
 
     //Metadata
     m_sAuthor = m_metadata.getAuthor();
@@ -26,7 +26,10 @@ CBook::CBook(nlohmann::json jMetadata) : m_metadata(jMetadata)
 // **** GETTER **** //
 const std::string& CBook::getKey() { return m_sKey;}
 const std::string& CBook::getPath() {return m_sPath;}
-bool CBook::getHasFiles() const { return m_bhasFiles; }
+
+bool CBook::hasOcr() const { return m_hasOcr;}
+bool CBook::hasImages() const { return m_hasImages; }
+bool CBook::hasContent() const { return m_hasImages || m_hasOcr; }
 
 std::string CBook::getOcrPath() {
     std::string sPath = m_sPath;
@@ -37,13 +40,12 @@ std::string CBook::getOcrPath() {
 std::string CBook::getShow() {
 
     std::string str = m_metadata.getShow();
-    if(m_bOcr == true)
+    if(m_hasOcr == true)
         return str;
     str+="<span style='color:orange;font-size:80%'> Book is not yet scanned, sorry for that.</span>";
     return str;
 }
 
-bool CBook::getOcr() { return m_bOcr;}
 int CBook::getNumPages() { return m_numPages; }
 CMetadata& CBook::getMetadata() { return m_metadata; } 
 
@@ -79,15 +81,12 @@ void CBook::setPath(std::string sPath) { m_sPath = sPath; }
 void CBook::createBook(std::string sPath)
 {
     std::ifstream readOcr(getOcrPath());
-    int counter = 0;
     for(auto& p: std::filesystem::directory_iterator(sPath))
     {
 	    (void)p;
-	    ++counter;
+        if(p.path().extension() == ".jpg")
+            m_hasImages = true; 
     }
-
-    if(counter>2)
-	m_bhasFiles = true;
 
     //If ocr exists create or load list with words
     if(!readOcr)
@@ -107,7 +106,12 @@ void CBook::createBook(std::string sPath)
     else
         loadPages();
 
-    m_bOcr = true;
+    //Test output to see if authors function works
+    std::cout << "AUTHORs: ";
+    for(const auto &it : m_metadata.getAuthors())
+        std::cout << it << "; ";
+    std::cout << std::endl;
+    m_hasOcr = true;
 }
 
 void CBook::createPages()
@@ -255,7 +259,7 @@ void CBook::loadPages()
 std::map<int, std::vector<std::string>>* CBook::getPages(std::string sInput, bool fuzzyness)
 {
     std::map<int, std::vector<std::string>>* mapPages = new std::map<int, std::vector<std::string>>;
-    if(m_bOcr == false)
+    if(m_hasOcr == false)
         return mapPages;
 
     std::replace(sInput.begin(), sInput.end(), ' ', '+');
@@ -427,7 +431,7 @@ std::string CBook::getOnePreview(std::string sWord)
     size_t page=1000000;
 
     // *** get Source string and position *** //
-    if(m_bOcr == true) 
+    if(m_hasOcr == true) 
         sSource = getPreviewText(sWord, pos, page);
     else
         sSource = getPreviewTitle(sWord, pos);

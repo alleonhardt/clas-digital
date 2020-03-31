@@ -79,6 +79,8 @@ public:
     */
     std::string getAuthor();
 
+    std::vector<std::string> getAuthors();
+
     /**
     * @return title of book
     */
