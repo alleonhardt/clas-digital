@@ -253,13 +253,21 @@ class StaticCatalogueCreator
             for(auto &it : manager.getMapOfBooks()) {
                 std::string lastName = it.second->getMetadata().getAuthor();
                 std::string firstName = it.second->getMetadata().getMetadata("firstName", "data", "creators", 0);
+		auto origName = lastName;
+		auto origFam = firstName;
+		func::convertToLower(lastName);
+		func::convertToLower(firstName);
                 mapAuthors[lastName + "_" + firstName] = {
-                            {"id", lastName + "_" + firstName},
-                            {"show", lastName + ", " + firstName},
+                            {"id", firstName + "-" + lastName},
+                            {"show", origName + ", " + origFam},
                             {"num", manager.getMapofAuthors()[func::returnToLower(lastName)].size()} };
             }
-            for(auto &it : mapAuthors)
-                js["authors"].push_back(it.second);
+            	for(auto &it : mapAuthors)
+	    	{
+			if(it.first == "_")
+				continue;
+                	js["authors"].push_back(it.second);
+		}
             
 
 			inja::Environment env;
@@ -278,7 +286,9 @@ class StaticCatalogueCreator
             for(auto &it : manager.getMapOfBooks()) {
                 std::string lastName = it.second->getMetadata().getAuthor();
                 std::string firstName = it.second->getMetadata().getMetadata("firstName", "data", "creators", 0);
-                std::string key = lastName + "_" + firstName;
+		func::convertToLower(lastName);
+		func::convertToLower(firstName);
+                std::string key = firstName + "-" + lastName;
                 std::string val = lastName + ", " + firstName;
 
                 if(lastName.size() == 0)
