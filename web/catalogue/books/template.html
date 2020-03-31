@@ -29,20 +29,13 @@
 	<header>
 	<h1>Index of all books</h1>
 	<p>{{ length(books) }} books</p>
-	<input placeholder="Search for categories..." oninput="on_search(this,2);"></input>
-	<span id='filteropts' style='display:none;color: grey;'></span>
+	{% include "../search_template.html" %}
 	</header>
 	
 	<ol>
 	{% for pg in books %}
-	<li> 
-		<a class="searchable_item" href="/books/{{ pg.key }}/">{{ pg.title }}</a>
-		<a class="searchable_item" class="metadata">{{ lower(pg.bib) }}</a>
-	</li>
+	<li class="searchable_item"><a href="/books/{{ pg.key }}/">{{ pg.title }}</a><a class="metadata">{{ pg.bib }}</a></li>
 	{% endfor %}
 	</ol>
 
 </body>
-
-
-

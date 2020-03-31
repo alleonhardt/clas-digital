@@ -25,7 +25,7 @@ li a {
 }
 
 .metadata {
-	font-size: 30%;
+	font-size: small;
 	text-color: grey;
 }
 
@@ -33,4 +33,23 @@ li a {
 header {
 	text-align: center;
 	border-bottom: 1px solid grey;
+	padding-bottom: 1rem;
+}
+
+.progress {
+	margin-top: 0.5rem;
+	display: block;
+	background: white;
+	text-align: center;
+}
+
+.progress progress {
+	height: 2rem;
+	width: 15rem;
+}
+
+.progresValue {
+    position:absolute;
+    right:0;
+    left:0;
 }

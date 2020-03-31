@@ -3,15 +3,25 @@ let global_start = 0;
 let global_count = 0;
 let global_factor = 1;
 
-function on_search_async(it,divide=1)
+function on_search_async(it)
 {
 	let lst = document.getElementsByClassName("searchable_item");
 	let num_items = Math.max(Math.floor((lst.length*global_factor)/50),20);
 	global_factor++;
+	if(global_factor>6)
+	{
+		document.getElementById("progressField").style.display = "";
+	}
+	
 
 	if(global_start>=lst.length)
+	{
+		document.getElementById("progressField").style.display = "none";
+		document.getElementById("infoProgress").style.color = "green";
+		document.getElementById("infoProgress").innerHTML = global_count+" results.";
 		return;
-	it.value = it.value.toLowerCase();
+	}
+
 	for(let i = 0; i < num_items; i++)
 	{
 		if((i+global_start)==lst.length)
@@ -19,29 +29,47 @@ function on_search_async(it,divide=1)
 			global_start+=i;
 			break;
 		}
-		let htm = lst[i+global_start].innerHTML;
-		if(htm.search(it.value) == -1)
-			lst[i+global_start].parentNode.style.display = "none";
-		else
+		let children = lst[i+global_start].childNodes;
+		let found = false;
+		if(it.value=="")
 		{
-			lst[i+global_start].parentNode.style.display = "";
+			found=true;
 			global_count++;
 		}
+		else
+		{
+			for(let inner = 0; inner < children.length; inner++)
+			{
+				let htm = children[inner].innerHTML;
+				if(htm != undefined && htm.search(it.value) != -1)
+				{
+					found = true;
+					global_count++;
+					break;
+				}
+			}
+		}
+		if(found)
+			lst[i+global_start].style.display = "";
+		else
+			lst[i+global_start].style.display = "none";
 	}
-	if(it.value=="")
+
+	if(it.value!="")
 	{
-		document.getElementById("filteropts").style.display="none";
+		document.getElementById("infoProgress").innerHTML = "searching...";
+		document.getElementById("searchProgress").value = Math.floor(global_start*100/lst.length);
+		document.getElementById("progressValue").innerHTML = Math.floor(global_start*100/lst.length)+"%";
 	}
 	else
 	{
-		document.getElementById("filteropts").innerHTML = "Filtering yielded "+global_count+" results<br>Searched "+Math.floor(global_start/divide)+"/"+Math.floor(lst.length/divide)+" entries";
-		document.getElementById("filteropts").style.display="block";
+		document.getElementById("filteropts").style.display="none";
 	}
 	global_start += num_items;
-	global_timer = window.setTimeout(function(){on_search_async(it,divide)},150);
+	global_timer = window.setTimeout(function(){on_search_async(it)},150);
 }
 
-function on_search(it,divide=1)
+function on_search(it)
 {
 	if(global_timer!=null)
 	{
@@ -52,5 +80,8 @@ function on_search(it,divide=1)
 	global_timer = null;
 	global_factor = 1;
 
-	on_search_async(it,divide);
+	document.getElementById("filteropts").style.display="block";
+	document.getElementById("infoProgress").style.color = "red";
+	document.getElementById("progressField").style.display = "none";
+	on_search_async(it);
 }

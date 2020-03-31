@@ -26,18 +26,15 @@
 
 <body>
 	{% include "../template_navbar.html" %}	
-	<center><h1>Catalogue year {{ year }}</h1></center>
-	<center><p>Found {{ length(books) }} books from the year {{ year }}</p></center>
-	<center><input placeholder="Search for books..." oninput="on_search(this,2);"></input></center>
-	<center><p id='filteropts' style='display:none;color: grey;'></p></center>
-	<hr/>
+	<header>
+	<h1>Catalogue year {{ year }}</h1>
+	<p>Found {{ length(books) }} books from the year {{ year }}</p>
+	{% include "../search_template.html" %}
+	</header>
+	
 	<ol>
 		{% for book in books %}
-		<li>
-			<a class="searchable_item" href="/books/{{ book.key }}/">{{ book.title }}</a>
-			<a class="searchable_item" style="display: none">{{ lower(book.bib) }}</a>
-
-		</li>
+		<li class="searchable_item"><a href="/books/{{ book.key }}/">{{ book.title }}</a><a class="metadata">{{ book.bib }}</a></li>
 		{% endfor %}
 	</ol>
 </body>

@@ -25,15 +25,16 @@
 
 <body>
 	{% include "template_navbar.html" %}
-	<center><h1>Catalogue categories</h1></center>
-	<center><p>{{ length(pages) }} categories</p></center>
-	<center><input placeholder="Search for categories..." oninput="on_search(this);"></input></center>
-	<center><p id='filteropts' style='display:none;color: grey;'></p></center>
-	<hr>
+	<header>
+	<h1>Catalogue categories</h1>
+	<p>{{ length(pages) }} categories</p>
+	{% include "search_template.html" %}
+	</header>
+	
 	
 	<ol>
 	{% for pg in pages %}
-	<li> <a href="/catalogue/{{ pg }}/" class="searchable_item">{{ pg }}</a></li>
+	<li class="searchable_item"> <a href="/catalogue/{{ pg }}/">{{ pg }}</a></li>
 	{% endfor %}
 	</ol>
 </body>

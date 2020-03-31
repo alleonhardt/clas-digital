@@ -30,12 +30,12 @@
 	<header>
 	<h1>Catalogue collection: {{pillar.name}}</h1>
 	<p>{{ length(books) }} books in this collection</p>
-	<input placeholder="Search for categories..." oninput="on_search(this);"></input>
-	<p id='filteropts' style='display:none;color: grey;'></p>
+	{% include "../search_template.html" %}
 	</header>
+	
     <ol>
     {% for book in books %}
-    <li><a class="searchable_item" href="/books/{{ book.id}}/">{{ book.show }}</a></li>
+    <li class="searchable_item"><a href="/books/{{ book.id}}/">{{ book.show }}</a></li>
     {% endfor %}
     </ol>
 </body>

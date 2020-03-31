@@ -26,15 +26,16 @@
 
 <body>
 	{% include "../template_navbar.html" %}	
-	<center><h1>Catalogue years</h1></center>
-	<center><p>Found books from {{ length(years) }} distinct years</p></center>
-	<center><input placeholder="Search for categories..." oninput="on_search(this);"></input></center>
-	<center><p id='filteropts' style='display:none;color: grey;'></p></center>
-	<hr/>
+	<header>
+	<h1>Catalogue years</h1>
+	<p>Found books from {{ length(years) }} distinct years</p>
+	{% include "../search_template.html" %}
+	</header>
+	
 	<ul>
-		{% for year in years %}
-		<li><a class="searchable_item" href="/catalogue/years/{{ year.year }}">{{ year.year }} (books: {{ year.count }})</a></li>
-		{% endfor %}
+	{% for year in years %}
+	<li class="searchable_item"><a href="/catalogue/years/{{ year.year }}">{{ year.year }} (books: {{ year.count }})</a></li>
+	{% endfor %}
 	</ul>
 </body>
 

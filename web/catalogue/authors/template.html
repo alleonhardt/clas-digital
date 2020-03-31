@@ -27,14 +27,14 @@
 <body>
 
 	{% include "../template_navbar.html" %}	
-	<center><h1>Catalogue author collection</h1></center>
-	<center><p>{{ length(authors) }} diffrent authors</p></center>
-	<center><input placeholder="Search for categories..." oninput="on_search(this);"></input></center>
-	<center><p id='filteropts' style='display:none;color: grey;'></p></center>
-	<hr/>
+	<header>
+	<h1>Catalogue author collection</h1>
+	<p>{{ length(authors) }} diffrent authors</p>
+	{% include "../search_template.html" %}
+	</header>
     <ol>
     {% for author in authors %}
-    <li><a class="searchable_item" href="/catalogue/authors/{{ author.id }}/">{{ author.show }} (books: {{ author.num }})</a></li>
+    <li class="searchable_item"><a href="/catalogue/authors/{{ author.id }}/">{{ author.show }} (books: {{ author.num }})</a></li>
     {% endfor %}
     </ol>
 
