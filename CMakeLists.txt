@@ -14,7 +14,6 @@ set(CMAKE_CXX_FLAGS "-O3 -Wall -Wextra -Werror -Wpedantic -march=native -std=c++
 
 find_package(Threads REQUIRED)
 find_package(CURL REQUIRED)
-find_package( Tesseract REQUIRED )
 include_directories(${Tesseract_INCLUDE_DIRS})
 
 set(SRC_FILES src/main.cpp src/login/user.cpp src/login/usertable.cpp src/util/URLParser.cpp src/zotero/zotero.cpp src/ocr/tesseract.cpp)
