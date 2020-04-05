@@ -5,7 +5,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="canonical" href="https://www.clas-digital.uni-frankfurt.de/catalogue/years" />
+    <link rel="canonical" href="https://www.clas-digital.uni-frankfurt.de/catalogue/years/{{year}}" />
     <!--<link rel="stylesheet" href="style.css">-->
 
     <link href="/topnav.css" rel="stylesheet" type="text/css">
@@ -15,8 +15,8 @@
     <link rel="shortcut icon" href="static/fav/hand-top-right-16+32+48.ico"/>
 
     <!-- Provide more sutable information show in google search -->
-    <title>Cultural and Literary Animal Studies: catalogue</title>
-    <meta name="description" lang="en" content="The CLAS Digital searchable book archive catalogue"/>
+    <title>Cultural and Literary Animal Studies: catalogue {{year}}</title>
+    <meta name="description" lang="en" content="The CLAS Digital searchable book archive: index of all booky published in {{year}}"/>
 
     <script src="/Search.js"></script>
     <script src="/user.js"></script>
@@ -27,7 +27,7 @@
 <body>
 	{% include "../template_navbar.html" %}	
 	<header>
-	<h1>Catalogue year {{ year }}</h1>
+	<h1>Book published in {{ year }}</h1>
 	<p>Found {{ length(books) }} books from the year {{ year }}</p>
 	{% include "../search_template.html" %}
 	</header>
