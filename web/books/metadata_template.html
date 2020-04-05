@@ -10,7 +10,7 @@
 		<link rel="stylesheet" type="text/css" href="/static/books.css"/>
 		</head>
 		<body itemscope itemtype="http://schema.org/Book">
-		<h1> {{ bib }} </h1>
+		<h1> {{ show }} </h1>
 		<nav id='booklcontentlink'>
 			<ul>
 				{% if hasContent %}
@@ -46,18 +46,22 @@
 				</span>
 			</dd>
 
-			<dt id="date">Date:
-			</dt>
+			<dt id="date">Date: </dt>
 			<dd itemprop="datePublished">
 				{{ date }}
 			</dd>
+
 			{% if hasISBN %}
 				<dt id="isbn">ISBN:</dt>
 				<dd itemprop="isbn">
 					{{ isbn }}
 				</dd>
 			{% endif %}
-			</dl>
+
+            <dt id="bib">Bibliography: </dt>
+            <dd>{{ bib }}</dd>
+
+	    </dl>
 		</section>
 	</body>
 </html>

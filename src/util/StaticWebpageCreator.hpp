@@ -25,6 +25,7 @@ class StaticWebpageCreator
 			auto title=m_info["data"].value("title","");
 			auto isbn = m_info["data"].value("isbn","");
 			nlohmann::json info;
+            info["show"] = m_book->getMetadata().getShow2();
 			info["bib"] = m_info["bib"];
 			info["hasContent"] = m_book->hasContent();
 			info["itemType"] = itemType;
