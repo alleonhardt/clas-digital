@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang=\"en\">
+	<head>
+		<meta charset="utf-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<link rel="shortcut icon" href="/static/fav/hand-top-right-16+32+48.ico"><title> {{ title }}</title>
+
+		<link rel="canonical" href="https://www.clas-digital.uni-frankfurt.de/books/{{ key }}">
+
+		<link rel="stylesheet" type="text/css" href="/static/books.css"/>
+		</head>
+		<body itemscope itemtype="http://schema.org/Book">
+		<h1> {{ bib }} </h1>
+		<nav id='booklcontentlink'>
+			<ul>
+				{% if hasContent %}
+				<li><a href="/books/{{ key }}/pages" rel="search">Pages in this book</a></li>
+				{% endif %}
+				<li><a href="/books/">Other books in catalogue</a></li>
+
+			</ul>
+		</nav>
+		<section>
+		<dl>
+			<dt id="itemType">Item Type:</dt>
+			<dd>{{ itemType }}</dd>
+			
+			<dt id="title">Title:</dt>
+			<dd itemprop="name"> {{ title }}</dd>
+			
+			<dt id='author'>Author:</dt>
+			<dd itemprop="author" itemscope itemtype="http://schema.org/Person">
+				<span itemprop="name">
+                for(const auto &it : m_book->getMetadata().getAuthors())
+				    content+=it + "; ";
+                content.erase(content.end()-2);
+				</span>
+			</dd>
+
+			<dt id="place">Place:</dt>
+			<dd itemscope itemtype="http://schema.org/Place">
+				<span itemprop="name">
+					{{ place }}
+				</span>
+			</dd>
+
+			<dt id="date">Date:
+			</dt>
+			<dd itemprop="datePublished">
+				{{ date }}
+			</dd>
+			{% if hasISBN %}
+				<dt id="isbn">ISBN:</dt>
+				<dd itemprop="isbn">
+					{{ isbn }}
+				</dd>
+			{% endif %}
+			</dl>
+		</section>
+	</body>
+</html>
+
