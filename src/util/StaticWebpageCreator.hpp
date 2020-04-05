@@ -21,7 +21,6 @@ class StaticWebpageCreator
 		
 		void CreateMetadataPage()
 		{
-            		std::cout << "CREATE WEBPAGE STATIC!!!"<<std::endl;
 			auto itemType =m_info["data"].value("itemType","");
 			auto title=m_info["data"].value("title","");
 			auto isbn = m_info["data"].value("isbn","");
@@ -57,7 +56,7 @@ class StaticWebpageCreator
 			inja::Environment env;
 			inja::Template temp = env.parse_template("web/books/pages_template.html");
 			std::string result = env.render(temp, js);
-			std::ofstream ofs("web/books/pages/"+m_book->getKey()+"/index.html",std::ios::out);
+			std::ofstream ofs("web/books/"+m_book->getKey()+"/pages/index.html",std::ios::out);
 			ofs<<result;
 			ofs.close();
 		}

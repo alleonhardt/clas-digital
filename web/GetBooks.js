@@ -186,6 +186,8 @@ function loadOCRFile(ocrtxt)
 	CreatePageLayout();
 }
 
+let gTitle = document.title;
+
 function CreatePageLayout()
 {
     console.log("OCR size: "+gOcrSplittedFile.arr.length);
@@ -278,7 +280,7 @@ function CreatePageLayout()
 		{
 		    let newurl = window.location.search;
 		    newurl+="#page"+kk[0].pageNumber;
-		    window.history.replaceState({},null,newurl);
+		    window.history.pushState({},gTitle+" Page: "+kk[0].pageNumber,newurl);
 		}
 	    }
 
