@@ -18,6 +18,35 @@ class StaticWebpageCreator
 			m_info = book->getMetadata().getMetadata();
 			m_book = book;
 		}
+		
+		void CreateMetadataPage()
+		{
+            		std::cout << "CREATE WEBPAGE STATIC!!!"<<std::endl;
+			auto itemType =m_info["data"].value("itemType","");
+			auto title=m_info["data"].value("title","");
+			auto isbn = m_info["data"].value("isbn","");
+			nlohmann::json info;
+			info["bib"] = m_info["bib"];
+			info["hasContent"] = m_book->hasContent();
+			info["itemType"] = itemType;
+			info["title"] = title;
+			info["authors"] = nlohmann::json::array();
+                	for(const auto &it : m_book->getMetadata().getAuthors())
+				info["authors"].push_back(it);
+			info["hasISBN"] = isbn != "";
+			info["isbn"] = isbn;
+			info["place"] = m_info["data"].value("place","");
+			info["date"] = m_info["data"].value("date","");
+			info["key"] = m_book->getKey();
+
+
+			inja::Environment env;
+			inja::Template temp = env.parse_template("web/books/metadata_template.html");
+			std::string result = env.render(temp, info);
+			std::ofstream ofs("web/books/"+m_book->getKey()+"/index.html",std::ios::out);
+			ofs<<result;
+			ofs.close();
+		}
 
 		bool createWebpage()
 		{
@@ -82,71 +111,7 @@ class StaticWebpageCreator
 			
 
 			{
-				auto itemType =m_info["data"].value("itemType","");
-				auto title=m_info["data"].value("title","");
-				auto isbn = m_info["data"].value("isbn","");
-				
-				//Metadata page only
-				std::string content = "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\"/>\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\">\n<link rel=\"shortcut icon\" href=\"/static/fav/hand-top-right-16+32+48.ico\"/><title>";
-				content+=m_book->getMetadata().getShow2();
-				content+="</title>\n";
-
-				content+="<link rel=\"canonical\" href=\"https://www.clas-digital.uni-frankfurt.de/books/";
-				content+=m_book->getKey();
-                                content+="\"/>\n";
-
-				content+="<link rel=\"stylesheet\" type=\"text/css\" href=\"/static/books.css\"/>\n";
-				
-                                content+="</head>\n<body itemscope itemtype=\"http://schema.org/Book\"><h1>\n";
-				content+=m_info["bib"];
-				content+="</h1><nav id='booklcontentlink'>\n<ul>\n";
-				if(m_book->hasContent()) {
-				content+="<li><a href=\"";
-				content+=webpath;
-				content+="\" rel=\"search\">Pages in this book</a></li>\n";
-				}
-				content+="<li><a href=\"/books/\">Other books in catalogue</a></li>\n";
-				content+="</ul>\n</nav>\n";
-
-				content+="<section>\n";
-				content+="<dl>\n";
-
-				content+="<dt id=\"itemType\">Item Type:</dt>\n<dd>";
-			       	content+=itemType;
-				content+="</dd>\n";
-
-				content+="<dt id=\"title\">Title:</dt>\n<dd itemprop=\"name\">";
-			       	content+=title;
-				content+="</dd>\n";
-
-				content+="<dt id='author'>Author:</dt>\n<dd itemprop=\"author\" itemscope itemtype=\"http://schema.org/Person\"><span itemprop=\"name\">";
-                for(const auto &it : m_book->getMetadata().getAuthors())
-				    content+=it + "; ";
-                content.erase(content.end()-2);
-				content+="</span></dd>\n";
-
-				content+="<dt id=\"place\">Place:</dt>\n<dd itemscope itemtype=\"http://schema.org/Place\"><span itemprop=\"name\">";
-				content+=m_info["data"].value("place","");
-				content+="</span></dd>\n";
-
-				content+="<dt id=\"date\">Date:</dt>\n<dd itemprop=\"datePublished\">";
-				content+=m_info["data"].value("date","");
-				content+="</dd>\n";
-
-				if(isbn!="")
-				{
-					content+="<dt id=\"isbn\">ISBN:</dt><dd itemprop=\"isbn\">";
-					content+=isbn;
-					content+="</dd>\n";
-				}
-				content+="</dl>\n</section>\n";
-				content+="</body>\n</html>\n";
-				std::string pathcopy = m_path;
-				pathcopy+="/index.html";
-
-				std::ofstream ofs(pathcopy.c_str(), std::ios::out);
-				ofs<<content;
-				ofs.close();
+				CreateMetadataPage();
 			}
 			return true;
 		}

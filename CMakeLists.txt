@@ -50,6 +50,7 @@ ADD_CUSTOM_TARGET(install_stable
 )
 
 install(FILES src/clas-digital.service DESTINATION /etc/systemd/system)
+install(FILES web/books/metadata_template.html DESTINATION ${INSTALL_DIRS}/web/books)
 install(FILES src/clas-digital-devel.service DESTINATION /etc/systemd/system)
 install(FILES src/default DESTINATION /etc/nginx/sites-available)
 install(PROGRAMS bin/clas-digital.o DESTINATION ${INSTALL_DIRS})

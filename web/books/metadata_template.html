@@ -31,9 +31,11 @@
 			<dt id='author'>Author:</dt>
 			<dd itemprop="author" itemscope itemtype="http://schema.org/Person">
 				<span itemprop="name">
-                for(const auto &it : m_book->getMetadata().getAuthors())
-				    content+=it + "; ";
-                content.erase(content.end()-2);
+					<ul>
+						{% for author in authors %}
+						<li>{{ author }}</li>
+						{% endfor %}
+					</ul>
 				</span>
 			</dd>
 
