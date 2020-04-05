@@ -262,16 +262,15 @@ std::string CMetadata::getShow2()
     for(unsigned int i=0; i<10 && i<vStrs.size(); i++)
         sResult += vStrs[i] + " ";
 
-    if(vStrs.size() > 10)
-        sResult += "...</i>";
+    sResult.pop_back();
+    if(vStrs.size() > 10 && getDate() != -1)
+        sResult += "...</i>, " + std::to_string(getDate()) + ".";
+    else if(vStrs.size() > 10)
+        sResult += "...</i>.";
+    else if(getDate() != -1)
+        sResult += "</i>, " + std::to_string(getDate()) + ".";
     else
-        sResult += "</i>";
-
-
-    if(getDate() != -1)
-        sResult += ", " + std::to_string(getDate());
-
-    sResult += ".";
+        sResult += "</i>.";
 
     return sResult;
 }
