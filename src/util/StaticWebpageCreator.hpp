@@ -286,10 +286,11 @@ class StaticCatalogueCreator
             for(auto &it : manager.getMapOfBooks()) {
                 std::string lastName = it.second->getMetadata().getAuthor();
                 std::string firstName = it.second->getMetadata().getMetadata("firstName", "data", "creators", 0);
-		func::convertToLower(lastName);
-		func::convertToLower(firstName);
+
+                std::string name = lastName + ", " + firstName;
+		        func::convertToLower(lastName);
+		        func::convertToLower(firstName);
                 std::string key = firstName + "-" + lastName;
-                std::string val = lastName + ", " + firstName;
 
                 if(lastName.size() == 0)
                     continue;
@@ -299,9 +300,10 @@ class StaticCatalogueCreator
                 std::filesystem::create_directory("web/catalogue/authors/"+key+"/", ec);
 
                 nlohmann::json js;
+                js["author"] = {{"name", name}, {"id", key}};
+
                 //Create json with all books
-                for(auto &jt : manager.getMapofAuthors()[func::returnToLower(lastName)]) {
-                    js["name"] = lastName;
+                for(auto &jt : manager.getMapofAuthors()[lastName]) {
                     js["books"].push_back({ 
                         {"id", jt.first},
                         { "show", manager.getMapOfBooks()[jt.first]->getMetadata().getMetadata("bib")}
