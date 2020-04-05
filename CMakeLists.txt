@@ -23,7 +23,7 @@ set(SRC_FILES_BOOKS src/books/Book.cpp src/books/Bookmanager.cpp src/books/Metad
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_HOME_DIRECTORY}/bin)
 add_executable(books.o EXCLUDE_FROM_ALL ${SRC_FILES_BOOKS} src/books/main.cpp)
 add_executable(clas-digital.o ${SRC_FILES} ${SRC_FILES_BOOKS})
-target_link_libraries(clas-digital.o stdc++fs ${CURL_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${Tesseract_LIBRARIES})
+target_link_libraries(clas-digital.o stdc++fs ${CURL_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} tesseract lept)
 target_link_libraries(books.o stdc++fs ${CURL_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 if(STABLE_INSTALL) 
