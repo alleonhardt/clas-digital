@@ -228,6 +228,7 @@ class StaticCatalogueCreator
 		void CreateCatalogueBooks(CBookManager &mng)
 		{
 			nlohmann::json books;
+            std::vector<nlohmann::json> vBooks;
 			for(auto &it : mng.getMapOfBooks())
 			{
 				nlohmann::json entry;
@@ -235,8 +236,13 @@ class StaticCatalogueCreator
 				entry["title"] = it.second->getMetadata().getShow2();
 				entry["bib"] = it.second->getMetadata().getMetadata()["bib"];
 				entry["has_ocr"] = it.second->hasOcr();
-				books["books"].push_back(std::move(entry));
+            
+				vBooks.push_back(std::move(entry));
 			}
+
+            std::sort(vBooks.begin(), vBooks.end(), [](nlohmann::json i, nlohmann::json j){ return i["title"]<j["title"];});
+
+            books["books"] = vBooks;
 			inja::Environment env;
 			inja::Template temp = env.parse_template("web/catalogue/books/template.html");
 			std::string result = env.render(temp, books);
