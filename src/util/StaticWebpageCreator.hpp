@@ -138,14 +138,18 @@ class StaticCatalogueCreator
 				std::error_code ec;
 				std::filesystem::create_directory("web/catalogue/years/"+x.first,ec);
 				nlohmann::json js;
+                std::vector<nlohmann::json> vBooks;
 				for(auto y : x.second.second)
 				{
 					nlohmann::json js_k;
 					js_k["key"] = y->getMetadata().getMetadata()["data"]["key"];
 					js_k["title"] = y->getMetadata().getShow2();
 					js_k["bib"] = y->getMetadata().getMetadata()["bib"];
-					js["books"].push_back(std::move(js_k));
+					vBooks.push_back(std::move(js_k));
 				}
+
+                std::sort(vBooks.begin(), vBooks.end(), &StaticCatalogueCreator::mySort);
+                js["books"] = vBooks;
 				js["year"] = x.first;
 
 				std::string result = env2.render(temp2, js);
@@ -157,7 +161,6 @@ class StaticCatalogueCreator
 
 		void CreateCatalogueBooks(CBookManager &mng)
 		{
-			nlohmann::json books;
             std::vector<nlohmann::json> vBooks;
 			for(auto &it : mng.getMapOfBooks())
 			{
@@ -170,8 +173,9 @@ class StaticCatalogueCreator
 				vBooks.push_back(std::move(entry));
 			}
 
-            std::sort(vBooks.begin(), vBooks.end(), [](nlohmann::json i, nlohmann::json j){ return i["title"]<j["title"];});
+            std::sort(vBooks.begin(), vBooks.end(), &StaticCatalogueCreator::mySort);
 
+			nlohmann::json books;
             books["books"] = vBooks;
 			inja::Environment env;
 			inja::Template temp = env.parse_template("web/catalogue/books/template.html");
@@ -239,13 +243,18 @@ class StaticCatalogueCreator
                 js["author"] = {{"name", name}, {"id", key}};
 
                 //Create json with all books
+                std::vector<nlohmann::json> vBooks;
                 for(auto &jt : manager.getMapofAuthors()[lastName]) {
-                    js["books"].push_back({ 
+                    vBooks.push_back({ 
                         {"id", jt.first},
-                        { "show", manager.getMapOfBooks()[jt.first]->getMetadata().getMetadata("bib")}
+                        { "title", manager.getMapOfBooks()[jt.first]->getMetadata().getShow2()},
+                        { "bib", manager.getMapOfBooks()[jt.first]->getMetadata().getMetadata("bib")}
                                           });
                 }
 
+                std::sort(vBooks.begin(), vBooks.end(), &StaticCatalogueCreator::mySort);
+
+                js["books"] = vBooks;
                 std::string result = env.render(temp, js);
                 std::ofstream ofs("web/catalogue/authors/"+key+"/index.html",std::ios::out);
                 ofs<<result;
@@ -282,21 +291,32 @@ class StaticCatalogueCreator
                 std::filesystem::create_directory("web/catalogue/collections/"+key+"/", ec);
 
                 //Create books for this collection
+                std::vector<nlohmann::json> vBooks;
                 for(auto &jt : manager.getMapOfBooks()) {
                     std::vector<std::string> collections = jt.second->getMetadata().getCollections();
 
                     if(collections.size() == 0 || func::in(key, collections) == false)
                         continue;
 
-                    js["books"].push_back({ 
+                    vBooks.push_back({ 
                         {"id", jt.first},
-                        { "show", jt.second->getMetadata().getShow2()} });
+                        { "title", jt.second->getMetadata().getShow2()},
+                        { "bib", jt.second->getMetadata().getMetadata("bib")} });
                 }
 
+                std::sort(vBooks.begin(), vBooks.end(), &StaticCatalogueCreator::mySort);
+
+                js["books"] = vBooks;
                 std::string result = env.render(temp, js);
                 std::ofstream ofs("web/catalogue/collections/"+key+"/index.html",std::ios::out);
                 ofs<<result;
                 ofs.close();
             }
+        }
+
+        static bool mySort(nlohmann::json i, nlohmann::json j) {
+            std::string str1 = i["title"];
+            std::string str2 = j["title"];
+            return func::returnToLower(str1)<func::returnToLower(str2);
         }
 };

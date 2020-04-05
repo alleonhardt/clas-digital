@@ -9,7 +9,6 @@
     <!--<link rel="stylesheet" href="style.css">-->
 
     <link href="/topnav.css" rel="stylesheet" type="text/css">
-    <link href="/Search.css" rel="stylesheet">
 
     <!-- Link favicon, so google can show in search results -->
     <link rel="shortcut icon" href="static/fav/hand-top-right-16+32+48.ico"/>
@@ -35,7 +34,7 @@
 	
     <ol>
     {% for book in books %}
-    <li class="searchable_item"><a href="/books/{{ book.id }}/">{{ book.show }}<a></li>
+    <li class="searchable_item"><a href="/books/{{ book.id }}/">{{ book.title}}<a><span class="metadata">{{book.bib}}</span></li>
     {% endfor %}
     </ol>
 
