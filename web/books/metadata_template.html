@@ -8,57 +8,82 @@
 		<link rel="canonical" href="https://www.clas-digital.uni-frankfurt.de/books/{{ key }}">
 
 		<link rel="stylesheet" type="text/css" href="/static/books.css"/>
+        <link rel="stylesheet" type="text/css" href="/style/metadata.css"/>
+
 		</head>
 		<body itemscope itemtype="http://schema.org/Book">
-		<h1> {{ bib }} </h1>
-		<nav id='booklcontentlink'>
-			<ul>
-				{% if hasContent %}
-				<li><a href="/books/{{ key }}/pages" rel="search">Pages in this book</a></li>
-				{% endif %}
-				<li><a href="/books/">Other books in catalogue</a></li>
 
-			</ul>
-		</nav>
-		<section>
-		<dl>
-			<dt id="itemType">Item Type:</dt>
-			<dd>{{ itemType }}</dd>
-			
-			<dt id="title">Title:</dt>
-			<dd itemprop="name"> {{ title }}</dd>
-			
-			<dt id='author'>Author:</dt>
-			<dd itemprop="author" itemscope itemtype="http://schema.org/Person">
-				<span itemprop="name">
-					<ul>
-						{% for author in authors %}
-						<li>{{ author }}</li>
-						{% endfor %}
-					</ul>
-				</span>
-			</dd>
+        <div class="metadata">
+            <h1> {{ show }} </h1>
+            <nav id='booklcontentlink'>
+                <ul>
+                    {% if hasContent %}
+                    <li><a href="/catalogue/books/{{ key }}/pages" rel="search">Pages in this book</a></li>
+                    {% endif %}
+                    <li><a href="/catalogue/books/">Other books in catalogue</a></li>
 
-			<dt id="place">Place:</dt>
-			<dd itemscope itemtype="http://schema.org/Place">
-				<span itemprop="name">
-					{{ place }}
-				</span>
-			</dd>
+                </ul>
+            </nav>
+            <section>
+            <dl>
+                <table>
+                <tr>
+                    <td><dt id="itemType"><b>Item Type:</b></td>
+                    <td><dd>{{ itemType }}</dd></td>
+                </tr>
+                
+                <tr>
+                    <td><dt id="title"><b>Title:</b></dt></td>
+                    <td><dd itemprop="name"> {{ title }}</dd></td>
+                </tr>
+                
+                <tr>
+                    <td><dt id='author'><b>Author:</b></dt></td>
+                    <td><dd itemprop="author" itemscope itemtype="http://schema.org/Person">
+                    <span itemprop="name">
+                        <ul>
+                            {% for author in authors %}
+                            <li>{{ author }}</li>
+                            {% endfor %}
+                        </ul>
+                    </span>
+                    </dd></td>
+                </tr>
 
-			<dt id="date">Date:
-			</dt>
-			<dd itemprop="datePublished">
-				{{ date }}
-			</dd>
-			{% if hasISBN %}
-				<dt id="isbn">ISBN:</dt>
-				<dd itemprop="isbn">
-					{{ isbn }}
-				</dd>
-			{% endif %}
-			</dl>
-		</section>
+                <tr>
+                    <td><dt id="place"><b>Place:</b></dt></td>
+                    <td><dd itemscope itemtype="http://schema.org/Place">
+                    <span itemprop="name">
+                        {{ place }}
+                    </span>
+                    </dd></td>
+                </tr>
+
+                <tr>
+                    <td><dt id="date"><b>Date:</b> </dt></td>
+                    <td><dd itemprop="datePublished">
+                    {{ date }}
+                    </dd></td>
+                </tr>
+
+                {% if hasISBN %}
+                <tr>
+                    <td><dt id="isbn"><b>ISBN:</b></dt></td>
+                    <td><dd itemprop="isbn">
+                        {{ isbn }}
+                    </dd></td>
+                </tr>
+                {% endif %}
+
+                <tr>
+                    <td><dt id="bib"><b>Bibliography: </b></dt></td>
+                    <td><dd>{{ bib }}</dd></td>
+                </tr>
+                </table>
+
+	        </dl>
+		    </section>
+        </div>
 	</body>
 </html>
 
