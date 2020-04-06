@@ -222,12 +222,15 @@ class StaticCatalogueCreator
             for(auto &it : manager.getMapOfBooks()) {
                 std::string lastName = it.second->getMetadata().getAuthor();
                 std::string firstName = it.second->getMetadata().getMetadata("firstName", "data", "creators", 0);
-		auto origName = lastName;
-		auto origFam = firstName;
-		func::convertToLower(lastName);
-		func::convertToLower(firstName);
+                auto origName = lastName;
+                auto origFam = firstName;
+                func::convertToLower(lastName);
+                func::convertToLower(firstName);
+                std::string key = firstName + "-" + lastName;
+                std::replace(key.begin(), key.end(), ' ', '-');
+        
                 mapAuthors[lastName + "_" + firstName] = {
-                            {"id", firstName + "-" + lastName},
+                            {"id", key},
                             {"show", origName + ", " + origFam},
                             {"num", manager.getMapofAuthors()[func::returnToLower(lastName)].size()} };
             }
@@ -260,6 +263,7 @@ class StaticCatalogueCreator
 		        func::convertToLower(lastName);
 		        func::convertToLower(firstName);
                 std::string key = firstName + "-" + lastName;
+                std::replace(key.begin(), key.end(), ' ', '-');
 
                 if(lastName.size() == 0)
                     continue;
