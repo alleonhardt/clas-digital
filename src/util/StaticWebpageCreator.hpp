@@ -18,6 +18,34 @@ class StaticWebpageCreator
 			m_info = book->getMetadata().getMetadata();
 			m_book = book;
 		}
+
+		template<typename T>
+		std::string general_applier(const std::string &esc, char character, T t1)
+		{
+			std::string newstr;
+			for(unsigned int i = 0; i < esc.length(); i++)
+				if( esc[i] == character )
+				{
+					newstr+=t1(character);
+				}
+				else
+					newstr+=esc[i];
+			return newstr;
+		}
+		std::string escaper(const std::string &esc,char character)
+		{
+			return general_applier(esc,character,[](char ch){return std::string("\\")+ch;});
+		}
+
+		std::string cutter(const std::string &esc, char character)
+		{
+			return general_applier(esc,character,[](char ){return "";});
+		}
+
+		std::string replacer(const std::string &esc, char character,std::string seq)
+		{
+			return general_applier(esc,character,[&seq](char){return seq;});
+		}
 		
 		void CreateMetadataPage()
 		{
@@ -53,6 +81,7 @@ class StaticWebpageCreator
 			js["key"] = m_book->getKey();
 			js["title"] = m_book->getMetadata().getShow2();
 			js["bib"] = m_info["bib"];
+			js["bib_esc"] = cutter(replacer(m_info["bib"].get<std::string>(),'"',"&quot;"),'\n');
 			inja::Environment env;
 			inja::Template temp = env.parse_template("web/books/pages_template.html");
 			std::string result = env.render(temp, js);
