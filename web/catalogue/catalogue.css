@@ -23,7 +23,8 @@ li {
  
 li a {
   text-decoration: none;
-  color: #000;
+
+  color: #007bff;
 
   display: block;
   overflow: hidden;
@@ -34,6 +35,10 @@ li a {
 	text-color: grey;
 }
 
+
+.searchable_item a:hover {
+    text-decoration: underline;
+}
 
 header {
 	text-align: center;
