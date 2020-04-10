@@ -3,17 +3,28 @@
 	<head>
 		<meta charset="utf-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-		<link rel="shortcut icon" href="/static/fav/hand-top-right-16+32+48.ico"><title> {{ title }}</title>
+		<link rel="shortcut icon" href="/static/fav/hand-top-right-16+32+48.ico"/>
+        <title> {{ title }} </title>
 
-		<link rel="canonical" href="https://www.clas-digital.uni-frankfurt.de/books/{{ key }}">
+		<link rel="canonical" href="https://www.clas-digital.uni-frankfurt.de/books/{{ key }}"/>
 
 		<link rel="stylesheet" type="text/css" href="/static/books.css"/>
         <link rel="stylesheet" type="text/css" href="/style/metadata.css"/>
-        <link href="/topnav.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" type="text/css" href="/topnav.css"/>
         <script src="/user.js"></script>
 
-		</head>
-		<body itemscope itemtype="http://schema.org/Book">
+    <style>
+    .topnav .dropdown .dropdown-content a {
+    display: block;
+    width: 73%;
+    cursor: pointer;
+    border-top: 1px solid black;
+    }
+    </style>
+
+    </head>
+
+	<body itemscope itemtype="http://schema.org/Book">
 	    {% include "../catalogue/template_navbar.html" %}
 
         <div class="metadata">
