@@ -1,3 +1,8 @@
+html {
+	width: 100%;
+	overflow-x: hidden;
+}
+
 ol {
 	margin-left: 10%;
 	width: 80%;

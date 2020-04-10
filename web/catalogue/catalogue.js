@@ -22,6 +22,7 @@ function on_search_async(it)
 		return;
 	}
 
+	lowercase_search = it.value.toLowerCase();
 	for(let i = 0; i < num_items; i++)
 	{
 		if((i+global_start)==lst.length)
@@ -41,7 +42,7 @@ function on_search_async(it)
 			for(let inner = 0; inner < children.length; inner++)
 			{
 				let htm = children[inner].innerHTML;
-				if(htm != undefined && htm.search(it.value) != -1)
+				if(htm != undefined && htm.toLowerCase().search(lowercase_search) != -1)
 				{
 					found = true;
 					global_count++;
