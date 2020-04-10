@@ -9,9 +9,12 @@
 
 		<link rel="stylesheet" type="text/css" href="/static/books.css"/>
         <link rel="stylesheet" type="text/css" href="/style/metadata.css"/>
+        <link href="/topnav.css" rel="stylesheet" type="text/css">
+        <script src="/user.js"></script>
 
 		</head>
 		<body itemscope itemtype="http://schema.org/Book">
+	    {% include "../catalogue/template_navbar.html" %}
 
         <div class="metadata">
             <h1> {{ show }} </h1>
