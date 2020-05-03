@@ -120,25 +120,26 @@ void update_all_files(CBookManager *m, nlohmann::json *zot)
 	std::ofstream is_updated("updated_static_books.txt");
 	is_updated<<"0";
 	is_updated.close();
-	if(!std::filesystem::is_regular_file("updated_catalogue.txt"))
-	{
-	    StaticCatalogueCreator ct;
-	    ct.CreateCatalogue(); 
-	    ct.CreateCatalogueAuthors(manager);
-	    ct.CreateCatalogueBooks(manager);
-	    ct.CreateCatalogueAuthor(manager);
-	    ct.CreateCatalogueCollections(zoteroPillars);
-	    ct.CreateCatalogueCollection(manager, zoteroPillars);
-	    ct.CreateCatlogueYears(manager);
-	    std::ofstream ofs("updated_catalogue.txt");
-	    ofs<<"0";
-	    ofs.close();
-	}
     }
     else
     {
 	std::cout<<"Using cached static files, to rebuild all files use \"make reset_static\""<<std::endl;
     }
+    if(!std::filesystem::is_regular_file("updated_catalogue.txt"))
+    {
+	StaticCatalogueCreator ct;
+	ct.CreateCatalogue(); 
+	ct.CreateCatalogueAuthors(manager);
+	ct.CreateCatalogueBooks(manager);
+	ct.CreateCatalogueAuthor(manager);
+	ct.CreateCatalogueCollections(zoteroPillars);
+	ct.CreateCatalogueCollection(manager, zoteroPillars);
+	ct.CreateCatlogueYears(manager);
+	std::ofstream ofs("updated_catalogue.txt");
+	ofs<<"0";
+	ofs.close();
+    }
+
 }
 
 void update_and_restart()
