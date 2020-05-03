@@ -173,6 +173,22 @@ std::vector<std::string> CMetadata::getAuthors()
 }
 
 /**
+* @param[in] sTag tag to search for
+* @return return whether book has a certain tag
+*/
+bool CMetadata::hasTag(std::string sTag) 
+{
+    if(m_metadata.count("tags") == 0)
+        return false;
+    for(auto it = m_metadata["tags"].begin(); it!=m_metadata["tags"].end(); it++)
+    {
+        if(it.value() == sTag)
+            return true;
+    }
+    return false;
+}
+
+/**
 * @return title of book
 */
 std::string CMetadata::getTitle() {
@@ -274,5 +290,3 @@ std::string CMetadata::getShow2()
 
     return sResult;
 }
-
-

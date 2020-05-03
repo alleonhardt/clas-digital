@@ -32,22 +32,51 @@ CBookManager::MAPWORDS& CBookManager::getMapofAuthors() {
 
 void CBookManager::writeListofBooksWithBSB() {    
     
-    std::string sBuffer;
-    size_t counter=0;
+    std::string inBSB_noOcr = "Buecher mit bsb-link, aber ohne OCR: \n";
+    std::string gibtEsBeiBSB_noOCR = "Buecher mit tag \"gibtEsBeiBSB\" aber ohne ocr: \n";
+    std::string gibtEsBeiBSB_OCR = "Buecher mit tag \"gibtEsBeiBSB\" aber mit ocr: \n";
+    std::string BSBDownLoadFertig_noOCR = "Buecher mit tag \"BSBDownLoadFertig\" aber ohne ocr: \n";
+
     for(auto it : m_mapBooks)
     {
-        if(it.second->getMetadata().getMetadata("archiveLocation", "data") != "" && it.second->hasOcr() == false)
+        if(it.second->hasOcr() == false)
         {
-            sBuffer+=it.second->getAuthor() + ", " + it.second->getMetadata().getTitle() + ", " + std::to_string(it.second->getDate()) + ". Link: " + it.second->getMetadata().getMetadata("archiveLocation", "data") + "\n";
-            counter++;
+            //Check if book has a bsb-link (archiveLocation)
+            if(it.second->getMetadata().getMetadata("archiveLocation", "data") != "")
+                inBSB_noOcr+= it.second->getKey() + ": " + it.second->getMetadata().getShow2() + "\n";
+            
+            //Check if book has tag: "GibtEsBeiBSB"
+            if(it.second->getMetadata().hasTag("GibtEsBeiBSB") == true)
+                gibtEsBeiBSB_noOCR += it.second->getKey() + ": " + it.second->getMetadata().getShow2() + "\n";
+    
+            //Check if book has tag: "BSBDownLoadFertig"
+            if(it.second->getMetadata().hasTag("BSBDownLoadFertig") == true)
+                BSBDownLoadFertig_noOCR += it.second->getKey() + ": " + it.second->getMetadata().getShow2()+"\n";
         }
+        else if(it.second->getMetadata().hasTag("GibtEsBeiBSB") == true)
+            gibtEsBeiBSB_OCR += it.second->getKey() + ": " + it.second->getMetadata().getShow2() + "\n";
+        
     }
 
-    std::string str = "Number of books with bsb-link: " + std::to_string(counter) + "\n\n";
-    sBuffer.insert(0, str);
-    std::ofstream write("inbsb.txt");
-    write << sBuffer;
-    write.close();
+    //Save books with bsb-link but o ocr
+    std::ofstream writeBSB_NoOCR("inBSB_noOcr.txt");
+    writeBSB_NoOCR << inBSB_noOcr;
+    writeBSB_NoOCR.close();
+
+    //Save books with tag GibtEsBeiBSB but without ocr
+    std::ofstream writeGIBT_NoOCR("gibtEsBeiBSB_noOCR.txt");
+    writeGIBT_NoOCR << gibtEsBeiBSB_noOCR;
+    writeGIBT_NoOCR.close();
+
+    //Save books with tag GibtEsBeiBSB but with ocr
+    std::ofstream writeGIBT_OCR("gibtEsBeiBSB_OCR.txt");
+    writeGIBT_OCR << gibtEsBeiBSB_OCR;
+    writeGIBT_OCR.close();
+
+    //Save books with tag BSBDownLoadFertig but with ocr
+    std::ofstream writeFERTIG_noOCR("BSBDownLoadFertig_noOCR.txt");
+    writeFERTIG_noOCR << BSBDownLoadFertig_noOCR;
+    writeFERTIG_noOCR.close();
 }
 
 /**
@@ -56,8 +85,6 @@ void CBookManager::writeListofBooksWithBSB() {
 bool CBookManager::initialize()
 {
     std::cout << "Starting initualizeing..." << std::endl;
-
-    
 
     //Load directory of all books 
     DIR *dir_allItems;
@@ -69,11 +96,20 @@ bool CBookManager::initialize()
         return false;
     
     std::cout << "extracting books." << std::endl;
+    std::string sUntrackedBooks = "Currently untracked books: \n";
     //Go though all books and create book
     while((e_allItems = readdir(dir_allItems)) != NULL) {
         if(m_mapBooks.count(e_allItems->d_name) > 0)
             addBook(e_allItems->d_name);
+        //Write books untracked by zotero in a seperate file
+        else
+            sUntrackedBooks += (std::string)e_allItems->d_name + "\n"; 
     }
+
+    //Write all untracked books to seperate files
+    std::ofstream write("untracked_books.txt");
+    write << sUntrackedBooks;
+    write.close();
 
     std::cout << "Createing map of books." << std::endl;
 
