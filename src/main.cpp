@@ -858,6 +858,9 @@ int main(int argc, char **argv)
     //Register for sigterm as it is send by systemd to stop the service.
     signal(SIGTERM, sig_handler);
     CBookManager manager;
+    StaticWebpageCreator creator;
+    creator.createSearchPages();
+    creator.createInformationPages();
 
     //Load all pillars
     nlohmann::json zoteroPillars;
