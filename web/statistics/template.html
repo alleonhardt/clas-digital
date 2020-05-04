@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!--<link rel="stylesheet" href="style.css">-->
+    <title>Statistiken von CLAS digital</title>
+
+    <!-- Link favicon, so google can show in search results -->
+    <link rel="shortcut icon" href="static/fav/hand-top-right-16+32+48.ico"/>
+
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <link rel="canonical" href="https://www.clas-digital.uni-frankfurt.de/information/statistics" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+    <script src='../user.js'></script>
+<style>
+body {
+	background-color: white;
+}
+
+body {
+    margin:0;
+}
+
+html {
+    margin:0;
+}
+
+.GeneralPageLayout {
+    width: 100%;
+    text-align: center;
+}
+
+.GeneralPageLayout p {
+    width: 40vw;
+    margin: auto;
+    padding: 1rem;
+    margin-top: 4.5rem;
+    font-size: large;
+}
+
+canvas {
+    width: 50%;
+    height: 50%;
+    margin-left: 25%;
+}
+
+</style>
+<link href="/topnav.css" rel="stylesheet" type="text/css">
+    <script>
+window.addEventListener("load",function(){initialise("homelink");receive_stats();},false);
+</script>
+  </head>
+<body>
+    {% include "../catalogue/template_navbar.html" %}
+    <center><h1>CLAS Digital - Statistics</h1></center>
+    <center><p>Book ocrs: {{ BookOcrCount }}</p></center>
+    <center><p>Scanned book pages: {{ BookPageCount }}</p></center>
+    <center><p>Managed metadata: {{ BookMetadataCount }}</p></center>
+    <canvas id="bookchart"></canvas>
+    <canvas id="bookpages"></canvas>
+</body>
+    <script>
+	var ctx = document.getElementById('bookchart').getContext('2d');
+var myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: ['Books with Metadata','Books with Metadata and OCR'],
+        datasets: [{
+            label: 'Books divided by Metadata and OCR',
+	    data: [{{ BookMetadataCount }}, {{ BookOcrCount }}],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.7)',
+                'rgba(54, 162, 235, 0.7)'
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+	responsive: false,
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true
+                }
+            }]
+        }
+    }
+});
+    ctx = document.getElementById("bookpages").getContext('2d');
+myChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+	labels: ['Books with less than 300 pages','Books with less than 500 Pages', 'Books with less than 1000 Pages', 'Books with more than 1000 pages'],
+        datasets: [{
+            label: 'Books divided by Pages',
+	    data: [{{ Books300 }}, {{ Books500 }}, {{ Books1000 }}, {{ Books1000plus }}],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.7)',
+                'rgba(54, 162, 235, 0.7)',
+                'rgba(54, 162, 135, 0.7)',
+                'rgba(254, 162, 235, 0.7)'
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(54, 162, 135, 1)',
+                'rgba(254, 162, 235, 1)'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+	responsive: false,
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true
+                }
+            }]
+        }
+    }
+});
+    </script>
+</html>
