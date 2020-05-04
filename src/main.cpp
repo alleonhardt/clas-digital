@@ -921,6 +921,53 @@ int main(int argc, char **argv)
     }
     srchFile.close();
 
+    nlohmann::json statistics;
+    unsigned long ocrcount = 0;
+    unsigned long pagecount = 0;
+    unsigned long books300 = 0;
+    unsigned long books500 = 0;
+    unsigned long books1000 = 0;
+    unsigned long books1000plus = 0;
+    for(auto it : manager.getMapOfBooks())
+    {
+	if(it.second->hasOcr())
+	{
+	    ++ocrcount;
+	    unsigned long cnt = 0;
+	    for(auto &it : std::filesystem::directory_iterator(it.second->getPath()))
+	    {
+		if(it.path().extension() == "jpg" || it.path().extension() == "png" || it.path().extension() == "bmp")
+		{
+		    ++pagecount;
+		    ++cnt;
+		}
+	    }
+	    
+	    if(cnt != 0)
+	    {
+		if(cnt<300)
+		    books300++;
+		else if(cnt < 500)
+		    books500++;
+		else if(cnt < 1000)
+		    books1000++;
+		else
+		    books1000plus++;
+	    }
+	}
+    }
+    statistics["BookOcrCount"] = ocrcount;
+    statistics["BookPageCount"] = pagecount;
+    statistics["BookMetadataCount"] = manager.getMapOfBooks().size();
+    statistics["Books300"] = books300;
+    statistics["Books500"] = books500;
+    statistics["Books1000"] = books1000;
+    statistics["Books1000plus"] = books1000plus;
+    inja::Environment env;
+    inja::Template temp = env.parse_template("web/statistics/template.html");
+    std::string result = env.render(temp,statistics);
+    atomic_write_file("web/statistics/index.html",result);
+
 
     srv.Post("/login",&do_login);
     srv.Get("/search",[&](const Request &req, Response &resp) { do_search(req,resp,fileSearchHtml,zoteroPillars,manager);});
