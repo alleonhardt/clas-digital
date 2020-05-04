@@ -82,6 +82,12 @@ public:
     std::vector<std::string> getAuthors();
 
     /**
+    * @param[in] sTag tag to search for
+    * @return return whether book has a certain tag
+    */
+    bool hasTag(std::string sTag);
+
+    /**
     * @return title of book
     */
     std::string getTitle();
