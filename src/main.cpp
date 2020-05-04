@@ -887,8 +887,13 @@ int main(int argc, char **argv)
 	for(auto &it : zoteroPillars)
 	{
 	    auto entryjs = nlohmann::json::parse(Zotero::SendRequest(Zotero::Request::GetAllItemsFromCollection(it["key"])));
+	    unsigned long numEntries = 0;
 	    for(auto &it : entryjs)
+	    {
 		metaData.push_back(it);
+		numEntries++;
+	    }
+	    it["numEntries"] = numEntries;
 	}
 	//Save the collected data as it is the newest data available
 	std::ofstream o("bin/zotero.json",std::ios::out);
@@ -931,19 +936,36 @@ int main(int argc, char **argv)
     unsigned long books500 = 0;
     unsigned long books1000 = 0;
     unsigned long books1000plus = 0;
+
+    for(auto &it : zoteroPillars)
+    {
+	    unsigned long numEntries = 0;
+	    for(auto it2 : manager.getMapOfBooks())
+	    {
+		auto vec = it2.second->getMetadata().getCollections();
+		if(std::find(vec.begin(),vec.end(),it["key"].get<std::string>()) != vec.end())
+			numEntries++;
+	    }
+	    it["numEntries"] = numEntries;
+    }
+
     for(auto it : manager.getMapOfBooks())
     {
 	if(it.second->hasOcr())
 	{
 	    ++ocrcount;
 	    unsigned long cnt = 0;
-	    for(auto &it : std::filesystem::directory_iterator(it.second->getPath()))
+	    std::filesystem::path p = std::filesystem::path(it.second->getPath())/"pages";
+	    if(std::filesystem::exists(p))
 	    {
-		if(it.path().extension() == "jpg" || it.path().extension() == "png" || it.path().extension() == "bmp")
+	    for(auto &it2 : std::filesystem::directory_iterator(p))
+	    {
+		if(it2.path().extension() == ".jpg" || it2.path().extension() == ".png" || it2.path().extension() == ".bmp")
 		{
 		    ++pagecount;
 		    ++cnt;
 		}
+	    }
 	    }
 	    
 	    if(cnt != 0)
@@ -959,6 +981,8 @@ int main(int argc, char **argv)
 	    }
 	}
     }
+    
+
     statistics["BookOcrCount"] = ocrcount;
     statistics["BookPageCount"] = pagecount;
     statistics["BookMetadataCount"] = manager.getMapOfBooks().size();
@@ -966,6 +990,16 @@ int main(int argc, char **argv)
     statistics["Books500"] = books500;
     statistics["Books1000"] = books1000;
     statistics["Books1000plus"] = books1000plus;
+    statistics["collections"] = nlohmann::json::array();
+
+    for(auto &it : zoteroPillars)
+    {
+    	nlohmann::json jk;
+    	jk["name"] = it["name"];
+    	jk["size"] = it["numEntries"];
+    	statistics["collections"].push_back(jk);
+    }
+    
     inja::Environment env;
     inja::Template temp = env.parse_template("web/statistics/template.html");
     std::string result = env.render(temp,statistics);
