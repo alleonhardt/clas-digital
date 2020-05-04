@@ -97,14 +97,24 @@ bool CBookManager::initialize()
     
     std::cout << "extracting books." << std::endl;
     std::string sUntrackedBooks = "Currently untracked books: \n";
+    size_t i=0;
+    size_t j=0;
     //Go though all books and create book
     while((e_allItems = readdir(dir_allItems)) != NULL) {
         if(m_mapBooks.count(e_allItems->d_name) > 0)
+        {
+            i++;
             addBook(e_allItems->d_name);
+        }
         //Write books untracked by zotero in a seperate file
-        else
+        else 
+        {
+            j++;
             sUntrackedBooks += (std::string)e_allItems->d_name + "\n"; 
+        }
     }
+    std::cout << "TRACKED: " << i << std::endl;
+    std::cout << "UNTRACKED: " << j << std::endl;
 
     //Write all untracked books to seperate files
     std::ofstream write("untracked_books.txt");
