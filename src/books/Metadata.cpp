@@ -178,11 +178,13 @@ std::vector<std::string> CMetadata::getAuthors()
 */
 bool CMetadata::hasTag(std::string sTag) 
 {
-    if(m_metadata.count("tags") == 0)
+    if(m_metadata.count("data") == 0)
         return false;
-    for(auto it = m_metadata["tags"].begin(); it!=m_metadata["tags"].end(); it++)
+    if(m_metadata["data"].count("tags") == 0)
+        return false;
+    for(auto it = m_metadata["data"]["tags"].begin(); it!=m_metadata["data"]["tags"].end(); it++)
     {
-        if(it.value() == sTag)
+        if(it.value()["tag"] == sTag)
             return true;
     }
     return false;

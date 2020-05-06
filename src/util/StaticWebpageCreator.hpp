@@ -27,6 +27,8 @@ class StaticWebpageCreator
 		nlohmann::json m_info;
 		CBook *m_book;
 	public:
+        StaticWebpageCreator(){};
+
 		StaticWebpageCreator(CBook *book)
 		{
 			m_path = book->getPath();
@@ -68,6 +70,31 @@ class StaticWebpageCreator
 			return replacer(replacer(replacer(replacer(str,'<',"&lt;"),'>',"&gt;"),'"',"&quot;"),'\'',"&apos;");
 		}
 
+        void createSearchPages()
+        {
+            inja::Environment env;
+            nlohmann::json j;
+            j["information"] = "";
+            j["search"] = "class='dropdown-banner active'";
+            j["catalogue"] = "";
+
+            inja::Template temp = env.parse_template("web/search_template.html");
+            std::string result = env.render(temp, j);  
+            atomic_write_file("web/Search.html", result);
+        }
+
+        void createInformationPages()
+        {
+            inja::Environment env;
+            nlohmann::json j;
+            j["information"] = "class='dropdown-banner active'";
+            j["search"] = "";
+            j["catalogue"] = "";
+
+            inja::Template temp = env.parse_template("web/information/information_template.html");
+            std::string result = env.render(temp, j);  
+            atomic_write_file("web/index.de.html", result);
+        }
 		void CreateMetadataPage()
 		{
 			auto itemType =m_info["data"].value("itemType","");

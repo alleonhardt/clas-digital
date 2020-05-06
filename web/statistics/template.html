@@ -45,6 +45,7 @@ canvas {
     width: 50%;
     height: 50%;
     margin-left: 25%;
+    margin-bottom: 3rem;
 }
 
 </style>
@@ -59,8 +60,12 @@ window.addEventListener("load",function(){initialise("homelink");receive_stats()
     <center><p>Book ocrs: {{ BookOcrCount }}</p></center>
     <center><p>Scanned book pages: {{ BookPageCount }}</p></center>
     <center><p>Managed metadata: {{ BookMetadataCount }}</p></center>
+    <center><h3>Books with Metadata/OCR</h3></center>
     <canvas id="bookchart"></canvas>
+    <center><h3>Distribution of book length in the book index</h3></center>
     <canvas id="bookpages"></canvas>
+    <center><h3>Distribution of books in the collections</h3></center>
+    <canvas id="bookcollections"></canvas>
 </body>
     <script>
 	var ctx = document.getElementById('bookchart').getContext('2d');
@@ -113,6 +118,45 @@ myChart = new Chart(ctx, {
                 'rgba(54, 162, 135, 1)',
                 'rgba(254, 162, 235, 1)'
             ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+	responsive: false,
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true
+                }
+            }]
+        }
+    }
+});
+	ctx = document.getElementById("bookcollections").getContext('2d');
+	myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+	
+	labels: [
+		{% for col in collections %}
+			{% if loop.is_first %}
+			"{{ col.name }}"
+			{% else %}
+			,"{{ col.name }}"
+			{% endif %}
+		{% endfor %}
+		],
+        datasets: [{
+            label:'How many books are in which collection',
+	    data: [
+		    {% for col in collections %}
+			{% if loop.is_first %}
+		    		{{ col.size }}
+			{% else %}
+		     		,{{ col.size }}
+			{% endif %}
+		     {% endfor %}
+	    ],
             borderWidth: 1
         }]
     },
