@@ -93,23 +93,6 @@ function Upload(x,key)
 		    Upload(x,key);
 		}
 		return;
-
-		let yes = document.createElement("button");
-		let no = document.createElement("button");
-		yes.style.background = "red";
-		yes.innerHTML = "Yes";
-		no.style.background = "green";
-		no.innerHTML = "No";
-		x.children[0].children[0].appendChild(yes);
-		x.children[0].children[0].appendChild(no);
-		x.children[0].children[1].style.display = "none";
-		x.children[0].children[2].style.display = "none";
-
-		yes.onclick = function() {
-		 		}
-
-		no.onclick = function() {
-		}
 	    }
 	    else
 	    {
