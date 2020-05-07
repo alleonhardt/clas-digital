@@ -241,7 +241,10 @@ function CreatePageLayout()
 	    doc = cont;
 	}
 
-	let svgcode = "<svg class='svgpage' data-width='"+gPageLayoutFile.pages[i].width+"' data-height='"+gPageLayoutFile.pages[i].height+"' data-path='"+"/books/"+scanId+ "/pages/" + gPageLayoutFile.pages[i].file.substr(gPageLayoutFile.pages[i].file.search("page"))+"' viewBox='0 0 "+gPageLayoutFile.pages[i].width+" "+gPageLayoutFile.pages[i].height+"'></svg>";
+	let lastIndex = gPageLayoutFile.pages[i].file.lastIndexOf("/");
+	if(lastIndex==-1)
+	    lastIndex=0;
+	let svgcode = "<svg class='svgpage' data-width='"+gPageLayoutFile.pages[i].width+"' data-height='"+gPageLayoutFile.pages[i].height+"' data-path='"+"/books/"+scanId+ "/pages/" + gPageLayoutFile.pages[i].file.substr(lastIndex)+"' viewBox='0 0 "+gPageLayoutFile.pages[i].width+" "+gPageLayoutFile.pages[i].height+"'></svg>";
 
 	doc.innerHTML +=svgcode;
     }

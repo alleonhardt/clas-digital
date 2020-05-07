@@ -614,16 +614,17 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 
 	    nlohmann::json entry;
 	    entry["file"] = fileName;
-	    std::regex reg("0*([1-9][0-9]*)\\..*");
+	    std::regex reg("_0*([1-9][0-9]*)");
 	    std::smatch cm;
 	    int maxPageNum = file_desc["maxPageNum"];
-	    if(std::regex_match(fileName,cm,reg))
-	    {
-		if(cm.size()<2)
-		    throw std::runtime_error("malformed_img_naming");
-		entry["pageNumber"]=std::stoi(cm[1]);
-		maxPageNum = std::max(maxPageNum,std::stoi(cm[1]));
-	    }
+	    std::cout<<fileName<<std::endl;
+	    std::regex_search(fileName,cm,reg);
+	    std::cout<<"Match size: "<<cm.size()<<std::endl;
+	    if(cm.size()<2)
+		throw std::runtime_error("malformed_img_naming");
+	    std::cout<<"Match: "<<cm[1]<<std::endl;
+	    entry["pageNumber"]=std::stoi(cm[1]);
+	    maxPageNum = std::max(maxPageNum,std::stoi(cm[1]));
 
 	    int width,height,z;
 	    stbi_info_from_memory(reinterpret_cast<const unsigned char*>(req.body.c_str()),req.body.length(),&width,&height,&z);
@@ -664,7 +665,11 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 	    return;
 	}
 	writePath = directory;
-	writePath += "/pages/";
+	writePath += "/pages";
+	std::error_code ec;
+	if(!std::filesystem::exists(writePath))
+	    std::filesystem::create_directory(writePath,ec);
+	writePath+="/";
 	writePath += fileName;
     }
     else if((fileEnd!="txt")&&(fileEnd!="TXT"))
@@ -672,6 +677,12 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 	resp.status = 403;
 	resp.set_content("unsupported_file_type","text/plain");
 	return;
+    }
+    else
+    {
+	writePath = directory;
+	writePath += "/ocr.txt";
+	std::cout<<writePath<<std::endl;
     }
     std::cout<<"Uploading file now! File size: "<<req.body.length()<<std::endl;
 
