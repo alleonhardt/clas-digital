@@ -643,9 +643,7 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 		}
 	    }
 	    file_desc["maxPageNum"] = maxPageNum;
-	    std::cout<<"Hallo 1"<<std::endl;
 	    int what = entry["pageNumber"];
-	    std::cout<<"Hallo 1"<<std::endl;
 	    if(!replace)
 		file_desc["pages"].push_back(std::move(entry));
 
@@ -667,7 +665,11 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 	    return;
 	}
 	writePath = directory;
-	writePath += "/pages/";
+	writePath += "/pages";
+	std::error_code ec;
+	if(!std::filesystem::exists(writePath))
+	    std::filesystem::create_directory(writePath,ec);
+	writePath+="/";
 	writePath += fileName;
     }
     else if((fileEnd!="txt")&&(fileEnd!="TXT"))
@@ -675,6 +677,12 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 	resp.status = 403;
 	resp.set_content("unsupported_file_type","text/plain");
 	return;
+    }
+    else
+    {
+	writePath = directory;
+	writePath += "/ocr.txt";
+	std::cout<<writePath<<std::endl;
     }
     std::cout<<"Uploading file now! File size: "<<req.body.length()<<std::endl;
 
