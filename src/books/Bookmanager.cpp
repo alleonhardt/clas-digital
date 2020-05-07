@@ -39,6 +39,7 @@ std::map<std::string, std::vector<std::string>>& CBookManager::getMapofUniqueAut
 
 void CBookManager::writeListofBooksWithBSB() {    
     
+    std::string untracked_books = "Currently untracked books:\n";
     std::string inBSB_noOcr = "Buecher mit bsb-link, aber ohne OCR: \n";
     std::string gibtEsBeiBSB_noOCR = "Buecher mit tag \"gibtEsBeiBSB\" aber ohne ocr: \n";
     std::string gibtEsBeiBSB_OCR = "Buecher mit tag \"gibtEsBeiBSB\" aber mit ocr: \n";
@@ -65,6 +66,27 @@ void CBookManager::writeListofBooksWithBSB() {
         
     }
 
+    //Search for untracked books
+    for(const auto& entry : std::filesystem::directory_iterator("web/books"))
+    {
+        const auto fileNameStr = entry.path().filename().string();
+        if(entry.is_directory() && m_mapWords.count(fileNameStr) == 0)
+        {
+            std::ifstream readJson(entry.path().string() + "/info.json");
+            if(!readJson) 
+                continue;
+            nlohmann::json j;
+            readJson >> j;
+            if(j.count("data") == 0 || j["data"].count("creators") == 0 || j["data"]["creators"][0].size() == 0)
+                continue;
+
+            std::string sName = j["data"]["creators"][0].value("lastName", "unkown name");
+            std::string sTitle = j["data"].value("title", "unkown title");
+            untracked_books += fileNameStr + " - " + sName + ", \"" + sTitle + "\"\n";
+            readJson.close(); 
+        }
+    }
+
     //Save books with bsb-link but o ocr
     std::ofstream writeBSB_NoOCR("inBSB_noOcr.txt");
     writeBSB_NoOCR << inBSB_noOcr;
@@ -84,6 +106,11 @@ void CBookManager::writeListofBooksWithBSB() {
     std::ofstream writeFERTIG_noOCR("BSBDownLoadFertig_noOCR.txt");
     writeFERTIG_noOCR << BSBDownLoadFertig_noOCR;
     writeFERTIG_noOCR.close();
+
+    //Write all untracked books to seperate files
+    std::ofstream writeUntracked("untracked_books.txt");
+    writeUntracked << untracked_books;
+    writeUntracked.close();
 }
 
 /**
@@ -103,30 +130,11 @@ bool CBookManager::initialize()
         return false;
     
     std::cout << "extracting books." << std::endl;
-    std::string sUntrackedBooks = "Currently untracked books: \n";
-    size_t i=0;
-    size_t j=0;
     //Go though all books and create book
     while((e_allItems = readdir(dir_allItems)) != NULL) {
         if(m_mapBooks.count(e_allItems->d_name) > 0)
-        {
-            i++;
             addBook(e_allItems->d_name);
-        }
-        //Write books untracked by zotero in a seperate file
-        else 
-        {
-            j++;
-            sUntrackedBooks += (std::string)e_allItems->d_name + "\n"; 
-        }
     }
-    std::cout << "TRACKED: " << i << std::endl;
-    std::cout << "UNTRACKED: " << j << std::endl;
-
-    //Write all untracked books to seperate files
-    std::ofstream write("untracked_books.txt");
-    write << sUntrackedBooks;
-    write.close();
 
     std::cout << "Createing map of books." << std::endl;
 
