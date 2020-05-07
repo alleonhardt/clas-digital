@@ -136,13 +136,11 @@ class StaticWebpageCreator
 			auto title=m_info["data"].value("title","");
 			auto isbn = m_info["data"].value("isbn","");
 			nlohmann::json info;
-            		info["show"] = escape_characters(m_book->getMetadata().getShow2());
-			info["bib"] = escape_characters(m_info["bib"].get<std::string>());
-			if(m_book->getKey() == "38B6SFRV")
-				std::cout<<info["bib"].get<std::string>()<<std::endl;
+            		info["show"] = m_book->getMetadata().getShow2();
+			info["bib"] = m_info["bib"].get<std::string>();
 			info["hasContent"] = m_book->hasContent();
 			info["itemType"] = itemType;
-			info["title"] = escape_characters(title);
+			info["title"] = title;
 			info["authors"] = nlohmann::json::array();
                 	for(const auto &it : m_book->getMetadata().getAuthors())
 				info["authors"].push_back(it);
@@ -164,8 +162,8 @@ class StaticWebpageCreator
 		{
 			nlohmann::json js;
 			js["key"] = m_book->getKey();
-			js["title"] = escape_characters(m_book->getMetadata().getShow2());
-			js["bib"] = escape_characters(m_info["bib"].get<std::string>());
+			js["title"] = m_book->getMetadata().getShow2();
+			js["bib"] = m_info["bib"].get<std::string>();
 			js["bib_esc"] = cutter(replacer(m_info["bib"].get<std::string>(),'"',"&quot;"),'\n');
 			inja::Environment env;
 			inja::Template temp = env.parse_template("web/books/pages_template.html");
