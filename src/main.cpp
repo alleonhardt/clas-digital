@@ -870,8 +870,10 @@ int main(int argc, char **argv)
     signal(SIGTERM, sig_handler);
     CBookManager manager;
     StaticWebpageCreator creator;
-    creator.createSearchPages();
-    creator.createInformationPages();
+    creator.createSearchPage();
+    creator.createInformationPage();
+    creator.createAdminPage();
+    creator.createUploadPage();
 
     //Load all pillars
     nlohmann::json zoteroPillars;

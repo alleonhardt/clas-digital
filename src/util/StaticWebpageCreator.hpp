@@ -70,31 +70,66 @@ class StaticWebpageCreator
 			return replacer(replacer(replacer(replacer(str,'<',"&lt;"),'>',"&gt;"),'"',"&quot;"),'\'',"&apos;");
 		}
 
-        void createSearchPages()
+        void createSearchPage()
         {
             inja::Environment env;
             nlohmann::json j;
             j["information"] = "";
             j["search"] = "class='dropdown-banner active'";
             j["catalogue"] = "";
+            j["admin"] = "";
+            j["upload"] = "";
 
             inja::Template temp = env.parse_template("web/search_template.html");
             std::string result = env.render(temp, j);  
             atomic_write_file("web/Search.html", result);
         }
 
-        void createInformationPages()
+        void createInformationPage()
         {
             inja::Environment env;
             nlohmann::json j;
             j["information"] = "class='dropdown-banner active'";
             j["search"] = "";
             j["catalogue"] = "";
+            j["admin"] = "";
+            j["upload"] = "";
 
             inja::Template temp = env.parse_template("web/information/information_template.html");
             std::string result = env.render(temp, j);  
-            atomic_write_file("web/index.de.html", result);
+            atomic_write_file("web/information/index.de.html", result);
         }
+
+        void createAdminPage()
+        {
+            inja::Environment env;
+            nlohmann::json j;
+            j["information"] = "";
+            j["search"] = "";
+            j["catalogue"] = "";
+            j["admin"] = "classifiedContent active";
+            j["upload"] = "";
+
+            inja::Template temp = env.parse_template("web/private/admin/administration_template.html");
+            std::string result = env.render(temp, j);  
+            atomic_write_file("web/private/admin/Administration.html", result);
+        }
+
+        void createUploadPage()
+        {
+            inja::Environment env;
+            nlohmann::json j;
+            j["information"] = "";
+            j["search"] = "";
+            j["catalogue"] = "";
+            j["admin"] = ""; 
+            j["upload"] = "classifiedContent active";
+
+            inja::Template temp = env.parse_template("web/private/write/uploadBook_template.html");
+            std::string result = env.render(temp, j);  
+            atomic_write_file("web/private/write/UploadBook.html", result);
+        }
+
 		void CreateMetadataPage()
 		{
 			auto itemType =m_info["data"].value("itemType","");
