@@ -251,12 +251,12 @@ class StaticCatalogueCreator
 			atomic_write_file("web/catalogue/books/index.html",result);
 		}
 
-
         void CreateCatalogueAuthors(CBookManager& manager)
 		{
 			nlohmann::json js;
             std::map<std::string, nlohmann::json> mapAuthors;
-            for(auto &it : manager.getMapOfBooks()) {
+            for(auto &it : manager.getMapOfBooks()) 
+            {
                 std::string lastName = it.second->getMetadata().getAuthor();
                 std::string firstName = it.second->getMetadata().getMetadata("firstName", "data", "creators", 0);
                 auto origName = lastName;
@@ -265,18 +265,20 @@ class StaticCatalogueCreator
                 func::convertToLower(firstName);
                 std::string key = firstName + "-" + lastName;
                 std::replace(key.begin(), key.end(), ' ', '-');
+                std::replace(key.begin(), key.end(), '/', ',');
         
                 mapAuthors[lastName + "_" + firstName] = {
                             {"id", key},
                             {"show", origName + ", " + origFam},
-                            {"num", manager.getMapofAuthors()[func::returnToLower(lastName)].size()} };
+                            {"num", manager.getMapofUniqueAuthors()[key].size()} };
             }
-            	for(auto &it : mapAuthors)
+
+            for(auto &it : mapAuthors)
 	    	{
-			if(it.first == "_")
-				continue;
-                	js["authors"].push_back(it.second);
-		}
+			    if(it.first == "_")
+				    continue;
+                js["authors"].push_back(it.second);
+		    }
             
 
 			inja::Environment env;
@@ -299,13 +301,13 @@ class StaticCatalogueCreator
 		        func::convertToLower(firstName);
                 std::string key = firstName + "-" + lastName;
                 std::replace(key.begin(), key.end(), ' ', '-');
+                std::replace(key.begin(), key.end(), '/', ',');
 
                 if(lastName.size() == 0)
                     continue;
 
                 //Create directory
                 std::error_code ec;
-                std::replace(key.begin(), key.end(), '/', ',');
                 std::filesystem::create_directory("web/catalogue/authors/"+key+"/", ec);
 
                 nlohmann::json js;
@@ -313,11 +315,16 @@ class StaticCatalogueCreator
 
                 //Create json with all books
                 std::vector<nlohmann::json> vBooks;
-                for(auto &jt : manager.getMapofAuthors()[lastName]) {
+                if(manager.getMapofUniqueAuthors().count(key) == 0)
+                {
+                    std::cout << key << " NOTFOUND!!\n";
+                    continue;
+                }
+                for(auto &jt : manager.getMapofUniqueAuthors()[key]) {
                     vBooks.push_back({ 
-                        {"id", jt.first},
-                        { "title", manager.getMapOfBooks()[jt.first]->getMetadata().getShow2()},
-                        { "bib", manager.getMapOfBooks()[jt.first]->getMetadata().getMetadata("bib")}
+                        {"id", jt},
+                        { "title", manager.getMapOfBooks()[jt]->getMetadata().getShow2()},
+                        { "bib", manager.getMapOfBooks()[jt]->getMetadata().getMetadata("bib")}
                                           });
                 }
 

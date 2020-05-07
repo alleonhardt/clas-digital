@@ -29,6 +29,7 @@ private:
     MAPWORDS m_mapWords;
     MAPWORDS m_mapWordsTitle;
     MAPWORDS m_mapWordsAuthors;
+    std::map<std::string, std::vector<std::string>> m_mapUniqueAuthors;
 
     typedef std::unordered_map<std::string, std::set<std::string>> dict;
     dict m_dict;
@@ -55,6 +56,11 @@ public:
     * @return unordered dicionary of authors
     */
     MAPWORDS& getMapofAuthors(); 
+
+    /**
+    * @return map of unique authors ([lastName]-[firstNam])
+    */
+    std::map<std::string, std::vector<std::string>>& getMapofUniqueAuthors();
 
     void writeListofBooksWithBSB();
 

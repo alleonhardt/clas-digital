@@ -30,6 +30,13 @@ CBookManager::MAPWORDS& CBookManager::getMapofAuthors() {
     return m_mapWordsAuthors;
 }
 
+/**
+* @return map of unique authors ([lastName]-[firstNam])
+*/
+std::map<std::string, std::vector<std::string>>& CBookManager::getMapofUniqueAuthors() {
+    return m_mapUniqueAuthors;
+}
+
 void CBookManager::writeListofBooksWithBSB() {    
     
     std::string inBSB_noOcr = "Buecher mit bsb-link, aber ohne OCR: \n";
@@ -311,9 +318,29 @@ void CBookManager::createMapWordsAuthor()
     //Iterate over all books. Add words to list (if the word does not already exist in map of all words)
     //or add book to list of books (if word already exists).
     for(auto it=m_mapBooks.begin(); it!=m_mapBooks.end(); it++)
-        m_mapWordsAuthors[it->second->getAuthor()][it->first] = 0.1;
+    {
+        std::string lastName = it->second->getAuthor();
+        std::string firstName = it->second->getMetadata().getMetadata("firstName", "data", "creators", 0); 
+        m_mapWordsAuthors[lastName][it->first] = 0.1;
+    
+		func::convertToLower(lastName);
+		func::convertToLower(firstName);
+        std::string key = firstName + "-" + lastName;
+        std::replace(key.begin(), key.end(), ' ', '-');
+        std::replace(key.begin(), key.end(), '/', ',');
+        m_mapUniqueAuthors[key].push_back(it->first);
+    }
     createListWords(m_mapWordsAuthors, m_listAuthors);
     std::cout << "List authors: " << m_listAuthors.size() << "\n";
+
+    if(m_mapUniqueAuthors.count("maureen-adams") > 0)
+        std::cout << "Maureen\n";
+    if(m_mapUniqueAuthors.count("douglas-adams") > 0)
+        std::cout << "Douglas\n";
+    if(m_mapUniqueAuthors.count("carol-j.-adams") > 0)
+        std::cout << "Carol J.\n";
+    if(m_mapUniqueAuthors.count("carol-j-adams") > 0)
+        std::cout << "Carol J\n";
 }
 
 /**
