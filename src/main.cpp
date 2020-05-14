@@ -96,6 +96,7 @@ void update_all_files(CBookManager *m, nlohmann::json *zot)
 	    std::ofstream json_write(dir.c_str(),std::ios::out);
 	    if(json_write.is_open())
 		json_write<<it.second->getMetadata().getMetadata();
+	    json_write.close();
 
 	    StaticWebpageCreator webpage(it.second);
 	    webpage.createWebpage();
@@ -920,6 +921,11 @@ int main(int argc, char **argv)
     }
     meta.close();
     std::cout<<"Start CBookmanager::UpdateZotero()"<<std::endl;
+    for(auto &entry : metaData)
+    {
+	    if(entry["data"]["key"].get<std::string>() == "QTYP6NYV")
+		    std::cout<<"Found everything!!!!!"<<std::endl;
+    }
     manager.updateZotero(metaData);
     std::cout<<"Finished CBookmanager::UpdateZotero()"<<std::endl;
 

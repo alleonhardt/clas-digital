@@ -132,6 +132,7 @@ class StaticWebpageCreator
 
 		void CreateMetadataPage()
 		{
+			std::cout<<"Processing: "<<m_book->getKey()<<std::endl;
 			auto itemType =m_info["data"].value("itemType","");
 			auto title=m_info["data"].value("title","");
 			auto isbn = m_info["data"].value("isbn","");
