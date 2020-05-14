@@ -5,8 +5,25 @@ body {
     margin:0;
 }
 
-h2 {
-    margin-top: 2rem;
+.collapsible {
+    font-size: 1.7rem;
+    cursor: pointer;
+    border: none; 
+    text-align: left;
+    outline:none;
+}
+
+.noncollapsible {
+    font-size: 1.7rem;
+    border: none; 
+    text-align: left;
+    outline:none;
+}
+.content {
+    display: none;
+}
+
+.active, .collapsible:hover{
 }
 
 .exampleImg {
@@ -94,7 +111,9 @@ background-position: 1rem center, right 1rem center;
 }
 
 .description{
+    margin-top: 1rem;
     margin-bottom: 2rem;
+    display:block;
 }
 .saveButton {
     display: block;

@@ -14,7 +14,6 @@
 
     <script src="/user.js"></script>
     <script src="UploadBook.js"></script>
-
 </head>
 <body>
     <!-- The navigation bar config -->
@@ -24,39 +23,49 @@
 	<h3 id='status_banner'></h3>
 	<h1>Volltexte hochladen</h1>
 	<input class="inputStyle" type="file" id="fileUpID" multiple/>
+    <br>
 
-    <h2><span>1.</span> Vorbereitung</h2>
+    <button type="button" class="collapsible"><span>1.</span> Vorbereitung</button>
+    <div class="content">
     <p>Was brauche ich, um ein Buch hochzuladen? Wenn Sie ein Buch hochladen wollen, sollten im Vorfeld folgende Dinge am besten auf Ihrem PC vorliegen: </p>
     <p>1. Alle zu dem Buch vorhandenen Dateien (Scans der einzelnen Seiten und ggf. die OCR-Datei). </p>
     <img src="/static/examples/buchDateien.png" alt="Beispiel Dateien" class="exampleImg"> 
     <p>2. Das Buch muss bereits einen Eintrag in Zotero haben. Liegt ein Buch in Zotero vor, dann besitzt es einen sogenannten "Item-Key", der zum Hochladen des Buches auf dem clas-digital Server notwendig ist. Es reicht allerdings, wenn sie die URL des Buches kennen, die in ihrem Browserfenster angezeigt weird, wenn Sie in Zotero das entsprechende Buch ausgewählt haben. Der Uploader sucht sich den Item-Key selbstständig heraus. </p>
     <img src="/static/examples/ItemKey.png" alt="Beispiel Item-Key" class="exampleImg"> 
     <h4>Zum Format der Dateien</h4>
-	<p>Jede Bilddatei/ jeder Scan muss nach folgendem Format benannt sein: page[Seitennummer].jpg. "Seitennummer" bezieht sich hier auf die Seitennummer im Buch (das Deckblatt wäre z.B. mit page001.jpg benannt). Die OCRs müssen zur Seitentrennung folgendes Format verwenden ----- [Seitennummer] / [maximale Seitenzahl] -----. Es werden nur Dateien im JPG, PNG und TXT Format angenommen. (Falls das Buch von der BSB stammen sollte müssen Sie sich darum keine Sorgen machen, sie sollten bereits in genau diesem Format vorliegen.)</p>
+	<p>Jede Bilddatei/ jeder Scan muss nach folgendem Format benannt sein: beliebiger_text[Seitennummer].jpg. "Seitennummer" bezieht sich hier auf die Seitennummer im Buch (das Deckblatt wäre z.B. mit page001.jpg benannt). Die OCRs müssen zur Seitentrennung folgendes Format verwenden ----- [Seitennummer] / [maximale Seitenzahl] -----. Es werden nur Dateien im JPG, PNG und TXT Format angenommen. (Falls das Buch von der BSB stammen sollte müssen Sie sich darum keine Sorgen machen, sie sollten bereits in genau diesem Format vorliegen.)</p>
+    </div>
 
-	<h2><span>2.</span> Auswählen der Dateien</h2>
+    <br><br>
+
+	<button type="button" class="collapsible"><span>2.</span> Auswählen der Dateien</button>
+    <div class="content">
 	<p>Es kann immer nur ein Buch hochgeladen werden. Ein "Buch" besteht aus Scans der einzelnen Seiten des Buches und ggf. einer .ocr Datei. Diese Datei sollten auf Ihrem PC vorliegen. Falls das hochzuladene Buch von der Staatsbibliothek kommt, laden Sie dieses also zunächst auf ihren PC (zu empfehlen: ein Ordner pro Buch, in dem sich alle Datei (Scans und ggf. ocr) befinden. Nutze sie dann das untenstehende Feld, um sie wieder auszuwählen. Die Dateien werden dann auf den Projekt-Server übertragen.</p>
+    </div>
 	<p><strong>Wichtig:</strong> Schließen Sie diesen Tab nicht, während der Upload läuft!</p>
 	<ul class="list-group" id="CurrentUploads">
 	</ul>
 	<ul id="FileDropList" class="filesList">
 	    <li onclick='document.getElementById("fileUpID").click()'>Hier klicken um eine Datei auszuwaehlen</li>
 	</ul>
-	<br>
-	<h2><span>3.</span> Ist alles korrekt?</h2>
-	<div aria-label="Vorhandene Scans" class="pagesRange">Noch keine Scans hochgeladen</div>
-	<div aria-label="Durchsuchbarer Text?" class="hasText">Nein, es wurde kein durchsuchbarer Text hochgeladen</div>
 
 	<br>
-	<h2><span>4.</span> Welches Werk ist das?</h2>
+
+    <button type="button" class="collapsible"> <span>3.</span> Welches Werk ist das?</button>
+    <div class="content">
 	<p>Fügen Sie noch den Link zu Zotero ein (die URL die oben in ihrem Browserfenster angezeigt wird, wenn Sie in Zotero das entsprechende Buch ausgewählt haben), damit der Projektserver das Buch später immer korrekt zuordnen kann (dies ist der zuvor erwähnte "Item-Key"):</p>
+    <p> Nachdem sie den Item-Link (bzw. die URL) eingetragen haben, erscheinen zwei links. Der erste führt Sie zu einer Übersicht der bereits für dieses Buch existierenden Dateien auf dem Server. Der zweite Link führt Sie zu den Metadaten des Buches (so können Sie nochmlas sichergehen, ob Sie das richtige Buch ausgewählt haben.</p>
+    </div>
 	<input id="Permalink" class="description" type="text" placeholder="Item-Key hier einfügen" oninput="ShowBookContentLink();">
 	<div id="BookContentLink" style='display:inline-block;margin-left: 2rem;'></div>
 	</input>
-    <p> Nachdem sie den Item-Link (bzw. die URL) eingetragen haben, erscheinen zwei links. Der erste führt Sie zu einer Übersicht der bereits für dieses Buch existierenden Dateien auf dem Server. Der zweite Link führt Sie zu den Metadaten des Buches (so können Sie nochmlas sichergehen, ob Sie das richtige Buch ausgewählt haben.</p>
-	<br>
-	<h2><span>5.</span> Option: Erstellen einer OCR</h2>
+
+    <br>
+
+    <button type="button" class="collapsible"><span>4.</span> Option: Erstellen einer OCR</button>
+    <div class="content">
 	<p>Es ist möglich eine OCR vom Server erstellen zu lassen. Um diese Option zu benutzen setzten Sie bitte ein Häkchen in der Checkbox unten. <b>Dieser Vorgang dauert sehr lange benuzten Sie diese Funktion nur wenn sie wenige Dateien hochladen!</b></p>
+    </div>
 	<div>
 	    <span>Der Server soll eine computergenerierte OCR erstellen: </span>
 	    <input id='languageoptenabled' onclick='show_language(this);' type='checkbox'/>
@@ -66,13 +75,19 @@
 		<option value='eng'>Englisch</option>
 	    </select>
 	</div>
-	<h2><span>6.</span> Hochladen beginnen!</h2>
+
+    <br>
+
+    <button type="button" class="noncollapsible"> <span>6.</span> Hochladen beginnen!</button>
 	<div class="saver" id="saver">
 	    <p>Speichere diesen Volltext auf dem Projektserver!</p>
 	    <button id="SaveNow" class="saveButton" onclick="UploadAll();return true;">Speichern!</button>
 	</div>
 
-    <h2><span>7.</span> Etwas Schiefgelaufen? Dateien schon auf dem Server vorhanden?</h2>
+    <br>
+
+    <button type="button" class="collapsible"> <span>6.</span> Etwas Schiefgelaufen? Keine Sorge!</button>
+    <div class="content">
     <p>Ist etwas schief gelaufen? Machen sie sich keine Sorgen! Sollte die Internetverbindung abgebrochen sein, oder das Hochladen aus einem anderen Grund nicht funktioniert haben, ist das kein Grund zur Sorge! Alle Datein, die bis zum dem Abruch hochgeladen worden sind befinden sich sicher auf dem Server. Wiederholen Sie einfach den Vorgang, wählen Sie nochmals alle Dateien aus, die Sie hochladen wollten. Es wird Ihnen dann angezeigt, welche Dateien, bereist vorhanden sind. Sie können selbst auswählen, welche Dateien Sie hochladen wollen. Drücken Sie dafür auf "Compare Files", um die Dateien zu vergleichen und dann auszuwählen.</p>
     <img src="/static/examples/überschreiben1.png" alt="Dateien Überschreiben1" class="exampleImg">
     <p>Generell wird Ihnen immer angeziegt, wenn zu dem Buch, dass Sie hochladen wollen bereits Dateien auf dem Server existieren. Sie können stets auswählen, welche Dateien Sie überschreiben, oder vielleicht lieber doch nicht hinzufügen wollen.</p>
@@ -80,6 +95,7 @@
     <p>Sie müssen für jedes Buch einzelnd diese Wahl treffen. Es wird Ihnen angezeigt, welches Datein sie überschreiben und für welche Dateien Sie den Upload abgebrochen haben.</p>
     <img src="/static/examples/überschreiben3.png" alt="Dateien Überschreiben3" class="exampleImg">
     <p>Wenn Sie für alle Dateien eine Aswahl getroffen haben wird der Upload automatisch fertig gestellt. Es sollte eine grüne Bestätigungsnachricht erscheinen.</p>
+    </div>
 
     </div> 
 
@@ -94,3 +110,21 @@
 	</div>
     </div>
 </body>
+
+<script>
+    var coll = document.getElementsByClassName("collapsible");
+    var i;
+    for (i = 0; i < coll.length; i++) {
+        console.log("adding click event");
+      coll[i].addEventListener("click", function() {
+        console.log("doing something");
+        this.classList.toggle("active");
+        var content = this.nextElementSibling;
+        if (content.style.display === "block") {
+          content.style.display = "none";
+        } else {
+          content.style.display = "block";
+        }
+      });
+    }
+</script>
