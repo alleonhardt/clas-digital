@@ -45,15 +45,9 @@ std::string CMetadata::getMetadata(std::string sSearch)
 */
 std::string CMetadata::getMetadata(std::string sSearch, std::string sFrom)
 {
-    nlohmann::json jFrom;           //Create secon json
-    jFrom = m_metadata[sFrom];
-
-    if(jFrom.size() == 0)
+    if(m_metadata.count(sFrom) == 0)
         return "";
-
-    std::string returnSearch = jFrom.value(sSearch, "");
-
-    return returnSearch; 
+    return m_metadata[sFrom].value(sSearch, ""); 
 }
 
 /**
@@ -65,21 +59,11 @@ std::string CMetadata::getMetadata(std::string sSearch, std::string sFrom)
 */
 std::string CMetadata::getMetadata(std::string sSearch, std::string sFrom1, std::string sFrom2)
 {
-    //Create first level
-    nlohmann::json jFrom1;           
-    jFrom1 = m_metadata[sFrom1];
-    
-    //Create second level
-    nlohmann::json jFrom2;
-    jFrom2 = jFrom1[sFrom2];
-
-    if(jFrom2.size() == 0)
+    if(m_metadata.count(sFrom1) == 0)
         return "";
-
-    //Get data from second level
-    std::string returnSearch = jFrom2.value(sSearch, "");
-
-    return returnSearch; 
+    if(m_metadata[sFrom1].count(sFrom2) == 0)
+        return "";
+    return m_metadata[sFrom1][sFrom2].value(sSearch, "");
 } 
 
 /**
@@ -92,28 +76,13 @@ std::string CMetadata::getMetadata(std::string sSearch, std::string sFrom1, std:
 */
 std::string CMetadata::getMetadata(std::string sSearch, std::string sFrom1, std::string sFrom2, int in)
 {
-    //Create first level
-    nlohmann::json jFrom1;           
-    jFrom1 = m_metadata[sFrom1];
-
-    if(jFrom1.size() == 0)
+    if(m_metadata.count(sFrom1) == 0)
         return "";
-
-    //Create vector of jsons
-    nlohmann::json listJsons = jFrom1[sFrom2];
-
-    //Check whether element could be accessed
-    if(listJsons.size() == 0)
+    if(m_metadata[sFrom1].count(sFrom2) == 0)
         return "";
-
-    //Create second level
-    nlohmann::json jFrom2;
-    jFrom2 = listJsons[in]; 
-
-    //Get data from second level
-    std::string returnSearch = jFrom2.value(sSearch, "");
-
-    return returnSearch; 
+    if(m_metadata[sFrom1][sFrom2].size() == 0)
+        return "";
+    return m_metadata[sFrom1][sFrom2][in].value(sSearch, "");
 }
 
 
@@ -123,19 +92,11 @@ std::string CMetadata::getMetadata(std::string sSearch, std::string sFrom1, std:
 std::vector<std::string> CMetadata::getCollections()
 {
     //Create empty vector as default
-    std::vector<std::string> vDefault;
+    std::vector<std::string> vec;
 
-    //Get json "data"
-    nlohmann::json jData;
-    jData = m_metadata["data"];
-
-    if(jData.size() == 0)
-        return vDefault;
-
-    //Get collection
-    std::vector<std::string> sCollections = jData["collections"];
-
-    return sCollections;
+    if(m_metadata.count("data") == 0)
+        return vec;
+    return m_metadata["data"].value("collections", vec);
 }
 
 /**
@@ -145,9 +106,6 @@ std::string CMetadata::getAuthor()
 {
     //Get author. Try to find "lastName"
     std::string sAuthor = getMetadata("lastName", "data", "creators", 0);
-
-    //std::string sAuthor = m_metadata["data"]["creators"][0]["lastName"];
-
 
     //If string is empty, try to find "name"
     if(sAuthor.size() == 0)
@@ -159,8 +117,13 @@ std::string CMetadata::getAuthor()
 
 std::vector<std::string> CMetadata::getAuthors()
 {
-    std::vector<nlohmann::json> v_jAuthors = m_metadata["data"]["creators"];
     std::vector<std::string> v_sAuthors;
+    if(m_metadata.count("data") == 0)
+        return v_sAuthors;
+    if(m_metadata["data"].count("creators") == 0)
+        return v_sAuthors;
+
+    std::vector<nlohmann::json> v_jAuthors = m_metadata["data"]["creators"];
     for(const auto &it : v_jAuthors)
     {
         std::string sAuthor = it.value("lastName", it.value("name", ""));
