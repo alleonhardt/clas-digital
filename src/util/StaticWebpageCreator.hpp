@@ -247,9 +247,9 @@ class StaticCatalogueCreator
 				for(auto y : x.second.second)
 				{
 					nlohmann::json js_k;
-					js_k["key"] = y->getMetadata().getMetadata()["data"]["key"];
+					js_k["key"] = y->getMetadata().getMetadata("key", "data");
 					js_k["title"] = y->getMetadata().getShow2();
-					js_k["bib"] = y->getMetadata().getMetadata()["bib"];
+					js_k["bib"] = y->getMetadata().getMetadata("bib");
 					vBooks.push_back(std::move(js_k));
 				}
 
@@ -268,9 +268,9 @@ class StaticCatalogueCreator
 			for(auto &it : mng.getMapOfBooks())
 			{
 				nlohmann::json entry;
-				entry["key"] = it.second->getMetadata().getMetadata()["data"]["key"];
+				entry["key"] = it.second->getMetadata().getMetadata("key", "data");
 				entry["title"] = it.second->getMetadata().getShow2();
-				entry["bib"] = it.second->getMetadata().getMetadata()["bib"];
+				entry["bib"] = it.second->getMetadata().getMetadata("bib");
 				entry["has_ocr"] = it.second->hasOcr();
             
 				vBooks.push_back(std::move(entry));
