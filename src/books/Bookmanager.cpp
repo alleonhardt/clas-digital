@@ -67,10 +67,13 @@ void CBookManager::writeListofBooksWithBSB() {
     }
 
     //Search for untracked books
+    int counter=0;
     for(const auto& entry : std::filesystem::directory_iterator("web/books"))
     {
-        const auto fileNameStr = entry.path().filename().string();
-        if(entry.is_directory() && m_mapWords.count(fileNameStr) == 0)
+	std::string fileNameStr = entry.path().filename().string();
+	counter++;
+
+        if(entry.is_directory() && m_mapBooks.count(fileNameStr) == 0)
         {
             std::ifstream readJson(entry.path().string() + "/info.json");
             if(!readJson) 
@@ -86,6 +89,7 @@ void CBookManager::writeListofBooksWithBSB() {
             readJson.close(); 
         }
     }
+    std::cout << "FILES: " << counter << std::endl;
 
     //Save books with bsb-link but o ocr
     std::ofstream writeBSB_NoOCR("inBSB_noOcr.txt");
@@ -331,24 +335,14 @@ void CBookManager::createMapWordsAuthor()
         std::string firstName = it->second->getMetadata().getMetadata("firstName", "data", "creators", 0); 
         m_mapWordsAuthors[lastName][it->first] = 0.1;
     
-		func::convertToLower(lastName);
-		func::convertToLower(firstName);
+	func::convertToLower(lastName);
+	func::convertToLower(firstName);
         std::string key = firstName + "-" + lastName;
         std::replace(key.begin(), key.end(), ' ', '-');
         std::replace(key.begin(), key.end(), '/', ',');
         m_mapUniqueAuthors[key].push_back(it->first);
     }
     createListWords(m_mapWordsAuthors, m_listAuthors);
-    std::cout << "List authors: " << m_listAuthors.size() << "\n";
-
-    if(m_mapUniqueAuthors.count("maureen-adams") > 0)
-        std::cout << "Maureen\n";
-    if(m_mapUniqueAuthors.count("douglas-adams") > 0)
-        std::cout << "Douglas\n";
-    if(m_mapUniqueAuthors.count("carol-j.-adams") > 0)
-        std::cout << "Carol J.\n";
-    if(m_mapUniqueAuthors.count("carol-j-adams") > 0)
-        std::cout << "Carol J\n";
 }
 
 /**
