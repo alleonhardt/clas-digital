@@ -23,6 +23,7 @@
 	<h3 id='status_banner'></h3>
 	<h1>Volltexte hochladen</h1>
 	<i> Click on the headlines to see additional information on how to upload.</i>
+	<br>
 	<input class="inputStyle" type="file" id="fileUpID" multiple/>
     <br>
 
@@ -60,8 +61,7 @@
 	<input id="Permalink" class="description" type="text" placeholder="Item-Key hier einfügen" oninput="ShowBookContentLink();">
 	<div id="BookContentLink" style='display:inline-block;margin-left: 2rem;'></div>
 	</input>
-
-    <br>
+	<br>
 
     <button type="button" class="collapsible"><span>4.</span> Option: Erstellen einer OCR</button>
     <div class="content">
@@ -100,14 +100,15 @@
 
     </div> 
 
-    <div id="modal" style="display: none;position: fixed; top: 10vh;left: 10vw; width: 80vw; padding: 1rem; height: 80vh; z-index: 3;background:grey;">
-	<div style='display: grid; grid-template-columns: 48% 48%;grid-template-rows: 2.5rem calc(100% - 5rem) 2.5rem;height:100%;width:100%;grid-column-gap: 2%;'>
+    <div id="modal" style="display: none;position: fixed; top: 10vh;left: 10vw; width: 80vw; padding: 1rem; height: 80vh; z-index: 3;background:grey;">	<div style='display: grid; grid-template-columns: 48% 48%;grid-template-rows: 2.5rem calc(100% - 7.5rem) 2.5rem 2.5rem;height:100%;width:100%;grid-column-gap: 2%'>
 	    <p style="grid-column: 1 /span 1;grid-row: 1 /span 1;margin:auto;background:white;">Old File</p>
 	    <p style="grid-column: 2 /span 1;grid-row: 1 /span 1;margin:auto;background:white;">New File</p>
 	    <div id="oldfile" style="grid-column: 1 /span 1;grid-row: 2 /span 1;width: 100%;height:100%;margin:auto;overflow: auto;"></div>
 	    <div id="newfile" style="grid-column: 2 /span 1;grid-row: 2 /span 1;width: 100%;height:100%;margin:auto;overflow: auto;"></div>
-	    <button id="nobut" style="grid-column: 1 /span 1;grid-row: 3 /span 1;background-color: green;cursor:pointer;">Keep existing</button>
-	    <button id="yesbut" style="grid-column: 2 /span 1;grid-row: 3 /span 1;background-color: red;cursor: pointer;">Replace existing</button>
+	    <button id="nobut" style="grid-column: 1 /span 1;grid-row: 3 /span 1;cursor:pointer;">Keep existing</button>
+	    <button id="yesbut" style="grid-column: 2 /span 1;grid-row: 3 /span 1;cursor:pointer;">Replace existing</button>
+	    <button id="noall" style="grid-column: 1 /span 1;grid-row: 4 /span 1;cursor:pointer;color: green;" onclick="onglobalno();return true;">Keep all existing files</button>
+	    <button id="yesall" style="grid-column: 2 /span 1;grid-row: 4 /span 1;cursor: pointer;color: red;" onclick="onglobalyes();return true;">Replace all existing</button>
 	</div>
     </div>
 </body>
