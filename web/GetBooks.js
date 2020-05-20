@@ -822,14 +822,14 @@ function doCompleteNewSearch()
     		newurl = "/books/"+scanId+"/pages?highlight="+document.getElementById("srchbox").value+"&fuzzyness="+fuzzyness;
 	else
     		newurl = "/books/"+scanId+"/pages?highlight="+document.getElementById("srchbox").value;
-    if(window.history.pushState)
+/*    if(window.history.pushState)
     {
 
 	window.history.pushState({},document.title,newurl);
 	removeElementsByClass("pagecontainer");
 	CreatePageLayout();
     }
-    else
+    else*/
 	window.location = newurl;
 }
 
