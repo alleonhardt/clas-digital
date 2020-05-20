@@ -145,6 +145,13 @@ function UpdateViewMode()
 	var_arr[i].classList.replace(var_class_old,var_class);
 }
 
+function removeElementsByClass(className){
+    var elements = document.getElementsByClassName(className);
+    while(elements.length > 0){
+        elements[0].parentNode.removeChild(elements[0]);
+    }
+}
+
 function UpdateOneViewMode(elem)
 {
     let var_class = 'pagecontainer';
@@ -283,7 +290,7 @@ function CreatePageLayout()
 		{
 		    let newurl = window.location.search;
 		    newurl+="#page"+kk[0].pageNumber;
-		    window.history.pushState({},gTitle+" Page: "+kk[0].pageNumber,newurl);
+		    window.history.replaceState({},null,newurl);
 		}
 	    }
 
@@ -815,7 +822,15 @@ function doCompleteNewSearch()
     		newurl = "/books/"+scanId+"/pages?highlight="+document.getElementById("srchbox").value+"&fuzzyness="+fuzzyness;
 	else
     		newurl = "/books/"+scanId+"/pages?highlight="+document.getElementById("srchbox").value;
-    window.location = newurl;
+/*    if(window.history.pushState)
+    {
+
+	window.history.pushState({},document.title,newurl);
+	removeElementsByClass("pagecontainer");
+	CreatePageLayout();
+    }
+    else*/
+	window.location = newurl;
 }
 
 window.addEventListener("load",initialise,false);
