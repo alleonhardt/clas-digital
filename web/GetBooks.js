@@ -145,6 +145,13 @@ function UpdateViewMode()
 	var_arr[i].classList.replace(var_class_old,var_class);
 }
 
+function removeElementsByClass(className){
+    var elements = document.getElementsByClassName(className);
+    while(elements.length > 0){
+        elements[0].parentNode.removeChild(elements[0]);
+    }
+}
+
 function UpdateOneViewMode(elem)
 {
     let var_class = 'pagecontainer';
@@ -816,7 +823,12 @@ function doCompleteNewSearch()
 	else
     		newurl = "/books/"+scanId+"/pages?highlight="+document.getElementById("srchbox").value;
     if(window.history.pushState)
+    {
+
 	window.history.pushState({},document.title,newurl);
+	removeElementsByClass("pagecontainer");
+	CreatePageLayout();
+    }
     else
 	window.location = newurl;
 }
