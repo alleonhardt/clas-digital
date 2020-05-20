@@ -44,6 +44,8 @@ function ShowStatus(x,color)
     window.scrollTo(0,0);
 }
 
+globalYes = false;
+globalNo = false;
 function Upload(x,key)
 {
     let xhr = new XMLHttpRequest();
@@ -60,20 +62,6 @@ function Upload(x,key)
 	{
 	    if(xhr.responseText == "file_exists" && x.force_overwrite!=true) //File exists go for overwrite
 	    {
-		x.style.background = "yellow";
-		x.children[0].children[0].innerHTML = "File already exists: "+x.file.name+", overwrite?";
-		let butt = document.createElement("compare");
-		butt.innerHTML = "Compare Files";
-		butt.style.background = "blue";
-		butt.style.float = "right";
-		butt.style.padding = "0.5rem";
-		butt.style.cursor = "pointer";
-		butt.onclick = function() {
-		    OpenModal(x.file,key);
-		}
-		x.children[0].children[0].appendChild(butt);
-		x.children[0].children[1].style.display = "none";
-		x.children[0].children[2].style.display = "none";
 		document.getElementById("nobut").onclick = function() {
 		    HideModal();
 		    x.innerHTML = "<p><div>Canceled upload of: "+x.file.name+" Keeping existing file</div></p>";
@@ -89,9 +77,29 @@ function Upload(x,key)
 		    x.children[0].children[1].style.display = "";
 		    x.children[0].children[2].style.display = "";
             x.innerHTML = "<p><div>Overwriting existing file with: " +x.file.name+"</div></p>";
-		    butt.parentNode.removeChild(butt);
 		    Upload(x,key);
 		}
+		if(globalYes)
+		{
+		    document.getElementById("yesbut").click();
+		    return;
+		}
+		else if(globalNo)
+		{
+		    document.getElementById("nobut").click();
+		    return;
+		}
+
+		document.getElementById("yesall").onclick = function() {
+		    globalYes = true;
+		    document.getElementById("yesbut").click();
+		}
+		document.getElementById("noall").onclick = function() {
+		    globalNo = true;
+		    document.getElementById("nobut").click();
+		}
+
+		OpenModal(x.file,key);
 		return;
 	    }
 	    else
@@ -173,7 +181,7 @@ function ShowOCRSlide(fl,key)
     newf.appendChild(newfileparagraph);
 
     let xhr = new XMLHttpRequest();
-    xhr.open("GET","/books/"+key+"/"+fl.name,true);
+    xhr.open("GET","/books/"+key+"/ocr.txt",true);
     xhr.onload = function() {
 	if(xhr.status!=200)
 	{
@@ -207,7 +215,7 @@ function ShowImageSlide(fl,key)
     document.getElementById("newfile").innerHTML = "";
 
     let val = document.createElement("img");
-    val.src = "/books/"+key+"/"+fl.name;
+    val.src = "/books/"+key+"/pages/"+fl.name;
     val.style["max-height"] = "100%";
     val.style["max-width"] = "100%";
     val.style.margin = "auto";
@@ -232,7 +240,7 @@ function ShowImageSlide(fl,key)
 function ShowBookContentLink()
 {
     let lnk = ExtractKey();
-    document.getElementById("BookContentLink").innerHTML = "<a href='/books/"+lnk+"/' target='_blank'>Book File List Index</a><a style='margin-left: 4rem;' href='/ShowMetadata.html?scanId="+lnk+"' target='_blank'> Book Metadata</a>";
+    document.getElementById("BookContentLink").innerHTML = "<a href='/ShowMetadata.html?scanId="+lnk+"' target='_blank'> Book Metadata</a>";
 }
 
 function UploadAll()
@@ -253,7 +261,7 @@ function UploadAll()
 	{
 	    val[i].onclick = function() { };
 	    Upload(val[i],finalKey);
-	    return ShowStatus("There are files that already exist, you may select whether to overwrite or not for each file", "red");
+	    return;
 	}
     }
     ShowStatus("Uploaded all files successfully! In order to find results in the new book you have to restart the server! (The Server automatically restarts over night)","green");

@@ -560,6 +560,12 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 	resp.set_content("malformed_parameters","text/plain");
 	return;
     }
+    auto pos = fileName.find_last_of('.');
+    std::string fileEnd = fileName.substr(pos+1,std::string::npos);
+
+
+    if(fileEnd == "txt" || fileEnd == "TXT")
+	fileName = "ocr.txt";
 
     writePath+=scanId;
     std::string directory = writePath;
@@ -587,9 +593,6 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 	resp.set_content("file_exists","text/plain");
 	return;
     }
-
-    auto pos = fileName.find_last_of('.');
-    std::string fileEnd = fileName.substr(pos+1,std::string::npos);
 
     if(fileEnd=="jpg"||fileEnd=="png"||fileEnd=="JPG"||fileEnd=="PNG")
     {

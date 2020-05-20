@@ -111,8 +111,8 @@ background-position: 1rem center, right 1rem center;
 }
 
 .description{
-    margin-top: 1rem;
-    margin-bottom: 2rem;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
     display:block;
 }
 .saveButton {
@@ -152,5 +152,5 @@ background-position: 1rem center, right 1rem center;
 .inputStyle {
     width: 80%;
     height: 5vh;
-    opacity: 0;
+    display: none;
 }
