@@ -283,7 +283,7 @@ function CreatePageLayout()
 		{
 		    let newurl = window.location.search;
 		    newurl+="#page"+kk[0].pageNumber;
-		    window.history.pushState({},gTitle+" Page: "+kk[0].pageNumber,newurl);
+		    window.history.replaceState({},null,newurl);
 		}
 	    }
 
@@ -815,7 +815,10 @@ function doCompleteNewSearch()
     		newurl = "/books/"+scanId+"/pages?highlight="+document.getElementById("srchbox").value+"&fuzzyness="+fuzzyness;
 	else
     		newurl = "/books/"+scanId+"/pages?highlight="+document.getElementById("srchbox").value;
-    window.location = newurl;
+    if(window.history.pushState)
+	window.history.pushState({},document.title,newurl);
+    else
+	window.location = newurl;
 }
 
 window.addEventListener("load",initialise,false);

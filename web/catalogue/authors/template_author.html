@@ -34,7 +34,7 @@
 	
     <ol>
     {% for book in books %}
-    <li class="searchable_item"><a href="/books/{{ book.id }}/">{{ book.title}}<a><span class="metadata">{{book.bib}}</span></li>
+    <li class="searchable_item"><a href="/books/{{ book.id }}/">{{ book.title}}</a><span class="metadata">{{book.bib}}</span></li>
     {% endfor %}
     </ol>
 
