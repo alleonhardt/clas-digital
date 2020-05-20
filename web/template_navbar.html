@@ -1,8 +1,8 @@
 <nav id='tpnav' class="topnav">
-	<a {{ information }} id='homelink' href='/information/'>Information</a>
-	<a {{ search }} id='searchlink' href='/search'>Search</a>
+	<a {{ topnav.information }} id='homelink' href='/information/'>Information</a>
+	<a {{ topnav.search }} id='searchlink' href='/search'>Search</a>
 	<div class='dropdown'>
-		<a id='statisticslink' {{ catalogue }}' href='/catalogue'>Catalogue</a>
+		<a id='statisticslink' {{ topnav.catalogue }}' href='/catalogue'>Catalogue</a>
 		<div class='dropdown-content'>
 			<a href="/catalogue/books">Books</a>
 			<a href="/catalogue/authors">Authors</a>
@@ -10,8 +10,8 @@
 			<a href="/catalogue/years">Years</a>
 		</div>
 	</div>
-	<a id='administrationlink' class='classifiedContent {{ admin }}' href='/private/admin/Administration.html' data-acc=4>Administration</a>
-	<a id='uploadbooklink' class='classifiedContent {{ upload }}' href='/private/write/UploadBook.html' data-acc=2>Upload Books</a>
+	<a id='administrationlink' class='classifiedContent {{ topnav.admin }}' href='/private/admin/Administration.html' data-acc=4>Administration</a>
+	<a id='uploadbooklink' class='classifiedContent {{ topnav.upload }}' href='/private/write/UploadBook.html' data-acc=2>Upload Books</a>
 
 	<div class='topnav-right-in' id='loggedintopnav'>
 		<span id='LoggedInAs'>Logged in</span>
@@ -26,4 +26,12 @@
 	</div>
 
 </nav>
+<footer>
+    <dl>
+        <dt>Generated:</dt>
+        <dd itemprop="dataModified" content={{topnav.time}}>
+            <time datetime={{topnav.time}}>{{topnav.time}}</time>
+        </dd>
+    </dl>
+</footer>
 

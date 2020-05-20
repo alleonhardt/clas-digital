@@ -3,6 +3,8 @@
 #include <filesystem>
 #include <inja/inja.hpp>
 #include <cstdio>
+#include <chrono>
+#include <ctime>
 
 static void atomic_write_file(std::string filename, const std::string &data)
 {
@@ -25,9 +27,16 @@ class StaticWebpageCreator
 		std::string m_path;
 		std::string m_bookID;
 		nlohmann::json m_info;
+        nlohmann::json m_topnav;
 		CBook *m_book;
 	public:
-        StaticWebpageCreator(){};
+        StaticWebpageCreator()
+        {
+            m_topnav = {{"information", ""}, {"search", ""}, {"catalogue", ""}, {"admin", ""}, {"upload", ""}};
+            auto time=std::chrono::system_clock::now();
+            std::time_t time_time = std::chrono::system_clock::to_time_t(time);
+            m_topnav["time"] = std::ctime(&time_time);    
+        }
 
 		StaticWebpageCreator(CBook *book)
 		{
@@ -35,6 +44,11 @@ class StaticWebpageCreator
 			m_bookID = book->getKey();
 			m_info = book->getMetadata().getMetadata();
 			m_book = book;
+
+            m_topnav = {{"information", ""}, {"search", ""}, {"catalogue", ""}, {"admin", ""}, {"upload", ""}};
+            auto time=std::chrono::system_clock::now();
+            std::time_t time_time = std::chrono::system_clock::to_time_t(time);
+            m_topnav["time"] = std::ctime(&time_time);   
 		}
 
 		template<typename T>
@@ -74,11 +88,8 @@ class StaticWebpageCreator
         {
             inja::Environment env;
             nlohmann::json j;
-            j["information"] = "";
-            j["search"] = "class='dropdown-banner active'";
-            j["catalogue"] = "";
-            j["admin"] = "";
-            j["upload"] = "";
+            j["topnav"]=m_topnav;
+            j["topnav"]["search"] = "class='dropdown-banner active'";
 
             inja::Template temp = env.parse_template("web/search_template.html");
             std::string result = env.render(temp, j);  
@@ -89,11 +100,8 @@ class StaticWebpageCreator
         {
             inja::Environment env;
             nlohmann::json j;
-            j["information"] = "class='dropdown-banner active'";
-            j["search"] = "";
-            j["catalogue"] = "";
-            j["admin"] = "";
-            j["upload"] = "";
+            j["topnav"]=m_topnav;
+            j["topnav"]["information"] = "class='dropdown-banner active'";
 
             inja::Template temp = env.parse_template("web/information/information_template.html");
             std::string result = env.render(temp, j);  
@@ -104,11 +112,8 @@ class StaticWebpageCreator
         {
             inja::Environment env;
             nlohmann::json j;
-            j["information"] = "";
-            j["search"] = "";
-            j["catalogue"] = "";
-            j["admin"] = "classifiedContent active";
-            j["upload"] = "";
+            j["topnav"]=m_topnav;
+            j["topnav"]["admin"] = "classifiedContent active";
 
             inja::Template temp = env.parse_template("web/private/admin/administration_template.html");
             std::string result = env.render(temp, j);  
@@ -119,11 +124,8 @@ class StaticWebpageCreator
         {
             inja::Environment env;
             nlohmann::json j;
-            j["information"] = "";
-            j["search"] = "";
-            j["catalogue"] = "";
-            j["admin"] = ""; 
-            j["upload"] = "classifiedContent active";
+            j["topnav"]=m_topnav;
+            j["topnav"]["upload"] = "classifiedContent active";
 
             inja::Template temp = env.parse_template("web/private/write/uploadBook_template.html");
             std::string result = env.render(temp, j);  
@@ -150,6 +152,9 @@ class StaticWebpageCreator
 			info["date"] = m_info["data"].value("date","");
 			info["key"] = m_book->getKey();
 
+            //Parse navbar
+            info["topnav"] = m_topnav;
+            info["topnav"]["catalogue"] = "class='dropdown-banner active";
 
 			inja::Environment env;
 			inja::Template temp = env.parse_template("web/books/metadata_template.html");
@@ -193,7 +198,18 @@ class StaticWebpageCreator
 
 class StaticCatalogueCreator
 {
+    private: 
+        nlohmann::json m_topnav;
+
 	public:
+        StaticCatalogueCreator()
+        {
+            m_topnav = {{"information", ""}, {"search", ""}, {"catalogue", ""}, {"admin", ""}, {"upload", ""}};
+            auto time=std::chrono::system_clock::now();
+            std::time_t time_time = std::chrono::system_clock::to_time_t(time);
+            m_topnav["time"] = std::ctime(&time_time);    
+        }
+
 		void CreateCatalogue()
 		{
 			nlohmann::json js;
@@ -202,6 +218,12 @@ class StaticCatalogueCreator
 			js["pages"].push_back("collections");
 			js["pages"].push_back("years");
 			js["world"] = "hallo";
+
+            //Parse navbar
+            js["topnav"] = m_topnav;
+            js["topnav"]["catalogue"] = "class='dropdown-banner active";
+
+
 			inja::Environment env;
 			inja::Template temp = env.parse_template("web/catalogue/template.html");
 			std::string result = env.render(temp, js);
@@ -211,6 +233,11 @@ class StaticCatalogueCreator
 		void CreateCatlogueYears(CBookManager &mng)
 		{
 			nlohmann::json rend;
+
+            //Parse navbar
+            rend["topnav"] = m_topnav;
+            rend["topnav"]["catalogue"] = "class='dropdown-banner active";
+
 			std::map<std::string,std::pair<int,std::list<CBook*>>> _map;
 			for(auto &book : mng.getMapOfBooks())
 			{
@@ -231,6 +258,7 @@ class StaticCatalogueCreator
 				ks["count"] = x.second.first;
 				rend["years"].push_back(ks);
 			}
+            
 			inja::Environment env;
 			inja::Template temp = env.parse_template("web/catalogue/years/template.html");
 			std::string result = env.render(temp, rend);
@@ -243,6 +271,11 @@ class StaticCatalogueCreator
 				std::error_code ec;
 				std::filesystem::create_directory("web/catalogue/years/"+x.first,ec);
 				nlohmann::json js;
+
+                //Parse navbar
+                js["topnav"] = m_topnav;
+                js["topnav"]["catalogue"] = "class='dropdown-banner active";
+
                 std::vector<nlohmann::json> vBooks;
 				for(auto y : x.second.second)
 				{
@@ -280,6 +313,11 @@ class StaticCatalogueCreator
 
 			nlohmann::json books;
             books["books"] = vBooks;
+
+            //Parse navbar
+            books["topnav"] = m_topnav;
+            books["topnav"]["catalogue"] = "class='dropdown-banner active";
+
 			inja::Environment env;
 			inja::Template temp = env.parse_template("web/catalogue/books/template.html");
 			std::string result = env.render(temp, books);
@@ -289,6 +327,11 @@ class StaticCatalogueCreator
         void CreateCatalogueAuthors(CBookManager& manager)
 		{
 			nlohmann::json js;
+
+            //Parse navbar
+            js["topnav"] = m_topnav;
+            js["topnav"]["catalogue"] = "class='dropdown-banner active";
+
             std::map<std::string, nlohmann::json> mapAuthors;
             for(auto &it : manager.getMapOfBooks()) 
             {
@@ -348,6 +391,10 @@ class StaticCatalogueCreator
                 nlohmann::json js;
                 js["author"] = {{"name", name}, {"id", key}};
 
+                //Parse navbar
+                js["topnav"] = m_topnav;
+                js["topnav"]["catalogue"] = "class='dropdown-banner active";
+
                 //Create json with all books
                 std::vector<nlohmann::json> vBooks;
                 if(manager.getMapofUniqueAuthors().count(key) == 0)
@@ -374,6 +421,11 @@ class StaticCatalogueCreator
         void CreateCatalogueCollections(nlohmann::json pillars)
         {
 			nlohmann::json js;
+
+            //Parse navbar
+            js["topnav"] = m_topnav;
+            js["topnav"]["catalogue"] = "class='dropdown-banner active";
+
             for(auto &it : pillars)
                 js["pillars"].push_back(it);
             
@@ -390,6 +442,11 @@ class StaticCatalogueCreator
             for(auto& it : pillars)
             {
                 nlohmann::json js;
+
+                //Parse navbar
+                js["topnav"] = m_topnav;
+                js["topnav"]["catalogue"] = "class='dropdown-banner active";
+
                 js["pillar"] = it;
                 std::string key = it["key"];
 
