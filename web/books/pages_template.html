@@ -13,14 +13,17 @@
 		<meta name="description" content="{{ bib_esc }}"/>
 
 		<link rel="stylesheet" href="/static/pages.css">
+        <link rel="stylesheet" href="/topnav.css">
 		<script>
 			let gGlobalBookId="{{ key }}";
 		</script>
 		<script src="/general.js"></script>
 		<script src="/GetBooks.js"></script>
+        <script src="/user.js"></script>
 	</head>
 	
 	<body>
+        {% include "../template_navbar.html" %}
 		<nav class='searchbox'>
 			<a class="about" href="../" rel="index up">About this book</a>
 			<center><input id='srchbox' style='width:25%;border-radius: 20px;padding-left: 0.5rem;padding-right: 0.5rem;margin-left: 1rem;min-width: 10rem;margin-top: 0.5rem;text-align: center;' type='text' placeholder="search this book"/>

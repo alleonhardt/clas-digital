@@ -167,6 +167,11 @@ class StaticWebpageCreator
 		void CreatePagesPage()
 		{
 			nlohmann::json js;
+
+            //Parse navbar
+            js["topnav"] = m_topnav;
+            js["topnav"]["catalogue"] = "class='dropdown-banner active";
+
 			js["key"] = m_book->getKey();
 			js["title"] = m_book->getMetadata().getShow2();
 			js["bib"] = m_info["bib"].get<std::string>();

@@ -28,6 +28,7 @@ body {
     z-index: 3;
     background: white;
     border-bottom: 2px solid black;
+    margin-top: 3em;
 }
 
 .searchstyler {
@@ -52,15 +53,6 @@ body {
     height: 5px;
     background-color: #00618F;
     cursor: s-resize;
-}
-
-.topnav button {
-    background: white;
-    border: 0;
-}
-
-.topnav button:hover {
-    background: linear-gradient(to top, rgba(0,0,255,0.3),rgba(0,0,255,0));
 }
 
 .linknav {
