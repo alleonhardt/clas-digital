@@ -659,7 +659,7 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 
 	    nlohmann::json entry;
 	    entry["file"] = fileName;
-	    std::regex reg("_0*([1-9][0-9]*)");
+	    std::regex reg("_0*([0-9]+)");
 	    std::smatch cm;
 	    int maxPageNum = file_desc["maxPageNum"];
 	    std::cout<<fileName<<std::endl;
