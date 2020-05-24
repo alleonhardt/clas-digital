@@ -9,17 +9,11 @@ function on_search_async(it)
 	let lst = document.getElementsByClassName("searchable_item");
 	let num_items = Math.max(Math.floor((lst.length*global_factor)/50),20);
 	global_factor++;
-	if(global_factor>6)
-	{
-		document.getElementById("progressField").style.display = "";
-	}
-	
 
 	if(global_start>=lst.length)
 	{
-		document.getElementById("progressField").style.display = "none";
 		document.getElementById("infoProgress").style.color = "green";
-		document.getElementById("infoProgress").innerHTML = global_count+" results.";
+		document.getElementById("num_results").innerHTML = global_count;
 		return;
 	}
 
@@ -68,13 +62,13 @@ function on_search_async(it)
 
 	if(it.value!="")
 	{
-		document.getElementById("infoProgress").innerHTML = "searching...";
-		document.getElementById("searchProgress").value = Math.floor(global_start*100/lst.length);
-		document.getElementById("progressValue").innerHTML = Math.floor(global_start*100/lst.length)+"%";
+		document.getElementById("num_max_books").innerHTML = lst.length;
+		document.getElementById("num_results").innerHTML = global_count;
+		document.getElementById("num_filtered").innerHTML = global_start;
 	}
 	else
 	{
-		document.getElementById("filteropts").style.display="none";
+		document.getElementById("infoProgress").style.display="none";
 	}
 	global_start += num_items;
 	global_timer = window.setTimeout(function(){on_search_async(it)},150);
@@ -91,8 +85,8 @@ function on_search(it)
 	global_timer = null;
 	global_factor = 1;
 
-	document.getElementById("filteropts").style.display="block";
-	document.getElementById("infoProgress").style.color = "red";
-	document.getElementById("progressField").style.display = "none";
+	document.getElementById("infoProgress").style.display = "block";
+	document.getElementById("infoProgress").style.color = "";
+
 	on_search_async(it);
 }
