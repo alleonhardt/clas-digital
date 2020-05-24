@@ -208,13 +208,13 @@ void CBook::createPages()
             convertToNormalLayout +="\n\n----- "+std::to_string(page)+" / 999 -----\n\n" + sBuffer;
     }
 
+    read.close();
     if(pageMark == false)
     {
-        std::ofstream write (m_sPath + "/intern/ocr.txt");
+        std::ofstream write (m_sPath + "/ocr.txt");
         write << convertToNormalLayout;
         write.close();
     }
-    read.close();
     m_numPages = pageCounter;
 }
 
