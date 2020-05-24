@@ -66,7 +66,7 @@ function Upload(x,key)
 		    HideModal();
 		    x.innerHTML = "<p><div>Canceled upload of: "+x.file.name+" Keeping existing file</div></p>";
 		    x.style.background = "red";
-		    x.upload_finished = true;
+		    x.upload_finished = false;
 		    UploadAll();
 		}
 
@@ -76,7 +76,7 @@ function Upload(x,key)
 		    x.style.background = "";
 		    x.children[0].children[1].style.display = "";
 		    x.children[0].children[2].style.display = "";
-            x.innerHTML = "<p><div>Overwriting existing file with: " +x.file.name+"</div></p>";
+		    x.innerHTML = "<p><div>Overwriting existing file with: " +x.file.name+"</div></p>";
 		    Upload(x,key);
 		}
 		if(globalYes)
@@ -104,6 +104,14 @@ function Upload(x,key)
 	    }
 	    else
 	    {
+		if(xhr.responseText == "unsupported_file_type")
+		{
+		    x.innerHTML = "<p><div>Canceled upload of: "+x.file.name+" Unsupported file type</div></p>";
+		    x.style.background = "red";
+		    x.upload_finished = false;
+		    UploadAll();
+		    return;
+		}
 		return ShowStatus("Server returned error: "+xhr.responseText,"red");
 	    }
 	    //File exists already ask for override permission
@@ -264,7 +272,27 @@ function UploadAll()
 	    return;
 	}
     }
-    ShowStatus("Uploaded all files successfully! In order to find results in the new book you have to restart the server! (The Server automatically restarts over night)","green");
+    let total_count = val.length-1;
+    let upcount = 0;
+    for(let i = 1; i < val.length; i++)
+    {
+	if(val[i].upload_finished)
+	    upcount++;
+    }
+    if(upcount == 0)
+    {
+	ShowStatus("Uploaded "+upcount+"/"+total_count+" files. Could not upload a single file please check the file list to see the error message and try again.","red");
+    }
+    else if(upcount!=total_count)
+    {
+	ShowStatus("Uploaded "+upcount+"/"+total_count+" files. Could not upload some files, please check the file list to see the error message and which files could not get uploaded. The changed search results will show starting tomorrow","yellow");
+	return;
+    }
+    else
+    {
+	ShowStatus("Uploaded "+upcount+"/"+total_count+" files. All files have been uploaded. In order to find results in the new book you have to restart the server! The changed search results will show starting tomorrow","green");
+    }
+    return;    
 }
 
 function show_language(x)
