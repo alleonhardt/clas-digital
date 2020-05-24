@@ -594,7 +594,7 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 	return;
     }
 
-    if(fileEnd=="jpg"||fileEnd=="png"||fileEnd=="JPG"||fileEnd=="PNG")
+    if(fileEnd=="jpg"||fileEnd=="png"||fileEnd=="JPG"||fileEnd=="PNG"||fileEnd=="jp2"||fileEnd=="JP2")
     {
 	try
 	{
