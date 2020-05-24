@@ -412,8 +412,9 @@ class StaticCatalogueCreator
                     vBooks.push_back({ 
                         {"id", jt},
                         { "title", manager.getMapOfBooks()[jt]->getMetadata().getShow2()},
-                        { "bib", manager.getMapOfBooks()[jt]->getMetadata().getMetadata("bib")}
-                                          });
+                        { "bib", manager.getMapOfBooks()[jt]->getMetadata().getMetadata("bib")},
+			{ "has_ocr", manager.getMapOfBooks()[jt]->hasOcr()}
+                        });
                 }
 
                 std::sort(vBooks.begin(), vBooks.end(), &StaticCatalogueCreator::mySort);

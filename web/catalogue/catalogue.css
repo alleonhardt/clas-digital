@@ -63,3 +63,9 @@ header {
     right:0;
     left:0;
 }
+
+li a span.bookhasocr {
+    color: #a25900;
+    text-decoration: none;
+    padding-right: 0.5rem;
+}
