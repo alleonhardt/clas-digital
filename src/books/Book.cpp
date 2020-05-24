@@ -123,16 +123,33 @@ void CBook::createPages()
     std::cout << "Creating map of words... \n";
     std::ifstream read(getOcrPath());
 
+    fs::create_directories(m_sPath + "/intern");
+
     std::string sBuffer = "";
     size_t pageCounter = 0;
 
+    bool pageMark = false;
+    for(size_t i=0; i<10; i++) {
+        std::string sLine;
+        getline(read, sLine);
+        if(func::checkPage(sLine) == true)
+            pageMark = true;
+    }
+    read.clear();
+    read.seekg(0, std::ios::beg); 
+
     size_t page=0;
+    size_t blanclines=0;
     while(!read.eof()) {
 
         std::string sLine;
         getline(read, sLine);
 
-        if(func::checkPage(sLine) == true) {
+        if(sLine == "" && pageMark == false) 
+            blanclines++;
+
+        //Create books with page mark (old format)
+        if(func::checkPage(sLine) == true && pageMark == true) {
             for(auto it : func::extractWordsFromString(sBuffer)) {
                 std::get<0>(m_mapWordsPages[it.first]).push_back(page);
                 std::get<1>(m_mapWordsPages[it.first]) += it.second*(it.second+1) / 2;
@@ -148,7 +165,25 @@ void CBook::createPages()
             std::string num = sLine.substr(6, sLine.find("/")-7);
             page = stoi(num);
         }
+        //Create books without page mark (new format)
+        else if(blanclines == 4 && pageMark == false)
+        {
+            //std::cout << "creating page " << page << std::endl;
+            for(auto it : func::extractWordsFromString(sBuffer)) {
+                std::get<0>(m_mapWordsPages[it.first]).push_back(page);
+                std::get<1>(m_mapWordsPages[it.first]) += it.second*(it.second+1) / 2;
+            } 
+            pageCounter++;
 
+            //Create new page
+            std::ofstream write(m_sPath + "/intern/page" + std::to_string(page) + ".txt");
+            write << func::returnToLower(sBuffer);
+            write.close();
+            sBuffer = "";
+
+            page++;
+            blanclines = 0;
+        }
         else
             sBuffer += " " + sLine;
     }

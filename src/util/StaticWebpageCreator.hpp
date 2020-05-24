@@ -189,7 +189,7 @@ class StaticWebpageCreator
 			//Remove the old folder structure
 			//std::filesystem::remove_all(m_path+"/view",ec);
 			//std::filesystem::remove_all(m_path+"/meta",ec);
-			if(std::filesystem::exists(m_path+"/readerInfo.json"))
+			if(std::filesystem::exists(m_path+"/ocr.txt"))
 			{
 				CreatePagesPage();
 			}
