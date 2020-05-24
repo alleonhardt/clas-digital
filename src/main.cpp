@@ -562,6 +562,7 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
     }
     auto pos = fileName.find_last_of('.');
     std::string fileEnd = fileName.substr(pos+1,std::string::npos);
+    std::string fileNameWithoutEnding = fileName.substr(0,pos);
 
 
     if(fileEnd == "txt" || fileEnd == "TXT")
@@ -593,13 +594,53 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 	resp.set_content("file_exists","text/plain");
 	return;
     }
-
+    const char *buffer = req.body.c_str();
+    auto buffer_length = req.body.length();
+    char imgbuffer[4*1014*1024];
     if(fileEnd=="jpg"||fileEnd=="png"||fileEnd=="JPG"||fileEnd=="PNG"||fileEnd=="jp2"||fileEnd=="JP2")
     {
 	try
 	{
 	    static std::mutex m;
+	    if(fileEnd=="JP2" || fileEnd == "jp2")
+	    {
+		fileName = fileNameWithoutEnding+".jpg";
+		std::ofstream ofs("tmp021.jp2",std::ios::out);
+		ofs.write(req.body.c_str(),req.body.length());
+		ofs.close();
 
+		if(system("opj_decompress -i tmp021.jp2 -o tmp021.bmp")<0)
+		{
+		    resp.status = 403;
+		    resp.set_content("Could not convert jp2 to jpg missing openjpeg library!","text/plain");
+		    return;
+		}
+		if(system("convert tmp021.bmp tmp021.jpg") < 0)
+		{
+		    resp.status = 403;
+		    resp.set_content("Could not convert bmp to jpg!","text/plain");
+		    return;
+		}
+		if(system("rm tmp021.jp2") < 0 || system("rm tmp021.bmp"))
+		{
+		    resp.status = 403;
+		    resp.set_content("Cleanup error!","text/plain");
+		    return;
+		}
+		std::ifstream ifs("tmp021.jpg",std::ios::in);
+		ifs.read(imgbuffer,4*1024*1024);
+		auto len = ifs.gcount();
+		ifs.close();
+		if(system("rm tmp021.jpg") < 0)
+		{
+		    resp.status = 403;
+		    resp.set_content("Cleanup error!","text/plain");
+		    return;
+		}
+
+		buffer = imgbuffer;
+		buffer_length = len;
+	    }
 	    std::string pa = directory;
 	    pa+="/readerInfo.json";
 	    std::lock_guard lck(m);
@@ -635,7 +676,7 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 	    maxPageNum = std::max(maxPageNum,std::stoi(cm[1]));
 
 	    int width,height,z;
-	    stbi_info_from_memory(reinterpret_cast<const unsigned char*>(req.body.c_str()),req.body.length(),&width,&height,&z);
+	    stbi_info_from_memory(reinterpret_cast<const unsigned char*>(buffer),buffer_length,&width,&height,&z);
 	    entry["width"] = width;
 	    entry["height"] = height;
 	    bool replace = false;
@@ -661,7 +702,7 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 
 	    if(ocr_create=="true")
 	    {
-		book->addPage(ocr_reader.CreateOcrFromImage(reinterpret_cast<const unsigned char*>(req.body.c_str()),req.body.length(),ocr_lang.c_str()),std::to_string(what),std::to_string(maxPageNum));
+		book->addPage(ocr_reader.CreateOcrFromImage(reinterpret_cast<const unsigned char*>(buffer),buffer_length,ocr_lang.c_str()),std::to_string(what),std::to_string(maxPageNum));
 	    }
 	}
 	catch(std::exception &e)
@@ -729,7 +770,7 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 	std::filesystem::rename(writePath,finnewpath);
     }
     std::ofstream ofs(writePath.c_str(),std::ios::out);
-    ofs.write(req.body.c_str(),req.body.length());
+    ofs.write(buffer,buffer_length);
     ofs.close();
     resp.status=200;
 }
