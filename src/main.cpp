@@ -602,6 +602,7 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 	try
 	{
 	    static std::mutex m;
+	    std::lock_guard lck(m);
 	    if(fileEnd=="JP2" || fileEnd == "jp2")
 	    {
 		fileName = fileNameWithoutEnding+".jpg";
@@ -609,19 +610,19 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 		ofs.write(req.body.c_str(),req.body.length());
 		ofs.close();
 
-		if(system("opj_decompress -i tmp021.jp2 -o tmp021.bmp")<0)
+		if(system("opj_decompress -i tmp021.jp2 -o tmp021.bmp") != 0)
 		{
 		    resp.status = 403;
 		    resp.set_content("Could not convert jp2 to jpg missing openjpeg library!","text/plain");
 		    return;
 		}
-		if(system("convert tmp021.bmp tmp021.jpg") < 0)
+		if(system("convert tmp021.bmp tmp021.jpg") != 0)
 		{
 		    resp.status = 403;
 		    resp.set_content("Could not convert bmp to jpg!","text/plain");
 		    return;
 		}
-		if(system("rm tmp021.jp2") < 0 || system("rm tmp021.bmp"))
+		if(system("rm tmp021.jp2") != 0 || system("rm tmp021.bmp") != 0)
 		{
 		    resp.status = 403;
 		    resp.set_content("Cleanup error!","text/plain");
@@ -631,7 +632,7 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 		ifs.read(imgbuffer,4*1024*1024);
 		auto len = ifs.gcount();
 		ifs.close();
-		if(system("rm tmp021.jpg") < 0)
+		if(system("rm tmp021.jpg") != 0)
 		{
 		    resp.status = 403;
 		    resp.set_content("Cleanup error!","text/plain");
@@ -643,7 +644,6 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 	    }
 	    std::string pa = directory;
 	    pa+="/readerInfo.json";
-	    std::lock_guard lck(m);
 	    nlohmann::json file_desc;
 	    if(std::filesystem::exists(pa))
 	    {
