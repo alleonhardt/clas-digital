@@ -18,7 +18,6 @@
     <meta name="description" lang="en" content="The CLAS Digital searchable book archive: index of all books."/>
     <link href="/catalogue/catalogue.css" rel="stylesheet" type="text/css">
 
-    <script src="/Search.js"></script>
     <script src="/user.js"></script>
     <script src="/catalogue/catalogue.js"></script>
 </head>
@@ -33,7 +32,7 @@
 	
 	<ol>
 	{% for pg in books %}
-	<li class="searchable_item"><a href="/books/{{ pg.key }}/">{{ pg.title }}</a><span class="metadata">{{ pg.bib }}</span></li>
+	<li class="searchable_item"><a href="/books/{{ pg.key }}/" data-key="{{ pg.key }}">{{ pg.title }}</a><span class="metadata">{{ pg.bib }}</span></li>
 	{% endfor %}
 	</ol>
 

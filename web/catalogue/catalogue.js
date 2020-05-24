@@ -5,6 +5,7 @@ let global_factor = 1;
 
 function on_search_async(it)
 {
+	console.log("Search is going");
 	let lst = document.getElementsByClassName("searchable_item");
 	let num_items = Math.max(Math.floor((lst.length*global_factor)/50),20);
 	global_factor++;
@@ -42,11 +43,20 @@ function on_search_async(it)
 			for(let inner = 0; inner < children.length; inner++)
 			{
 				let htm = children[inner].innerHTML;
-				if(htm != undefined && htm.toLowerCase().search(lowercase_search) != -1)
+				if(htm != undefined)
 				{
+				    if(htm.toLowerCase().search(lowercase_search) != -1)
+				    {
 					found = true;
 					global_count++;
 					break;
+				    }
+				    else if(children[inner].hasAttribute("data-key") && (children[inner].dataset.key == it.value))
+				    {
+					found = true;
+					global_count++;
+					break;
+				    }
 				}
 			}
 		}
