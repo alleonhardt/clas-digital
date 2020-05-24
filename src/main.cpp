@@ -625,7 +625,11 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 	    std::regex_search(fileName,cm,reg);
 	    std::cout<<"Match size: "<<cm.size()<<std::endl;
 	    if(cm.size()<2)
-		throw std::runtime_error("malformed_img_naming");
+	    {
+		resp.status = 403;
+		resp.set_content("Wrong format: Expected [ bsbid_pagenumber.jpg ]","text/plain");
+		return;
+	    }
 	    std::cout<<"Match: "<<cm[1]<<std::endl;
 	    entry["pageNumber"]=std::stoi(cm[1]);
 	    maxPageNum = std::max(maxPageNum,std::stoi(cm[1]));
@@ -679,7 +683,7 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
     else if((fileEnd!="txt")&&(fileEnd!="TXT"))
     {
 	resp.status = 403;
-	resp.set_content("unsupported_file_type","text/plain");
+	resp.set_content("Unsupported file type, the uploader only supports .txt, .jpg and .png files!","text/plain");
 	return;
     }
     else

@@ -104,16 +104,13 @@ function Upload(x,key)
 	    }
 	    else
 	    {
-		if(xhr.responseText == "unsupported_file_type")
-		{
-		    x.innerHTML = "<p><div>Canceled upload of: "+x.file.name+" Unsupported file type</div></p>";
-		    x.style.background = "red";
-		    x.upload_finished = false;
-		    UploadAll();
-		    return;
-		}
-		return ShowStatus("Server returned error: "+xhr.responseText,"red");
+		x.innerHTML = "<p>"+x.file.name+" ==> "+xhr.responseText+"</p>";
+		x.style.background = "red";
+		x.upload_finished = false;
+		UploadAll();
+		return;
 	    }
+	    return ShowStatus("Server returned error: "+xhr.responseText,"red");
 	    //File exists already ask for override permission
 	}
 	else if(xhr.status==200)
