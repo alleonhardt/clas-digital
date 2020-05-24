@@ -140,6 +140,7 @@ void CBook::createPages()
 
     size_t page=0;
     size_t blanclines=0;
+    std::string convertToNormalLayout = "";
     while(!read.eof()) {
 
         std::string sLine;
@@ -147,6 +148,8 @@ void CBook::createPages()
 
         if(sLine == "" && pageMark == false) 
             blanclines++;
+        else if(sLine != "" && pageMark == false)
+            blanclines = 0;
 
         //Create books with page mark (old format)
         if(func::checkPage(sLine) == true && pageMark == true) {
@@ -179,6 +182,8 @@ void CBook::createPages()
             std::ofstream write(m_sPath + "/intern/page" + std::to_string(page) + ".txt");
             write << func::returnToLower(sBuffer);
             write.close();
+
+            convertToNormalLayout += "\n\n----- "+std::to_string(page)+" / 999 -----\n\n" + sBuffer;
             sBuffer = "";
 
             page++;
@@ -197,6 +202,16 @@ void CBook::createPages()
         //Create new page
         std::ofstream write(m_sPath + "/intern/page" + std::to_string(page) + ".txt");
         write << func::returnToLower(sBuffer);
+        write.close();
+
+        if(pageMark == false)
+            convertToNormalLayout +="\n\n----- "+std::to_string(page)+" / 999 -----\n\n" + sBuffer;
+    }
+
+    if(pageMark == false)
+    {
+        std::ofstream write (m_sPath + "/intern/ocr.txt");
+        write << convertToNormalLayout;
         write.close();
     }
     read.close();
