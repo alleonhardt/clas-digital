@@ -173,10 +173,12 @@ class StaticWebpageCreator
 		void CreatePagesPage()
 		{
 			nlohmann::json js;
-
-            //Parse navbar
-            js["topnav"] = m_topnav;
-            js["topnav"]["catalogue"] = "class='dropdown-banner active";
+		    
+			std::error_code ec;
+			std::filesystem::create_directory("web/books/"+m_book->getKey()+"/pages", ec);
+		    //Parse navbar
+		    js["topnav"] = m_topnav;
+		    js["topnav"]["catalogue"] = "class='dropdown-banner active";
 
 			js["key"] = m_book->getKey();
 			js["title"] = m_book->getMetadata().getShow2();
