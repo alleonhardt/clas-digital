@@ -32,7 +32,11 @@
 	
 	<ol>
 	{% for pg in books %}
-	<li class="searchable_item"><a href="/books/{{ pg.key }}/" data-key="{{ pg.key }}">{{ pg.title }}</a><span class="metadata">{{ pg.bib }}</span></li>
+	{% if pg.has_ocr %}
+	<li class="searchable_item"><a href="/books/{{ pg.key }}/" data-key="{{ pg.key }}"><span class='bookhasocr'>[OCR]</span>{{ pg.title }}</a><span class="metadata">{{ pg.bib }}</span></li>
+	{% else %}
+	    <li class="searchable_item"><a href="/books/{{ pg.key }}/" data-key="{{ pg.key }}">{{ pg.title }}</a><span class="metadata">{{ pg.bib }}</span></li>
+	{% endif %}
 	{% endfor %}
 	</ol>
 

@@ -33,9 +33,14 @@
 	</header>
 	
     <ol>
-    {% for book in books %}
-    <li class="searchable_item"><a href="/books/{{ book.id }}/" data-key="{{ book.id }}">{{ book.title}}</a><span class="metadata">{{book.bib}}</span></li>
-    {% endfor %}
+	{% for pg in books %}
+	{% if pg.has_ocr %}
+	<li class="searchable_item"><a href="/books/{{ pg.id }}/" data-key="{{ pg.id }}"><span class='bookhasocr'>[OCR]</span>{{ pg.title }}</a><span class="metadata">{{ pg.bib }}</span></li>
+	{% else %}
+	    <li class="searchable_item"><a href="/books/{{ pg.id }}/" data-key="{{ pg.id }}">{{ pg.title }}</a><span class="metadata">{{ pg.bib }}</span></li>
+	{% endif %}
+	{% endfor %}
+
     </ol>
 
 </body>

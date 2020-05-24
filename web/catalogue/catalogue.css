@@ -63,3 +63,13 @@ header {
     right:0;
     left:0;
 }
+
+.searchprogress {
+    display: none;
+}
+
+li a span.bookhasocr {
+    color: #a25900;
+    text-decoration: none;
+    padding-right: 0.5rem;
+}
