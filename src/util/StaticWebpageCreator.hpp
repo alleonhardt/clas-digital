@@ -5,9 +5,13 @@
 #include <cstdio>
 #include <chrono>
 #include <ctime>
+#include <mutex>
 
+inline std::mutex global_lock_write;
 static void atomic_write_file(std::string filename, const std::string &data)
 {
+	global_lock_write.lock();
+
 	std::cout<<"Filename : "<<filename<<std::endl;
 	std::ofstream ofs("main.tmp",std::ios::out);
 	ofs<<data;
@@ -17,8 +21,10 @@ static void atomic_write_file(std::string filename, const std::string &data)
 	if( ec )
 	{
 		std::cout<<"Error code, rename : "<<ec<<std::endl;
+		global_lock_write.unlock();
 		throw 0;
 	}
+	global_lock_write.unlock();
 }
 
 class StaticWebpageCreator

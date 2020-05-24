@@ -13,7 +13,6 @@ function on_search_async(it)
 	if(global_start>=lst.length)
 	{
 		document.getElementById("infoProgress").style.color = "green";
-		document.getElementById("num_results").innerHTML = global_count;
 		return;
 	}
 
