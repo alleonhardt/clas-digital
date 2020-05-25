@@ -298,6 +298,7 @@ void do_login(const Request& req, Response &resp)
     {
 	//Show the user the access denied formula
 	resp.set_content("<html><head></head><body><h1>Access Denied 403</body></html>","text/html");
+	resp.status = 403;
     }
 }
 
