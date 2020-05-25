@@ -257,7 +257,7 @@ function CreatePageLayout()
     }
 
     let timer = null;
-    let currentSize = document.getElementsByClassName("searchbox")[0].getBoundingClientRect().bottom;
+    let currentSize = 0;
     document.body.onscroll = function() {
 	let gNewSize = document.getElementsByClassName("searchbox")[0].getBoundingClientRect().bottom;
 	if(currentSize!=gNewSize)
