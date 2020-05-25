@@ -2,7 +2,7 @@
 	<a {{ topnav.information }} id='homelink' href='/information/'>Information</a>
 	<a {{ topnav.search }} id='searchlink' href='/search'>Search</a>
 	<div class='dropdown'>
-		<a id='statisticslink' {{ topnav.catalogue }}' href='/catalogue'>Catalogue</a>
+		<a id='statisticslink' {{ topnav.catalogue }} href='/catalogue'>Catalogue</a>
 		<div class='dropdown-content'>
 			<a href="/catalogue/books">Books</a>
 			<a href="/catalogue/authors">Authors</a>
@@ -18,10 +18,10 @@
 		<button id='logoutBut' onclick='DoLogout()'>Logout</button>
 	</div>
 	<div class='topnav-right-out' id='loggedouttopnav'>
-		<form id ="LoginForm" action="/login" method="post">
+		<form id ="LoginForm" class='loginform' action="/login" method="post">
 			<input id="EmailType" type="email" name="email" placeholder="Email" aria-label="Email" required>
 			<input id="PasswordType" type="password" name="password" placeholder="Password" aria-label="Password" required>
-			<input type="submit" value="Log In"/>
+			<input type="submit" class='loginbutton' value="Log In"/>
 		</form>
 	</div>
 
