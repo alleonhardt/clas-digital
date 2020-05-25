@@ -282,7 +282,7 @@ function UploadAll()
     }
     else if(upcount!=total_count)
     {
-	ShowStatus("Uploaded "+upcount+"/"+total_count+" files. Could not upload some files, please check the file list to see the error message and which files could not get uploaded. The changed search results will show starting tomorrow","yellow");
+	ShowStatus("Uploaded "+upcount+"/"+total_count+" files. Could not upload some files, please check the file list to see the error message and which files could not get uploaded. The changed search results will show starting tomorrow","#e77f00");
 	return;
     }
     else
