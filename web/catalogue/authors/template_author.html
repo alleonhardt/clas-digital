@@ -35,7 +35,7 @@
     <ol>
 	{% for pg in books %}
 	{% if pg.has_ocr %}
-	<li class="searchable_item"><a href="/books/{{ pg.id }}/" data-key="{{ pg.id }}"><span class='bookhasocr'>[OCR]</span>{{ pg.title }}</a><span class="metadata">{{ pg.bib }}</span></li>
+	<li class="searchable_item"><a title="This book has an OCR, which means it contains a searchable approximation of the text inside the book and possible some images" href="/books/{{ pg.id }}/" data-key="{{ pg.id }}"><span class='bookhasocr'>[OCR]</span>{{ pg.title }}</a><span class="metadata">{{ pg.bib }}</span></li>
 	{% else %}
 	    <li class="searchable_item"><a href="/books/{{ pg.id }}/" data-key="{{ pg.id }}">{{ pg.title }}</a><span class="metadata">{{ pg.bib }}</span></li>
 	{% endif %}
