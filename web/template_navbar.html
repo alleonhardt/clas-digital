@@ -15,13 +15,14 @@
 
 	<div class='topnav-right-in' id='loggedintopnav'>
 		<span id='LoggedInAs'>Logged in</span>
-		<button id='logoutBut' onclick='DoLogout()'>Logout</button>
+		<input id="logoutBut" type='submit' value="Logout" class='loginbutton' onclick="DoLogout();return true;"/>
 	</div>
 	<div class='topnav-right-out' id='loggedouttopnav'>
-		<form id ="LoginForm" class='loginform' action="/login" method="post">
-			<input id="EmailType" type="email" name="email" placeholder="Email" aria-label="Email" required>
-			<input id="PasswordType" type="password" name="password" placeholder="Password" aria-label="Password" required>
-			<input type="submit" class='loginbutton' value="Log In"/>
+		<form id ="LoginForm" class='loginform'>
+			<input id="EmailType" class="emailinput" type="email" name="email" placeholder="Email" aria-label="Email" required>
+			<input id="PasswordType" class="passwordinput" type="password" name="password" placeholder="Password" aria-label="Password" required>
+			<input id="LoginButton" type='submit' value="Log In" class='loginbutton' onclick="ExecuteLogin();return true;"/>
+			<div id="LoaderButton" class='loader'></div>
 		</form>
 	</div>
 

@@ -40,7 +40,7 @@ function initialise(linkforactive) {
 	{
     console.log("Logged In");
     document.getElementById("loggedouttopnav").style.display = "none";
-    document.getElementById("loggedintopnav").style.display = "block";
+    document.getElementById("loggedintopnav").style.display = "flex";
 		document.getElementById("LoggedInAs").innerHTML = "Logged in as <strong>"+this.ServerDataObj.user.email+"</strong>";
 
 
@@ -53,6 +53,38 @@ function initialise(linkforactive) {
 				list[i].style.display="block";
 		}
 	}
+}
+
+function ExecuteLogin()
+{
+    document.getElementById("LoginForm").onsubmit = function(event){event.preventDefault();}
+    document.getElementById("LoginButton").style.display = "none";
+    document.getElementById("LoaderButton").style.display = "inherit";
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "/login"); 
+    xhr.onload = function(event){ 
+	if(xhr.status == 200)
+	    window.setTimeout(function(){ window.location="/"; }, 300);
+	else
+	{
+	    window.setTimeout(function(){ 
+		document.getElementById("LoginButton").style.display = "";
+		document.getElementById("LoaderButton").style.display = "";
+		let emailtp = document.getElementById("EmailType");
+		emailtp.style["background-color"] = "#ffcccb";
+		emailtp.value = "";
+		emailtp.onclick = function(){emailtp.style.background = "";};
+		
+		let passwordtp = document.getElementById("PasswordType");
+		passwordtp.style["background-color"] = "#ffcccb";
+		passwordtp.value = "";
+		passwordtp.onclick = function(){passwordtp.style.background = "";};
+	    }, 300);
+	}
+    }; 
+    var email = document.getElementById("EmailType").value; 
+    var password = document.getElementById("PasswordType").value;
+    xhr.send("email="+encodeURIComponent(email)+"&password="+encodeURIComponent(password));
 }
 
 window.addEventListener("load",function(){initialise('searchlink')},false);

@@ -56,21 +56,23 @@ body {
 .topnav-right-in {
     float: right;
     display: none;
+    align-items: center;
     margin-left: auto;
 }
+
 .topnav-right-out {
     float: right;
     display: none;
     margin-left: auto;
 }
 
-.topnav-right-in button{
-	margin: 0.5em 0.8em;
+.topnav-right-in input{
+    margin: 0.4rem 0.4rem;
 }
 
 .topnav-right-in span {
 	color: black;
-	font-size: 1.2em;
+	font-size: 1.05em;
 	text-align: center;
 }
 
@@ -113,8 +115,40 @@ body {
     height: 100%;
     text-align: center;
     vertical-align: middle;
+    align-items: center;
+    margin: 0;
 }
 
 form.loginform input {
-    margin: 0.5rem 0.2rem;
+    margin: 0.4rem 0.4rem;
+}
+
+form.loginform input.emailinput {
+    margin-right: 0;
+}
+
+form.loginform input.passwordinput {
+    margin-left: 0.2rem;
+}
+
+.loginbutton {
+    width: 6rem;
+}
+
+.loader {
+  border: 6px solid grey; /* Light grey */
+  border-top: 6px solid blue; /* Blue */
+  border-radius: 50%;
+  animation: spin 2s linear infinite;
+  margin: 0.4rem;
+  width: 2rem;
+  margin-left: 2.4rem;
+  margin-right: 2.4rem;
+  height: 2rem;
+  display: none;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
