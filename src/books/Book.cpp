@@ -139,7 +139,7 @@ void CBook::createPages()
     read.seekg(0, std::ios::beg); 
 
     size_t page=0;
-    size_t blanclines=0;
+    size_t blanclines=3;
     std::string convertToNormalLayout = "";
     while(!read.eof()) {
 
@@ -190,7 +190,7 @@ void CBook::createPages()
             blanclines = 0;
         }
         else
-            sBuffer += " " + sLine;
+            sBuffer += " " + sLine + "\n";
     }
     if(sBuffer.length() !=0)
     {
