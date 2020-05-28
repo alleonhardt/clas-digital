@@ -120,7 +120,8 @@ function UpdateLinkPrev()
     {
 	if(page<=val[i].page)
 	{
-	    val[i].scrollIntoView();
+	    if(!isElementInViewport(val[i]))
+		val[i].scrollIntoView();
 	    return;
 	}
     }
@@ -294,7 +295,7 @@ function CreatePageLayout()
 		}
 	    }
 
-	    UpdateLinkPrev();
+	    //UpdateLinkPrev();
 	    for(let i = 0; i < arr.length; i++)
 	    {
 		LoadImageFromSVG(arr[i]);
@@ -315,9 +316,7 @@ function LoadImageFromSVG(x)
     img.classList.add('imgpage');
     img.src=x.dataset.path;
     img.onload = function(){
-	let y = document.body.scrollTop;
 	x.parentElement.replaceChild(img,x);
-	document.body.scrollTop = y;
     }
 
 }
