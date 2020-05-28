@@ -28,13 +28,14 @@ body {
     top: 3.5rem;
     overflow: hidden;
     z-index: 3;
-    padding-left: 0.5rem;
+    padding: 0;
     transition: width 0.5s linear 1s, max-height 1s ease-out 0s, left 0.5s linear 1s, border-radius 0.1s linear 1.5s, box-shadow 1.5s linear 0s;
     background-image: url('/static/GetBooks/compass.svg');
     background-repeat: no-repeat;
     background-size: 2.5rem 2.5rem;
-    background-color: #EEEEEE;
+    background-color: #DDDDDD;
     border-radius: 50%;
+    border: 0;
 }
 
 .searchbox:hover {
@@ -44,8 +45,8 @@ body {
     transition-duration: 0s;
     background-image: none;
     box-shadow: 12px 12px 2px 1px rgba(0, 0, 0, .6);
-    background-color: #EEEEEE;
     border-radius: 0;
+    border: 2px solid black;
     overflow: visible;
     max-height: 85vh;
 }
@@ -248,6 +249,7 @@ nav a.about
 { 
     float: left; 
     visibility: hidden;
+    margin-left: 0.5rem;
 }
 
 nav:hover a.about
