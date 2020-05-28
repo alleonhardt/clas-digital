@@ -22,17 +22,17 @@ body {
 
 .searchbox {
     position: fixed;
-    width: 2rem;
-    height: 2rem;
+    width: 2.5rem;
+    max-height: 2.5rem;
     left: calc(50vw - 1rem);
     top: 3.5rem;
     overflow: hidden;
     z-index: 3;
     padding-left: 0.5rem;
-    transition: width 0.5s linear 1s, height 0.5s linear 0.5s, left 0.5s linear 1s, border-radius 0.1s linear 1.5s;
+    transition: width 0.5s linear 1s, max-height 1s ease-out 0s, left 0.5s linear 1s, border-radius 0.1s linear 1.5s, box-shadow 1.5s linear 0s;
     background-image: url('/static/GetBooks/compass.svg');
     background-repeat: no-repeat;
-    background-size: 2rem 2rem;
+    background-size: 2.5rem 2.5rem;
     background-color: #EEEEEE;
     border-radius: 50%;
 }
@@ -43,10 +43,11 @@ body {
     transition-delay: 0s;
     transition-duration: 0s;
     background-image: none;
+    box-shadow: 12px 12px 2px 1px rgba(0, 0, 0, .6);
     background-color: #EEEEEE;
     border-radius: 0;
     overflow: visible;
-    height: 6.5rem;
+    max-height: 85vh;
 }
 
 .searchbox:hover div {
@@ -148,20 +149,6 @@ body {
 .botpage {
     background: grey;
     overflow: auto;
-}
-
-.bibliostyle {
-    display: block;
-    padding-top: 0.2rem;
-    font-size: small;
-    color: green;
-    overflow-wrap: anywhere;
-    overflow: auto;
-    -webkit-touch-callout: all; /* iOS Safari */
-    -webkit-user-select: all; /* Safari */
-    -moz-user-select: all; /* Firefox */
-    -ms-user-select: all; /* Internet Explorer/Edge */
-    user-select: all; /* Chrome and Opera */
 }
 
 .tmphit {
@@ -268,3 +255,19 @@ nav:hover a.about
     float: left;
     visibility: visible;
 }
+
+
+nav span.bibliostyle {
+    display: block;
+    padding-top: 0.2rem;
+    font-size: small;
+    color: green;
+    overflow-wrap: anywhere;
+    overflow: auto;
+    -webkit-touch-callout: all; /* iOS Safari */
+    -webkit-user-select: all; /* Safari */
+    -moz-user-select: all; /* Firefox */
+    -ms-user-select: all; /* Internet Explorer/Edge */
+    user-select: all; /* Chrome and Opera */
+}
+

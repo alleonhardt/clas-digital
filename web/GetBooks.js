@@ -500,6 +500,7 @@ function initialise()
 	    document.getElementById("fullbut").src = "/static/GetBooks/fullscreen-24px.svg";
 	}
     });
+
 }
 
 
@@ -833,3 +834,13 @@ function doCompleteNewSearch()
 }
 
 window.addEventListener("load",initialise,false);
+document.addEventListener('DOMContentLoaded', function() {
+    window.setTimeout(function(){
+    let rect = document.getElementById("tpnav").getBoundingClientRect();
+    console.log(rect);
+    let strval = ""+(Math.floor(rect.bottom)+8)+"px";
+    console.log(strval);
+    document.getElementsByClassName("searchbox")[0].style.top = strval;
+}
+    ,400);
+}, false);
