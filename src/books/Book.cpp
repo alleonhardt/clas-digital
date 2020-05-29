@@ -111,10 +111,8 @@ void CBook::createBook(std::string sPath)
         loadPages();
 
     //Test output to see if authors function works
-    std::cout << "AUTHORs: ";
     for(const auto &it : m_metadata.getAuthors())
         std::cout << it << "; ";
-    std::cout << std::endl;
     m_hasOcr = true;
 }
 
