@@ -138,9 +138,9 @@ void CBook::createPages()
     read.clear();
     read.seekg(0, std::ios::beg); 
 
-    size_t page=0;
+    size_t page=1;
     size_t blanclines=3;
-    std::string convertToNormalLayout = "";
+    std::string convertToNormalLayout = "----- 0 / 999 -----\n\n";
     while(!read.eof()) {
 
         std::string sLine;
@@ -169,7 +169,7 @@ void CBook::createPages()
             page = stoi(num);
         }
         //Create books without page mark (new format)
-        else if(blanclines == 4 && pageMark == false)
+        else if( (blanclines == 4 || (blanclines >= 4 && blanclines % 2 == 1)) && pageMark == false)
         {
             //std::cout << "creating page " << page << std::endl;
             for(auto it : func::extractWordsFromString(sBuffer)) {
@@ -187,7 +187,7 @@ void CBook::createPages()
             sBuffer = "";
 
             page++;
-            blanclines = 0;
+            //blanclines = 0;
         }
         else
             sBuffer += " " + sLine + "\n";
@@ -211,6 +211,11 @@ void CBook::createPages()
     read.close();
     if(pageMark == false)
     {
+        try {
+            std::filesystem::rename(m_sPath + "/ocr.txt", m_sPath + "/old_ocr.txt");
+        } catch (std::filesystem::filesystem_error& e) {
+            std::cout << e.what() << "\n";
+        }
         std::ofstream write (m_sPath + "/ocr.txt");
         write << convertToNormalLayout;
         write.close();
