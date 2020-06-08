@@ -597,7 +597,7 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
     }
     const char *buffer = req.body.c_str();
     auto buffer_length = req.body.length();
-    char imgbuffer[16*1014*1024];
+    char imgbuffer[4*1014*1024];
     if(fileEnd=="jpg"||fileEnd=="png"||fileEnd=="JPG"||fileEnd=="PNG"||fileEnd=="jp2"||fileEnd=="JP2")
     {
 	try
@@ -622,11 +622,9 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 		    return;
 		}
 
-		if(system("convert tmp021.bmp tmp021.jpg") != 0)
+		if(system("convert tmp021.bmp tmp021.jpg") == 0)
 		{
-		    fileName = fileNameWithoutEnding+".bmp";
-		    endTmpFileName = "tmp021.bmp";
-		    deleteBMP = false;
+
 		}
 		
 		if((deleteJP2 && (system("rm tmp021.jp2") != 0)) || (deleteBMP && (system("rm tmp021.bmp") != 0)))
@@ -636,7 +634,13 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 		    return;
 		}
 		std::ifstream ifs(endTmpFileName.c_str(),std::ios::in);
-		ifs.read(imgbuffer,16*1024*1024);
+		if(!ifs)
+		{
+		    resp.status = 403;
+		    resp.set_content("Could not convert jp2 to jpg!","text/plain");
+		    return;
+		}
+		ifs.read(imgbuffer,4*1024*1024);
 		auto len = ifs.gcount();
 		ifs.close();
 		std::string delname = "rm "+endTmpFileName;
