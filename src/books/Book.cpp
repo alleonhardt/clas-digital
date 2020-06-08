@@ -88,7 +88,7 @@ void CBook::createBook(std::string sPath)
     for(auto& p: std::filesystem::directory_iterator(sPath))
     {
 	    (void)p;
-        if(p.path().extension() == ".jpg")
+        if(p.path().extension() == ".jpg" || p.path().extension() == ".bmp")
             m_hasImages = true; 
     }
 
