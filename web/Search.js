@@ -376,7 +376,10 @@ function ShowLinks()
 	
 	let q = getParameterByName('q');
 	document.getElementById("SpecialSID").value = q;
-	document.title = q + " ‒ CLAS digital book search";
+	if(q == null)
+	    document.title = "CLAS digital book search";
+	else
+	    document.title = q + " ‒ CLAS digital book search";
 	let description = "Search results for \"" + q + "\" from the CLAS digital book search collection of over 100,000 pages.";
 	document.querySelector('meta[name="description"]').setAttribute("content", description);
 	console.log(ServerDataObj);

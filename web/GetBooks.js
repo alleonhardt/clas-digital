@@ -453,8 +453,13 @@ function initialise()
     document.getElementById('srchbox').addEventListener("focusout", function(event){
 	if(event.relatedTarget)
 	    event.relatedTarget.click();
-	document.getElementById("fuzzysuggestions").style.visibility="hidden";
-	document.getElementById("fuzzysuggestions").selec = undefined;});
+	document.getElementById("fuzzysuggestions").style.visibility="hidden";});
+     
+    document.getElementById('srchbox').addEventListener("focusin", function(event){
+	if(document.getElementById("fuzzysuggestions").children.length > 0)
+	    document.getElementById("fuzzysuggestions").style.visibility="visible";
+    });
+
     document.getElementById("srchbox").addEventListener("keydown",function(event){
 	let x = document.getElementById("srchbox").value;
 	let k = document.getElementById("fuzzysuggestions").selec;
@@ -486,7 +491,18 @@ function initialise()
 		k+=1;
 	    k = k%lst.length;
 	    lst[k].style.background = "#ddd";
-	    lst[k].scrollIntoView();
+
+	    let docViewTop = document.getElementById("fuzzysuggestions").scrollTop;
+	    let docViewBottom = docViewTop + document.getElementById("fuzzysuggestions").offsetHeight;
+
+	    let elemTop = lst[k].offsetTop;
+	    let elemBottom = elemTop + lst[k].offsetHeight;
+
+	    if(!((elemBottom <= docViewBottom) && (elemTop >= docViewTop)))
+		if(event.key=="ArrowUp")
+		    document.getElementById("fuzzysuggestions").scrollTop = elemTop;
+		else
+		    document.getElementById("fuzzysuggestions").scrollTop = elemBottom-document.getElementById("fuzzysuggestions").offsetHeight;
 	    event.preventDefault();
 	    document.getElementById("fuzzysuggestions").selec = k;
 	}
