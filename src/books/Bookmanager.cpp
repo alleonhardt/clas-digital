@@ -67,12 +67,10 @@ void CBookManager::writeListofBooksWithBSB() {
     }
 
     //Search for untracked books
-    int counter=0;
+    std::vector<std::filesystem::path> vec;
     for(const auto& entry : std::filesystem::directory_iterator("web/books"))
     {
-	std::string fileNameStr = entry.path().filename().string();
-	counter++;
-
+	    std::string fileNameStr = entry.path().filename().string();
         if(entry.is_directory() && m_mapBooks.count(fileNameStr) == 0)
         {
             std::ifstream readJson(entry.path().string() + "/info.json");
@@ -87,9 +85,23 @@ void CBookManager::writeListofBooksWithBSB() {
             std::string sTitle = j["data"].value("title", "unkown title");
             untracked_books += fileNameStr + " - " + sName + ", \"" + sTitle + "\"\n";
             readJson.close(); 
+            vec.push_back(entry); 
         }
     }
-    std::cout << "FILES: " << counter << std::endl;
+
+    //Move old zotero files to archive: "zotero_old"
+    if(std::filesystem::exists("web/books/zotero_old") == false)
+        std::filesystem::create_directories("web/books/zotero_old");
+    for(const auto& it : vec)
+    {
+        std::string path=it.string().substr(0, 9)+"/zotero_old"+it.string().substr(9);
+        try{
+            std::filesystem::rename(it, path);
+        }
+        catch (std::filesystem::filesystem_error& e) {
+            std::cout << e.what() << std::endl;
+        }
+    }
 
     //Save books with bsb-link but o ocr
     std::ofstream writeBSB_NoOCR("inBSB_noOcr.txt");
@@ -112,9 +124,14 @@ void CBookManager::writeListofBooksWithBSB() {
     writeFERTIG_noOCR.close();
 
     //Write all untracked books to seperate files
-    std::ofstream writeUntracked("untracked_books.txt");
-    writeUntracked << untracked_books;
-    writeUntracked.close();
+    if(std::filesystem::exists("untracked_books.txt"))
+        std::filesystem::rename("untracked_books.txt", "web/books/zotero_old/untracked_books.txt");
+    if(vec.size() > 0)
+    {
+        std::ofstream writeUntracked("untracked_books.txt");
+        writeUntracked << untracked_books;
+        writeUntracked.close();
+    }
 }
 
 /**
