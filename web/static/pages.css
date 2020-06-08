@@ -45,7 +45,7 @@ body {
     padding: 0;
 }
 
-.searchbox:hover,.pinnedsearchbox {
+.searchbox:hover, .searchbox.pinnedsearchbox {
     width: 95%;
     left: 2.5%;
     transition-delay: 0s;
@@ -58,7 +58,7 @@ body {
     max-height: 85vh;
 }
 
-.searchbox:hover div,.pinnedsearchbox div {
+.searchbox:hover div, .pinnedsearchbox div {
     overflow: visible;
 }
 
@@ -260,7 +260,7 @@ nav a.about
     margin-left: 0.5rem;
 }
 
-nav:hover a.about
+nav:hover a.about, nav.searchbox.pinnedsearchbox a.about
 {
     float: left;
     visibility: visible;

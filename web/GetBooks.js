@@ -845,6 +845,21 @@ document.addEventListener('DOMContentLoaded', function() {
     ,400);
 }, false);
 
-function TogglePin()
+function TogglePin(x)
 {
+    curstr = x.innerHTML;
+    if(curstr == "Pin")
+	curstr = "Unpin";
+    else
+	curstr = "Pin";
+
+    x.innerHTML = curstr;
+    if(curstr=="Pin")
+    {
+	document.getElementsByClassName("searchbox")[0].classList.remove("pinnedsearchbox");
+    }
+    else
+    {
+	document.getElementsByClassName("searchbox")[0].classList.add("pinnedsearchbox");
+    }
 }

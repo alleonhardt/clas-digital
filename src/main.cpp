@@ -624,7 +624,6 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 
 		if(system("convert tmp021.bmp tmp021.jpg") == 0)
 		{
-
 		}
 		
 		if((deleteJP2 && (system("rm tmp021.jp2") != 0)) || (deleteBMP && (system("rm tmp021.bmp") != 0)))
