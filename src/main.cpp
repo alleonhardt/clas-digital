@@ -597,7 +597,7 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
     }
     const char *buffer = req.body.c_str();
     auto buffer_length = req.body.length();
-    char imgbuffer[4*1014*1024];
+    char imgbuffer[16*1014*1024];
     if(fileEnd=="jpg"||fileEnd=="png"||fileEnd=="JPG"||fileEnd=="PNG"||fileEnd=="jp2"||fileEnd=="JP2")
     {
 	try
@@ -607,6 +607,10 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 	    if(fileEnd=="JP2" || fileEnd == "jp2")
 	    {
 		fileName = fileNameWithoutEnding+".jpg";
+		std::string endTmpFileName = "tmp021.jpg";
+		bool deleteJP2 = true;
+		bool deleteBMP = true;
+
 		std::ofstream ofs("tmp021.jp2",std::ios::out);
 		ofs.write(req.body.c_str(),req.body.length());
 		ofs.close();
@@ -617,23 +621,26 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 		    resp.set_content("Could not convert jp2 to jpg missing openjpeg library!","text/plain");
 		    return;
 		}
+
 		if(system("convert tmp021.bmp tmp021.jpg") != 0)
 		{
-		    resp.status = 403;
-		    resp.set_content("Could not convert bmp to jpg!","text/plain");
-		    return;
+		    fileName = fileNameWithoutEnding+".bmp";
+		    endTmpFileName = "tmp021.bmp";
+		    deleteBMP = false;
 		}
-		if(system("rm tmp021.jp2") != 0 || system("rm tmp021.bmp") != 0)
+		
+		if((deleteJP2 && (system("rm tmp021.jp2") != 0)) || (deleteBMP && (system("rm tmp021.bmp") != 0)))
 		{
 		    resp.status = 403;
 		    resp.set_content("Cleanup error!","text/plain");
 		    return;
 		}
-		std::ifstream ifs("tmp021.jpg",std::ios::in);
-		ifs.read(imgbuffer,4*1024*1024);
+		std::ifstream ifs(endTmpFileName.c_str(),std::ios::in);
+		ifs.read(imgbuffer,16*1024*1024);
 		auto len = ifs.gcount();
 		ifs.close();
-		if(system("rm tmp021.jpg") != 0)
+		std::string delname = "rm "+endTmpFileName;
+		if(system(delname.c_str()) != 0)
 		{
 		    resp.status = 403;
 		    resp.set_content("Cleanup error!","text/plain");

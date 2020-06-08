@@ -844,3 +844,7 @@ document.addEventListener('DOMContentLoaded', function() {
 }
     ,400);
 }, false);
+
+function TogglePin()
+{
+}

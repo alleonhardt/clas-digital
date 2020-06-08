@@ -12,7 +12,7 @@ body {
 }
 
 .fullscreen:hover {
-    background-color: #ddd;
+    background-color: #888;
 }
 
 .fullscreen:active {
@@ -38,22 +38,30 @@ body {
     border: 0;
 }
 
-.searchbox:hover {
-    width: 80%;
-    left: 10%;
+.pinnedsearchbox {
+    position: fixed;
+    top: 3.5rem;
+    z-index: 3;
+    padding: 0;
+}
+
+.searchbox:hover,.pinnedsearchbox {
+    width: 95%;
+    left: 2.5%;
     transition-delay: 0s;
     transition-duration: 0s;
     background-image: none;
-    box-shadow: 12px 12px 2px 1px rgba(0, 0, 0, .6);
+    box-shadow: 0px 0px 30px -7px black;
     border-radius: 0;
     border: 2px solid black;
     overflow: visible;
     max-height: 85vh;
 }
 
-.searchbox:hover div {
+.searchbox:hover div,.pinnedsearchbox div {
     overflow: visible;
 }
+
 
 .toprow {
     display: flex;
@@ -118,7 +126,7 @@ body {
 }
 
 .nextbut:hover,.lastbut:hover {
-    background-color: #ddd;
+    background-color: #888;
 }
 
 .nextbut:focus,.nextbut:active,.lastbut:focus,.lastbut:active {
@@ -256,6 +264,10 @@ nav:hover a.about
 {
     float: left;
     visibility: visible;
+}
+
+nav img:hover {
+    background-color: grey;
 }
 
 

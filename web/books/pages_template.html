@@ -24,7 +24,7 @@
 	
 	<body>
         {% include "../template_navbar.html" %}
-		<nav class='searchbox aniwidth aniheight'>
+		<nav class='searchbox'>
 		    <div class='toprow'>
 			<a class="about" href="../" rel="index up">About this book</a>
 			<div>
@@ -33,6 +33,7 @@
 				</i>
 			</div>
 			<div>
+				<button onclick='TogglePin();return true;'>Pin</button>
 				<img id='fullbut' onclick='tooglefullscreen(this);' class='fullscreen' title='Toogle fullscreen mode' style='float: right; margin:0.5rem' src="/static/GetBooks/fullscreen-24px.svg"/>
 				<img id='tooglebut' onclick="read_mode(this);" class='fullscreen' style='float: right;margin:0.5rem;' title="Toggle image reader and split reader mode" src="/static/GetBooks/chrome_reader_mode-24px.svg"/>
 			</div>
