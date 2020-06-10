@@ -82,6 +82,11 @@ public:
     std::vector<std::string> getAuthors();
 
     /**
+     * @return Returns an escaped version of the bibliography
+     */
+    std::string getBibliographyEscaped();
+
+    /**
     * @param[in] sTag tag to search for
     * @return return whether book has a certain tag
     */

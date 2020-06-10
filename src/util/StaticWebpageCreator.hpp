@@ -147,6 +147,7 @@ class StaticWebpageCreator
 			nlohmann::json info;
             		info["show"] = m_book->getMetadata().getShow2();
 			info["bib"] = m_info["bib"].get<std::string>();
+			info["bib_own"] = m_book->getMetadata().getBibliographyEscaped();
 			info["hasContent"] = m_book->hasContent();
 			info["itemType"] = itemType;
 			info["title"] = title;
@@ -220,7 +221,7 @@ class StaticWebpageCreator
 			std::filesystem::create_directory("web/books/"+m_book->getKey()+"/pages", ec);
 		    //Parse navbar
 		    js["topnav"] = m_topnav;
-		    js["topnav"]["catalogue"] = "class='dropdown-banner active";
+		    js["topnav"]["catalogue"] = "class='dropdown-banner active'";
 
 			js["key"] = m_book->getKey();
 			js["title"] = m_book->getMetadata().getShow2();
@@ -277,7 +278,7 @@ class StaticCatalogueCreator
 
             //Parse navbar
             js["topnav"] = m_topnav;
-            js["topnav"]["catalogue"] = "class='dropdown-banner active";
+            js["topnav"]["catalogue"] = "class='dropdown-banner active'";
 
 
 			inja::Environment env;
@@ -292,7 +293,7 @@ class StaticCatalogueCreator
 
             //Parse navbar
             rend["topnav"] = m_topnav;
-            rend["topnav"]["catalogue"] = "class='dropdown-banner active";
+            rend["topnav"]["catalogue"] = "class='dropdown-banner active'";
 
 			std::map<std::string,std::pair<int,std::list<CBook*>>> _map;
 			for(auto &book : mng.getMapOfBooks())
@@ -330,7 +331,7 @@ class StaticCatalogueCreator
 
                 //Parse navbar
                 js["topnav"] = m_topnav;
-                js["topnav"]["catalogue"] = "class='dropdown-banner active";
+                js["topnav"]["catalogue"] = "class='dropdown-banner active'";
 
                 std::vector<nlohmann::json> vBooks;
 				for(auto y : x.second.second)
@@ -372,7 +373,7 @@ class StaticCatalogueCreator
 
             //Parse navbar
             books["topnav"] = m_topnav;
-            books["topnav"]["catalogue"] = "class='dropdown-banner active";
+            books["topnav"]["catalogue"] = "class='dropdown-banner active'";
 
 			inja::Environment env;
 			inja::Template temp = env.parse_template("web/catalogue/books/template.html");
@@ -386,7 +387,7 @@ class StaticCatalogueCreator
 
             //Parse navbar
             js["topnav"] = m_topnav;
-            js["topnav"]["catalogue"] = "class='dropdown-banner active";
+            js["topnav"]["catalogue"] = "class='dropdown-banner active'";
 
             std::map<std::string, nlohmann::json> mapAuthors;
             for(auto &it : manager.getMapOfBooks()) 
@@ -479,7 +480,7 @@ class StaticCatalogueCreator
 
             //Parse navbar
             js["topnav"] = m_topnav;
-            js["topnav"]["catalogue"] = "class='dropdown-banner active";
+            js["topnav"]["catalogue"] = "class='dropdown-banner active'";
 
             for(auto &it : pillars)
                 js["pillars"].push_back(it);
@@ -500,7 +501,7 @@ class StaticCatalogueCreator
 
                 //Parse navbar
                 js["topnav"] = m_topnav;
-                js["topnav"]["catalogue"] = "class='dropdown-banner active";
+                js["topnav"]["catalogue"] = "class='dropdown-banner active'";
 
                 js["pillar"] = it;
                 std::string key = it["key"];

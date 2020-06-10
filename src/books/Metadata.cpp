@@ -255,3 +255,73 @@ std::string CMetadata::getShow2()
 
     return sResult;
 }
+
+std::string CMetadata::getBibliographyEscaped()
+{
+    std::string new_bib;
+    auto authors = getAuthors();
+    if(!authors.empty())
+    {
+	for(auto it : getAuthors())
+	{
+	    new_bib+=it;
+	    new_bib+="/";
+	}
+	new_bib.pop_back();
+	new_bib+=": ";
+    }
+    
+    std::string tmp;
+    if((tmp=getTitle())!="")
+    {
+	new_bib+=tmp;
+	new_bib+=".";
+    }
+
+    if(getMetadata("itemType")=="bookSection")
+    {
+	if((tmp=getMetadata("itemType","data"))!="")
+	{
+	    new_bib+=" ";
+	    new_bib+=tmp;
+	}
+    }
+    else
+    {
+	if((tmp=getMetadata("publicationTitle","data"))!="")
+	{
+	    new_bib+=" ";
+	    new_bib+=tmp;
+	}
+    }
+
+    if((tmp=getMetadata("volume","data"))!="")
+    {
+	new_bib+=" ";
+	new_bib+=tmp;
+	new_bib+=".";
+    }
+    
+    if((tmp=getMetadata("place","data"))!="")
+    {
+	new_bib+=" ";
+	new_bib+=tmp;
+    }
+
+    if((tmp=getMetadata("date","data"))!="")
+    {
+	new_bib+=" ";
+	new_bib+=tmp;
+	new_bib+=".";
+    }
+
+    
+    if((tmp=getMetadata("pages","data"))!="")
+    {
+	new_bib+=" S. ";
+	new_bib+=tmp;
+	new_bib+=".";
+    }
+    return new_bib;
+}
+
