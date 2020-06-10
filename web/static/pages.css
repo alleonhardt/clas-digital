@@ -11,6 +11,10 @@ body {
     border: 0;
 }
 
+.righthandedbox {
+    padding-left: 5rem;
+}
+
 .fullscreen:hover {
     background-color: #888;
 }
@@ -19,49 +23,75 @@ body {
     background-color: #444;
 }
 
+.srchbarcontainer {
+    width: 25%;
+    align-self: center;
+    min-width: 20rem;
+}
+
+.srchbarinput {
+    margin-top: 0.5rem;
+    border-radius: 20px;
+    text-align: center;
+    width: 100%;
+}
 
 .searchbox {
     position: fixed;
-    width: 2.5rem;
-    max-height: 2.5rem;
-    left: calc(50vw - 1rem);
+    width: 95vw;
+    left: 2.5vw;
     top: 3.5rem;
-    overflow: hidden;
+    overflow: visible;
     z-index: 3;
     padding: 0;
-    transition: width 0.5s linear 1s, max-height 1s ease-out 0s, left 0.5s linear 1s, border-radius 0.1s linear 1.5s, box-shadow 1.5s linear 0s;
-    background-image: url('/static/GetBooks/compass.svg');
-    background-repeat: no-repeat;
-    background-size: 2.5rem 2.5rem;
-    background-color: #DDDDDD;
-    border-radius: 50%;
-    border: 0;
-}
-
-.pinnedsearchbox {
-    position: fixed;
-    top: 3.5rem;
-    z-index: 3;
-    padding: 0;
-}
-
-.searchbox:hover, .searchbox.pinnedsearchbox {
-    width: 95%;
-    left: 2.5%;
-    transition-delay: 0s;
-    transition-duration: 0s;
-    background-image: none;
+    transition-duration: 1.5s;
     box-shadow: 0px 0px 30px -7px black;
-    border-radius: 0;
-    border: 2px solid black;
-    overflow: visible;
-    max-height: 85vh;
+    border: 1px solid black;
+    display: grid;
+    grid-template-columns: calc(100% - 1rem) 1rem;
 }
 
-.searchbox:hover div, .pinnedsearchbox div {
-    overflow: visible;
+.hidesearchbox {
+    transform: translateX(calc(-97.5vw + 1rem));
+    transition-duration: 1.5s;
 }
 
+.contentcolumn {
+    grid-column: 1;
+    background-color: white;
+}
+
+.noncontentcolumn {
+    grid-column: 2;
+}
+
+.unfoldbut {
+    height: 100%;
+    width: 1rem;
+    background-image: url('/last.svg');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    background-color: #CCC;
+}
+
+.hidebut {
+    height: 100%;
+    width: 1rem;
+    background-image: url('/next.svg');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    background-color: #CCC;
+}
+
+.hidebut:hover, .unfoldbut:hover {
+    background-color: grey;
+    cursor: pointer;
+}
+
+.hidebut:active, .unfoldbut:active {
+    background-color: darkgrey;
+    cursor: pointer;
+}
 
 .toprow {
     display: flex;
@@ -73,12 +103,9 @@ body {
     border-radius: 50%;
     background: white;
     padding: 0.1rem;
-    margin-left: -1.6rem;
+    margin-left: -2.3rem;
+    color: grey;
     cursor: pointer;
-}
-
-#srchbox {
-    align-self: center;
 }
 
 .searchstyler:hover {
@@ -256,15 +283,8 @@ div .fuzzysugslink:hover {
 nav a.about 
 { 
     float: left; 
-    visibility: hidden;
     margin-left: 0.5rem;
     width: 10rem;
-}
-
-nav:hover a.about, nav.searchbox.pinnedsearchbox a.about
-{
-    float: left;
-    visibility: visible;
 }
 
 nav img:hover {

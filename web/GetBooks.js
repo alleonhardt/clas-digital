@@ -260,7 +260,8 @@ function CreatePageLayout()
     let timer = null;
     let currentSize = 0;
     document.body.onscroll = function() {
-	let gNewSize = document.getElementsByClassName("searchbox")[0].getBoundingClientRect().bottom;
+	let boundrect = document.getElementsByClassName("searchbox")[0].getBoundingClientRect();
+	let gNewSize = Math.floor(boundrect.bottom);
 	if(currentSize!=gNewSize)
 	{
 	    console.log("Resizing ocrs top value!");
@@ -271,6 +272,7 @@ function CreatePageLayout()
 	    for(let i = 0; i < lst.length; i++)
 		lst[i].style.top = (gNewSize+17)+"px";
 	    currentSize = gNewSize;
+	    
 	}
 	UpdateViewMode();
 
@@ -862,21 +864,22 @@ document.addEventListener('DOMContentLoaded', function() {
     ,400);
 }, false);
 
-function TogglePin(x)
+function unfoldnav(x)
 {
-    curstr = x.innerHTML;
-    if(curstr == "Pin")
-	curstr = "Unpin";
-    else
-	curstr = "Pin";
+    x.classList.remove('unfoldbut');
+    x.classList.add('hidebut');
+    x.onclick = function() {
+	hidenav(x);
+    };
+    document.getElementsByClassName("searchbox")[0].classList.remove('hidesearchbox');
+}
 
-    x.innerHTML = curstr;
-    if(curstr=="Pin")
-    {
-	document.getElementsByClassName("searchbox")[0].classList.remove("pinnedsearchbox");
-    }
-    else
-    {
-	document.getElementsByClassName("searchbox")[0].classList.add("pinnedsearchbox");
-    }
+function hidenav(x)
+{
+    x.classList.remove('hidebut');
+    x.classList.add('unfoldbut');
+    x.onclick = function() {
+	unfoldnav(x);
+    };
+    document.getElementsByClassName("searchbox")[0].classList.add('hidesearchbox');
 }

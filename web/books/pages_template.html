@@ -25,15 +25,15 @@
 	<body>
         {% include "../template_navbar.html" %}
 		<nav class='searchbox'>
+		    <div class='contentcolumn'>
 		    <div class='toprow'>
 			<a class="about" href="../" rel="index up">About this book</a>
-			<div style="align-self: center;">
-			<input id='srchbox' style='width:25%;border-radius: 20px;padding-left: 0.5rem;padding-right: 0.5rem;margin-left: 1rem;min-width: 10rem;margin-top: 0.5rem;text-align: center;' type='text' placeholder="search this book"/>
+			<div class='srchbarcontainer'>
+			<input id='srchbox' class='srchbarinput' type='text' placeholder="search this book"/>
 				<i class="fa fa-search searchstyler" onclick='doCompleteNewSearch();return true;'>
 				</i>
 			</div>
-			<div>
-				<button class="tooglebut" onclick='TogglePin(this);return true;'>Pin</button>
+			<div class='righthandedbox'>
 				<img id='fullbut' onclick='tooglefullscreen(this);' class='fullscreen' title='Toogle fullscreen mode' style='float: right; margin:0.5rem' src="/static/GetBooks/fullscreen-24px.svg"/>
 				<img id='tooglebut' onclick="read_mode(this);" class='fullscreen' style='float: right;margin:0.5rem;' title="Toggle image reader and split reader mode" src="/static/GetBooks/chrome_reader_mode-24px.svg"/>
 			</div>
@@ -57,6 +57,10 @@
 					<img class='nextbut' onclick='SelectNextHit();' src='/last.svg'/>
 				</div>
 			</div>
+		    </div>
+		    <div class='noncontentcolumn'>
+			<div class='hidebut' onclick='hidenav(this);'></div>
+		    </div>
 		</nav>
 	</body>
 </html>
