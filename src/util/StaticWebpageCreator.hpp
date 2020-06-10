@@ -203,7 +203,7 @@ class StaticWebpageCreator
 
             //Parse navbar
             info["topnav"] = m_topnav;
-            info["topnav"]["catalogue"] = "class='dropdown-banner active";
+            info["topnav"]["catalogue"] = "class='dropdown-banner active'";
 
 			inja::Environment env;
 			inja::Template temp = env.parse_template("web/books/metadata_template.html");

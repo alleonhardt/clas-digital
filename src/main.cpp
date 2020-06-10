@@ -713,7 +713,9 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 
 	    if(ocr_create=="true")
 	    {
+		std::cout<<"Creating ocr for image!"<<std::endl;
 		book->addPage(ocr_reader.CreateOcrFromImage(reinterpret_cast<const unsigned char*>(buffer),buffer_length,ocr_lang.c_str()),std::to_string(what),std::to_string(maxPageNum));
+		std::cout<<"Finished creating ocr!"<<std::endl;
 	    }
 	}
 	catch(std::exception &e)
