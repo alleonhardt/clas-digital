@@ -99,7 +99,7 @@ void update_all_files(CBookManager *m, nlohmann::json *zot)
 	    json_write.close();
 
 	    StaticWebpageCreator webpage(it.second);
-	    webpage.createWebpage();
+	    webpage.createWebpage(zoteroPillars);
 	}
 #ifdef WRITE_FORBIDDEN_FILES
 	std::ofstream of("bin/tmpforbiddenfiles",std::ios::out);
