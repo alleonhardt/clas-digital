@@ -426,52 +426,50 @@ class StaticCatalogueCreator
             inja::Environment env;
             inja::Template temp = env.parse_template("web/catalogue/authors/template_author.html");
 
-            for(auto &it : manager.getMapOfBooks()) {
-                std::string lastName = it.second->getMetadata().getAuthor();
-                std::string firstName = it.second->getMetadata().getMetadata("firstName", "data", "creators", 0);
+            for(const auto &it : manager.getMapOfBooks()) {
 
-                std::string name = lastName + ", " + firstName;
-		        func::convertToLower(lastName);
-		        func::convertToLower(firstName);
-                std::string key = firstName + "-" + lastName;
-                std::replace(key.begin(), key.end(), ' ', '-');
-                std::replace(key.begin(), key.end(), '/', ',');
-
-                if(lastName.size() == 0)
-                    continue;
-
-                //Create directory
-                std::error_code ec;
-                std::filesystem::create_directory("web/catalogue/authors/"+key+"/", ec);
-
-                nlohmann::json js;
-                js["author"] = {{"name", name}, {"id", key}};
-
-                //Parse navbar
-                js["topnav"] = m_topnav;
-                js["topnav"]["catalogue"] = "class='dropdown-banner active";
-
-                //Create json with all books
-                std::vector<nlohmann::json> vBooks;
-                if(manager.getMapofUniqueAuthors().count(key) == 0)
+                for(const auto& author : it.second->getMetadata().getAuthors())
                 {
-                    std::cout << key << " NOTFOUND!!\n";
-                    continue;
-                }
-                for(auto &jt : manager.getMapofUniqueAuthors()[key]) {
-                    vBooks.push_back({ 
-                        {"id", jt},
-                        { "title", manager.getMapOfBooks()[jt]->getMetadata().getShow2()},
-                        { "bib", manager.getMapOfBooks()[jt]->getMetadata().getMetadata("bib")},
-			{ "has_ocr", manager.getMapOfBooks()[jt]->hasOcr()}
-                        });
-                }
+                    std::string lastName = author;
+                    std::string key = func::createAuthorKey(lastName);
 
-                std::sort(vBooks.begin(), vBooks.end(), &StaticCatalogueCreator::mySort);
+                    if(lastName.size() == 0)
+                        continue;
 
-                js["books"] = vBooks;
-                std::string result = env.render(temp, js);
-                atomic_write_file("web/catalogue/authors/"+key+"/index.html",result);
+                    //Create directory
+                    std::error_code ec;
+                    std::filesystem::create_directory("web/catalogue/authors/"+key+"/", ec);
+
+                    nlohmann::json js;
+                    js["author"] = {{"name", author}, {"id", key}};
+
+                    //Parse navbar
+                    js["topnav"] = m_topnav;
+                    js["topnav"]["catalogue"] = "class='dropdown-banner active";
+
+                    //Create json with all books
+                    std::vector<nlohmann::json> vBooks;
+                    if(manager.getMapofUniqueAuthors().count(key) == 0)
+                    {
+                        std::cout << "Key: " << key <<  " not found!" << std::endl;
+                        continue;
+                    }
+
+                    for(auto &jt : manager.getMapofUniqueAuthors()[key]) {
+                        vBooks.push_back({ 
+                            {"id", jt},
+                            { "title", manager.getMapOfBooks()[jt]->getMetadata().getShow2()},
+                            { "bib", manager.getMapOfBooks()[jt]->getMetadata().getMetadata("bib")},
+                { "has_ocr", manager.getMapOfBooks()[jt]->hasOcr()}
+                            });
+                    }
+
+                    std::sort(vBooks.begin(), vBooks.end(), &StaticCatalogueCreator::mySort);
+
+                    js["books"] = vBooks;
+                    std::string result = env.render(temp, js);
+                    atomic_write_file("web/catalogue/authors/"+key+"/index.html",result);
+                }
             }
         }
     
