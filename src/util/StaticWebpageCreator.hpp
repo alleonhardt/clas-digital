@@ -147,6 +147,7 @@ class StaticWebpageCreator
 			nlohmann::json info;
             		info["show"] = m_book->getMetadata().getShow2();
 			info["bib"] = m_info["bib"].get<std::string>();
+			info["bib_own"] = m_book->getMetadata().getBibliographyEscaped();
 			info["hasContent"] = m_book->hasContent();
 			info["itemType"] = itemType;
 			info["title"] = title;
