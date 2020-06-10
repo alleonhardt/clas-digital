@@ -444,7 +444,8 @@ function initialise()
 
     ServerGet("/books/"+scanId+"/ocr.txt", loadOCRFile,loadOCRFileError);
     ServerGet("/books/"+scanId+"/readerInfo.json",loadPageLayoutFile,loadMetadataFileError);
-    ServerGet("/searchinbook?scanId="+scanId+'&query='+query+'&fuzzyness='+fuzzyness,highlightHitsAndLoadHitlist,highlightHitsAndLoadHitlistError);
+    if(query!=null)
+	ServerGet("/searchinbook?scanId="+scanId+'&query='+query+'&fuzzyness='+fuzzyness,highlightHitsAndLoadHitlist,highlightHitsAndLoadHitlistError);
     ServerGet("/books/"+scanId+"/intern/pages.txt",LoadPreindexingOfPages,LoadPreindexingOfPagesError);
 
     document.getElementById("srchbox").oninput = function() {
