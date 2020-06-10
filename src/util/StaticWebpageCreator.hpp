@@ -138,7 +138,7 @@ class StaticWebpageCreator
             atomic_write_file("web/private/write/UploadBook.html", result);
         }
 
-		void CreateMetadataPage()
+		void CreateMetadataPage(nlohmann::json pillars)
 		{
 			std::cout<<"Processing: "<<m_book->getKey()<<std::endl;
 			auto itemType =m_info["data"].value("itemType","");
@@ -151,13 +151,55 @@ class StaticWebpageCreator
 			info["itemType"] = itemType;
 			info["title"] = title;
 			info["authors"] = nlohmann::json::array();
-                	for(const auto &it : m_book->getMetadata().getAuthors())
-				info["authors"].push_back(it);
+            for(const auto &it : m_book->getMetadata().getAuthors())
+            {
+                std::string key = "";
+                std::string name = it;
+                if(name.find(",") != std::string::npos)
+                {
+                    std::string lastName = func::split2(name, ",")[0];
+                    std::string firstName = func::split2(name, ",")[1];
+                    firstName.erase(0, 1);
+                    func::convertToLower(lastName);
+                    func::convertToLower(firstName);
+                    key=firstName+"-"+lastName; 
+                }
+                else
+                    key = func::returnToLower(name);
+                std::replace(key.begin(), key.end(), ' ', '-');
+                std::replace(key.begin(), key.end(), '/', ',');
+
+                nlohmann::json j;
+                j["key"] = key;
+                j["name"] = name;
+				info["authors"].push_back(j);
+            } 
 			info["hasISBN"] = isbn != "";
 			info["isbn"] = isbn;
 			info["place"] = m_info["data"].value("place","");
-			info["date"] = m_info["data"].value("date","");
+			info["date"] = "";
+            if(m_book->getDate() != -1)
+                 info["date"] = m_book->getDate(); 
+            info["hasDate"] = m_book->getDate() != -1;
 			info["key"] = m_book->getKey();
+            
+            info["collections"] = nlohmann::json::array();
+            for(const auto& it : m_book->getMetadata().getCollections())
+            {
+                nlohmann::json j;
+                j["key"] = it;
+                j["name"] = "Untracked collection.";
+                bool found = false;
+                for(const auto& jt : pillars) {
+                    if(jt["key"] == it)
+                    {
+                        found = true;
+                        j["name"] = jt["name"];
+                    }
+                }
+                if(found != false)
+                    info["collections"].push_back(j);
+            }
 
             //Parse navbar
             info["topnav"] = m_topnav;
@@ -189,7 +231,7 @@ class StaticWebpageCreator
 			std::string result = env.render(temp, js);
 			atomic_write_file("web/books/"+m_book->getKey()+"/pages/index.html",result);
 		}
-		bool createWebpage()
+		bool createWebpage(nlohmann::json pillars)
 		{
 			std::string webpath = "/books/"+m_bookID+"/pages";
 			std::error_code ec;
@@ -204,7 +246,7 @@ class StaticWebpageCreator
 			
 
 			{
-				CreateMetadataPage();
+				CreateMetadataPage(pillars);
 			}
 			return true;
 		}
