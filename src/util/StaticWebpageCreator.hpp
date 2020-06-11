@@ -157,6 +157,8 @@ class StaticWebpageCreator
                 nlohmann::json j;
                 j["key"] = author["key"];
                 j["name"] = author["fullname"];
+                j["type"] = author["creatorType"];
+                j["isAuthor"] = author["creatorType"] == "author";
 				info["authors"].push_back(j);
             } 
 			info["hasISBN"] = isbn != "";
@@ -378,6 +380,9 @@ class StaticCatalogueCreator
             {
                 for(auto author : it.second->getMetadata().getAuthorsKeys())
                 {
+                    if(author["creatorType"] != "author")
+                        continue;
+
                     mapAuthors[author["key"]] = {
                         {"id", author["key"]},
                         {"show", author["fullname"]},
@@ -411,7 +416,7 @@ class StaticCatalogueCreator
                 {
                     std::string key = author["key"];
 
-                    if(author["lastname"].size() == 0)
+                    if(author["lastname"].size() == 0 && author["creatorType"] != "author")
                         continue;
 
                     //Create directory

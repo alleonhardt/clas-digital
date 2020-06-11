@@ -138,9 +138,10 @@ std::vector<std::string> CMetadata::getAuthors()
 
 /**
 * return a vector contaiing
-* [0] lastname
-* [1] lastname, firstname
-* [2] key (firstname-lastname)
+* [lastname] lastname
+* [fullname] lastname, firstname
+* [key] key (firstname-lastname)
+* [creatorType] author, publisher, editor
 */
 std::vector<std::map<std::string, std::string>> CMetadata::getAuthorsKeys()
 {
@@ -170,6 +171,8 @@ std::vector<std::map<std::string, std::string>> CMetadata::getAuthorsKeys()
         std::replace(key.begin(), key.end(), ' ', '-');
         std::replace(key.begin(), key.end(), '/', ',');
         author["key"] = key;
+
+        author["creatorType"] = it.value("creatorType", "undefined");
 
         //Add to results
         v_sAuthors.push_back(author);
