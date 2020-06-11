@@ -248,8 +248,13 @@ function ShowBookContentLink()
     document.getElementById("BookContentLink").innerHTML = "<a href='/ShowMetadata.html?scanId="+lnk+"' target='_blank'> Book Metadata</a>";
 }
 
+let gBaseTitle = null;
+
 function UploadAll()
 {
+    if(gBaseTitle==null)
+	gBaseTitle = document.title;
+
     let elem = document.getElementById("fileUpID");
     elem.onclick = function(){return false;};
 
@@ -262,6 +267,7 @@ function UploadAll()
     let val = document.getElementById("FileDropList").children;
     for(let i = 1; i < val.length; i++)
     {
+	document.title = ""+Math.floor((i+1)*100/val.length)+"%- "+gBaseTitle;
 	if(val[i].upload_finished==undefined || val[i].upload_finished == null)
 	{
 	    val[i].onclick = function() { };
@@ -269,6 +275,7 @@ function UploadAll()
 	    return;
 	}
     }
+    
     let total_count = val.length-1;
     let upcount = 0;
     for(let i = 1; i < val.length; i++)
