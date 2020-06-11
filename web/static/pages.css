@@ -257,8 +257,8 @@ div .fuzzysugslink {
     text-decoration: none;
     text-align: left;
     cursor: pointer;
-    border-bottom: 1px solid grey;
     overflow-wrap: anywhere;
+    background: #DDD;
 }
 
 .fuzzysugslink mark {
@@ -277,7 +277,7 @@ div .fuzzysugslink:hover {
     color: black;
     text-decoration: none;
     text-align: left;
-    background-color: #ddd;
+    background-color: grey;
 }
 
 nav a.about 
