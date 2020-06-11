@@ -536,17 +536,17 @@ void do_authentification(const Request& req, Response &resp)
     else if(std::regex_search(req.path,reg_meta)
 	    || std::regex_search(req.path,reg_metajs))
 	accreq = 0;
-    else if(std::regex_search(req.path,reg_pages)
-	    ||std::regex_search(req.path,reg_pages2))
-    {
-	accreq = 0;
-	resp.status = 206;
-    }
 
     
     if(!User::AccessCheck(GetUserFromCookie(req),accreq))
     {
-	resp.status = 403;
+	if(std::regex_search(req.path,reg_pages)
+	    ||std::regex_search(req.path,reg_pages2))
+	{
+	    resp.status = 206;
+	}
+	else
+	   resp.status = 403;
 	return;
     }
 

@@ -116,12 +116,17 @@ server {
 	    auth_request /authenticate;
 	    auth_request_set $backend_status $upstream_status;
 	    if ($backend_status = "206") {
+		set $allow_passthrough $uri;
 		return 401;
 	    }
 	}
 
 	location @error401 {
-	    try_files $uri $uri/ =401;
+	    set $unique_path "=401";
+	    if ($allow_passthrough) {
+		set $unique_path $uri;
+	    }
+	    try_files $unique_path $unique_path/ =401;
 	}
 
 	location /upload {
