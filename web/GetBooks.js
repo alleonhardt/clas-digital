@@ -17,6 +17,7 @@ function ServerGet(filename, okCallback, errorCallback) {
 
 let gOCRLoaded = false;
 let gHitsLoaded = false;
+let gOCRError = false;
 let gOcrSplittedFile = null;
 let gPageLayoutFile = null;
 let scanId = '';
@@ -378,6 +379,10 @@ function isElementInViewport (el) {
 function loadOCRFileError(errortext)
 {
     gOcrSplittedFile = [];
+    
+    if(gHitsLoaded)
+	HighlightHitsAndConstructLinkList();
+    gOCRError = true;
 
     if(gPageLayoutFile!=null)
 	CreatePageLayout();
@@ -388,8 +393,12 @@ function loadMetadataFileError(errortxt,state)
 {
     if(state==403)
     {
-	document.getElementById("bibliography").innerHTML = "Sorry this book is copyright protected you cannot view this...";
-	document.getElementById("bibliography").style.color = "red";
+	//document.getElementById("bibliography").innerHTML = "Sorry this book is copyright protected you cannot view this...";
+	//document.getElementById("bibliography").style.color = "red";
+	let elem = document.createElement("div");
+	elem.classList.add("copyright");
+	elem.innerHTML = "<div><h3>Sorry this book is copyright protected, please login to view this book</h3></div>";
+	document.body.appendChild(elem);
     }
     else
 	document.getElementById("bibliography").innerHTML = "Could not load metadata sorry for that :(";
@@ -415,7 +424,7 @@ function highlightHitsAndLoadHitlistError(text)
 {
     document.getElementById("fullsearchhitlist").innerHTML = "<li>Could not load hit list sorry for that</li>";
     document.getElementById("fullsearchhitlist").hitsloaded = null;
-    if(gOCRLoaded)
+    if(gOCRLoaded||gOCRError)
 	HighlightHitsAndConstructLinkList();
     gHitsLoaded = true;
 }
@@ -424,7 +433,7 @@ function highlightHitsAndLoadHitlist(hits)
 {
     let searchhits = JSON.parse(hits);
     document.getElementById("fullsearchhitlist").hitsloaded = searchhits;
-    if(gOCRLoaded)
+    if(gOCRLoaded||gOCRError)
 	HighlightHitsAndConstructLinkList();
     gHitsLoaded = true;
 }

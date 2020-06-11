@@ -311,3 +311,21 @@ nav span.bibliostyle {
     user-select: all; /* Chrome and Opera */
 }
 
+.copyright {
+    top: 45vh;
+    width: 100vw;
+    left: 0;
+    position: fixed;
+    color: black;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+}
+
+.copyright h3 {
+    background: white;
+    width: auto;
+    border: 1px solid darkred;
+    align-self: center;
+    padding: 0.5rem;
+}

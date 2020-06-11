@@ -510,10 +510,21 @@ std::shared_ptr<User> GetUserFromCookie(const Request &req)
     return UserHandler::GetUserTable().GetUserBySessid(cookie);
 }
 
+inline bool ends_with(std::string const & value, std::string const & ending)
+{
+    if (ending.size() > value.size()) return false;
+    return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
+}
+
 void do_authentification(const Request& req, Response &resp)
 {
     std::cout<<req.path<<std::endl;
 
+    std::regex reg_meta("/books/[a-zA-Z0-9]+/$");
+    std::regex reg_metajs("/books/[a-zA-Z0-9]+/info.json$");
+    std::regex reg_pages("/books/[a-zA-Z0-9]+/pages/index.html$");
+    std::regex reg_pages2("/books/[a-zA-Z0-9]+/pages/$");
+    
     int accreq = 1;
     if(req.path.find("/admin/")!=std::string::npos)
 	accreq = 4;
@@ -521,7 +532,12 @@ void do_authentification(const Request& req, Response &resp)
 	accreq = 2;
     else if(req.path.find("/backups")!=std::string::npos && req.path.find("/books/")!=std::string::npos)
 	accreq = 2;
-
+    else if(std::regex_search(req.path,reg_meta)
+	    || std::regex_search(req.path,reg_metajs)
+	    || std::regex_search(req.path,reg_pages)
+	    || std::regex_search(req.path,reg_pages2))
+	accreq = 0;
+    
     if(!User::AccessCheck(GetUserFromCookie(req),accreq))
     {resp.status = 403;return;}
 
