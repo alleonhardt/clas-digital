@@ -152,27 +152,11 @@ class StaticWebpageCreator
 			info["itemType"] = itemType;
 			info["title"] = title;
 			info["authors"] = nlohmann::json::array();
-            for(const auto &it : m_book->getMetadata().getAuthors())
+            for(auto author : m_book->getMetadata().getAuthorsKeys())
             {
-                std::string key = "";
-                std::string name = it;
-                if(name.find(",") != std::string::npos)
-                {
-                    std::string lastName = func::split2(name, ",")[0];
-                    std::string firstName = func::split2(name, ",")[1];
-                    firstName.erase(0, 1);
-                    func::convertToLower(lastName);
-                    func::convertToLower(firstName);
-                    key=firstName+"-"+lastName; 
-                }
-                else
-                    key = func::returnToLower(name);
-                std::replace(key.begin(), key.end(), ' ', '-');
-                std::replace(key.begin(), key.end(), '/', ',');
-
                 nlohmann::json j;
-                j["key"] = key;
-                j["name"] = name;
+                j["key"] = author["key"];
+                j["name"] = author["fullname"];
 				info["authors"].push_back(j);
             } 
 			info["hasISBN"] = isbn != "";
@@ -392,20 +376,14 @@ class StaticCatalogueCreator
             std::map<std::string, nlohmann::json> mapAuthors;
             for(auto &it : manager.getMapOfBooks()) 
             {
-                std::string lastName = it.second->getMetadata().getAuthor();
-                std::string firstName = it.second->getMetadata().getMetadata("firstName", "data", "creators", 0);
-                auto origName = lastName;
-                auto origFam = firstName;
-                func::convertToLower(lastName);
-                func::convertToLower(firstName);
-                std::string key = firstName + "-" + lastName;
-                std::replace(key.begin(), key.end(), ' ', '-');
-                std::replace(key.begin(), key.end(), '/', ',');
-        
-                mapAuthors[lastName + "_" + firstName] = {
-                            {"id", key},
-                            {"show", origName + ", " + origFam},
-                            {"num", manager.getMapofUniqueAuthors()[key].size()} };
+                for(auto author : it.second->getMetadata().getAuthorsKeys())
+                {
+                    mapAuthors[author["key"]] = {
+                        {"id", author["key"]},
+                        {"show", author["fullname"]},
+                        {"num", manager.getMapofUniqueAuthors()[author["key"]].size()} 
+                    };
+                }
             }
 
             for(auto &it : mapAuthors)
@@ -429,12 +407,11 @@ class StaticCatalogueCreator
 
             for(const auto &it : manager.getMapOfBooks()) {
 
-                for(const auto& author : it.second->getMetadata().getAuthors())
+                for(auto author : it.second->getMetadata().getAuthorsKeys())
                 {
-                    std::string lastName = author;
-                    std::string key = func::createAuthorKey(lastName);
+                    std::string key = author["key"];
 
-                    if(lastName.size() == 0)
+                    if(author["lastname"].size() == 0)
                         continue;
 
                     //Create directory
@@ -442,7 +419,7 @@ class StaticCatalogueCreator
                     std::filesystem::create_directory("web/catalogue/authors/"+key+"/", ec);
 
                     nlohmann::json js;
-                    js["author"] = {{"name", author}, {"id", key}};
+                    js["author"] = {{"name", author["fullname"]}, {"id", key}};
 
                     //Parse navbar
                     js["topnav"] = m_topnav;
@@ -451,10 +428,7 @@ class StaticCatalogueCreator
                     //Create json with all books
                     std::vector<nlohmann::json> vBooks;
                     if(manager.getMapofUniqueAuthors().count(key) == 0)
-                    {
-                        std::cout << "Key: " << key <<  " not found!" << std::endl;
                         continue;
-                    }
 
                     for(auto &jt : manager.getMapofUniqueAuthors()[key]) {
                         vBooks.push_back({ 
