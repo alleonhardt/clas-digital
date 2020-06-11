@@ -119,6 +119,8 @@ namespace func
     * @return 
     */
     bool checkPage(std::string &buffer);
+
+    std::string createAuthorKey(std::string& sAuthor);
 }
 
 

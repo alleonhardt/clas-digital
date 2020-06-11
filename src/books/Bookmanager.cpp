@@ -348,16 +348,14 @@ void CBookManager::createMapWordsAuthor()
     //or add book to list of books (if word already exists).
     for(auto it=m_mapBooks.begin(); it!=m_mapBooks.end(); it++)
     {
-        std::string lastName = it->second->getAuthor();
-        std::string firstName = it->second->getMetadata().getMetadata("firstName", "data", "creators", 0); 
-        m_mapWordsAuthors[lastName][it->first] = 0.1;
-    
-	func::convertToLower(lastName);
-	func::convertToLower(firstName);
-        std::string key = firstName + "-" + lastName;
-        std::replace(key.begin(), key.end(), ' ', '-');
-        std::replace(key.begin(), key.end(), '/', ',');
-        m_mapUniqueAuthors[key].push_back(it->first);
+        for(auto author : it->second->getMetadata().getAuthors())
+        {
+            std::string lastName = author;
+            std::string key = func::createAuthorKey(lastName);
+
+            m_mapWordsAuthors[lastName][it->first] = 0.1;
+            m_mapUniqueAuthors[key].push_back(it->first);
+        }
     }
     createListWords(m_mapWordsAuthors, m_listAuthors);
 }
