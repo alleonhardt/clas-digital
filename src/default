@@ -110,8 +110,18 @@ server {
 		return 404;
 	}
 
-	location ~ /books/[a-zA-Z0-9]+/ {
+	error_page 401 @error401;
+	
+	location ~ (/books/[a-zA-Z0-9]+/) {
 	    auth_request /authenticate;
+	    auth_request_set $backend_status $upstream_status;
+	    if ($backend_status = "206") {
+		return 401;
+	    }
+	}
+
+	location @error401 {
+	    try_files $uri $uri/ =401;
 	}
 
 	location /upload {
