@@ -68,7 +68,7 @@ bool CBook::getPublic() {
     tm *local_time = localtime(&ttime);
 
     //Local time number of seconds elapsed since 1. January 1900. 
-    if(getDate() == -1 || getDate() > (local_time->tm_year+1800))
+    if(getDate() == -1 || getDate() >= (local_time->tm_year+1800))
         return false;
     else
         return true;
