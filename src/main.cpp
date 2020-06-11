@@ -520,10 +520,10 @@ void do_authentification(const Request& req, Response &resp)
 {
     std::cout<<req.path<<std::endl;
 
-    std::regex reg_meta("/books/[a-zA-Z0-9]+/$");
+    std::regex reg_meta("/books/[a-zA-Z0-9]+/?$");
     std::regex reg_metajs("/books/[a-zA-Z0-9]+/info.json$");
     std::regex reg_pages("/books/[a-zA-Z0-9]+/pages/index.html$");
-    std::regex reg_pages2("/books/[a-zA-Z0-9]+/pages/$");
+    std::regex reg_pages2("/books/[a-zA-Z0-9]+/pages/?$");
     
     int accreq = 1;
     if(req.path.find("/admin/")!=std::string::npos)

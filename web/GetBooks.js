@@ -36,50 +36,59 @@ function HighlightHitsAndConstructLinkList()
     let ulhitlst = document.getElementById("fullsearchhitlist");
     ulhitlst.innerHTML = "";	//Delete hits if there are any
 
-    if(hitlist && hitlist.books)
+    if(hitlist)
     {
-	//document.getElementsByClassName("topnav")[0].style.display = "block";
-	//document.getElementsByClassName("resizer")[0].style.display = "block";
-	let HighlightList = [];
-
-	for(let i = 0; i < hitlist.books.length; i++)
+	if(hitlist.books)
 	{
-	    let link = document.createElement("a");
+	    //document.getElementsByClassName("topnav")[0].style.display = "block";
+	    //document.getElementsByClassName("resizer")[0].style.display = "block";
+	    let HighlightList = [];
 
-	    let inner = hitlist.books[i].page;
-	    if(hitlist.is_fuzzy==true)
+	    for(let i = 0; i < hitlist.books.length; i++)
 	    {
-		inner+="("+hitlist.books[i].words+"); ";
-	    }
-	    else
-		inner+=" ";
-	    link.innerHTML = inner;
-	    link.page = hitlist.books[i].page;
-	    link.classList.add('hitlinkstyle');
-	    link.onclick = function() {
-		CorrectedScrollIntoView(document.getElementById("uniquepageid"+hitlist.books[i].page));
-		UpdateViewMode();
-		CorrectedScrollIntoView(document.getElementById("uniquepageid"+hitlist.books[i].page));
-		link.style.color = "purple";
-	    }
+		let link = document.createElement("a");
 
-	    ulhitlst.appendChild(link);
-
-	    HighlightList = hitlist.books[i].words.split(",");
-
-	    for(let x = 0; x < HighlightList.length; x++)
-	    {
-		let thpage = document.getElementById("uniqueocrpage"+hitlist.books[i].page);
-		console.log(HighlightList);
-		if(thpage!=null)
+		let inner = hitlist.books[i].page;
+		if(hitlist.is_fuzzy==true)
 		{
+		    inner+="("+hitlist.books[i].words+"); ";
+		}
+		else
+		    inner+=" ";
+		link.innerHTML = inner;
+		link.page = hitlist.books[i].page;
+		link.classList.add('hitlinkstyle');
+		link.onclick = function() {
+		    CorrectedScrollIntoView(document.getElementById("uniquepageid"+hitlist.books[i].page));
+		    UpdateViewMode();
+		    CorrectedScrollIntoView(document.getElementById("uniquepageid"+hitlist.books[i].page));
+		    link.style.color = "purple";
+		}
+
+		ulhitlst.appendChild(link);
+
+		HighlightList = hitlist.books[i].words.split(",");
+
+		for(let x = 0; x < HighlightList.length; x++)
+		{
+		    let thpage = document.getElementById("uniqueocrpage"+hitlist.books[i].page);
+		    console.log(HighlightList);
+		    if(thpage!=null)
+		    {
 			HighlightList[x] = HighlightList[x].replace(new RegExp('o','g'),'[oö]');
 			HighlightList[x] = HighlightList[x].replace(new RegExp('u','g'),'[uü]');
 			HighlightList[x] = HighlightList[x].replace(new RegExp('a','g'),'[aä]');
 			HighlightList[x] = HighlightList[x].replace(new RegExp('s','g'),'[sßſ]');
-		       thpage.innerHTML=thpage.innerHTML.replace(new RegExp('('+HighlightList[x]+')','gi'),'<mark>$1</mark>');
+			thpage.innerHTML=thpage.innerHTML.replace(new RegExp('('+HighlightList[x]+')','gi'),'<mark>$1</mark>');
+		    }
 		}
 	    }
+	}
+	else
+	{
+		let link = document.createElement("p");
+		link.innerHTML = "No hits found";
+		ulhitlst.appendChild(link);
 	}
     }
     if(location.hash=="")
@@ -455,8 +464,15 @@ function initialise()
 
     ServerGet("/books/"+scanId+"/ocr.txt", loadOCRFile,loadOCRFileError);
     ServerGet("/books/"+scanId+"/readerInfo.json",loadPageLayoutFile,loadMetadataFileError);
-    if(query!=null)
+    if(query!=null && query!='null')
+    {
+	console.log(query);
 	ServerGet("/searchinbook?scanId="+scanId+'&query='+query+'&fuzzyness='+fuzzyness,highlightHitsAndLoadHitlist,highlightHitsAndLoadHitlistError);
+    }
+    else
+    {
+	document.getElementsByClassName("linknav")[0].style.display = "none";
+    }
     ServerGet("/books/"+scanId+"/intern/pages.txt",LoadPreindexingOfPages,LoadPreindexingOfPagesError);
 
     document.getElementById("srchbox").oninput = function() {

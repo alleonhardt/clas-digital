@@ -300,7 +300,7 @@ nav img:hover {
 nav span.bibliostyle {
     display: block;
     padding-top: 0.2rem;
-    font-size: small;
+    padding-bottom: 0.2rem;
     color: green;
     overflow-wrap: anywhere;
     overflow: auto;
