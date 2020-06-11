@@ -135,6 +135,51 @@ std::vector<std::string> CMetadata::getAuthors()
     return v_sAuthors;
 }
 
+
+/**
+* return a vector contaiing
+* [lastname] lastname
+* [fullname] lastname, firstname
+* [key] key (firstname-lastname)
+* [creatorType] author, publisher, editor
+*/
+std::vector<std::map<std::string, std::string>> CMetadata::getAuthorsKeys()
+{
+    std::vector<std::map<std::string, std::string>> v_sAuthors;
+    if(m_metadata.count("data") == 0)
+        return v_sAuthors;
+    if(m_metadata["data"].count("creators") == 0)
+        return v_sAuthors;
+
+    std::vector<nlohmann::json> v_jAuthors = m_metadata["data"]["creators"];
+    for(const auto &it : v_jAuthors)
+    {
+        std::map<std::string, std::string> author;
+        
+        //Generate last name [0]
+        std::string lastName = it.value("lastName", it.value("name", ""));
+        author["lastname"] = lastName;
+
+        //Generate  lastName, firstname [1]
+        author["fullname"] = lastName;
+        std::string firstname = it.value("firstName", "");
+        if(firstname != "")
+            author["fullname"] += ", " + firstname;
+
+        //Generate key firstname-lastName
+        std::string key = func::returnToLower(firstname)+"-"+func::returnToLower(lastName);
+        std::replace(key.begin(), key.end(), ' ', '-');
+        std::replace(key.begin(), key.end(), '/', ',');
+        author["key"] = key;
+
+        author["creatorType"] = it.value("creatorType", "undefined");
+
+        //Add to results
+        v_sAuthors.push_back(author);
+    }
+
+    return v_sAuthors;
+}
 /**
 * @param[in] sTag tag to search for
 * @return return whether book has a certain tag

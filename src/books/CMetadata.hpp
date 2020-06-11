@@ -82,6 +82,14 @@ public:
     std::vector<std::string> getAuthors();
 
     /**
+    * return a vector contaiing
+    * [laszname] lastname
+    * [fullname] lastname, firstname
+    * [key] key (firstname-lastname)
+    */
+    std::vector<std::map<std::string, std::string>> getAuthorsKeys();
+
+    /**
      * @return Returns an escaped version of the bibliography
      */
     std::string getBibliographyEscaped();
