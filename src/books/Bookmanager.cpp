@@ -44,25 +44,32 @@ void CBookManager::writeListofBooksWithBSB() {
     std::string gibtEsBeiBSB_noOCR = "Buecher mit tag \"gibtEsBeiBSB\" aber ohne ocr: \n";
     std::string gibtEsBeiBSB_OCR = "Buecher mit tag \"gibtEsBeiBSB\" aber mit ocr: \n";
     std::string BSBDownLoadFertig_noOCR = "Buecher mit tag \"BSBDownLoadFertig\" aber ohne ocr: \n";
+    std::string tierwissen_noOCR = "Buecher in \"Geschichte des Tierwissens\" aber ohne ocr: \n";
 
     for(auto it : m_mapBooks)
     {
+        std::string info = it.second->getKey() + ": " + it.second->getMetadata().getShow2() + "\n";
         if(it.second->hasOcr() == false)
         {
             //Check if book has a bsb-link (archiveLocation)
             if(it.second->getMetadata().getMetadata("archiveLocation", "data") != "")
-                inBSB_noOcr+= it.second->getKey() + ": " + it.second->getMetadata().getShow2() + "\n";
+                inBSB_noOcr += info;
             
             //Check if book has tag: "GibtEsBeiBSB"
             if(it.second->getMetadata().hasTag("GibtEsBeiBSB") == true)
-                gibtEsBeiBSB_noOCR += it.second->getKey() + ": " + it.second->getMetadata().getShow2() + "\n";
+                gibtEsBeiBSB_noOCR += info;
     
             //Check if book has tag: "BSBDownLoadFertig"
             if(it.second->getMetadata().hasTag("BSBDownLoadFertig") == true)
-                BSBDownLoadFertig_noOCR += it.second->getKey() + ": " + it.second->getMetadata().getShow2()+"\n";
+                BSBDownLoadFertig_noOCR += info;
+
+            //Check if book is in collection: "Geschichte des Tierwissens"
+            if(func::in("RFWJC42V", it.second->getMetadata().getCollections()) == true)
+                tierwissen_noOCR += info;
         }
+
         else if(it.second->getMetadata().hasTag("GibtEsBeiBSB") == true)
-            gibtEsBeiBSB_OCR += it.second->getKey() + ": " + it.second->getMetadata().getShow2() + "\n";
+            gibtEsBeiBSB_OCR += info;
         
     }
 
@@ -122,6 +129,11 @@ void CBookManager::writeListofBooksWithBSB() {
     std::ofstream writeFERTIG_noOCR("BSBDownLoadFertig_noOCR.txt");
     writeFERTIG_noOCR << BSBDownLoadFertig_noOCR;
     writeFERTIG_noOCR.close();
+
+    //Save books in collection "Geschichte des Tierwissens": RFWJC42V, without ocr
+    std::ofstream writeTierwissen_noOCR("tierwissen_noOCR.txt");
+    writeTierwissen_noOCR << tierwissen_noOCR;
+    writeTierwissen_noOCR.close();
 
     //Write all untracked books to seperate files
     if(std::filesystem::exists("untracked_books.txt"))
