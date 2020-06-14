@@ -22,32 +22,35 @@
             <h1> {{ show }} </h1>
             <nav id='booklcontentlink'>
                 <ul>
-                    <li><a href="/catalogue/books/">Other books in catalogue</a></li>
-                    <li><a href="/catalogue/authors/">Other authors in catalogue</a></li>
+                    <li><a href="/">Clas Digital</a></li>
                         <ul>
-                            {% for author in authors %}
-                                {% if author.isAuthor %}
-                                    <li><a href="/catalogue/authors/{{ author.key }}/">{{author.name}}</a></li>
+                            <li><a href="/catalogue/books/">Other books in catalogue</a></li>
+                            <li><a href="/catalogue/authors/">Other authors in catalogue</a></li>
+                                <ul>
+                                    {% for author in authors %}
+                                        {% if author.isAuthor %}
+                                            <li><a href="/catalogue/authors/{{ author.key }}/">{{author.name}}</a></li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            <li><a href="/catalogue/collections/">Other collections in catalogue</a></li>
+                                <ul>
+                                    {% for collection in collections %}
+                                    <li><a href="/catalogue/collections/{{ collection.key }}/">{{ collection.name }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            <li><a href="/catalogue/years/">Other years in catalogue</a></li>
+                                {% if hasDate %}
+                                <ul>
+                                    <li><a href="/catalogue/years/{{ date }}/">{{ date }}</a></li>
+                                </ul>
                                 {% endif %}
-                            {% endfor %}
-                        </ul>
-                    <li><a href="/catalogue/collections/">Other collections in catalogue</a></li>
-                        <ul>
-                            {% for collection in collections %}
-                            <li><a href="/catalogue/collections/{{ collection.key }}/">{{ collection.name }}</a></li>
-                            {% endfor %}
-                        </ul>
-                    <li><a href="/catalogue/years/">Other years in catalogue</a></li>
-                        {% if hasDate %}
-                        <ul>
-                            <li><a href="/catalogue/years/{{ date }}/">{{ date }}</a></li>
-                        </ul>
-                        {% endif %}
-                
-                    {% if hasContent %}
-                    <li><a href="/books/{{ key }}/pages" rel="search">Pages in this book</a></li>
-                    {% endif %}
+                        
+                            {% if hasContent %}
+                            <li><a href="/books/{{ key }}/pages" rel="search">Pages in this book</a></li>
+                            {% endif %}
 
+                        </ul>
                 </ul>
             </nav>
             <section>
