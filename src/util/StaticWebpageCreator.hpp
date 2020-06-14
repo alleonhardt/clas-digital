@@ -158,7 +158,7 @@ class StaticWebpageCreator
                 j["key"] = author["key"];
                 j["name"] = author["fullname"];
                 j["type"] = author["creatorType"];
-                j["isAuthor"] = author["creatorType"] == "author";
+                j["isAuthor"] = m_book->getMetadata().isAuthorEditor(j["type"]);
 				info["authors"].push_back(j);
             } 
 			info["hasISBN"] = isbn != "";
@@ -380,7 +380,7 @@ class StaticCatalogueCreator
             {
                 for(auto author : it.second->getMetadata().getAuthorsKeys())
                 {
-                    if(author["creatorType"] != "author")
+                    if(!it.second->getMetadata().isAuthorEditor(author["creatorType"]))
                         continue;
 
                     mapAuthors[author["key"]] = {
@@ -416,7 +416,10 @@ class StaticCatalogueCreator
                 {
                     std::string key = author["key"];
 
-                    if(author["lastname"].size() == 0 && author["creatorType"] != "author")
+                    if(author["lastname"].size() == 0)
+                        continue;
+
+                    if(!it.second->getMetadata().isAuthorEditor(author["creatorType"]))
                         continue;
 
                     //Create directory

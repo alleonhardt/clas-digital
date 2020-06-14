@@ -362,7 +362,7 @@ void CBookManager::createMapWordsAuthor()
     {
         for(auto author : it->second->getMetadata().getAuthorsKeys())
         {
-            if(author["creatorType"] != "author")   
+            if(!it->second->getMetadata().isAuthorEditor(author["creatorType"]))
                 continue;
             m_mapWordsAuthors[func::returnToLower(author["lastname"])][it->first] = 0.1;
             m_mapUniqueAuthors[author["key"]].push_back(it->first);
