@@ -258,10 +258,24 @@ server {
 		return 301 https://$host/books/$arg_scanId;
 	}
 
-	location ~ /books/[a-zA-Z0-9]+/ {
+	error_page 401 @error401;
+	
+	location ~ (/books/[a-zA-Z0-9]+/) {
 	    auth_request /authenticate;
+	    auth_request_set $backend_status $upstream_status;
+	    if ($backend_status = "206") {
+		set $allow_passthrough $uri;
+		return 401;
+	    }
 	}
 
+	location @error401 {
+	    set $unique_path "=401";
+	    if ($allow_passthrough) {
+		set $unique_path $uri;
+	    }
+	    try_files $unique_path $unique_path/ =401;
+	}
 	location /upload {
 		client_max_body_size 10M;
         	proxy_pass         http://localhost:9000;
