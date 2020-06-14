@@ -26,6 +26,9 @@
 <body>
 	{% include "../../template_navbar.html" %}	
 	<header>
+	<ul>
+	    <li><a href="../" rel="index up">Authors</a></li>
+	</ul> 
 	<h1>Books by {{ author.name }}</h1>
 	<p>{{ length(books) }} books by this author</p>
 	<p>{{ length(books) }} books</p>

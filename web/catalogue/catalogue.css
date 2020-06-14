@@ -46,6 +46,10 @@ header {
 	padding-bottom: 1rem;
 }
 
+header ul {
+    text-align: left;
+}
+
 .progress {
 	margin-top: 0.5rem;
 	display: block;

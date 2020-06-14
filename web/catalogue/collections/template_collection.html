@@ -27,6 +27,9 @@
 <body>
 	{% include "../../template_navbar.html" %}	
 	<header>
+	<ul>
+	    <li><a href="../" rel="index up">Collections</a></li>
+	</ul> 
 	<h1>Books in Collection: {{pillar.name}}</h1>
 	<p>{{ length(books) }} books in this collection</p>
 	{% include "../search_template.html" %}

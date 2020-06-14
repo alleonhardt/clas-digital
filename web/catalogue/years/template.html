@@ -26,6 +26,9 @@
 <body>
 	{% include "../../template_navbar.html" %}	
 	<header>
+	<ul>
+	    <li><a href="../" rel="index up">Catalogue</a></li>
+	</ul> 
 	<h1>Catalogue: Years</h1>
 	<p>Found books from {{ length(years) }} distinct years</p>
 	{% include "../search_template.html" %}
