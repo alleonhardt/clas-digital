@@ -27,15 +27,11 @@
 <body>
 	{% include "../../template_navbar.html" %}	
 	<header>
-	<ul>
+	<ol>
 	    <li><a href="/">Clas digital</a></li>
-	    <ul>
-		<li><a href="/catalogue/">Catalogue</a></li>
-		<ul>
-		    <li><a href="../" rel="index up">Years</a></li>
-		</ul>
-	    </ul>
-	</ul>
+	    <li><a href="/catalogue/">Catalogue</a></li>
+	    <li><a href="../" rel="index up">Years</a></li>
+	</ol>
 	<h1>Book published in {{ year }}</h1>
 	<p>Found {{ length(books) }} books from the year {{ year }}</p>
 	{% include "../search_template.html" %}

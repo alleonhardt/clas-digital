@@ -446,7 +446,7 @@ class StaticCatalogueCreator
 
                     //Parse navbar
                     js["topnav"] = m_topnav;
-                    js["topnav"]["catalogue"] = "class='dropdown-banner active";
+                    js["topnav"]["catalogue"] = "class='dropdown-banner active'";
 
                     //Create json with all books
                     std::vector<nlohmann::json> vBooks;

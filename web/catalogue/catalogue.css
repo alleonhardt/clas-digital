@@ -51,6 +51,32 @@ header ul {
     margin-left: 1rem;
 }
 
+header ol {
+    text-align: left;
+    margin-left: 1rem;
+    list-style: none;
+}
+
+header ol li {
+    display: inline-block;
+}
+
+header ol li a {
+    display: inline;
+}
+
+header ol li+li:before {
+  content: "->";
+  display: inline-block;
+  padding-right: 1rem;
+  padding-left: 1rem;
+}
+/*
+header ol li:last-child:after {
+    display: inline-block;
+    content: "";
+}*/
+
 .progress {
 	margin-top: 0.5rem;
 	display: block;

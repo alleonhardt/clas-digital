@@ -26,12 +26,10 @@
 <body>
 	{% include "../../template_navbar.html" %}	
 	<header>
-	<ul>
+	<ol>
 	    <li><a href="/">Clas digital</a></li>
-	    <ul>
 	    <li><a href="../" rel="index up">Catalogue</a></li>
-	    </ul>
-	</ul> 
+	</ol> 
 	<h1>Index of all Books</h1>
 	<p>{{ length(books) }} books</p>
 	{% include "../search_template.html" %}

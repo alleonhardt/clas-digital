@@ -27,18 +27,12 @@
 <body>
 	{% include "../../template_navbar.html" %}	
 	<header>
-	<ul>
+	<ol>
 	    <li><a href="/">Clas digital</a></li>
-	    <ul>
-		<li><a href="/catalogue/" rel="index up">Catalogue</a></li>
-		<ul>
-		    <li><a href="../" rel="index up">Authors</a></li>
-		</ul>
-	    </ul>
-	</ul>
+	    <li><a href="/catalogue/" rel="index up">Catalogue</a></li>
+	    <li><a href="../" rel="index up">Authors</a></li>
+	</ol>
 
-
-	</ul> 
 	<h1>Books by {{ author.name }}</h1>
 	<p>{{ length(books) }} books by this author</p>
 	<p>{{ length(books) }} books</p>
