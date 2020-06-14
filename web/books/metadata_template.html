@@ -69,7 +69,7 @@
                     <span itemprop="name">
                         <ul>
                             {% for author in authors %}
-                            <li>{{ author.name }} ({{author.type}})</li>
+                            <li itemscope itemtype="http://schema.org/Person"><span itemprop="name">{{ author.name }}</span> ({{author.type}})</li>
                             {% endfor %}
                         </ul>
                     </span>
@@ -106,7 +106,7 @@
                     <td><dd>{{ bib }}</dd></td>
                 </tr>
                 <tr>
-                    <td><dt id="bib"><b>Own created bibliography: </b></dt></td>
+                    <td><dt id="own_bib"><b>Own created bibliography: </b></dt></td>
                     <td><dd>{{ bib_own }}</dd></td>
                 </tr>
 
