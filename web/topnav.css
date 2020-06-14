@@ -178,3 +178,8 @@ article.main {
 article.main ol {
     text-transform: capitalize;
 }
+
+.yearbooks {
+    display: inline;
+    margin-left: 0.5rem;
+}

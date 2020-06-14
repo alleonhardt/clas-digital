@@ -41,11 +41,11 @@
 	    <p>Found books from {{ length(years) }} distinct years</p>
 	    {% include "../search_template.html" %}
 
-	    <ul>
+	    <ol>
 		{% for year in years %}
-		<li class="searchable_item"><a href="/catalogue/years/{{ year.year }}">{{ year.year }} (books: {{ year.count }})</a></li>
+		<li class="searchable_item"><a href="/catalogue/years/{{ year.year }}">Year {{ year.year }}</a><span class="yearbooks">(books: {{ year.count }})</span></li>
 		{% endfor %}
-	    </ul>
+	    </ol>
 	</article>
 </body>
 
