@@ -39,9 +39,14 @@ class StaticWebpageCreator
         StaticWebpageCreator()
         {
             m_topnav = {{"information", ""}, {"search", ""}, {"catalogue", ""}, {"admin", ""}, {"upload", ""}};
-            auto time=std::chrono::system_clock::now();
-            std::time_t time_time = std::chrono::system_clock::to_time_t(time);
-            m_topnav["time"] = std::ctime(&time_time);    
+	    time_t now;
+	    std::time(&now);
+	    char buf[sizeof("YYYY-mm-ddTHH:MM:ssZ")];
+	    std::strftime(buf, sizeof(buf), "%FT%TZ", gmtime(&now));
+            m_topnav["time"] = buf;
+	    char buf_human[sizeof("YYYY-mm-dd HH:MM:ss")];
+	    strftime(buf_human, sizeof(buf_human), "%F %T", gmtime(&now));
+	    m_topnav["time_human"] = buf_human;
         }
 
 		StaticWebpageCreator(CBook *book)
@@ -52,9 +57,14 @@ class StaticWebpageCreator
 			m_book = book;
 
             m_topnav = {{"information", ""}, {"search", ""}, {"catalogue", ""}, {"admin", ""}, {"upload", ""}};
-            auto time=std::chrono::system_clock::now();
-            std::time_t time_time = std::chrono::system_clock::to_time_t(time);
-            m_topnav["time"] = std::ctime(&time_time);   
+	    time_t now;
+	    time(&now);
+	    char buf[sizeof("YYYY-mm-ddTHH:MM:ssZ")];
+	    strftime(buf, sizeof(buf), "%FT%TZ", gmtime(&now));
+            m_topnav["time"] = buf;
+	    char buf_human[sizeof("YYYY-mm-dd HH:MM:ss")];
+	    strftime(buf_human, sizeof(buf_human), "%F %T", gmtime(&now));
+	    m_topnav["time_human"] = buf_human;
 		}
 
 		template<typename T>
@@ -248,9 +258,14 @@ class StaticCatalogueCreator
         StaticCatalogueCreator()
         {
             m_topnav = {{"information", ""}, {"search", ""}, {"catalogue", ""}, {"admin", ""}, {"upload", ""}};
-            auto time=std::chrono::system_clock::now();
-            std::time_t time_time = std::chrono::system_clock::to_time_t(time);
-            m_topnav["time"] = std::ctime(&time_time);    
+	    time_t now;
+	    time(&now);
+	    char buf[sizeof("YYYY-mm-ddTHH:MM:ssZ")];
+	    strftime(buf, sizeof(buf), "%FT%TZ", gmtime(&now));
+            m_topnav["time"] = buf;   
+	    char buf_human[sizeof("YYYY-mm-dd HH:MM:ss")];
+	    strftime(buf_human, sizeof(buf_human), "%F %T", gmtime(&now));
+	    m_topnav["time_human"] = buf_human;
         }
 
 		void CreateCatalogue()
