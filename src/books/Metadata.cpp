@@ -180,6 +180,19 @@ std::vector<std::map<std::string, std::string>> CMetadata::getAuthorsKeys()
 
     return v_sAuthors;
 }
+
+/**
+* Get whether author needs to be shown acording to book key.
+* @param[in] creatorType
+*/
+bool CMetadata::isAuthorEditor(std::string creatorType)
+{
+    if(getMetadata("itemType", "data") == "bookSection")
+        return creatorType == "author";
+    else
+        return creatorType == "author" || creatorType == "editor";
+}
+
 /**
 * @param[in] sTag tag to search for
 * @return return whether book has a certain tag

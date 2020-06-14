@@ -90,6 +90,12 @@ public:
     std::vector<std::map<std::string, std::string>> getAuthorsKeys();
 
     /**
+    * Get whether author needs to be shown acording to book key.
+    * @param[in] creatorType
+    */
+    bool isAuthorEditor(std::string creatorType);
+    
+    /**
      * @return Returns an escaped version of the bibliography
      */
     std::string getBibliographyEscaped();

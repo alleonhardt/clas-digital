@@ -315,23 +315,5 @@ bool checkPage(std::string &buffer)
    return false;
 }
 
-std::string createAuthorKey(std::string& sAuthor)
-{
-    std::string key = sAuthor;
-    func::convertToLower(key);
-    if(key.find(",") != std::string::npos)
-    {
-        std::string lastName = func::split2(key, ",")[0];
-        sAuthor = lastName;
-        std::string firstName = func::split2(key, ",")[1];
-        firstName.erase(0,1);
-        func::convertToLower(lastName);
-        func::convertToLower(firstName);
-        key = firstName + "-" + lastName;
-    }
-    std::replace(key.begin(), key.end(), ' ', '-');
-    std::replace(key.begin(), key.end(), '/', ',');
-    return key;
-}
 
 } //Close namespace 
