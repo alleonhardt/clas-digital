@@ -27,7 +27,7 @@
                         <ul>
                             {% for author in authors %}
                                 {% if author.isAuthor %}
-                                    <li><a href="/catalogue/authors/{{ author.key }}/">{{author.key}}</a></li>
+                                    <li><a href="/catalogue/authors/{{ author.key }}/">{{author.name}}</a></li>
                                 {% endif %}
                             {% endfor %}
                         </ul>
