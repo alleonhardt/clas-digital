@@ -29,9 +29,14 @@
 	{% include "../../template_navbar.html" %}	
 	<header>
 	<ul>
-	    <li><a href="../" rel="index up">Collections</a></li>
-	</ul> 
-	<h1>Books in Collection: {{pillar.name}}</h1>
+	    <li><a href="/">Clas digital</a></li>
+	    <ul>
+		<li><a href="/catalogue/">Catalogue</a></li>
+		<ul>
+		    <li><a href="../" rel="index up">Collections</a></li>
+		</ul>
+	    </ul>
+	</ul>	<h1>Books in Collection: {{pillar.name}}</h1>
 	<p>{{ length(books) }} books in this collection</p>
 	{% include "../search_template.html" %}
 	</header>

@@ -28,7 +28,16 @@
 	{% include "../../template_navbar.html" %}	
 	<header>
 	<ul>
-	    <li><a href="../" rel="index up">Authors</a></li>
+	    <li><a href="/">Clas digital</a></li>
+	    <ul>
+		<li><a href="/catalogue/" rel="index up">Catalogue</a></li>
+		<ul>
+		    <li><a href="../" rel="index up">Authors</a></li>
+		</ul>
+	    </ul>
+	</ul>
+
+
 	</ul> 
 	<h1>Books by {{ author.name }}</h1>
 	<p>{{ length(books) }} books by this author</p>
