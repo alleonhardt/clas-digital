@@ -25,23 +25,29 @@
 </head>
 
 <body>
-	{% include "../../template_navbar.html" %}	
 	<header>
-	<ol>
-	    <li><a href="/">Clas digital</a></li>
-	    <li><a href="/catalogue/">Catalogue</a></li>
-	    <li><a href="../" rel="index up">Years</a></li>
-	</ol>
-	<h1>Book published in {{ year }}</h1>
-	<p>Found {{ length(books) }} books from the year {{ year }}</p>
-	{% include "../search_template.html" %}
+	{% include "../../template_navbar.html" %}	
 	</header>
-	
-	<ol>
+	<nav aria-label="breadcrumb">
+	    <ol class="breadcrumb">
+		<li class="breadcrumb-item"><a href="/">Clas digital</a></li>
+		<li class="breadcrumb-item"><a href="/catalogue/">Catalogue</a></li>
+		<li class="breadcrumb-item"><a href="../" rel="index up">Years</a></li>
+		<li class="breadcrumb-item active">{{ year }}</li>
+	    </ol>
+	</nav>
+
+	<article class="main">
+	    <h1>Book published in {{ year }}</h1>
+	    <p>Found {{ length(books) }} books from the year {{ year }}</p>
+	    {% include "../search_template.html" %}
+
+	    <ol>
 		{% for book in books %}
 		<li class="searchable_item"><a href="/books/{{ book.key }}/">{{ book.title }}</a><span class="metadata">{{ book.bib }}</span></li>
 		{% endfor %}
-	</ol>
+	    </ol>
+	</article>
 </body>
 
 

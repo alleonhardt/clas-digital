@@ -24,22 +24,28 @@
 </head>
 
 <body>
-	{% include "../template_navbar.html" %}
 	<header>
-	<ol>
-	    <li><a href="../" rel="index up">Clas digital</a></li>
-	</ol> 
-	<h1>Catalogue categories</h1>
-	<p>{{ length(pages) }} categories</p>
-	{% include "search_template.html" %}
+	{% include "../template_navbar.html" %}
 	</header>
-	
-	
-	<ol>
-	{% for pg in pages %}
-	<li class="searchable_item"> <a href="/catalogue/{{ pg }}/">{{ pg }}</a></li>
-	{% endfor %}
-	</ol>
+	<nav aria-label="breadcrumb">
+	    <ol class="breadcrumb">
+		<li class="breadcrumb-item"><a href="../" rel="index up">Clas Digital</a></li>
+		<li class="breadcrumb-item active" aria-current="page">Catalogue</li>
+	    </ol>
+	</nav>
+
+	<article class="main">
+	    <h1>Catalogue categories</h1>
+	    <p>{{ length(pages) }} categories</p>
+	    {% include "search_template.html" %}
+
+
+	    <ol>
+		{% for pg in pages %}
+		<li class="searchable_item"> <a href="/catalogue/{{ pg }}/">{{ pg }}</a></li>
+		{% endfor %}
+	    </ol>
+	</article>
 </body>
 
 

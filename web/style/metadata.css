@@ -2,16 +2,8 @@ td {
     padding: 0.5rem;
 }
 
-.metadata {
+/*.metadata {
     margin-top: 3rem;
     margin-left: 5rem;
     margin-right: 10rem;
-}
-
-.breadcrumb li{
-    display: inline;
-}
-
-.breadcrumb li+li::before{
-    content: " -> ";
-}
+}*/

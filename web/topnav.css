@@ -152,3 +152,29 @@ form.loginform input.passwordinput {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+
+/*.breadcrumb li{
+    display: inline;
+}
+
+.breadcrumb li+li::before{
+    content: " -> ";
+}*/
+
+ol.breadcrumb li.booktitle {
+    text-overflow: ellipsis;
+    max-width: 20em;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+
+article.main {
+    margin-left: 5rem;
+    margin-right: 10rem;
+}
+
+article.main ol {
+    text-transform: capitalize;
+}

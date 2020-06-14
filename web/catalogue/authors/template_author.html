@@ -25,31 +25,36 @@
 </head>
 
 <body>
-	{% include "../../template_navbar.html" %}	
 	<header>
-	<ol>
-	    <li><a href="/">Clas digital</a></li>
-	    <li><a href="/catalogue/" rel="index up">Catalogue</a></li>
-	    <li><a href="../" rel="index up">Authors</a></li>
-	</ol>
-
-	<h1>Books by {{ author.name }}</h1>
-	<p>{{ length(books) }} books by this author</p>
-	<p>{{ length(books) }} books</p>
-	{% include "../search_template.html" %}
+	{% include "../../template_navbar.html" %}	
 	</header>
 	
-    <ol>
-	{% for pg in books %}
-	{% if pg.has_ocr %}
-	<li class="searchable_item"><a title="This book has an OCR, which means it contains a searchable approximation of the text inside the book and possible some images" href="/books/{{ pg.id }}/" data-key="{{ pg.id }}"><span class='bookhasocr'>[OCR]</span>{{ pg.title }}</a><span class="metadata">{{ pg.bib }}</span></li>
-	{% else %}
-	    <li class="searchable_item"><a href="/books/{{ pg.id }}/" data-key="{{ pg.id }}">{{ pg.title }}</a><span class="metadata">{{ pg.bib }}</span></li>
-	{% endif %}
-	{% endfor %}
+	<nav aria-label="breadcrumb">
+	    <ol class="breadcrumb">
+		<li class="breadcrumb-item"><a href="/">Clas digital</a></li>
+		<li class="breadcrumb-item"><a href="/catalogue/" rel="index up">Catalogue</a></li>
+		<li class="breadcrumb-item"><a href="../" rel="index up">Authors</a></li>
+		<li class="breadcrumb-item active">{{ author.name }}</li>
+	    </ol>
+	</nav>
 
-    </ol>
+	<article class="main">
+	    <h1>Books by {{ author.name }}</h1>
+	    <p>{{ length(books) }} books by this author</p>
+	    <p>{{ length(books) }} books</p>
+	    {% include "../search_template.html" %}
 
+	    <ol>
+		{% for pg in books %}
+		{% if pg.has_ocr %}
+		<li class="searchable_item"><a title="This book has an OCR, which means it contains a searchable approximation of the text inside the book and possible some images" href="/books/{{ pg.id }}/" data-key="{{ pg.id }}"><span class='bookhasocr'>[OCR]</span>{{ pg.title }}</a><span class="metadata">{{ pg.bib }}</span></li>
+		{% else %}
+		<li class="searchable_item"><a href="/books/{{ pg.id }}/" data-key="{{ pg.id }}">{{ pg.title }}</a><span class="metadata">{{ pg.bib }}</span></li>
+		{% endif %}
+		{% endfor %}
+
+	    </ol>
+	</article>
 </body>
 
 
