@@ -220,7 +220,7 @@ class StaticWebpageCreator
 		    js["topnav"]["catalogue"] = "class='dropdown-banner active'";
 
 			js["key"] = m_book->getKey();
-			js["title"] = m_book->getMetadata().getShow2();
+			js["title"] = m_book->getMetadata().getShow2(false);
 			js["bib"] = m_info["bib"].get<std::string>();
 			js["bib_esc"] = cutter(replacer(m_info["bib"].get<std::string>(),'"',"&quot;"),'\n');
 			inja::Environment env;

@@ -286,15 +286,18 @@ std::string CMetadata::getZit(size_t page)
 /**
 * @return string with Auhtor + first 6 words 15 words of title + date
 */
-std::string CMetadata::getShow2()
+std::string CMetadata::getShow2(bool html)
 {
     // *** Add Author *** //
     std::string sResult = getAuthor();
-    if(sResult == "") sResult = "Unknown author";
+    if(sResult == "") 
+        sResult = "Unknown author";
 
-    if(getTitle() != "")
+    if(getTitle() != "" && html == true)
         sResult += ", <i>";
-
+    else if(getTitle() != "")
+        sResult += ", ";
+        
     // *** Add first [num] words of title *** //
     std::vector<std::string> vStrs;
     func::split(getTitle(), " ", vStrs);
@@ -302,16 +305,13 @@ std::string CMetadata::getShow2()
         sResult += vStrs[i] + " ";
 
     sResult.pop_back();
-    if(vStrs.size() > 10 && getDate() != -1)
-        sResult += "...</i>, " + std::to_string(getDate()) + ".";
-    else if(vStrs.size() > 10)
-        sResult += "...</i>.";
-    else if(getDate() != -1)
-        sResult += "</i>, " + std::to_string(getDate()) + ".";
-    else
-        sResult += "</i>.";
-
-    return sResult;
+    if(html == true)
+        sResult+="</i>";
+    if(vStrs.size() > 10)
+        sResult += "...";
+    if(getDate() != -1)
+        sResult += ", " + std::to_string(getDate());
+    return sResult + ".";
 }
 
 std::string CMetadata::getBibliographyEscaped()

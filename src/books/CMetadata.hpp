@@ -131,6 +131,6 @@ public:
     /**
     * @return string with Auhtor + first 10 words title + date
     */
-    std::string getShow2();
+    std::string getShow2(bool html=true);
 
 };
