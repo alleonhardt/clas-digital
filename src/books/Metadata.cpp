@@ -215,7 +215,9 @@ bool CMetadata::hasTag(std::string sTag)
 * @return title of book
 */
 std::string CMetadata::getTitle() {
-    return getMetadata("title", "data");
+    std::string title = getMetadata("title", "data");
+    func::escapeHTML(title);
+    return title;
 }
 
 /**

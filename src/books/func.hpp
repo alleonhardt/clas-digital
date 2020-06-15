@@ -79,6 +79,11 @@ namespace func
     */
     std::string returnToLower(std::string &str);
 
+    /**
+    * @param[in, out] str string to be modified
+    */
+    void escapeHTML(std::string &str);
+    
     std::string convertStr(std::string &str);
 
     /**
