@@ -151,7 +151,7 @@ void CBookManager::writeListofBooksWithBSB() {
 */
 bool CBookManager::initialize()
 {
-    std::cout << "Starting initualizeing..." << std::endl;
+    std::cout << "Starting initializing..." << std::endl;
 
     //Load directory of all books 
     DIR *dir_allItems;
@@ -169,7 +169,7 @@ bool CBookManager::initialize()
             addBook(e_allItems->d_name);
     }
 
-    std::cout << "Createing map of books." << std::endl;
+    std::cout << "Creating map of books." << std::endl;
 
     //Create map of all words + and of all words in all titles
     createMapWords();
@@ -328,7 +328,6 @@ void CBookManager::createMapWords()
     }
 
     createListWords(m_mapWords, m_listWords);
-    std::cout << "List words: " << m_listWords.size() << "\n";
 } 
 
 /**
@@ -348,6 +347,9 @@ void CBookManager::createMapWordsTitle()
         //Iterate over all words in this book. Check whether word already exists in list off all words.
         for(auto yt=mapWords.begin(); yt!=mapWords.end(); yt++)
             m_mapWordsTitle[yt->first][it->first] = 0.1;
+
+        //Add author names and year
+        m_mapWordsTitle[std::to_string(it->second->getDate())][it->first] = 0.1;
     }
 }
 

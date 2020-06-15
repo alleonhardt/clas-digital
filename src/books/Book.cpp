@@ -412,12 +412,22 @@ void CBook::removePages(std::map<int, std::vector<std::string>>* results1, std::
 
 bool CBook::onSamePage(std::vector<std::string> sWords)
 {
+    //Check if words occur only in metadata (Author, Title, Data)
+    bool inMetadata = true;
+    for(const auto& word : sWords) {
+        std::string sTitle = m_metadata.getTitle(); func::convertToLower(sTitle);
+        std::string sAuthor = m_metadata.getAuthor(); func::convertToLower(sAuthor);
+        if(sAuthor.find(word) == std::string::npos && sTitle.find(word) == std::string::npos && std::to_string(m_date) != word)
+            inMetadata = false;
+    }
+    if(inMetadata == true)
+        return true;
+
     std::vector<size_t> pages1 = pages(sWords[0]);
     if(pages1.size() == 0) return false;
 
     for(size_t i=1; i<sWords.size(); i++)
     {
-        
         std::vector<size_t> pages2 = pages(sWords[i]);
 
         if(pages2.size() == 0) return false;
@@ -429,7 +439,6 @@ bool CBook::onSamePage(std::vector<std::string> sWords)
                 break;
             }
         }
-
         if(found==false) 
             return false;
     }
@@ -466,15 +475,18 @@ std::string CBook::getPreview(std::string sInput)
         size_t pos = prev.find(searchedWords[i]);
         if(pos!=std::string::npos) {
             size_t end = prev.find(" ", pos);
-            if(end != std::string::npos) {
+            if(end != std::string::npos) 
                 prev.insert(end, "</mark>");
-            }
             else
                 prev.insert(pos+searchedWords[i].length(), "</mark>");
             prev.insert(pos, "<mark>");
         } 
         else
-            prev += "\n" + getOnePreview(searchedWords[i]);
+        {
+            std::string newPrev = getOnePreview(searchedWords[i]);
+            if(newPrev != "No Preview.")
+                prev += "\n" + newPrev;
+        }
     }
     return prev;
 }
@@ -533,7 +545,14 @@ std::string CBook::getPreviewText(std::string& sWord, size_t& pos, size_t& page)
     if(m_mapWordsPages.count(sWord) > 0)
         sWord = sWord;
     else if(m_mapFull.count(sWord) > 0)
+    {
         sWord = m_mapFull[sWord].front();
+        if(m_mapWordsPages.count(sWord) == 0)
+        {
+            std::cout << "Word in mapFull, which is not in mapWordPages.\n";
+            return "";
+        }
+    }
     else if(m_mapFuzzy.count(sWord) > 0) 
         sWord = m_mapFuzzy[sWord].front().first;
     else 
