@@ -390,6 +390,7 @@ class StaticCatalogueCreator
             js["topnav"] = m_topnav;
             js["topnav"]["catalogue"] = "class='dropdown-banner active'";
 
+            //Using map to erase dublicates
             std::map<std::string, nlohmann::json> mapAuthors;
             for(auto &it : manager.getMapOfBooks()) 
             {
@@ -406,12 +407,13 @@ class StaticCatalogueCreator
                 }
             }
 
+            
+            //Convert to vector, sort and add to json
+            std::vector<nlohmann::json> vAuthors;
             for(auto &it : mapAuthors)
-	    	{
-			    if(it.first == "_")
-				    continue;
-                js["authors"].push_back(it.second);
-		    }
+                vAuthors.push_back(it.second);
+            std::sort(vAuthors.begin(), vAuthors.end(), &StaticCatalogueCreator::mySort);
+            js["authors"] = vAuthors;
             
 
 			inja::Environment env;
@@ -532,8 +534,13 @@ class StaticCatalogueCreator
         }
 
         static bool mySort(nlohmann::json i, nlohmann::json j) {
-            std::string str1 = i["title"];
-            std::string str2 = j["title"];
+            std::string check = "";
+            if(i.count("title") > 0) check = "title";
+            else if(i.count("show") > 0) check = "show";
+            else return true;
+
+            std::string str1 = i[check];
+            std::string str2 = j[check];
             return func::returnToLower(str1)<func::returnToLower(str2);
         }
 };
