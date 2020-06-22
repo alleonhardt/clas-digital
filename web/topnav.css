@@ -169,6 +169,17 @@ ol.breadcrumb li.booktitle {
     overflow: hidden;
 }
 
+nav ol.breadcrumb {
+    margin: 0;
+    padding: 0.1rem 0.1rem;
+    padding-left: 1rem;
+}
+
+ol.breadcrumb li {
+    margin-top: 0.6rem;
+    margin-bottom: 0.6rem;
+}
+
 
 article.main {
     margin-left: 5rem;
