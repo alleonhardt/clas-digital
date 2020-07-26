@@ -31,6 +31,11 @@ const std::string& CBook::getPath() {return m_sPath;}
 bool CBook::hasOcr() const { return m_hasOcr;}
 bool CBook::hasImages() const { return m_hasImages; }
 bool CBook::hasContent() const { return m_hasImages || m_hasOcr; }
+bool CBook::checkJson() {
+    if(m_sAuthor == "" && m_metadata.getTitle() == "" && m_date == -1)
+        return false;
+    return true;
+}
 
 std::string CBook::getOcrPath() {
     std::string sPath = m_sPath;

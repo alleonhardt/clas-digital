@@ -70,6 +70,7 @@ public:
     bool hasOcr() const;
     bool hasImages() const;
     bool hasContent() const;
+    bool checkJson();
 
     /**
     * @return number of pages

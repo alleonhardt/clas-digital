@@ -199,6 +199,16 @@ void CBookManager::updateZotero(nlohmann::json j_items)
         //If it does not exits, create new book and add to map of all books
         else
             m_mapBooks[it["key"]] = new CBook(it);
+
+        //If book's json does not contain the most relevant information, delete again
+        if(m_mapBooks[it["key"]]->checkJson() == false)
+        {
+            std::cout << "Found empty entry.\n";
+            delete m_mapBooks[it["key"]];
+            std::cout << "Deleted.\n";
+            m_mapBooks.erase(it["key"]);
+            std::cout << "Erased.\n";
+        }
     }
 }
 
