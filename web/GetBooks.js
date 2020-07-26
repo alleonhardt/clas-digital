@@ -314,6 +314,7 @@ function CreatePageLayout()
 	    }
 	},400);
     }
+    document.body.onscroll();
 
     if(gHitsLoaded)
 	HighlightHitsAndConstructLinkList();
