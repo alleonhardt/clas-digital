@@ -99,7 +99,7 @@ void update_all_files(CBookManager *m, nlohmann::json *zot)
 	    json_write.close();
 
 	    StaticWebpageCreator webpage(it.second);
-	    webpage.createWebpage();
+	    webpage.createWebpage(zoteroPillars);
 	}
 #ifdef WRITE_FORBIDDEN_FILES
 	std::ofstream of("bin/tmpforbiddenfiles",std::ios::out);
@@ -510,23 +510,47 @@ std::shared_ptr<User> GetUserFromCookie(const Request &req)
     return UserHandler::GetUserTable().GetUserBySessid(cookie);
 }
 
+inline bool ends_with(std::string const & value, std::string const & ending)
+{
+    if (ending.size() > value.size()) return false;
+    return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
+}
+
 void do_authentification(const Request& req, Response &resp)
 {
     std::cout<<req.path<<std::endl;
 
+    std::regex reg_meta("/books/[a-zA-Z0-9]+/?$");
+    std::regex reg_metajs("/books/[a-zA-Z0-9]+/info.json$");
+    std::regex reg_pages("/books/[a-zA-Z0-9]+/pages/index.html$");
+    std::regex reg_pages2("/books/[a-zA-Z0-9]+/pages/?$");
+    
     int accreq = 1;
+    resp.status = 200;
     if(req.path.find("/admin/")!=std::string::npos)
 	accreq = 4;
     else if(req.path.find("/write/")!=std::string::npos)
 	accreq = 2;
     else if(req.path.find("/backups")!=std::string::npos && req.path.find("/books/")!=std::string::npos)
 	accreq = 2;
+    else if(std::regex_search(req.path,reg_meta)
+	    || std::regex_search(req.path,reg_metajs))
+	accreq = 0;
 
+    
     if(!User::AccessCheck(GetUserFromCookie(req),accreq))
-    {resp.status = 403;return;}
+    {
+	if(std::regex_search(req.path,reg_pages)
+	    ||std::regex_search(req.path,reg_pages2))
+	{
+	    resp.status = 206;
+	}
+	else
+	   resp.status = 403;
+	return;
+    }
 
     std::cout<<"Access granted!"<<std::endl;
-    resp.status = 200;
 }
 
 void do_upload(const Request& req, Response &resp, CBookManager &manager)
@@ -607,6 +631,10 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 	    if(fileEnd=="JP2" || fileEnd == "jp2")
 	    {
 		fileName = fileNameWithoutEnding+".jpg";
+		std::string endTmpFileName = "tmp021.jpg";
+		bool deleteJP2 = true;
+		bool deleteBMP = true;
+
 		std::ofstream ofs("tmp021.jp2",std::ios::out);
 		ofs.write(req.body.c_str(),req.body.length());
 		ofs.close();
@@ -617,23 +645,29 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 		    resp.set_content("Could not convert jp2 to jpg missing openjpeg library!","text/plain");
 		    return;
 		}
-		if(system("convert tmp021.bmp tmp021.jpg") != 0)
+
+		if(system("convert tmp021.bmp tmp021.jpg") == 0)
 		{
-		    resp.status = 403;
-		    resp.set_content("Could not convert bmp to jpg!","text/plain");
-		    return;
 		}
-		if(system("rm tmp021.jp2") != 0 || system("rm tmp021.bmp") != 0)
+		
+		if((deleteJP2 && (system("rm tmp021.jp2") != 0)) || (deleteBMP && (system("rm tmp021.bmp") != 0)))
 		{
 		    resp.status = 403;
 		    resp.set_content("Cleanup error!","text/plain");
 		    return;
 		}
-		std::ifstream ifs("tmp021.jpg",std::ios::in);
+		std::ifstream ifs(endTmpFileName.c_str(),std::ios::in);
+		if(!ifs)
+		{
+		    resp.status = 403;
+		    resp.set_content("Could not convert jp2 to jpg!","text/plain");
+		    return;
+		}
 		ifs.read(imgbuffer,4*1024*1024);
 		auto len = ifs.gcount();
 		ifs.close();
-		if(system("rm tmp021.jpg") != 0)
+		std::string delname = "rm "+endTmpFileName;
+		if(system(delname.c_str()) != 0)
 		{
 		    resp.status = 403;
 		    resp.set_content("Cleanup error!","text/plain");
@@ -703,7 +737,9 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
 
 	    if(ocr_create=="true")
 	    {
+		std::cout<<"Creating ocr for image!"<<std::endl;
 		book->addPage(ocr_reader.CreateOcrFromImage(reinterpret_cast<const unsigned char*>(buffer),buffer_length,ocr_lang.c_str()),std::to_string(what),std::to_string(maxPageNum));
+		std::cout<<"Finished creating ocr!"<<std::endl;
 	    }
 	}
 	catch(std::exception &e)

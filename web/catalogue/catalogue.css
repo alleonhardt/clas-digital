@@ -3,33 +3,6 @@ html {
 	overflow-x: hidden;
 }
 
-ol {
-	margin-left: 10%;
-	width: 80%;
-}
-
-
-ul {
-	margin-left: 10%;
-	width: 80%;
-}
-
-
-li {
-  font: 200 20px/1.5 Helvetica, Verdana, sans-serif;
-  min-height: 5%;
-  margin-top: 1.6rem;
-}
- 
-li a {
-  text-decoration: none;
-
-  color: #007bff;
-
-  display: block;
-  overflow: hidden;
-}
-
 .metadata {
 	font-size: small;
 	text-color: grey;
@@ -40,11 +13,30 @@ li a {
     text-decoration: underline;
 }
 
-header {
-	text-align: center;
-	border-bottom: 1px solid grey;
+article.main {
 	padding-bottom: 1rem;
 }
+
+article.main ol {
+    text-align: left;
+    margin-top: 1rem;
+}
+
+article.main ol li {
+    font-size: large;
+}
+
+article.main ol:before {
+	border-bottom: 1px solid grey;
+	content: "";
+}
+
+
+/*
+header ol li:last-child:after {
+    display: inline-block;
+    content: "";
+}*/
 
 .progress {
 	margin-top: 0.5rem;
@@ -71,5 +63,4 @@ header {
 li a span.bookhasocr {
     color: #a25900;
     text-decoration: none;
-    padding-right: 0.5rem;
 }

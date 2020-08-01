@@ -31,6 +31,11 @@ const std::string& CBook::getPath() {return m_sPath;}
 bool CBook::hasOcr() const { return m_hasOcr;}
 bool CBook::hasImages() const { return m_hasImages; }
 bool CBook::hasContent() const { return m_hasImages || m_hasOcr; }
+bool CBook::checkJson() {
+    if(m_sAuthor == "" && m_metadata.getTitle() == "" && m_date == -1)
+        return false;
+    return true;
+}
 
 std::string CBook::getOcrPath() {
     std::string sPath = m_sPath;
@@ -66,8 +71,12 @@ int CBook::getDate() { return m_date; }
 bool CBook::getPublic() {
     std::time_t ttime = time(0);
     tm *local_time = localtime(&ttime);
+
+    if(m_metadata.getMetadata("rights","data") == "CLASfrei")
+	return true;
+
     //Local time number of seconds elapsed since 1. January 1900. 
-    if(getDate() == -1 || getDate() > (local_time->tm_year+1800))
+    if(getDate() == -1 || getDate() >= (local_time->tm_year+1800))
         return false;
     else
         return true;
@@ -88,7 +97,7 @@ void CBook::createBook(std::string sPath)
     for(auto& p: std::filesystem::directory_iterator(sPath))
     {
 	    (void)p;
-        if(p.path().extension() == ".jpg")
+        if(p.path().extension() == ".jpg" || p.path().extension() == ".bmp")
             m_hasImages = true; 
     }
 
@@ -111,10 +120,8 @@ void CBook::createBook(std::string sPath)
         loadPages();
 
     //Test output to see if authors function works
-    std::cout << "AUTHORs: ";
     for(const auto &it : m_metadata.getAuthors())
         std::cout << it << "; ";
-    std::cout << std::endl;
     m_hasOcr = true;
 }
 
@@ -138,9 +145,9 @@ void CBook::createPages()
     read.clear();
     read.seekg(0, std::ios::beg); 
 
-    size_t page=0;
+    size_t page=1;
     size_t blanclines=3;
-    std::string convertToNormalLayout = "";
+    std::string convertToNormalLayout = "----- 0 / 999 -----\n\n";
     while(!read.eof()) {
 
         std::string sLine;
@@ -169,7 +176,7 @@ void CBook::createPages()
             page = stoi(num);
         }
         //Create books without page mark (new format)
-        else if(blanclines == 4 && pageMark == false)
+        else if( (blanclines == 4 || (blanclines >= 4 && blanclines % 2 == 1)) && pageMark == false)
         {
             //std::cout << "creating page " << page << std::endl;
             for(auto it : func::extractWordsFromString(sBuffer)) {
@@ -187,7 +194,7 @@ void CBook::createPages()
             sBuffer = "";
 
             page++;
-            blanclines = 0;
+            //blanclines = 0;
         }
         else
             sBuffer += " " + sLine + "\n";
@@ -211,6 +218,11 @@ void CBook::createPages()
     read.close();
     if(pageMark == false)
     {
+        try {
+            std::filesystem::rename(m_sPath + "/ocr.txt", m_sPath + "/old_ocr.txt");
+        } catch (std::filesystem::filesystem_error& e) {
+            std::cout << e.what() << "\n";
+        }
         std::ofstream write (m_sPath + "/ocr.txt");
         write << convertToNormalLayout;
         write.close();
@@ -405,12 +417,22 @@ void CBook::removePages(std::map<int, std::vector<std::string>>* results1, std::
 
 bool CBook::onSamePage(std::vector<std::string> sWords)
 {
+    //Check if words occur only in metadata (Author, Title, Data)
+    bool inMetadata = true;
+    for(const auto& word : sWords) {
+        std::string sTitle = m_metadata.getTitle(); func::convertToLower(sTitle);
+        std::string sAuthor = m_metadata.getAuthor(); func::convertToLower(sAuthor);
+        if(sAuthor.find(word) == std::string::npos && sTitle.find(word) == std::string::npos && std::to_string(m_date) != word)
+            inMetadata = false;
+    }
+    if(inMetadata == true)
+        return true;
+
     std::vector<size_t> pages1 = pages(sWords[0]);
     if(pages1.size() == 0) return false;
 
     for(size_t i=1; i<sWords.size(); i++)
     {
-        
         std::vector<size_t> pages2 = pages(sWords[i]);
 
         if(pages2.size() == 0) return false;
@@ -422,7 +444,6 @@ bool CBook::onSamePage(std::vector<std::string> sWords)
                 break;
             }
         }
-
         if(found==false) 
             return false;
     }
@@ -459,15 +480,18 @@ std::string CBook::getPreview(std::string sInput)
         size_t pos = prev.find(searchedWords[i]);
         if(pos!=std::string::npos) {
             size_t end = prev.find(" ", pos);
-            if(end != std::string::npos) {
+            if(end != std::string::npos) 
                 prev.insert(end, "</mark>");
-            }
             else
                 prev.insert(pos+searchedWords[i].length(), "</mark>");
             prev.insert(pos, "<mark>");
         } 
         else
-            prev += "\n" + getOnePreview(searchedWords[i]);
+        {
+            std::string newPrev = getOnePreview(searchedWords[i]);
+            if(newPrev != "No Preview.")
+                prev += "\n" + newPrev;
+        }
     }
     return prev;
 }
@@ -526,7 +550,14 @@ std::string CBook::getPreviewText(std::string& sWord, size_t& pos, size_t& page)
     if(m_mapWordsPages.count(sWord) > 0)
         sWord = sWord;
     else if(m_mapFull.count(sWord) > 0)
+    {
         sWord = m_mapFull[sWord].front();
+        if(m_mapWordsPages.count(sWord) == 0)
+        {
+            std::cout << "Word in mapFull, which is not in mapWordPages.\n";
+            return "";
+        }
+    }
     else if(m_mapFuzzy.count(sWord) > 0) 
         sWord = m_mapFuzzy[sWord].front().first;
     else 

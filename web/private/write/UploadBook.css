@@ -34,6 +34,19 @@ body {
     width: 50%;
 }
 
+.savebox {
+    display: flex;
+    justify-content: center;
+}
+
+div.savebox p {
+    margin: 0.5rem;
+}
+
+div.savebox progress {
+    margin: 0.5rem;
+}
+
 .biggerPageClass {
     margin-top: 4rem;
     padding-left: 10%;

@@ -44,35 +44,40 @@ void CBookManager::writeListofBooksWithBSB() {
     std::string gibtEsBeiBSB_noOCR = "Buecher mit tag \"gibtEsBeiBSB\" aber ohne ocr: \n";
     std::string gibtEsBeiBSB_OCR = "Buecher mit tag \"gibtEsBeiBSB\" aber mit ocr: \n";
     std::string BSBDownLoadFertig_noOCR = "Buecher mit tag \"BSBDownLoadFertig\" aber ohne ocr: \n";
+    std::string tierwissen_noOCR = "Buecher in \"Geschichte des Tierwissens\" aber ohne ocr: \n";
 
     for(auto it : m_mapBooks)
     {
+        std::string info = it.second->getKey() + ": " + it.second->getMetadata().getShow2() + "\n";
         if(it.second->hasOcr() == false)
         {
             //Check if book has a bsb-link (archiveLocation)
             if(it.second->getMetadata().getMetadata("archiveLocation", "data") != "")
-                inBSB_noOcr+= it.second->getKey() + ": " + it.second->getMetadata().getShow2() + "\n";
+                inBSB_noOcr += info;
             
             //Check if book has tag: "GibtEsBeiBSB"
             if(it.second->getMetadata().hasTag("GibtEsBeiBSB") == true)
-                gibtEsBeiBSB_noOCR += it.second->getKey() + ": " + it.second->getMetadata().getShow2() + "\n";
+                gibtEsBeiBSB_noOCR += info;
     
             //Check if book has tag: "BSBDownLoadFertig"
             if(it.second->getMetadata().hasTag("BSBDownLoadFertig") == true)
-                BSBDownLoadFertig_noOCR += it.second->getKey() + ": " + it.second->getMetadata().getShow2()+"\n";
+                BSBDownLoadFertig_noOCR += info;
+
+            //Check if book is in collection: "Geschichte des Tierwissens"
+            if(func::in("RFWJC42V", it.second->getMetadata().getCollections()) == true)
+                tierwissen_noOCR += info;
         }
+
         else if(it.second->getMetadata().hasTag("GibtEsBeiBSB") == true)
-            gibtEsBeiBSB_OCR += it.second->getKey() + ": " + it.second->getMetadata().getShow2() + "\n";
+            gibtEsBeiBSB_OCR += info;
         
     }
 
     //Search for untracked books
-    int counter=0;
+    std::vector<std::filesystem::path> vec;
     for(const auto& entry : std::filesystem::directory_iterator("web/books"))
     {
-	std::string fileNameStr = entry.path().filename().string();
-	counter++;
-
+	    std::string fileNameStr = entry.path().filename().string();
         if(entry.is_directory() && m_mapBooks.count(fileNameStr) == 0)
         {
             std::ifstream readJson(entry.path().string() + "/info.json");
@@ -87,9 +92,23 @@ void CBookManager::writeListofBooksWithBSB() {
             std::string sTitle = j["data"].value("title", "unkown title");
             untracked_books += fileNameStr + " - " + sName + ", \"" + sTitle + "\"\n";
             readJson.close(); 
+            vec.push_back(entry); 
         }
     }
-    std::cout << "FILES: " << counter << std::endl;
+
+    //Move old zotero files to archive: "zotero_old"
+    if(std::filesystem::exists("web/books/zotero_old") == false)
+        std::filesystem::create_directories("web/books/zotero_old");
+    for(const auto& it : vec)
+    {
+        std::string path=it.string().substr(0, 9)+"/zotero_old"+it.string().substr(9);
+        try{
+            std::filesystem::rename(it, path);
+        }
+        catch (std::filesystem::filesystem_error& e) {
+            std::cout << e.what() << std::endl;
+        }
+    }
 
     //Save books with bsb-link but o ocr
     std::ofstream writeBSB_NoOCR("inBSB_noOcr.txt");
@@ -111,10 +130,20 @@ void CBookManager::writeListofBooksWithBSB() {
     writeFERTIG_noOCR << BSBDownLoadFertig_noOCR;
     writeFERTIG_noOCR.close();
 
+    //Save books in collection "Geschichte des Tierwissens": RFWJC42V, without ocr
+    std::ofstream writeTierwissen_noOCR("tierwissen_noOCR.txt");
+    writeTierwissen_noOCR << tierwissen_noOCR;
+    writeTierwissen_noOCR.close();
+
     //Write all untracked books to seperate files
-    std::ofstream writeUntracked("untracked_books.txt");
-    writeUntracked << untracked_books;
-    writeUntracked.close();
+    if(std::filesystem::exists("untracked_books.txt"))
+        std::filesystem::rename("untracked_books.txt", "web/books/zotero_old/untracked_books.txt");
+    if(vec.size() > 0)
+    {
+        std::ofstream writeUntracked("untracked_books.txt");
+        writeUntracked << untracked_books;
+        writeUntracked.close();
+    }
 }
 
 /**
@@ -122,7 +151,7 @@ void CBookManager::writeListofBooksWithBSB() {
 */
 bool CBookManager::initialize()
 {
-    std::cout << "Starting initualizeing..." << std::endl;
+    std::cout << "Starting initializing..." << std::endl;
 
     //Load directory of all books 
     DIR *dir_allItems;
@@ -140,7 +169,7 @@ bool CBookManager::initialize()
             addBook(e_allItems->d_name);
     }
 
-    std::cout << "Createing map of books." << std::endl;
+    std::cout << "Creating map of books." << std::endl;
 
     //Create map of all words + and of all words in all titles
     createMapWords();
@@ -170,6 +199,16 @@ void CBookManager::updateZotero(nlohmann::json j_items)
         //If it does not exits, create new book and add to map of all books
         else
             m_mapBooks[it["key"]] = new CBook(it);
+
+        //If book's json does not contain the most relevant information, delete again
+        if(m_mapBooks[it["key"]]->checkJson() == false)
+        {
+            std::cout << "Found empty entry.\n";
+            delete m_mapBooks[it["key"]];
+            std::cout << "Deleted.\n";
+            m_mapBooks.erase(it["key"]);
+            std::cout << "Erased.\n";
+        }
     }
 }
 
@@ -299,7 +338,6 @@ void CBookManager::createMapWords()
     }
 
     createListWords(m_mapWords, m_listWords);
-    std::cout << "List words: " << m_listWords.size() << "\n";
 } 
 
 /**
@@ -319,6 +357,9 @@ void CBookManager::createMapWordsTitle()
         //Iterate over all words in this book. Check whether word already exists in list off all words.
         for(auto yt=mapWords.begin(); yt!=mapWords.end(); yt++)
             m_mapWordsTitle[yt->first][it->first] = 0.1;
+
+        //Add author names and year
+        m_mapWordsTitle[std::to_string(it->second->getDate())][it->first] = 0.1;
     }
 }
 
@@ -331,16 +372,13 @@ void CBookManager::createMapWordsAuthor()
     //or add book to list of books (if word already exists).
     for(auto it=m_mapBooks.begin(); it!=m_mapBooks.end(); it++)
     {
-        std::string lastName = it->second->getAuthor();
-        std::string firstName = it->second->getMetadata().getMetadata("firstName", "data", "creators", 0); 
-        m_mapWordsAuthors[lastName][it->first] = 0.1;
-    
-	func::convertToLower(lastName);
-	func::convertToLower(firstName);
-        std::string key = firstName + "-" + lastName;
-        std::replace(key.begin(), key.end(), ' ', '-');
-        std::replace(key.begin(), key.end(), '/', ',');
-        m_mapUniqueAuthors[key].push_back(it->first);
+        for(auto author : it->second->getMetadata().getAuthorsKeys())
+        {
+            if(!it->second->getMetadata().isAuthorEditor(author["creatorType"]))
+                continue;
+            m_mapWordsAuthors[func::returnToLower(author["lastname"])][it->first] = 0.1;
+            m_mapUniqueAuthors[author["key"]].push_back(it->first);
+        }
     }
     createListWords(m_mapWordsAuthors, m_listAuthors);
 }

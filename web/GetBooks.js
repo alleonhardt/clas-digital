@@ -17,6 +17,7 @@ function ServerGet(filename, okCallback, errorCallback) {
 
 let gOCRLoaded = false;
 let gHitsLoaded = false;
+let gOCRError = false;
 let gOcrSplittedFile = null;
 let gPageLayoutFile = null;
 let scanId = '';
@@ -35,50 +36,59 @@ function HighlightHitsAndConstructLinkList()
     let ulhitlst = document.getElementById("fullsearchhitlist");
     ulhitlst.innerHTML = "";	//Delete hits if there are any
 
-    if(hitlist && hitlist.books)
+    if(hitlist)
     {
-	//document.getElementsByClassName("topnav")[0].style.display = "block";
-	//document.getElementsByClassName("resizer")[0].style.display = "block";
-	let HighlightList = [];
-
-	for(let i = 0; i < hitlist.books.length; i++)
+	if(hitlist.books)
 	{
-	    let link = document.createElement("a");
+	    //document.getElementsByClassName("topnav")[0].style.display = "block";
+	    //document.getElementsByClassName("resizer")[0].style.display = "block";
+	    let HighlightList = [];
 
-	    let inner = hitlist.books[i].page;
-	    if(hitlist.is_fuzzy==true)
+	    for(let i = 0; i < hitlist.books.length; i++)
 	    {
-		inner+="("+hitlist.books[i].words+"); ";
-	    }
-	    else
-		inner+=" ";
-	    link.innerHTML = inner;
-	    link.page = hitlist.books[i].page;
-	    link.classList.add('hitlinkstyle');
-	    link.onclick = function() {
-		CorrectedScrollIntoView(document.getElementById("uniquepageid"+hitlist.books[i].page));
-		UpdateViewMode();
-		CorrectedScrollIntoView(document.getElementById("uniquepageid"+hitlist.books[i].page));
-		link.style.color = "purple";
-	    }
+		let link = document.createElement("a");
 
-	    ulhitlst.appendChild(link);
-
-	    HighlightList = hitlist.books[i].words.split(",");
-
-	    for(let x = 0; x < HighlightList.length; x++)
-	    {
-		let thpage = document.getElementById("uniqueocrpage"+hitlist.books[i].page);
-		console.log(HighlightList);
-		if(thpage!=null)
+		let inner = hitlist.books[i].page;
+		if(hitlist.is_fuzzy==true)
 		{
+		    inner+="("+hitlist.books[i].words+"); ";
+		}
+		else
+		    inner+=" ";
+		link.innerHTML = inner;
+		link.page = hitlist.books[i].page;
+		link.classList.add('hitlinkstyle');
+		link.onclick = function() {
+		    CorrectedScrollIntoView(document.getElementById("uniquepageid"+hitlist.books[i].page));
+		    UpdateViewMode();
+		    CorrectedScrollIntoView(document.getElementById("uniquepageid"+hitlist.books[i].page));
+		    link.style.color = "purple";
+		}
+
+		ulhitlst.appendChild(link);
+
+		HighlightList = hitlist.books[i].words.split(",");
+
+		for(let x = 0; x < HighlightList.length; x++)
+		{
+		    let thpage = document.getElementById("uniqueocrpage"+hitlist.books[i].page);
+		    console.log(HighlightList);
+		    if(thpage!=null)
+		    {
 			HighlightList[x] = HighlightList[x].replace(new RegExp('o','g'),'[oö]');
 			HighlightList[x] = HighlightList[x].replace(new RegExp('u','g'),'[uü]');
 			HighlightList[x] = HighlightList[x].replace(new RegExp('a','g'),'[aä]');
 			HighlightList[x] = HighlightList[x].replace(new RegExp('s','g'),'[sßſ]');
-		       thpage.innerHTML=thpage.innerHTML.replace(new RegExp('('+HighlightList[x]+')','gi'),'<mark>$1</mark>');
+			thpage.innerHTML=thpage.innerHTML.replace(new RegExp('('+HighlightList[x]+')','gi'),'<mark>$1</mark>');
+		    }
 		}
 	    }
+	}
+	else
+	{
+		let link = document.createElement("p");
+		link.innerHTML = "No hits found";
+		ulhitlst.appendChild(link);
 	}
     }
     if(location.hash=="")
@@ -260,7 +270,8 @@ function CreatePageLayout()
     let timer = null;
     let currentSize = 0;
     document.body.onscroll = function() {
-	let gNewSize = document.getElementsByClassName("searchbox")[0].getBoundingClientRect().bottom;
+	let boundrect = document.getElementsByClassName("searchbox")[0].getBoundingClientRect();
+	let gNewSize = Math.floor(boundrect.bottom);
 	if(currentSize!=gNewSize)
 	{
 	    console.log("Resizing ocrs top value!");
@@ -271,6 +282,7 @@ function CreatePageLayout()
 	    for(let i = 0; i < lst.length; i++)
 		lst[i].style.top = (gNewSize+17)+"px";
 	    currentSize = gNewSize;
+	    
 	}
 	UpdateViewMode();
 
@@ -302,6 +314,7 @@ function CreatePageLayout()
 	    }
 	},400);
     }
+    document.body.onscroll();
 
     if(gHitsLoaded)
 	HighlightHitsAndConstructLinkList();
@@ -376,6 +389,10 @@ function isElementInViewport (el) {
 function loadOCRFileError(errortext)
 {
     gOcrSplittedFile = [];
+    
+    if(gHitsLoaded)
+	HighlightHitsAndConstructLinkList();
+    gOCRError = true;
 
     if(gPageLayoutFile!=null)
 	CreatePageLayout();
@@ -386,8 +403,12 @@ function loadMetadataFileError(errortxt,state)
 {
     if(state==403)
     {
-	document.getElementById("bibliography").innerHTML = "Sorry this book is copyright protected you cannot view this...";
-	document.getElementById("bibliography").style.color = "red";
+	//document.getElementById("bibliography").innerHTML = "Sorry this book is copyright protected you cannot view this...";
+	//document.getElementById("bibliography").style.color = "red";
+	let elem = document.createElement("div");
+	elem.classList.add("copyright");
+	elem.innerHTML = "<div><h3>Sorry this book is copyright protected, please login to view this book</h3></div>";
+	document.body.appendChild(elem);
     }
     else
 	document.getElementById("bibliography").innerHTML = "Could not load metadata sorry for that :(";
@@ -413,7 +434,7 @@ function highlightHitsAndLoadHitlistError(text)
 {
     document.getElementById("fullsearchhitlist").innerHTML = "<li>Could not load hit list sorry for that</li>";
     document.getElementById("fullsearchhitlist").hitsloaded = null;
-    if(gOCRLoaded)
+    if(gOCRLoaded||gOCRError)
 	HighlightHitsAndConstructLinkList();
     gHitsLoaded = true;
 }
@@ -422,7 +443,7 @@ function highlightHitsAndLoadHitlist(hits)
 {
     let searchhits = JSON.parse(hits);
     document.getElementById("fullsearchhitlist").hitsloaded = searchhits;
-    if(gOCRLoaded)
+    if(gOCRLoaded||gOCRError)
 	HighlightHitsAndConstructLinkList();
     gHitsLoaded = true;
 }
@@ -444,7 +465,15 @@ function initialise()
 
     ServerGet("/books/"+scanId+"/ocr.txt", loadOCRFile,loadOCRFileError);
     ServerGet("/books/"+scanId+"/readerInfo.json",loadPageLayoutFile,loadMetadataFileError);
-    ServerGet("/searchinbook?scanId="+scanId+'&query='+query+'&fuzzyness='+fuzzyness,highlightHitsAndLoadHitlist,highlightHitsAndLoadHitlistError);
+    if(query!=null && query!='null')
+    {
+	console.log(query);
+	ServerGet("/searchinbook?scanId="+scanId+'&query='+query+'&fuzzyness='+fuzzyness,highlightHitsAndLoadHitlist,highlightHitsAndLoadHitlistError);
+    }
+    else
+    {
+	document.getElementsByClassName("linknav")[0].style.display = "none";
+    }
     ServerGet("/books/"+scanId+"/intern/pages.txt",LoadPreindexingOfPages,LoadPreindexingOfPagesError);
 
     document.getElementById("srchbox").oninput = function() {
@@ -453,8 +482,13 @@ function initialise()
     document.getElementById('srchbox').addEventListener("focusout", function(event){
 	if(event.relatedTarget)
 	    event.relatedTarget.click();
-	document.getElementById("fuzzysuggestions").style.visibility="hidden";
-	document.getElementById("fuzzysuggestions").selec = undefined;});
+	document.getElementById("fuzzysuggestions").style.visibility="hidden";});
+     
+    document.getElementById('srchbox').addEventListener("focusin", function(event){
+	if(document.getElementById("fuzzysuggestions").children.length > 0)
+	    document.getElementById("fuzzysuggestions").style.visibility="visible";
+    });
+
     document.getElementById("srchbox").addEventListener("keydown",function(event){
 	let x = document.getElementById("srchbox").value;
 	let k = document.getElementById("fuzzysuggestions").selec;
@@ -486,7 +520,18 @@ function initialise()
 		k+=1;
 	    k = k%lst.length;
 	    lst[k].style.background = "#ddd";
-	    lst[k].scrollIntoView();
+
+	    let docViewTop = document.getElementById("fuzzysuggestions").scrollTop;
+	    let docViewBottom = docViewTop + document.getElementById("fuzzysuggestions").offsetHeight;
+
+	    let elemTop = lst[k].offsetTop;
+	    let elemBottom = elemTop + lst[k].offsetHeight;
+
+	    if(!((elemBottom <= docViewBottom) && (elemTop >= docViewTop)))
+		if(event.key=="ArrowUp")
+		    document.getElementById("fuzzysuggestions").scrollTop = elemTop;
+		else
+		    document.getElementById("fuzzysuggestions").scrollTop = elemBottom-document.getElementById("fuzzysuggestions").offsetHeight;
 	    event.preventDefault();
 	    document.getElementById("fuzzysuggestions").selec = k;
 	}
@@ -500,6 +545,7 @@ function initialise()
 	    document.getElementById("fullbut").src = "/static/GetBooks/fullscreen-24px.svg";
 	}
     });
+
 }
 
 
@@ -833,3 +879,33 @@ function doCompleteNewSearch()
 }
 
 window.addEventListener("load",initialise,false);
+document.addEventListener('DOMContentLoaded', function() {
+    window.setTimeout(function(){
+    let rect = document.getElementById("tpnav").getBoundingClientRect();
+    console.log(rect);
+    let strval = ""+(Math.floor(rect.bottom)+8)+"px";
+    console.log(strval);
+    document.getElementsByClassName("searchbox")[0].style.top = strval;
+}
+    ,400);
+}, false);
+
+function unfoldnav(x)
+{
+    x.classList.remove('unfoldbut');
+    x.classList.add('hidebut');
+    x.onclick = function() {
+	hidenav(x);
+    };
+    document.getElementsByClassName("searchbox")[0].classList.remove('hidesearchbox');
+}
+
+function hidenav(x)
+{
+    x.classList.remove('hidebut');
+    x.classList.add('unfoldbut');
+    x.onclick = function() {
+	unfoldnav(x);
+    };
+    document.getElementsByClassName("searchbox")[0].classList.add('hidesearchbox');
+}

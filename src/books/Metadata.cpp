@@ -1,34 +1,46 @@
 #include "CMetadata.hpp"
 
+///Empty constructor, not initializing metadata.
 CMetadata::CMetadata () {}
 
-
 /**
+* @brief Constructor initializing metadata.
 * @param[in] jMetadata json with metadata
 */
 CMetadata::CMetadata(nlohmann::json jMetadata) {
     m_metadata = jMetadata;
 }
 
+// *** GETTER *** //
+
+/**
+* @brief return metadata as json
+*/
+nlohmann::json CMetadata::getMetadata() {
+    return m_metadata;
+}
+
+
+// *** SETTER *** //
 
 /*
-* @param[in] jMetadata new metadata
+* @brief Set metadata, f.e. when json is updated from zotero
+* @param[in] jMetadata (New metadata)
 */
+
 void CMetadata::setMetadata(nlohmann::json jMetadata) {
     m_metadata = jMetadata;
 }
     
 
 
-//************ get metadata *******************//
+//************ RETRIEVE DATA FROM JSON *******************//
 
-nlohmann::json CMetadata::getMetadata() {
-    return m_metadata;
-}
+// *** GENERAL *** //
 
 /**
-* getter function to return selected metadata
-* @parameter string (sSearch: which metadata (f.e. title, date...)
+* @brief return data from json.
+* @param[in] sSearch (which metadata (f.e. title, date...)
 * @return string 
 */
 std::string CMetadata::getMetadata(std::string sSearch)
@@ -36,11 +48,11 @@ std::string CMetadata::getMetadata(std::string sSearch)
     std::string returnSearch = m_metadata.value(sSearch, "");
     return returnSearch;
 } 
- 
+
 /**
-* getter function to return selected metadata
-* @parameter string (sSearch: which metadata (f.e. title, date...)
-* @parameter string (sFrom: from which json (f.e. title -> data -> title) 
+* @brief return data from metadata.
+* @param[in] sSearch (which metadata (f.e. title, date...)
+* @param[in] sFrom (from which json (f.e. title -> data -> title) 
 * @return string 
 */
 std::string CMetadata::getMetadata(std::string sSearch, std::string sFrom)
@@ -51,10 +63,10 @@ std::string CMetadata::getMetadata(std::string sSearch, std::string sFrom)
 }
 
 /**
-* getter function to return selected metadata
-* @parameter string (sSearch: which metadata (f.e. title, date...)
-* @parameter string (sFrom2: from which json (f.e. title -> data -> title) 
-* @parameter string (sFrom2: in json from which json (f.e. author -> data creators -> author)
+* @brief return data from metadata
+* @param[in] sSearch (which metadata (f.e. title, date...)
+* @param[in] sFrom1 (from which json (f.e. title -> data -> title) 
+* @param[in] sFrom2 (in json from which json (f.e. author -> data creators -> author)
 * @return string 
 */
 std::string CMetadata::getMetadata(std::string sSearch, std::string sFrom1, std::string sFrom2)
@@ -67,14 +79,14 @@ std::string CMetadata::getMetadata(std::string sSearch, std::string sFrom1, std:
 } 
 
 /**
-* getter function to return selected metadata
-* @parameter string (sSearch: which metadata (f.e. title, date...)
-* @parameter string (sFrom2: from which json (f.e. title -> data -> title) 
-* @parameter string (sFrom2: in json from which json (f.e. author -> data creators -> author)
-* @parameter int (index: in case of list: which element from list)
+* @brief return data from metadata
+* @param[in] sSearch (which metadata (f.e. title, date...)
+* @param[in] sFrom1 (from which json (f.e. title -> data -> title) 
+* @param[in] sFrom2 (in json from which json (f.e. author -> data creators -> author)
+* @param[in] in (in case of list: which element from list)
 * @return string 
 */
-std::string CMetadata::getMetadata(std::string sSearch, std::string sFrom1, std::string sFrom2, int in)
+std::string CMetadata::getMetadata(std::string sSearch, std::string sFrom1, std::string sFrom2,int in)
 {
     if(m_metadata.count(sFrom1) == 0)
         return "";
@@ -85,6 +97,11 @@ std::string CMetadata::getMetadata(std::string sSearch, std::string sFrom1, std:
     return m_metadata[sFrom1][sFrom2][in].value(sSearch, "");
 }
 
+
+// *** SPECIFIC *** // 
+
+
+// --- collection --- //
 
 /**
 * @return vector with all collections this book is in
@@ -99,8 +116,11 @@ std::vector<std::string> CMetadata::getCollections()
     return m_metadata["data"].value("collections", vec);
 }
 
+
+// --- author --- //
+
 /**
-* @return lastName, or Name of author
+* @return "lastName", or (if not exists) "name" of author
 */
 std::string CMetadata::getAuthor()
 {
@@ -115,53 +135,101 @@ std::string CMetadata::getAuthor()
     return sAuthor;
 }
 
+/**
+* @return vector of strings in the form: "[lastName/ name], [firstName]"
+*/
 std::vector<std::string> CMetadata::getAuthors()
 {
-    std::vector<std::string> v_sAuthors;
-    if(m_metadata.count("data") == 0)
-        return v_sAuthors;
-    if(m_metadata["data"].count("creators") == 0)
-        return v_sAuthors;
+    //Check is list if authors exists, if not: return empty vector
+    if(m_metadata.count("data") == 0 || m_metadata["data"].count("creators") == 0)
+        return std::vector<std::string>();
 
-    std::vector<nlohmann::json> v_jAuthors = m_metadata["data"]["creators"];
-    for(const auto &it : v_jAuthors)
+    std::vector<std::string> v_sAuthors;
+    //Iterate and create "lastname, firstname" string to push
+    for(const auto &it : m_metadata["data"]["creators"])
     {
         std::string sAuthor = it.value("lastName", it.value("name", ""));
         if(it.value("firstName", "") != "")
             sAuthor += ", " + it.value("firstName", "");
         v_sAuthors.push_back(sAuthor);
     }
+    return v_sAuthors;
+}
+
+/*
+* return a vector containing:
+* {"lastname": "[lastName/ name]"
+* {"fullname": "[lastName/ name], [firstName]"
+* {"key": "[firstName]-[lastName/ name]" (Lower-case. Replacements: " "->"-", "/"->",")
+*/
+std::vector<std::map<std::string, std::string>> CMetadata::getAuthorsKeys()
+{
+    //Check is list if authors exists, if not: return empty vector
+    if(m_metadata.count("data") == 0 || m_metadata["data"].count("creators") == 0)
+        return std::vector<std::map<std::string, std::string>>();
+
+    std::vector<std::map<std::string, std::string>> v_sAuthors;
+    //Iterate and push map including "lastname", "fullname" and "key"
+    for(const auto &it : m_metadata["data"]["creators"])
+    {
+        std::map<std::string, std::string> author;
+        
+        //Generate last name [0]
+        std::string lastName = it.value("lastName", it.value("name", ""));
+        author["lastname"] = lastName;
+
+        //Generate  lastName, firstname [1]
+        author["fullname"] = lastName;
+        std::string firstname = it.value("firstName", "");
+        if(firstname != "")
+            author["fullname"] += ", " + firstname;
+
+        //Generate key firstname-lastName
+        std::string key = func::returnToLower(firstname)+"-"+func::returnToLower(lastName);
+        std::replace(key.begin(), key.end(), ' ', '-');
+        std::replace(key.begin(), key.end(), '/', ',');
+        author["key"] = key;
+
+        author["creatorType"] = it.value("creatorType", "undefined");
+
+        //Add to results
+        v_sAuthors.push_back(author);
+    }
 
     return v_sAuthors;
 }
 
 /**
-* @param[in] sTag tag to search for
-* @return return whether book has a certain tag
+* Get whether author needs to be shown according to book creator Type.
+* @param[in] creatorType
+* @return whether to show author in catalogue
 */
-bool CMetadata::hasTag(std::string sTag) 
+bool CMetadata::isAuthorEditor(std::string creatorType)
 {
-    if(m_metadata.count("data") == 0)
-        return false;
-    if(m_metadata["data"].count("tags") == 0)
-        return false;
-    for(auto it = m_metadata["data"]["tags"].begin(); it!=m_metadata["data"]["tags"].end(); it++)
-    {
-        if(it.value()["tag"] == sTag)
-            return true;
-    }
-    return false;
+    if(getMetadata("itemType", "data") == "bookSection")
+        return creatorType == "author";
+    else
+        return creatorType == "author" || creatorType == "editor";
 }
+
+
+// --- title --- //
 
 /**
 * @return title of book
 */
 std::string CMetadata::getTitle() {
-    return getMetadata("title", "data");
+
+    //Get title
+    std::string title = getMetadata("title", "data");
+
+    //Escape html
+    func::escapeHTML(title);
+    return title;
 }
 
 /**
-* @return short-title of book (Title if not exists)
+* @return "shortTitle" of book (return "title" if not exists)
 */
 std::string CMetadata::getShortTitle() {
     std::string sReturn = getMetadata("shortTitle", "data");
@@ -171,8 +239,11 @@ std::string CMetadata::getShortTitle() {
         return sReturn;
 }
 
+
+// --- date --- //
+
 /**
-* @return date or -1 if date does not exists or is currupted
+* @return date or -1 if date does not exists or is corrupted
 */
 int CMetadata::getDate()
 {
@@ -195,8 +266,12 @@ int CMetadata::getDate()
     return -1;
 }
 
+
+// --- bibliography and citation --- //
+
 /**
-* @return string with Auhtor + first 6 words 15 words of title + date
+* Custom short-citation (author, date)
+* @return string with "[lastName/ name], [date]"
 */
 std::string CMetadata::getShow()
 {
@@ -212,6 +287,46 @@ std::string CMetadata::getShow()
     return sResult;
 }
 
+/**
+* Custom short-citation (author, title[first 10 words], date)
+* @return string with "[lastName/ name], [title](first 10 words), [date]"
+*/
+std::string CMetadata::getShow2(bool html)
+{
+    // *** Add Author *** //
+    std::string sResult = getAuthor();
+    if(sResult == "") 
+        sResult = "Unknown author";
+
+    // *** Add title *** //
+    if(getTitle() != "" && html == true)
+        sResult += ", <i>";
+    else if(getTitle() != "")
+        sResult += ", ";
+        
+    //Add first [num] words of title
+    std::vector<std::string> vStrs;
+    func::split(getTitle(), " ", vStrs);
+    for(unsigned int i=0; i<10 && i<vStrs.size(); i++)
+        sResult += vStrs[i] + " ";
+
+    //Do some formatting
+    sResult.pop_back();
+    if(html == true)
+        sResult+="</i>";
+    if(vStrs.size() > 10)
+        sResult += "...";
+
+    // *** Add date *** //
+    if(getDate() != -1)
+        sResult += ", " + std::to_string(getDate());
+    return sResult + ".";
+}
+
+/**
+* Basically the custom short citation extended with page.
+* @return string containing "[getShow()], S. [page]"
+*/ 
 std::string CMetadata::getZit(size_t page)
 {
     std::string sZit = getShow();
@@ -226,32 +341,94 @@ std::string CMetadata::getZit(size_t page)
 }
 
 /**
-* @return string with Auhtor + first 6 words 15 words of title + date
+* Self created version of bibliography with escaped html.
+* @return Returns an escaped version of the bibliography
 */
-std::string CMetadata::getShow2()
+std::string CMetadata::getBibliographyEscaped()
 {
-    // *** Add Author *** //
-    std::string sResult = getAuthor();
-    if(sResult == "") sResult = "Unknown author";
+    std::string new_bib;
+    auto authors = getAuthors();
+    if(!authors.empty())
+    {
+	for(auto it : getAuthors())
+	{
+	    new_bib+=it;
+	    new_bib+="/";
+	}
+	new_bib.pop_back();
+	new_bib+=": ";
+    }
+    
+    std::string tmp;
+    if((tmp=getTitle())!="")
+    {
+	new_bib+=tmp;
+	new_bib+=".";
+    }
 
-    if(getTitle() != "")
-        sResult += ", <i>";
-
-    // *** Add first [num] words of title *** //
-    std::vector<std::string> vStrs;
-    func::split(getTitle(), " ", vStrs);
-    for(unsigned int i=0; i<10 && i<vStrs.size(); i++)
-        sResult += vStrs[i] + " ";
-
-    sResult.pop_back();
-    if(vStrs.size() > 10 && getDate() != -1)
-        sResult += "...</i>, " + std::to_string(getDate()) + ".";
-    else if(vStrs.size() > 10)
-        sResult += "...</i>.";
-    else if(getDate() != -1)
-        sResult += "</i>, " + std::to_string(getDate()) + ".";
+    if(getMetadata("itemType")=="bookSection")
+    {
+	if((tmp=getMetadata("itemType","data"))!="")
+	{
+	    new_bib+=" ";
+	    new_bib+=tmp;
+	}
+    }
     else
-        sResult += "</i>.";
+    {
+	if((tmp=getMetadata("publicationTitle","data"))!="")
+	{
+	    new_bib+=" ";
+	    new_bib+=tmp;
+	}
+    }
 
-    return sResult;
+    if((tmp=getMetadata("volume","data"))!="")
+    {
+	new_bib+=" ";
+	new_bib+=tmp;
+	new_bib+=".";
+    }
+    
+    if((tmp=getMetadata("place","data"))!="")
+    {
+	new_bib+=" ";
+	new_bib+=tmp;
+    }
+
+    if((tmp=getMetadata("date","data"))!="")
+    {
+	new_bib+=" ";
+	new_bib+=tmp;
+	new_bib+=".";
+    }
+
+    
+    if((tmp=getMetadata("pages","data"))!="")
+    {
+	new_bib+=" S. ";
+	new_bib+=tmp;
+	new_bib+=".";
+    }
+    return new_bib;
+}
+
+// --- others --- //
+
+/**
+* @param[in] sTag tag to search for
+* @return return whether book has a certain tag
+*/
+bool CMetadata::hasTag(std::string sTag) 
+{
+    if(m_metadata.count("data") == 0)
+        return false;
+    if(m_metadata["data"].count("tags") == 0)
+        return false;
+    for(auto it = m_metadata["data"]["tags"].begin(); it!=m_metadata["data"]["tags"].end(); it++)
+    {
+        if(it.value()["tag"] == sTag)
+            return true;
+    }
+    return false;
 }

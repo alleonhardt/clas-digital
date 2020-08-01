@@ -11,46 +11,86 @@ body {
     border: 0;
 }
 
+.righthandedbox {
+    padding-left: 5rem;
+}
+
 .fullscreen:hover {
-    background-color: #ddd;
+    background-color: #888;
 }
 
 .fullscreen:active {
     background-color: #444;
 }
 
+.srchbarcontainer {
+    width: 25%;
+    align-self: center;
+    min-width: 20rem;
+}
+
+.srchbarinput {
+    margin-top: 0.5rem;
+    border-radius: 20px;
+    text-align: center;
+    width: 100%;
+}
 
 .searchbox {
     position: fixed;
-    width: 2rem;
-    height: 2rem;
-    left: calc(50vw - 1rem);
+    width: 95vw;
+    left: 2.5vw;
     top: 3.5rem;
-    overflow: hidden;
+    overflow: visible;
     z-index: 3;
-    padding-left: 0.5rem;
-    transition: width 0.5s linear 1s, height 0.5s linear 0.5s, left 0.5s linear 1s, border-radius 0.1s linear 1.5s;
-    background-image: url('/static/GetBooks/compass.svg');
+    padding: 0;
+    transition-duration: 1.5s;
+    box-shadow: 0px 0px 30px -7px black;
+    border: 1px solid black;
+    display: grid;
+    grid-template-columns: calc(100% - 1rem) 1rem;
+}
+
+.hidesearchbox {
+    transform: translateX(calc(-97.5vw + 1rem));
+    transition-duration: 1.5s;
+}
+
+.contentcolumn {
+    grid-column: 1;
+    background-color: white;
+}
+
+.noncontentcolumn {
+    grid-column: 2;
+}
+
+.unfoldbut {
+    height: 100%;
+    width: 1rem;
+    background-image: url('/last.svg');
     background-repeat: no-repeat;
-    background-size: 2rem 2rem;
-    background-color: #EEEEEE;
-    border-radius: 50%;
+    background-size: 100% 100%;
+    background-color: #CCC;
 }
 
-.searchbox:hover {
-    width: 80%;
-    left: 10%;
-    transition-delay: 0s;
-    transition-duration: 0s;
-    background-image: none;
-    background-color: #EEEEEE;
-    border-radius: 0;
-    overflow: visible;
-    height: 6.5rem;
+.hidebut {
+    height: 100%;
+    width: 1rem;
+    background-image: url('/next.svg');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    background-color: #CCC;
 }
 
-.searchbox:hover div {
-    overflow: visible;
+.hidebut:hover, .unfoldbut:hover {
+    background-color: grey;
+    cursor: pointer;
+}
+
+.hidebut:active, .unfoldbut:active {
+    background-color: darkgrey;
+    cursor: pointer;
 }
 
 .toprow {
@@ -63,12 +103,9 @@ body {
     border-radius: 50%;
     background: white;
     padding: 0.1rem;
-    margin-left: -1.6rem;
+    margin-left: -2.3rem;
+    color: grey;
     cursor: pointer;
-}
-
-#srchbox {
-    align-self: center;
 }
 
 .searchstyler:hover {
@@ -116,7 +153,7 @@ body {
 }
 
 .nextbut:hover,.lastbut:hover {
-    background-color: #ddd;
+    background-color: #888;
 }
 
 .nextbut:focus,.nextbut:active,.lastbut:focus,.lastbut:active {
@@ -148,20 +185,6 @@ body {
 .botpage {
     background: grey;
     overflow: auto;
-}
-
-.bibliostyle {
-    display: block;
-    padding-top: 0.2rem;
-    font-size: small;
-    color: green;
-    overflow-wrap: anywhere;
-    overflow: auto;
-    -webkit-touch-callout: all; /* iOS Safari */
-    -webkit-user-select: all; /* Safari */
-    -moz-user-select: all; /* Firefox */
-    -ms-user-select: all; /* Internet Explorer/Edge */
-    user-select: all; /* Chrome and Opera */
 }
 
 .tmphit {
@@ -234,8 +257,8 @@ div .fuzzysugslink {
     text-decoration: none;
     text-align: left;
     cursor: pointer;
-    border-bottom: 1px solid grey;
     overflow-wrap: anywhere;
+    background: #DDD;
 }
 
 .fuzzysugslink mark {
@@ -254,17 +277,55 @@ div .fuzzysugslink:hover {
     color: black;
     text-decoration: none;
     text-align: left;
-    background-color: #ddd;
+    background-color: grey;
 }
 
 nav a.about 
 { 
     float: left; 
-    visibility: hidden;
+    margin-left: 0.5rem;
+    width: 10rem;
 }
 
-nav:hover a.about
-{
-    float: left;
-    visibility: visible;
+nav img:hover {
+    background-color: grey;
+}
+
+.tooglebut {
+    margin: 0.5rem;
+    width: 4.5rem;
+}
+
+
+nav span.bibliostyle {
+    display: block;
+    padding-top: 0.2rem;
+    padding-bottom: 0.2rem;
+    color: green;
+    overflow-wrap: anywhere;
+    overflow: auto;
+    -webkit-touch-callout: all; /* iOS Safari */
+    -webkit-user-select: all; /* Safari */
+    -moz-user-select: all; /* Firefox */
+    -ms-user-select: all; /* Internet Explorer/Edge */
+    user-select: all; /* Chrome and Opera */
+}
+
+.copyright {
+    top: 45vh;
+    width: 100vw;
+    left: 0;
+    position: fixed;
+    color: black;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+}
+
+.copyright h3 {
+    background: white;
+    width: auto;
+    border: 1px solid darkred;
+    align-self: center;
+    padding: 0.5rem;
 }

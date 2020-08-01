@@ -1,3 +1,4 @@
+<!DOCTYPE HTML>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -23,21 +24,34 @@
 </head>
 
 <body>
-	{% include "../../template_navbar.html" %}	
 	<header>
-	<h1>Index of all Books</h1>
-	<p>{{ length(books) }} books</p>
-	{% include "../search_template.html" %}
+	{% include "../../template_navbar.html" %}	
 	</header>
-	
-	<ol>
-	{% for pg in books %}
-	{% if pg.has_ocr %}
-	<li class="searchable_item"><a title="This book has an OCR, which means it contains a searchable approximation of the text inside the book and possible some images" href="/books/{{ pg.key }}/" data-key="{{ pg.key }}"><span class='bookhasocr'>[OCR]</span>{{ pg.title }}</a><span class="metadata">{{ pg.bib }}</span></li>
-	{% else %}
-	    <li class="searchable_item"><a href="/books/{{ pg.key }}/" data-key="{{ pg.key }}">{{ pg.title }}</a><span class="metadata">{{ pg.bib }}</span></li>
-	{% endif %}
-	{% endfor %}
-	</ol>
+	<nav aria-label="breadcrumb">
+	    <ol class="breadcrumb">
+		<li class="breadcrumb-item"><a href="/">Clas digital</a></li>
+		<li class="breadcrumb-item"><a href="../" rel="index up">Catalogue</a></li>
+		<li class="breadcrumb-item active">Books</li>
+	    </ol>
+	</nav>
+	<article class="main">
+	    <h1>Index of all Books</h1>
+	    <p>{{ length(books) }} books</p>
+	    {% include "../search_template.html" %}
 
+	    <ol>
+		{% for pg in books %}
+		{% if pg.has_ocr %}
+		<li class="searchable_item">
+            <a title="This book has an OCR, which means it contains a searchable approximation of the text inside the book and possibly some images"  data-key="{{ pg.key }}" href="/books/{{pg.key}}/pages">
+                <span class='bookhasocr'>[OCR]</span>
+            </a>
+            <a href="/books/{{pg.key}}/">{{ pg.title }}</a>
+            <span class="metadata">{{ pg.bib }}</span></li>
+		{% else %}
+		<li class="searchable_item"><a href="/books/{{ pg.key }}/" data-key="{{ pg.key }}">{{ pg.title }}</a><span class="metadata">{{ pg.bib }}</span></li>
+		{% endif %}
+		{% endfor %}
+	    </ol>
+	</article>
 </body>

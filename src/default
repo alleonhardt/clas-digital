@@ -1,4 +1,5 @@
 ##
+#
 # You should look at the following URL's in order to grasp a solid understanding
 # of Nginx configuration files in order to fully unleash the power of Nginx.
 # https://www.nginx.com/resources/wiki/start/
@@ -109,8 +110,23 @@ server {
 		return 404;
 	}
 
-	location ~ /books/[a-zA-Z0-9]+/(view|pages|intern)/.* {
+	error_page 401 @error401;
+	
+	location ~ (/books/[a-zA-Z0-9]+/) {
 	    auth_request /authenticate;
+	    auth_request_set $backend_status $upstream_status;
+	    if ($backend_status = "206") {
+		set $allow_passthrough $uri;
+		return 401;
+	    }
+	}
+
+	location @error401 {
+	    set $unique_path "=401";
+	    if ($allow_passthrough) {
+		set $unique_path $uri;
+	    }
+	    try_files $unique_path $unique_path/ =401;
 	}
 
 	location /upload {
@@ -156,7 +172,7 @@ server {
 
 	location /search {
         	proxy_pass         http://localhost:9992;
- #       	proxy_cache_key $uri$is_args$args;
+#       	proxy_cache_key $uri$is_args$args;
 #		proxy_buffering        on;
 #            	proxy_cache            STATIC;
 #            	proxy_cache_valid      200  1d;
@@ -242,10 +258,24 @@ server {
 		return 301 https://$host/books/$arg_scanId;
 	}
 
-	location ~ /books/[a-zA-Z0-9]+/(view|pages|intern)/.* {
+	error_page 401 @error401;
+	
+	location ~ (/books/[a-zA-Z0-9]+/) {
 	    auth_request /authenticate;
+	    auth_request_set $backend_status $upstream_status;
+	    if ($backend_status = "206") {
+		set $allow_passthrough $uri;
+		return 401;
+	    }
 	}
 
+	location @error401 {
+	    set $unique_path "=401";
+	    if ($allow_passthrough) {
+		set $unique_path $uri;
+	    }
+	    try_files $unique_path $unique_path/ =401;
+	}
 	location /upload {
 		client_max_body_size 10M;
         	proxy_pass         http://localhost:9000;

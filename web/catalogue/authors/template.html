@@ -1,3 +1,4 @@
+<!DOCTYPE HTML>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -25,17 +26,27 @@
 
 <body>
 
-	{% include "../../template_navbar.html" %}	
 	<header>
-	<h1>Catalogue: Authors</h1>
-	<p>{{ length(authors) }} different authors</p>
-	{% include "../search_template.html" %}
+	{% include "../../template_navbar.html" %}	
 	</header>
-    <ol>
-    {% for author in authors %}
-    <li class="searchable_item"><a href="/catalogue/authors/{{ author.id }}/">{{ author.show }} (books: {{ author.num }})</a></li>
-    {% endfor %}
-    </ol>
+	<nav aria-label="breadcrumb">
+	    <ol class="breadcrumb">
+		<li class="breadcrumb-item"><a href="/">Clas digital</a></li>
+		<li class="breadcrumb-item"><a href="../" rel="index up">Catalogue</a></li>
+		<li class="breadcrumb-item active">Authors</li>
+	    </ol>
+	</nav>
+
+	<article class="main">
+	    <h1>Catalogue: Authors</h1>
+	    <p>{{ length(authors) }} different authors</p>
+	    {% include "../search_template.html" %}
+	    <ol>
+		{% for author in authors %}
+		<li class="searchable_item"><a href="/catalogue/authors/{{ author.id }}/">{{ author.show }} (books: {{ author.num }})</a></li>
+		{% endfor %}
+	    </ol>
+	</article>
 
 </body>
 

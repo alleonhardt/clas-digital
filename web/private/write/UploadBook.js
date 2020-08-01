@@ -248,27 +248,57 @@ function ShowBookContentLink()
     document.getElementById("BookContentLink").innerHTML = "<a href='/ShowMetadata.html?scanId="+lnk+"' target='_blank'> Book Metadata</a>";
 }
 
+let gBaseTitle = null;
+
 function UploadAll()
 {
+
     let elem = document.getElementById("fileUpID");
     elem.onclick = function(){return false;};
 
     let finalKey = ExtractKey();
     if(finalKey=="")
 	return ShowStatus("Either you forgot to type in the item key or the permalink is in the wrong format!","red");
-
-
-
     let val = document.getElementById("FileDropList").children;
+    
+    if(gBaseTitle==null)
+    {
+	gBaseTitle = document.title;
+	// Just do this once
+	document.getElementById("SaveNow").style.display="none";
+
+	let saver = document.getElementById("saver");
+	let prog = document.createElement("progress");
+	let div = document.createElement("div");
+	let info = document.createElement("p");
+	info.id = "uploadinfo";
+	info.innerHTML = "Uploaded 0/"+(val.length-1)+" files";
+	div.classList.add("savebox");
+
+	prog.value = "0";
+	prog.max = "100";
+	prog.id = "uploadprogress";
+	div.appendChild(info);
+	div.appendChild(prog);
+
+	saver.appendChild(div);
+    }
+    let progress = document.getElementById("uploadprogress");
+    let infoprog = document.getElementById("uploadinfo");
+
     for(let i = 1; i < val.length; i++)
     {
+	document.title = ""+Math.floor((i+1)*100/val.length)+"%- "+gBaseTitle;
+	progress.value = ""+Math.floor((i+1)*100/val.length);
 	if(val[i].upload_finished==undefined || val[i].upload_finished == null)
 	{
 	    val[i].onclick = function() { };
 	    Upload(val[i],finalKey);
+	    infoprog.innerHTML = "Uploaded "+i+"/"+(val.length-1)+" files";
 	    return;
 	}
     }
+    
     let total_count = val.length-1;
     let upcount = 0;
     for(let i = 1; i < val.length; i++)
@@ -307,5 +337,3 @@ function show_language(x)
 
 
 window.addEventListener("load",function(){initialise("uploadbooklink");init_events();},false);
-
- 

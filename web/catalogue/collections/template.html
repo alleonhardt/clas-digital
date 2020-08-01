@@ -1,3 +1,4 @@
+<!DOCTYPE HTML>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -24,18 +25,29 @@
 </head>
 
 <body>
-	{% include "../../template_navbar.html" %}	
 	<header>
-	<h1>Catalogue: Collection</h1>
-	<p>{{ length(pillars) }} diffrent collections</p>
-	{% include "../search_template.html" %}
+	{% include "../../template_navbar.html" %}	
 	</header>
-	
-    <ol>
-    {% for pillar in pillars %}
-    <li class="searchable_item"><a href="/catalogue/collections/{{ pillar.key }}/">{{ pillar.name}}<a></li>
-    {% endfor %}
-    </ol>
+
+	<nav aria-label="breadcrumb">
+	    <ol class="breadcrumb">
+		<li class="breadcrumb-item"><a href="/">Clas digital</a></li>
+		<li class="breadcrumb-item"><a href="../" rel="index up">Catalogue</a></li>
+		<li class="breadcrumb-item active">Collections</li>
+	    </ol>
+	</nav>
+	<article class="main">
+
+	    <h1>Catalogue: Collection</h1>
+	    <p>{{ length(pillars) }} different collections</p>
+	    {% include "../search_template.html" %}
+
+	    <ol>
+		{% for pillar in pillars %}
+		<li class="searchable_item"><a href="/catalogue/collections/{{ pillar.key }}/">{{ pillar.name}}<a></li>
+		{% endfor %}
+	    </ol>
+	</article>
 </body>
 
 

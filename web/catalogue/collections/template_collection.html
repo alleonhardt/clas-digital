@@ -1,3 +1,4 @@
+<!DOCTYPE HTML>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -25,16 +26,32 @@
 
 
 <body>
-	{% include "../../template_navbar.html" %}	
 	<header>
-	<h1>Books in Collection: {{pillar.name}}</h1>
-	<p>{{ length(books) }} books in this collection</p>
-	{% include "../search_template.html" %}
+	{% include "../../template_navbar.html" %}	
 	</header>
-	
-    <ol>
-    {% for book in books %}
-    <li class="searchable_item"><a href="/books/{{ book.id}}/">{{ book.title}}</a><span class="metadata">{{book.bib}}</span></li>
-    {% endfor %}
-    </ol>
+	<nav aria-label="breadcrumb">
+	    <ol class="breadcrumb">
+		<li class="breadcrumb-item"><a href="/">Clas digital</a></li>
+		<li class="breadcrumb-item"><a href="/catalogue/">Catalogue</a></li>
+		<li class="breadcrumb-item"><a href="../" rel="index up">Collections</a></li>
+		<li class="breadcrumb-item active">{{ pillar.name }}</li>
+	    </ol>
+	</nav>
+
+
+	<article class="main">
+	    <h1>Books in Collection: {{pillar.name}}</h1>
+	    <p>{{ length(books) }} books in this collection</p>
+	    {% include "../search_template.html" %}
+
+	    <ol>
+		{% for pg in books %}
+		{% if pg.has_ocr %}
+		<li class="searchable_item"><a title="This book has an OCR, which means it contains a searchable approximation of the text inside the book and possible some images" href="/books/{{ pg.id }}/" data-key="{{ pg.id }}"><span class='bookhasocr'>[OCR]</span>{{ pg.title }}</a><span class="metadata">{{ pg.bib }}</span></li>
+		{% else %}
+		<li class="searchable_item"><a href="/books/{{ pg.id }}/" data-key="{{ pg.id }}">{{ pg.title }}</a><span class="metadata">{{ pg.bib }}</span></li>
+		{% endif %}
+		{% endfor %}
+	    </ol>
+	</article>
 </body>

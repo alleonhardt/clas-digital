@@ -22,15 +22,7 @@ public:
     * @param[in] jMetadata json with metadata
     */
     CMetadata(nlohmann::json jMetadata);
- 
-    /*
-    * @brief Set metadata, f.e. when json is updated from zotero
-    * @param[in] jMetadata (New metadata)
-    */
-    void setMetadata(nlohmann::json jMetadata);
 
-
-    //************ get metadata *******************//
 
     // *** GETTER *** //
 
@@ -39,11 +31,24 @@ public:
     */
     nlohmann::json getMetadata();
 
+
+    // *** SETTER *** //
+
+    /*
+    * @brief Set metadata, f.e. when json is updated from zotero
+    * @param[in] jMetadata (New metadata)
+    */
+    void setMetadata(nlohmann::json jMetadata);
+
+
+    
+    //************ RETRIEVE DATA FROM JSON *******************//
+
     
     // *** GENERAL *** //
 
     /**
-    * @brief return data from metadata.
+    * @brief return data from json.
     * @param[in] sSearch (which metadata (f.e. title, date...)
     * @return string 
     */
@@ -77,12 +82,19 @@ public:
     std::string getMetadata(std::string sSearch, std::string sFrom1, std::string sFrom2, int in);
 
 
+
     // *** SPECIFIC *** // 
+
+
+    // --- collection --- //
 
     /**
     * @return vector with all collections this book is in
     */
     std::vector<std::string> getCollections();
+
+
+    // --- author --- //
 
     /**
     * @return "lastName", or (if not exists) "name" of author
@@ -94,11 +106,24 @@ public:
     */
     std::vector<std::string> getAuthors();
 
-    /**
-    * @param[in] sTag (tag to search for)
-    * @return return whether book has a given tag
+    /*
+    * return a vector containing:
+    * {"lastname": "[lastName/ name]"
+    * {"fullname": "[lastName/ name], [firstName]"
+    * {"key": "[firstName]-[lastName/ name]" (Lower-case. Replacements: " "->"-", "/"->",")
     */
-    bool hasTag(std::string sTag);
+    std::vector<std::map<std::string, std::string>> getAuthorsKeys();
+
+    /**
+    * Get whether author needs to be shown according to book creator Type.
+    * @param[in] creatorType
+    * @return whether to show author in catalogue
+    */
+    bool isAuthorEditor(std::string creatorType);
+
+
+        
+    // --- title --- //
 
     /**
     * @return title of book
@@ -110,21 +135,47 @@ public:
     */
     std::string getShortTitle();
 
+
+    // --- date --- //
+
     /**
     * @return date or -1 if date does not exists or is corrupted
     */
     int getDate();
 
+
+    // --- bibliography and citation --- //
+
     /**
+    * Custom short-citation (author, date)
     * @return string with "[lastName/ name], [date]"
     */
     std::string getShow();
 
+    /**
+    * Custom short-citation (author, title[first 10 words], date)
+    * @return string with "[lastName/ name], [title](first 10 words), [date]"
+    */
+    std::string getShow2(bool html=true);
+    
+    /**
+    * Basically the custom short citation extended with page.
+    * @return string containing "[getShow()], S. [page]"
+    */ 
     std::string getZit(size_t page);
 
     /**
-    * @return string with Auhtor + first 10 words title + date
+    * Self created version of bibliography with escaped html.
+    * @return Returns an escaped version of the bibliography
     */
-    std::string getShow2();
+    std::string getBibliographyEscaped();
 
+
+    // --- others --- //
+
+    /**
+    * @param[in] sTag (tag to search for)
+    * @return return whether book has a given tag
+    */
+    bool hasTag(std::string sTag);
 };

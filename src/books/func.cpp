@@ -138,7 +138,23 @@ std::string returnToLower(std::string &str)
     return str2;
 }
 
-
+/**
+* @param[in, out] str string to be modified
+*/
+void escapeHTML(std::string &str)
+{
+    std::map<char, std::string> replacements = {{'>', "&gt"}, {'<', "&lt"}};
+    for(unsigned int i=0; i<str.length(); i++)
+    {
+        if(replacements.count(str[i]) > 0)
+        {
+            char s = str[i];
+            str.erase(i, 1);
+            str.insert(i, replacements[s]);
+            i+=replacements[s].length();
+        }
+    }
+}
 
 /**
 * @brief split a string at given delimiter. Store strings in array.
@@ -314,5 +330,6 @@ bool checkPage(std::string &buffer)
    }
    return false;
 }
+
 
 } //Close namespace 

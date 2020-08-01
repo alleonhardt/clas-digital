@@ -39,9 +39,14 @@ class StaticWebpageCreator
         StaticWebpageCreator()
         {
             m_topnav = {{"information", ""}, {"search", ""}, {"catalogue", ""}, {"admin", ""}, {"upload", ""}};
-            auto time=std::chrono::system_clock::now();
-            std::time_t time_time = std::chrono::system_clock::to_time_t(time);
-            m_topnav["time"] = std::ctime(&time_time);    
+	    time_t now;
+	    std::time(&now);
+	    char buf[sizeof("YYYY-mm-ddTHH:MM:ssZ")];
+	    std::strftime(buf, sizeof(buf), "%FT%TZ", gmtime(&now));
+            m_topnav["time"] = buf;
+	    char buf_human[sizeof("YYYY-mm-dd HH:MM:ss")];
+	    strftime(buf_human, sizeof(buf_human), "%F %T", gmtime(&now));
+	    m_topnav["time_human"] = buf_human;
         }
 
 		StaticWebpageCreator(CBook *book)
@@ -52,9 +57,14 @@ class StaticWebpageCreator
 			m_book = book;
 
             m_topnav = {{"information", ""}, {"search", ""}, {"catalogue", ""}, {"admin", ""}, {"upload", ""}};
-            auto time=std::chrono::system_clock::now();
-            std::time_t time_time = std::chrono::system_clock::to_time_t(time);
-            m_topnav["time"] = std::ctime(&time_time);   
+	    time_t now;
+	    time(&now);
+	    char buf[sizeof("YYYY-mm-ddTHH:MM:ssZ")];
+	    strftime(buf, sizeof(buf), "%FT%TZ", gmtime(&now));
+            m_topnav["time"] = buf;
+	    char buf_human[sizeof("YYYY-mm-dd HH:MM:ss")];
+	    strftime(buf_human, sizeof(buf_human), "%F %T", gmtime(&now));
+	    m_topnav["time_human"] = buf_human;
 		}
 
 		template<typename T>
@@ -138,7 +148,7 @@ class StaticWebpageCreator
             atomic_write_file("web/private/write/UploadBook.html", result);
         }
 
-		void CreateMetadataPage()
+		void CreateMetadataPage(nlohmann::json pillars)
 		{
 			std::cout<<"Processing: "<<m_book->getKey()<<std::endl;
 			auto itemType =m_info["data"].value("itemType","");
@@ -147,21 +157,50 @@ class StaticWebpageCreator
 			nlohmann::json info;
             		info["show"] = m_book->getMetadata().getShow2();
 			info["bib"] = m_info["bib"].get<std::string>();
+			info["bib_own"] = m_book->getMetadata().getBibliographyEscaped();
 			info["hasContent"] = m_book->hasContent();
 			info["itemType"] = itemType;
 			info["title"] = title;
 			info["authors"] = nlohmann::json::array();
-                	for(const auto &it : m_book->getMetadata().getAuthors())
-				info["authors"].push_back(it);
+            for(auto author : m_book->getMetadata().getAuthorsKeys())
+            {
+                nlohmann::json j;
+                j["key"] = author["key"];
+                j["name"] = author["fullname"];
+                j["type"] = author["creatorType"];
+                j["isAuthor"] = m_book->getMetadata().isAuthorEditor(j["type"]);
+				info["authors"].push_back(j);
+            } 
 			info["hasISBN"] = isbn != "";
 			info["isbn"] = isbn;
 			info["place"] = m_info["data"].value("place","");
-			info["date"] = m_info["data"].value("date","");
+			info["date"] = "";
+            if(m_book->getDate() != -1)
+                 info["date"] = m_book->getDate(); 
+            info["hasDate"] = m_book->getDate() != -1;
 			info["key"] = m_book->getKey();
+            
+            info["collections"] = nlohmann::json::array();
+            for(const auto& it : m_book->getMetadata().getCollections())
+            {
+                nlohmann::json j;
+                j["key"] = it;
+                j["name"] = "Untracked collection.";
+                bool found = false;
+                for(const auto& jt : pillars) {
+                    if(jt["key"] == it)
+                    {
+                        found = true;
+                        j["name"] = jt["name"];
+                    }
+                }
+                if(found != false)
+                    info["collections"].push_back(j);
+            }
 
             //Parse navbar
             info["topnav"] = m_topnav;
-            info["topnav"]["catalogue"] = "class='dropdown-banner active";
+            info["topnav"]["catalogue"] = "class='dropdown-banner active'";
 
 			inja::Environment env;
 			inja::Template temp = env.parse_template("web/books/metadata_template.html");
@@ -178,10 +217,10 @@ class StaticWebpageCreator
 			std::filesystem::create_directory("web/books/"+m_book->getKey()+"/pages", ec);
 		    //Parse navbar
 		    js["topnav"] = m_topnav;
-		    js["topnav"]["catalogue"] = "class='dropdown-banner active";
+		    js["topnav"]["catalogue"] = "class='dropdown-banner active'";
 
 			js["key"] = m_book->getKey();
-			js["title"] = m_book->getMetadata().getShow2();
+			js["title"] = m_book->getMetadata().getShow2(false);
 			js["bib"] = m_info["bib"].get<std::string>();
 			js["bib_esc"] = cutter(replacer(m_info["bib"].get<std::string>(),'"',"&quot;"),'\n');
 			inja::Environment env;
@@ -189,7 +228,7 @@ class StaticWebpageCreator
 			std::string result = env.render(temp, js);
 			atomic_write_file("web/books/"+m_book->getKey()+"/pages/index.html",result);
 		}
-		bool createWebpage()
+		bool createWebpage(nlohmann::json pillars)
 		{
 			std::string webpath = "/books/"+m_bookID+"/pages";
 			std::error_code ec;
@@ -204,7 +243,7 @@ class StaticWebpageCreator
 			
 
 			{
-				CreateMetadataPage();
+				CreateMetadataPage(pillars);
 			}
 			return true;
 		}
@@ -219,9 +258,14 @@ class StaticCatalogueCreator
         StaticCatalogueCreator()
         {
             m_topnav = {{"information", ""}, {"search", ""}, {"catalogue", ""}, {"admin", ""}, {"upload", ""}};
-            auto time=std::chrono::system_clock::now();
-            std::time_t time_time = std::chrono::system_clock::to_time_t(time);
-            m_topnav["time"] = std::ctime(&time_time);    
+	    time_t now;
+	    time(&now);
+	    char buf[sizeof("YYYY-mm-ddTHH:MM:ssZ")];
+	    strftime(buf, sizeof(buf), "%FT%TZ", gmtime(&now));
+            m_topnav["time"] = buf;   
+	    char buf_human[sizeof("YYYY-mm-dd HH:MM:ss")];
+	    strftime(buf_human, sizeof(buf_human), "%F %T", gmtime(&now));
+	    m_topnav["time_human"] = buf_human;
         }
 
 		void CreateCatalogue()
@@ -235,7 +279,7 @@ class StaticCatalogueCreator
 
             //Parse navbar
             js["topnav"] = m_topnav;
-            js["topnav"]["catalogue"] = "class='dropdown-banner active";
+            js["topnav"]["catalogue"] = "class='dropdown-banner active'";
 
 
 			inja::Environment env;
@@ -250,7 +294,7 @@ class StaticCatalogueCreator
 
             //Parse navbar
             rend["topnav"] = m_topnav;
-            rend["topnav"]["catalogue"] = "class='dropdown-banner active";
+            rend["topnav"]["catalogue"] = "class='dropdown-banner active'";
 
 			std::map<std::string,std::pair<int,std::list<CBook*>>> _map;
 			for(auto &book : mng.getMapOfBooks())
@@ -288,7 +332,7 @@ class StaticCatalogueCreator
 
                 //Parse navbar
                 js["topnav"] = m_topnav;
-                js["topnav"]["catalogue"] = "class='dropdown-banner active";
+                js["topnav"]["catalogue"] = "class='dropdown-banner active'";
 
                 std::vector<nlohmann::json> vBooks;
 				for(auto y : x.second.second)
@@ -330,7 +374,7 @@ class StaticCatalogueCreator
 
             //Parse navbar
             books["topnav"] = m_topnav;
-            books["topnav"]["catalogue"] = "class='dropdown-banner active";
+            books["topnav"]["catalogue"] = "class='dropdown-banner active'";
 
 			inja::Environment env;
 			inja::Template temp = env.parse_template("web/catalogue/books/template.html");
@@ -344,33 +388,32 @@ class StaticCatalogueCreator
 
             //Parse navbar
             js["topnav"] = m_topnav;
-            js["topnav"]["catalogue"] = "class='dropdown-banner active";
+            js["topnav"]["catalogue"] = "class='dropdown-banner active'";
 
+            //Using map to erase dublicates
             std::map<std::string, nlohmann::json> mapAuthors;
             for(auto &it : manager.getMapOfBooks()) 
             {
-                std::string lastName = it.second->getMetadata().getAuthor();
-                std::string firstName = it.second->getMetadata().getMetadata("firstName", "data", "creators", 0);
-                auto origName = lastName;
-                auto origFam = firstName;
-                func::convertToLower(lastName);
-                func::convertToLower(firstName);
-                std::string key = firstName + "-" + lastName;
-                std::replace(key.begin(), key.end(), ' ', '-');
-                std::replace(key.begin(), key.end(), '/', ',');
-        
-                mapAuthors[lastName + "_" + firstName] = {
-                            {"id", key},
-                            {"show", origName + ", " + origFam},
-                            {"num", manager.getMapofUniqueAuthors()[key].size()} };
+                for(auto author : it.second->getMetadata().getAuthorsKeys())
+                {
+                    if(!it.second->getMetadata().isAuthorEditor(author["creatorType"]))
+                        continue;
+
+                    mapAuthors[author["key"]] = {
+                        {"id", author["key"]},
+                        {"show", author["fullname"]},
+                        {"num", manager.getMapofUniqueAuthors()[author["key"]].size()} 
+                    };
+                }
             }
 
+            
+            //Convert to vector, sort and add to json
+            std::vector<nlohmann::json> vAuthors;
             for(auto &it : mapAuthors)
-	    	{
-			    if(it.first == "_")
-				    continue;
-                js["authors"].push_back(it.second);
-		    }
+                vAuthors.push_back(it.second);
+            std::sort(vAuthors.begin(), vAuthors.end(), &StaticCatalogueCreator::mySort);
+            js["authors"] = vAuthors;
             
 
 			inja::Environment env;
@@ -384,52 +427,49 @@ class StaticCatalogueCreator
             inja::Environment env;
             inja::Template temp = env.parse_template("web/catalogue/authors/template_author.html");
 
-            for(auto &it : manager.getMapOfBooks()) {
-                std::string lastName = it.second->getMetadata().getAuthor();
-                std::string firstName = it.second->getMetadata().getMetadata("firstName", "data", "creators", 0);
+            for(const auto &it : manager.getMapOfBooks()) {
 
-                std::string name = lastName + ", " + firstName;
-		        func::convertToLower(lastName);
-		        func::convertToLower(firstName);
-                std::string key = firstName + "-" + lastName;
-                std::replace(key.begin(), key.end(), ' ', '-');
-                std::replace(key.begin(), key.end(), '/', ',');
-
-                if(lastName.size() == 0)
-                    continue;
-
-                //Create directory
-                std::error_code ec;
-                std::filesystem::create_directory("web/catalogue/authors/"+key+"/", ec);
-
-                nlohmann::json js;
-                js["author"] = {{"name", name}, {"id", key}};
-
-                //Parse navbar
-                js["topnav"] = m_topnav;
-                js["topnav"]["catalogue"] = "class='dropdown-banner active";
-
-                //Create json with all books
-                std::vector<nlohmann::json> vBooks;
-                if(manager.getMapofUniqueAuthors().count(key) == 0)
+                for(auto author : it.second->getMetadata().getAuthorsKeys())
                 {
-                    std::cout << key << " NOTFOUND!!\n";
-                    continue;
-                }
-                for(auto &jt : manager.getMapofUniqueAuthors()[key]) {
-                    vBooks.push_back({ 
-                        {"id", jt},
-                        { "title", manager.getMapOfBooks()[jt]->getMetadata().getShow2()},
-                        { "bib", manager.getMapOfBooks()[jt]->getMetadata().getMetadata("bib")},
-			{ "has_ocr", manager.getMapOfBooks()[jt]->hasOcr()}
-                        });
-                }
+                    std::string key = author["key"];
 
-                std::sort(vBooks.begin(), vBooks.end(), &StaticCatalogueCreator::mySort);
+                    if(author["lastname"].size() == 0)
+                        continue;
 
-                js["books"] = vBooks;
-                std::string result = env.render(temp, js);
-                atomic_write_file("web/catalogue/authors/"+key+"/index.html",result);
+                    if(!it.second->getMetadata().isAuthorEditor(author["creatorType"]))
+                        continue;
+
+                    //Create directory
+                    std::error_code ec;
+                    std::filesystem::create_directory("web/catalogue/authors/"+key+"/", ec);
+
+                    nlohmann::json js;
+                    js["author"] = {{"name", author["fullname"]}, {"id", key}};
+
+                    //Parse navbar
+                    js["topnav"] = m_topnav;
+                    js["topnav"]["catalogue"] = "class='dropdown-banner active'";
+
+                    //Create json with all books
+                    std::vector<nlohmann::json> vBooks;
+                    if(manager.getMapofUniqueAuthors().count(key) == 0)
+                        continue;
+
+                    for(auto &jt : manager.getMapofUniqueAuthors()[key]) {
+                        vBooks.push_back({ 
+                            {"id", jt},
+                            { "title", manager.getMapOfBooks()[jt]->getMetadata().getShow2()},
+                            { "bib", manager.getMapOfBooks()[jt]->getMetadata().getMetadata("bib")},
+                { "has_ocr", manager.getMapOfBooks()[jt]->hasOcr()}
+                            });
+                    }
+
+                    std::sort(vBooks.begin(), vBooks.end(), &StaticCatalogueCreator::mySort);
+
+                    js["books"] = vBooks;
+                    std::string result = env.render(temp, js);
+                    atomic_write_file("web/catalogue/authors/"+key+"/index.html",result);
+                }
             }
         }
     
@@ -439,7 +479,7 @@ class StaticCatalogueCreator
 
             //Parse navbar
             js["topnav"] = m_topnav;
-            js["topnav"]["catalogue"] = "class='dropdown-banner active";
+            js["topnav"]["catalogue"] = "class='dropdown-banner active'";
 
             for(auto &it : pillars)
                 js["pillars"].push_back(it);
@@ -460,7 +500,7 @@ class StaticCatalogueCreator
 
                 //Parse navbar
                 js["topnav"] = m_topnav;
-                js["topnav"]["catalogue"] = "class='dropdown-banner active";
+                js["topnav"]["catalogue"] = "class='dropdown-banner active'";
 
                 js["pillar"] = it;
                 std::string key = it["key"];
@@ -480,7 +520,9 @@ class StaticCatalogueCreator
                     vBooks.push_back({ 
                         {"id", jt.first},
                         { "title", jt.second->getMetadata().getShow2()},
-                        { "bib", jt.second->getMetadata().getMetadata("bib")} });
+                        { "bib", jt.second->getMetadata().getMetadata("bib")},
+			{"has_ocr",jt.second->hasOcr()}
+			});
                 }
 
                 std::sort(vBooks.begin(), vBooks.end(), &StaticCatalogueCreator::mySort);
@@ -492,8 +534,13 @@ class StaticCatalogueCreator
         }
 
         static bool mySort(nlohmann::json i, nlohmann::json j) {
-            std::string str1 = i["title"];
-            std::string str2 = j["title"];
+            std::string check = "";
+            if(i.count("title") > 0) check = "title";
+            else if(i.count("show") > 0) check = "show";
+            else return true;
+
+            std::string str1 = i[check];
+            std::string str2 = j[check];
             return func::returnToLower(str1)<func::returnToLower(str2);
         }
 };
