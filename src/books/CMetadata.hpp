@@ -147,23 +147,11 @@ public:
     // --- bibliography and citation --- //
 
     /**
-    * Custom short-citation (author, date)
-    * @return string with "[lastName/ name], [date]"
-    */
-    std::string getShow();
-
-    /**
     * Custom short-citation (author, title[first 10 words], date)
     * @return string with "[lastName/ name], [title](first 10 words), [date]"
     */
     std::string getShow2(bool html=true);
     
-    /**
-    * Basically the custom short citation extended with page.
-    * @return string containing "[getShow()], S. [page]"
-    */ 
-    std::string getZit(size_t page);
-
     /**
     * Self created version of bibliography with escaped html.
     * @return Returns an escaped version of the bibliography

@@ -240,7 +240,7 @@ bool CSearch::checkSearchOptions(CBook* book)
          
     //*** check pillars ***//
     for(auto const &collection : m_sOpts->getCollections()) {
-        if(func::in(collection, book->getMetadata().getCollections()) == true)
+        if(func::in(collection, book->getCollections()) == true)
             return true;
     }
     return false;

@@ -14,24 +14,27 @@ class CBook
 {
 private:
 
-    std::string m_sKey;                                 //Key of the book
-    std::string m_sPath;                                //Path to book (if exists)
-    bool m_hasOcr;                                        //Book has ocr path
+    std::string m_sKey;         ///< Key of the book
+    std::string m_sPath;        ///< Path to book (if exists)
+    bool m_hasOcr;              ///< Book has ocr path
     bool m_hasImages;
 
     //Metadata
-    CMetadata m_metadata;                               //Json with all metadata 
-    std::string m_sAuthor;
-    int m_date;
+    CMetadata m_metadata;       ///< Json with all metadata 
+    std::string m_sAuthor;      ///< Author for fast access during search
+    int m_date;                 ///< Date for fast access during search
+    std::vector<std::string> m_collections; ///< Collections for fast access during search
+    std::string m_author_date;  ///< [author], [date] for fast acces during search.
 
-    //Map of matches
+    ///Map of matches found with fuzzy-search
     std::unordered_map<std::string, std::list<std::pair<std::string, double>>> m_mapFuzzy;
+    ///Map of matches found with contains-search
     std::unordered_map<std::string, std::list<std::string>> m_mapFull;
 
-    //Map of words_pages
+    ///Map of words_pages_pos_relevance
     std::unordered_map<std::string, std::tuple<std::vector<size_t>, int, size_t>> m_mapWordsPages;
 
-    int m_numPages;
+    int m_numPages;     ///< Number of pages in book
 
 
 public:
@@ -48,63 +51,58 @@ public:
 
     // **** Getter **** //
 
-    /**
-    * @return Key of the book, after extracting it from the path
-    */
+    ///Return Key of the book, after extracting it from the path
     const std::string& getKey();
 
-    /**
-    * @brief getter function to return the path to the directory of a book
-    * @return string (Path to directory of the book)
-    */
+    ///Getter function to return the path to the directory of a book
     const std::string& getPath();
 
-    /**
-    * @return Path to directory of the book
-    */
+    ///Return Path to directory of the book
     std::string getOcrPath();
 
-    /**
-    * @return Boolean, whether book contains ocr or not 
-    */
+    ///Return Boolean, whether book contains ocr or not 
     bool hasOcr() const;
+
+    ///Returns whether book has images.
     bool hasImages() const;
+
+    ///Return whether book has images or ocr
     bool hasContent() const;
+
+    ///Return whether book has title, author or date
     bool checkJson();
 
-    /**
-    * @return number of pages
-    */
+    ///Return "[author], [date]" and add "book not yet scanned", when hasOcr == false
+    std::string getAuthorDateScanned();
+
+    ///Return number of pages
     int getNumPages();
 
-    /**
-    * @return info.json of book
-    */
+    ///Return metadata-class to access all metadata 
     CMetadata& getMetadata();
 
-    /**
-    * @return lastName, or Name of author
-    */
+    ///Return lastName, or Name of author
     std::string getAuthor();
 
-    /**
-    * @return date or -1 if date does not exists or is currupted
-    */
+    ///Return date or -1 if date does not exists or is currupted
     int getDate();
 
-    /**
-    * @brief return whether book is publically accessable 
-    */
+    ///Return collections the book is in
+    std::vector<std::string> getCollections();
+
+    ///Return "[author], [date]
+    std::string getAuthorDate();
+
+    ///Return whether book is publicly accessible 
     bool getPublic();
 
-    /**
-    * @brief return getShow(author, date) from CMetadata but add "book not yet scanned", when bOCR=false
-    */
-    std::string getShow();
-
-
+    ///Get map of words with list of pages, preview-position and relevance.
     std::unordered_map<std::string, std::tuple<std::vector<size_t>, int, size_t>>&   getMapWordsPages();
+    
+    ///Return matches found with fuzzy-search
     std::unordered_map<std::string, std::list<std::pair<std::string, double>>>& getMapFuzzy();
+
+    ///Return matches found with contains-search
     std::unordered_map<std::string, std::list<std::string>>& getMapFull();
 
  
@@ -113,17 +111,33 @@ public:
     /**
     * @param[in] path set Path to book)
     */
+
+    ///Set path to book-directory.
     void setPath(std::string sPath);
     
 
     // **** CREATE BOOK AND MAPS (PAGES, RELEVANCE, PREVIEW) **** // 
 
     /**
-    * @brief Create a map of all word of this book
+    * @brief sets m_hasOcr/Images,
+    * if hasOcr==true, safes json to disc creates/ loads map of words/pages.
+    * @brief creates/loads map of pages, sets hasOCR and hasImages and safes json
+    * @param[in] sPath (path to book)
     */
     void createBook(std::string sPath);
 
+    ///Create map of all pages and safe.
     void createPages();
+
+    /**
+    * @brief function adding all words from one page to map of words. Writes the
+    * page to disc as single file. Add the page break line to a string used to convert 
+    * new format to old/ normal format. 
+    * 
+    */
+    void createPage(std::string sBuffer, std::string& sConvetr, size_t page, bool old);
+
+    ///Finds preview-position for all words.
     void createMapPreview();
 
     /**
@@ -155,7 +169,19 @@ public:
     */
     void removePages(std::map<int, std::vector<std::string>>* results1, std::map<int, std::vector<std::string>>* results2);
 
+    /**
+    * @brief checks whether words found occur on the same page
+    * @param[in] sWords (words to check)
+    * @return boolean indicating whether words or on the same page or not
+    */
     bool onSamePage(std::vector<std::string> sWords);
+
+    /**
+    * @brief generates list of all pages of this book, also checking fuzzy-matches
+    * (but not contains-matches (please check!!!))
+    * @param[in] word to generate list of pages for.
+    * @return list of pages
+    */
     std::vector<size_t> pages(std::string sWord);
 
 
@@ -182,6 +208,6 @@ public:
 
     void shortenPreview(std::string& finalResult);
 
-    //Teseract
+    ///Add a single new pages, generate by Teseract
     void addPage(std::string sInput, std::string sPage, std::string sMaxPage);
 };

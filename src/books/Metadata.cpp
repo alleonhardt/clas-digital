@@ -270,24 +270,6 @@ int CMetadata::getDate()
 // --- bibliography and citation --- //
 
 /**
-* Custom short-citation (author, date)
-* @return string with "[lastName/ name], [date]"
-*/
-std::string CMetadata::getShow()
-{
-    // *** Add Author *** //
-    std::string sResult = getAuthor();
-
-    if(sResult == "") sResult = "No Author";
-
-    if(getDate() != -1) 
-        sResult += ", " + std::to_string(getDate());
-    sResult += ".";
-
-    return sResult;
-}
-
-/**
 * Custom short-citation (author, title[first 10 words], date)
 * @return string with "[lastName/ name], [title](first 10 words), [date]"
 */
@@ -323,22 +305,6 @@ std::string CMetadata::getShow2(bool html)
     return sResult + ".";
 }
 
-/**
-* Basically the custom short citation extended with page.
-* @return string containing "[getShow()], S. [page]"
-*/ 
-std::string CMetadata::getZit(size_t page)
-{
-    std::string sZit = getShow();
-    sZit.pop_back();
-    sZit.insert(0, "(");
-    if(page != 1000000)
-        sZit.append(", S. " + std::to_string(page) + ".)");
-    else
-        sZit.append(".)");
-
-    return sZit;
-}
 
 /**
 * Self created version of bibliography with escaped html.

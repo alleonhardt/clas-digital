@@ -19,55 +19,72 @@ CBook::CBook(nlohmann::json jMetadata) : m_metadata(jMetadata)
 
     //Metadata
     m_sAuthor = m_metadata.getAuthor();
+    if(m_sAuthor.size() == 0) m_sAuthor = "No Author";
+    m_author_date = m_sAuthor;
     func::convertToLower(m_sAuthor);
-    if(m_sAuthor.size() == 0) m_sAuthor = "no author";
     m_date    = m_metadata.getDate();
+    m_collections = m_metadata.getCollections();
+    if(m_date != -1) m_author_date += ", " + std::to_string(m_date);
+    m_author_date += ".";
 }
 
 // **** GETTER **** //
+
+///Return Key of the book, after extracting it from the path
 const std::string& CBook::getKey() { return m_sKey;}
+
+///Getter function to return the path to the directory of a book
 const std::string& CBook::getPath() {return m_sPath;}
 
-bool CBook::hasOcr() const { return m_hasOcr;}
-bool CBook::hasImages() const { return m_hasImages; }
-bool CBook::hasContent() const { return m_hasImages || m_hasOcr; }
-bool CBook::checkJson() {
-    if(m_sAuthor == "" && m_metadata.getTitle() == "" && m_date == -1)
-        return false;
-    return true;
-}
-
+///Return Path to directory of the book
 std::string CBook::getOcrPath() {
     std::string sPath = m_sPath;
     sPath.append("/ocr.txt");
     return sPath;
 }
 
-std::string CBook::getShow() {
+///Return Boolean, whether book contains ocr or not 
+bool CBook::hasOcr() const { return m_hasOcr;}
 
-    std::string str = m_metadata.getShow();
-    if(m_hasOcr == true)
-        return str;
-    str+="<span style='color:orange;font-size:80%'> Book is not yet scanned, sorry for that.</span>";
-    return str;
+///Returns whether book has images.
+bool CBook::hasImages() const { return m_hasImages; }
+
+///Return whether book has images or ocr
+bool CBook::hasContent() const { return m_hasImages || m_hasOcr; }
+
+///Return whether book has title, author or date
+bool CBook::checkJson() {
+    if(m_sAuthor == "" && m_metadata.getTitle() == "" && m_date == -1)
+        return false;
+    return true;
 }
 
+///Return "[author], [date]" and add "book not yet scanned", when hasOcr == false
+std::string CBook::getAuthorDateScanned() {
+    if(m_hasOcr == true)
+        return m_author_date;
+    return m_author_date + "<span style='color:orange;font-size:80%'> Book is not yet scanned, sorry for that.</span>";
+}
+
+///Return number of pages
 int CBook::getNumPages() { return m_numPages; }
+
+///Return metadata-class to access all metadata 
 CMetadata& CBook::getMetadata() { return m_metadata; } 
 
-std::unordered_map<std::string, std::tuple<std::vector<size_t>,int,size_t>>& CBook::getMapWordsPages() { 
-    return m_mapWordsPages;
-}
-std::unordered_map<std::string, std::list<std::pair<std::string, double>>>& CBook::getMapFuzzy() {
-    return m_mapFuzzy;
-}
-std::unordered_map<std::string, std::list<std::string>>& CBook::getMapFull() {
-    return m_mapFull;
-}
-
+///Return lastName, or Name of author
 std::string CBook::getAuthor() { return m_sAuthor; }
+
+///Return date or -1 if date does not exists or is currupted
 int CBook::getDate() { return m_date; }
 
+///Return collections the book is in
+std::vector<std::string> CBook::getCollections() { return m_collections; }
+
+///Return "[author], [date]"
+std::string CBook::getAuthorDate() { return m_author_date; }
+
+///Return whether book is publicly accessible 
 bool CBook::getPublic() {
     std::time_t ttime = time(0);
     tm *local_time = localtime(&ttime);
@@ -81,19 +98,39 @@ bool CBook::getPublic() {
     else
         return true;
 }
+
+///Get map of words with list of pages, preview-position and relevance.
+std::unordered_map<std::string, std::tuple<std::vector<size_t>,int,size_t>>& CBook::getMapWordsPages() { 
+    return m_mapWordsPages;
+}
+
+///Return matches found with fuzzy-search
+std::unordered_map<std::string, std::list<std::pair<std::string, double>>>& CBook::getMapFuzzy() {
+    return m_mapFuzzy;
+}
+
+///Return matches found with contains-search
+std::unordered_map<std::string, std::list<std::string>>& CBook::getMapFull() {
+    return m_mapFull;
+}
+
      
 // **** SETTER **** //
+
+///Set path to book-directory.
 void CBook::setPath(std::string sPath) { m_sPath = sPath; }
 
 
 // **** CREATE BOOK AND MAPS (PAGES, RELEVANCE, PREVIEW) **** // 
 
 /**
-* @brief checks whether book already has map of words, if not it create them
+* @brief sets m_hasOcr/Images, 
+* if hasOcr==true, safes json to disc creates/ loads map of words/pages.
+* @param[in] sPath (path to book)
 */
 void CBook::createBook(std::string sPath)
 {
-    std::ifstream readOcr(getOcrPath());
+    //Check if book has images
     for(auto& p: std::filesystem::directory_iterator(sPath))
     {
 	    (void)p;
@@ -101,133 +138,128 @@ void CBook::createBook(std::string sPath)
             m_hasImages = true; 
     }
 
-    //If ocr exists create or load list with words
-    if(!readOcr)
-        return;
+    //Open ocr, if it doesn't exist, end function -> book does not need to be "created".
+    if(!std::filesystem::exists(getOcrPath())) return;
+    m_hasOcr = true;
 
+    //Write json to disc.
     std::ofstream writeJson(m_sPath + "/info.json");
     writeJson << m_metadata.getMetadata();
     writeJson.close();
 
-    std::ifstream readWords(m_sPath + "/intern/pages.txt");
-    if(!readWords || readWords.peek() == std::ifstream::traits_type::eof() ) {
+    //Check whether list of words_pages already exists, if yes load, otherwise, create
+    std::string path = m_sPath + "/intern/pages.txt";
+    if(!std::filesystem::exists(path) || std::filesystem::is_empty(path))
+    {
+        //Create pages
         createPages();
+        //Find (first) preview.
         createMapPreview();
+        //Safe to disc
         safePages();
     }
-
+    //Load pages
     else
         loadPages();
-
-    //Test output to see if authors function works
-    for(const auto &it : m_metadata.getAuthors())
-        std::cout << it << "; ";
-    m_hasOcr = true;
 }
 
+///Create map of all pages and safe.
 void CBook::createPages()
 {
     std::cout << "Creating map of words... \n";
+    //Load ocr and create ne directory "intern" for this book.
     std::ifstream read(getOcrPath());
-
     fs::create_directories(m_sPath + "/intern");
 
-    std::string sBuffer = "";
-    size_t pageCounter = 0;
+    std::string sBuffer = "", sLine = "";
 
+    //Check if book has old format (with page mark)
     bool pageMark = false;
     for(size_t i=0; i<10; i++) {
-        std::string sLine;
-        getline(read, sLine);
-        if(func::checkPage(sLine) == true)
+        std::getline(read, sLine);
+        if(func::checkPage(sLine) == true) {
             pageMark = true;
+            break;
+        }
     }
+    //Reset file
     read.clear();
     read.seekg(0, std::ios::beg); 
 
-    size_t page=1;
-    size_t blanclines=3;
-    std::string convertToNormalLayout = "----- 0 / 999 -----\n\n";
+    //Variable storing complete ocr, to convert to old format if necessary 
+    std::string sConvertToNormalLayout = "----- 0 / 999 -----\n\n";
+    size_t page=1, pageCounter = 0, blanclines = 3;
     while(!read.eof()) {
 
-        std::string sLine;
+        //Read line
         getline(read, sLine);
 
-        if(sLine == "" && pageMark == false) 
-            blanclines++;
-        else if(sLine != "" && pageMark == false)
-            blanclines = 0;
+        //Increase, or reset blanc lines
+        if(sLine == "") blanclines++;
+        else blanclines = 0;
 
-        //Create books with page mark (old format)
-        if(func::checkPage(sLine) == true && pageMark == true) {
-            for(auto it : func::extractWordsFromString(sBuffer)) {
-                std::get<0>(m_mapWordsPages[it.first]).push_back(page);
-                std::get<1>(m_mapWordsPages[it.first]) += it.second*(it.second+1) / 2;
-            } 
-            pageCounter++;
-
-            //Create new page
-            std::ofstream write(m_sPath + "/intern/page" + std::to_string(page) + ".txt");
-            write << func::returnToLower(sBuffer);
-            write.close();
-            sBuffer = "";
-
-            std::string num = sLine.substr(6, sLine.find("/")-7);
-            page = stoi(num);
-        }
-        //Create books without page mark (new format)
-        else if( (blanclines == 4 || (blanclines >= 4 && blanclines % 2 == 1)) && pageMark == false)
+        //Add a page when new page is reached.
+        if((func::checkPage(sLine) == true && pageMark == true) || ((blanclines == 4 || (blanclines >= 4 && blanclines % 2 == 1)) && pageMark == false))
         {
-            //std::cout << "creating page " << page << std::endl;
-            for(auto it : func::extractWordsFromString(sBuffer)) {
-                std::get<0>(m_mapWordsPages[it.first]).push_back(page);
-                std::get<1>(m_mapWordsPages[it.first]) += it.second*(it.second+1) / 2;
-            } 
-            pageCounter++;
+            //Add new page to map of pages and update values. Safe page to disc
+            createPage(sBuffer, sConvertToNormalLayout, page, pageMark);
 
-            //Create new page
-            std::ofstream write(m_sPath + "/intern/page" + std::to_string(page) + ".txt");
-            write << func::returnToLower(sBuffer);
-            write.close();
-
-            convertToNormalLayout += "\n\n----- "+std::to_string(page)+" / 999 -----\n\n" + sBuffer;
+            //Different handling for old and new format
+            if(pageMark == true)   
+                page = stoi(sLine.substr(6, sLine.find("/")-7));
+            else
+                page++; 
             sBuffer = "";
-
-            page++;
-            //blanclines = 0;
+            pageCounter++;
         }
+        
+        //Append line to buffer if page end is not reached.
         else
             sBuffer += " " + sLine + "\n";
     }
+
+    //If there is "something left", safe as new page.
     if(sBuffer.length() !=0)
-    {
-        for(auto it : func::extractWordsFromString(sBuffer)) {
-            std::get<0>(m_mapWordsPages[it.first]).push_back(page);
-            std::get<1>(m_mapWordsPages[it.first]) += it.second*(it.second+1) / 2;
-        } 
-
-        //Create new page
-        std::ofstream write(m_sPath + "/intern/page" + std::to_string(page) + ".txt");
-        write << func::returnToLower(sBuffer);
-        write.close();
-
-        if(pageMark == false)
-            convertToNormalLayout +="\n\n----- "+std::to_string(page)+" / 999 -----\n\n" + sBuffer;
-    }
+        createPage(sBuffer, sConvertToNormalLayout, page, pageMark);
 
     read.close();
+
+    //Write old format to disc, if ocr was in new format.
     if(pageMark == false)
     {
+        //Move new format, so it is not overwritten.
         try {
             std::filesystem::rename(m_sPath + "/ocr.txt", m_sPath + "/old_ocr.txt");
         } catch (std::filesystem::filesystem_error& e) {
             std::cout << e.what() << "\n";
         }
+
+        //Safe as old format
         std::ofstream write (m_sPath + "/ocr.txt");
-        write << convertToNormalLayout;
+        write << sConvertToNormalLayout;
         write.close();
     }
+
+    //Set number of pages for this book.
     m_numPages = pageCounter;
+}
+
+
+void CBook::createPage(std::string sBuffer, std::string& sConvert, size_t page, bool pageMark)
+{
+    //Add entry, or update entry in map of words/ pages (new page + relevance)
+    for(auto it : func::extractWordsFromString(sBuffer)) {
+        std::get<0>(m_mapWordsPages[it.first]).push_back(page);
+        std::get<1>(m_mapWordsPages[it.first]) += it.second*(it.second+1) / 2;
+    } 
+
+    //Create new page
+    std::ofstream write(m_sPath + "/intern/page" + std::to_string(page) + ".txt");
+    write << func::returnToLower(sBuffer);
+    write.close();
+
+    if(pageMark == false)
+        sConvert += "\n\n----- "+std::to_string(page)+" / 999 -----\n\n" + sBuffer;
 }
 
 void CBook::createMapPreview()
@@ -539,7 +571,7 @@ std::string CBook::getOnePreview(std::string sWord)
     //*** Append [...] front and back *** //
     finalResult.insert(0, " \u2026"); 
     if(page!=1000000)
-        return finalResult += " \u2026 (S." + std::to_string(page) +")";
+        return finalResult += " \u2026 (S. " + std::to_string(page) +")";
     else
         return finalResult += " \u2026";
 }
