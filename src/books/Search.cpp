@@ -31,7 +31,7 @@ std::string CSearch::getSearchedWord() {
 // *** GETTER (from searchoptions) *** //
 
 /** 
-* @return fuzzynes
+* @return fuzzyness
 */
 bool CSearch::getFuzzyness() {
     return m_sOpts->getFuzzyness();
@@ -66,6 +66,8 @@ void CSearch::setWord(std::string sWord) {
 */
 std::map<std::string, double>* CSearch::search(MAPWORDS& mWs, MAPWORDS& mWsTitle, MAPWORDS& mWsAuthor, map_books& mapBooks, dict& d_dict)
 {
+    std::cout << "Searching for " << m_sWord << "\n";
+
     //Normal search (full-match)
     if (getFuzzyness() == false)
     {
@@ -107,26 +109,18 @@ void CSearch::normalSearch(MAPWORDS& mapWords, dict& d_dict, map_books& mapBooks
 
         //Grundform Suchen:
         auto it=d_dict[sInput].begin();
-        if((*it) != "") {
-            std::cout << "Passende Grundform gefunden! \""<<(*it)<<"\"\n";
+        if((*it) != "") 
             sInput = (*it);
-        }
-        else
-            std::cout << "\""<<sInput<<"\" ist bereits in der Grundform.\n";
 
         for(auto it : d_dict[sInput]) {
-            std::cout << "Searching for " << it << "\n";
             if(mapWords.count(it) > 0) {
                 std::map<std::string, double> found = mapWords.at(it);
                 myInsert(found, it, mapBooks);
             }        
         }
     }
-
-    else {
-        std::cout << m_sWord << " not in dictionary.\n";
+    else 
         normalSearch(mapWords);
-    }
 }
 
 /**
@@ -136,8 +130,6 @@ void CSearch::normalSearch(MAPWORDS& mapWords, dict& d_dict, map_books& mapBooks
 */
 void CSearch::normalSearch(MAPWORDS& mapWords)
 {
-    
-    std::cout << "Searching for " << m_sWord << "\n";
     if(mapWords.count(m_sWord) > 0) {
         std::map<std::string, double> found = mapWords.at(m_sWord);
         m_mapSR->insert(found.begin(), found.end());
@@ -149,12 +141,12 @@ void CSearch::normalSearch(MAPWORDS& mapWords)
 * @param[in] mapWords map of all words with a list of books in which this word accures
 * @param[in, out] mapSR searchresults
 */
-void CSearch::fuzzySearch(MAPWORDS& mapWords, map_books& mapBooks, bool t)
+void CSearch::fuzzySearch(MAPWORDS& mapWords, map_books& mapBooks, bool title)
 {
     for(auto it= mapWords.begin(); it!=mapWords.end(); it++)
     {
         double value = fuzzy::fuzzy_cmp(it->first, m_sWord);
-        if(value <= 0.2 && t==false) 
+        if(value <= 0.2 && title == false) 
             myInsert(it->second, it->first, mapBooks, value);
         else if(value <= 0.2)
             m_mapSR->insert(it->second.begin(), it->second.end());

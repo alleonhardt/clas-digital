@@ -1,9 +1,11 @@
 #include <iostream> 
 #include <fstream>
 #include <filesystem>
+#include <string>
 #include <map>
 #include <list>
-#include <string>
+#include <vector>
+#include <set>
 #include "func.hpp"
 #include "fuzzy.hpp"
 #include "CMetadata.hpp"
@@ -26,9 +28,9 @@ private:
     std::vector<std::string> m_collections; ///< Collections for fast access during search
     std::string m_author_date;  ///< [author], [date] for fast acces during search.
 
-    ///Map of matches found with fuzzy-search
+    ///Map of matches found with fuzzy-search (contains/ fuzzy)
     std::unordered_map<std::string, std::list<std::pair<std::string, double>>> m_mapFuzzy;
-    ///Map of matches found with contains-search
+    ///Map of matches found via different grammatical forms
     std::unordered_map<std::string, std::list<std::string>> m_mapFull;
 
     ///Map of words_pages_pos_relevance
@@ -102,7 +104,7 @@ public:
     ///Return matches found with fuzzy-search
     std::unordered_map<std::string, std::list<std::pair<std::string, double>>>& getMapFuzzy();
 
-    ///Return matches found with contains-search
+    ///Return matches found via different grammatical forms
     std::unordered_map<std::string, std::list<std::string>>& getMapFull();
 
  
@@ -159,35 +161,55 @@ public:
     // **** GET PAGES FUNCTIONS **** //
 
     /**
-    * @brief getPages calls the matching getPages... function according to fuzzyness
+    * @brief getPages calls findPages (extracting all pages from given word) for each 
+    * word searched and removes duplicates and/ or pages, where not all words searched
+    * occur.
+    * @param[in] sInput (list of searched words as a string, separated by ' ' or + 
+    * @param[in] fuzzyness (boolean indicating whether fuzziness is set or not)
+    * @return map of pages, with vector of words on this page 
+    * (all the same if fuzziness==false)
     */
     std::map<int, std::vector<std::string>>* getPages(std::string sInput, bool fuzzyness);
 
     /**
-    * @brief Create map of pages and found words for i-word (full-search).
+    * @brief Create map of pages and found words on page. As words found may differ 
+    * from searched word. (F.e. "Löwe" may match for "Löwin" even if fuzziness == false).
+    * @param[in] sWord (word search)
+    * @param[in] fuzzyness (boolean indicating whether fuzziness is set or not)
     * @return map of all pages on which word was found.
     */
     std::map<int, std::vector<std::string>>* findPages(std::string sWord, bool fuzzyness);
 
     /**
-    * @brief Remove all elements from mapPages, which do not exist in results2. 
+    * @brief Remove all elements from results-1, which do not exist in results-2. 
+    * @param[in, out] results1 (map of pages and words on page).
+    * @param[in] results2 (map of param and words on page).
     */
     void removePages(std::map<int, std::vector<std::string>>* results1, std::map<int, std::vector<std::string>>* results2);
 
     /**
-    * @brief checks whether words found occur on the same page
+    * @brief checks whether all words found occur on the same page or in metadata.
     * @param[in] sWords (words to check)
+    * @param[in] fuzzyness (fuzzy-search yes/ no)
     * @return boolean indicating whether words or on the same page or not
     */
-    bool onSamePage(std::vector<std::string> sWords);
+    bool onSamePage(std::vector<std::string> sWords, bool fuzzyness);
+
+    /** 
+    * @brief check whether all words occur in metadata
+    * @param[in] vWords (words to check)
+    * @param[in] fuzzyness (fuzzy-search yes/ no)
+    * @return boolean whether all words are in metadata or not.
+    */
+    bool metadata_cmp(std::vector<std::string> vWords, bool fuzzyness);
 
     /**
-    * @brief generates list of all pages of this book, also checking fuzzy-matches
-    * (but not contains-matches (please check!!!))
+    * @brief generates list of all pages from searched word, also checking fuzzy-matches
+    * (but not grammatical matches (please check!!!))
     * @param[in] word to generate list of pages for.
     * @return list of pages
     */
-    std::vector<size_t> pages(std::string sWord);
+    std::vector<size_t> pages(std::string sWord, bool fuzzyness);
 
 
     // ***** GET PREVIEW - functions ***** //

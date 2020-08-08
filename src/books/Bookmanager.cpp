@@ -235,7 +235,7 @@ std::list<std::string>* CBookManager::search(CSearchOptions* searchOpts)
 
     //Start first search
     CSearch search(searchOpts, sWords[0]);
-    std::map<std::string, double>* results = search.search(m_mapWords, m_mapWordsTitle, m_mapWordsAuthors, m_mapBooks, m_dict);
+    auto* results = search.search(m_mapWords, m_mapWordsTitle, m_mapWordsAuthors, m_mapBooks, m_dict);
 
     for(size_t i=1; i<sWords.size(); i++)
     {
@@ -243,12 +243,12 @@ std::list<std::string>* CBookManager::search(CSearchOptions* searchOpts)
             continue;
 
         CSearch search2(searchOpts, sWords[i]);
-        std::map<std::string, double>* results2 = search2.search(m_mapWords, m_mapWordsTitle, m_mapWordsAuthors, m_mapBooks, m_dict);
+        auto* results2 = search2.search(m_mapWords, m_mapWordsTitle, m_mapWordsAuthors, m_mapBooks, m_dict);
 
         for(auto it=results->begin(); it!=results->end();) {
             if(results2->count(it->first) == 0)
                  it = results->erase(it);
-            else if(m_mapBooks[it->first]->hasOcr() == true && m_mapBooks[it->first]->onSamePage(sWords)==false)
+            else if(m_mapBooks[it->first]->onSamePage(sWords, searchOpts->getFuzzyness())==false)
                  it = results->erase(it);
             else
                 ++it;

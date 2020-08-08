@@ -367,124 +367,141 @@ void CBook::loadPages()
 
 // **** GET PAGES FUNCTIONS **** //
 
+
 /**
-* @brief getPages calls the matching getPages... function according to fuzzyness
+* @brief getPages calls findPages (extracting all pages from given word) for each 
+* word searched and removes duplicates and/ or pages, where not all words searched
+* occur.
+* @param[in] sInput (list of searched words as a string, separated by ' ' or + 
+* @param[in] fuzzyness (boolean indicating whether fuzziness is set or not)
+* @return map of pages, with vector of words on this page 
+* (all the same if fuzziness==false)
 */
 std::map<int, std::vector<std::string>>* CBook::getPages(std::string sInput, bool fuzzyness)
 {
-    std::map<int, std::vector<std::string>>* mapPages = new std::map<int, std::vector<std::string>>;
+    //Initialize new map and return empty map in case the book has no ocr.
+    auto* mapPages = new std::map<int, std::vector<std::string>>;
     if(m_hasOcr == false)
         return mapPages;
 
+    //Do some parsing, as user can use ' ' or + to indicate searching for several words.
     std::replace(sInput.begin(), sInput.end(), ' ', '+');
     std::vector<std::string> vWords = func::split2(func::returnToLower(sInput), "+");
 
     //Create map of pages and found words for first word
     mapPages = findPages(vWords[0], fuzzyness);
 
-    for(size_t i=1; i<vWords.size(); i++) {
-
-        std::map<int, std::vector<std::string>>* mapPages2 = findPages(vWords[i], fuzzyness);
+    //Iterate over all 1..n words create list of pages, and remove words not on same page.
+    for(size_t i=1; i<vWords.size(); i++) 
+    {
+        //Get pages from word i.
+        auto* mapPages2 = findPages(vWords[i], fuzzyness);
 
         //Remove all elements from mapPages, which do not exist in results2. 
         removePages(mapPages, mapPages2);
         delete mapPages2;
     }
-
-    std::cout << "Found hits for " << sInput <<  " on " << mapPages->size() << " pages.\n";
-
     return mapPages;
 }
 
-
-//Create map of pages and found words for i-word (full-search)
+/**
+* @brief Create map of pages and found words on page. As words found may differ 
+* from searched word. (F.e. "Löwe" may match for "Löwin" even if fuzziness == false).
+* @param[in] sWord (word search)
+* @param[in] fuzzyness (boolean indicating whether fuzziness is set or not)
+* @return map of all pages on which word was found.
+*/
 std::map<int, std::vector<std::string>>* CBook::findPages(std::string sWord, bool fuzzyness)
 {
     //Create empty list of pages
-    std::map<int, std::vector<std::string>>* mapPages = new std::map<int, std::vector<std::string>>;
+    auto* mapPages = new std::map<int, std::vector<std::string>>;
 
-    //Fuzzyness = false
-    if (fuzzyness == false) {
+    //Normal-search
+    if (fuzzyness == false) 
+    {
+        //Check for different grammatical forms.
         if(m_mapFull.count(sWord) > 0) {
+            //Obtain pages from each word.
             for(auto elem : m_mapFull[sWord]) {
                 for(auto page : std::get<0>(m_mapWordsPages.at(elem)))
                     (*mapPages)[page].push_back(elem);
             }
         }
+        //Obtains pages.
         else if(m_mapWordsPages.count(sWord) > 0) {
             for(auto page : std::get<0>(m_mapWordsPages.at(sWord)))
                 (*mapPages)[page].push_back(sWord);
         }
     }
 
-    //Fuzzyness = true
+    //Fuzziness-search 
     else
     {
-        //1. try map of fuzzy matches
+        //Check for words in map of fuzzy matches.
         if(m_mapFuzzy.count(sWord) > 0) {
+            //Obtain pages from each word found by fuzzy-search.
             for(auto elem : m_mapFuzzy[sWord]) {
                 for(auto page : std::get<0>(m_mapWordsPages.at(elem.first)))
                     (*mapPages)[page].push_back(elem.first);
             }
         }
-
-        //2. Iterate over list of words
-        else {
-            for(auto it : m_mapWordsPages) {
-                if(fuzzy::fuzzy_cmp(it.first, sWord) <= 0.2) {
-                    for(auto page : std::get<0>(it.second))
-                        (*mapPages)[page].push_back(it.first);
-                }
-            }
-        }
     }
-
     return mapPages;
 }
 
 
 /**
-* @brief Remove all elements from mapPages, which do not exist in results2. 
-*  For all other elements, add the found string from results to on this page to the result
+* @brief Remove all elements from results-1, which do not exist in results-2. 
 * @param[in, out] results1
 * @param[in] results2
 * @return map of pages and words found on this page
 */
 void CBook::removePages(std::map<int, std::vector<std::string>>* results1, std::map<int, std::vector<std::string>>* results2)
 {
+    //Iterate over results-1.
     for(auto it=results1->begin(); it!=results1->end();)
     {
+        //Erase if, page does not exist in results-2
         if(results2->count(it->first) == 0)
             it = results1->erase(it);
+        //Insert words on page i in results-2 into words on page i in results-1
         else {
-            it->second.insert(it->second.end(), (*results2)[it->first].begin(), (*results2)[it->first].end());
+            std::vector<std::string> vec = (*results2)[it->first];
+            it->second.insert(it->second.end(), vec.begin(), vec.end());
             ++it;
         }
     }
 }
 
-bool CBook::onSamePage(std::vector<std::string> sWords)
+/**
+* @brief checks whether words found occur on the same page
+* @param[in] sWords (words to check)
+* @return boolean indicating whether words or on the same page or not
+*/
+bool CBook::onSamePage(std::vector<std::string> vWords, bool fuzzyness)
 {
-    //Check if words occur only in metadata (Author, Title, Data)
-    bool inMetadata = true;
-    for(const auto& word : sWords) {
-        std::string sTitle = m_metadata.getTitle(); func::convertToLower(sTitle);
-        std::string sAuthor = m_metadata.getAuthor(); func::convertToLower(sAuthor);
-        if(sAuthor.find(word) == std::string::npos && sTitle.find(word) == std::string::npos && std::to_string(m_date) != word)
-            inMetadata = false;
-    }
-    if(inMetadata == true)
+    //Check if words occur only in metadata (Author, Title, Date)
+    if(metadata_cmp(vWords, fuzzyness) == true)
         return true;
 
-    std::vector<size_t> pages1 = pages(sWords[0]);
-    if(pages1.size() == 0) return false;
+    //Get all pages, the first word is on
+    std::vector<size_t> pages1 = pages(vWords[0], fuzzyness);
 
-    for(size_t i=1; i<sWords.size(); i++)
+    //If no pages or found, return false
+    if(pages1.size() == 0) 
+        return false;
+
+    //Iterate over words 1..n
+    for(size_t i=1; i<vWords.size(); i++)
     {
-        std::vector<size_t> pages2 = pages(sWords[i]);
+        //get all pages of word i.
+        std::vector<size_t> pages2 = pages(vWords[i], fuzzyness);
 
-        if(pages2.size() == 0) return false;
+        //Return false if pages are empty
+        if(pages2.size() == 0) 
+            return false;
 
+        //Check if all pages in pages-1 occur in pages-2.
         bool found=false;
         for(size_t j=0; j<pages1.size(); j++) {
             if(std::find(pages2.begin(), pages2.end(), pages1[j]) != pages2.end()) {
@@ -499,22 +516,99 @@ bool CBook::onSamePage(std::vector<std::string> sWords)
     return true;
 }
 
-std::vector<size_t> CBook::pages(std::string sWord) {
-    std::vector<size_t> pages;
+/** 
+* @brief check whether all words occur in metadata
+* @param[in] vWords (words to check)
+* @param[in] fuzzyness (fuzzy-search yes/ no)
+* @return boolean whether all words are in metadata or not.
+*/
+bool CBook::metadata_cmp(std::vector<std::string> vWords, bool fuzzyness)
+{
+    bool inMetadata = true;
+            
+    //Iterate over all words and check for occurrence in metadata
+    for(const auto& word : vWords) {
+        std::string sTitle = m_metadata.getTitle(); func::convertToLower(sTitle);
+        std::string sAuthor = m_metadata.getAuthor(); func::convertToLower(sAuthor);
 
+        //If word occurs neither in author, title, or date, set inMetadata to false.
+        if(sAuthor.find(word) == std::string::npos && sTitle.find(word) == std::string::npos && std::to_string(m_date) != word) 
+            inMetadata = false;
+
+        //Check title and author again with fuzzy search.
+        if(fuzzyness == true)
+        {
+            //Check title
+            bool found = false;
+            sTitle = func::convertStr(sTitle);
+            for(auto it : func::extractWordsFromString(sTitle)) {
+                if(fuzzy::fuzzy_cmp(word, it.first) <= 0.2)
+                    found = true;
+            }
+
+            //check author
+            sAuthor = func::convertStr(sAuthor);
+            for(auto it : func::extractWordsFromString(sAuthor)) {
+                if(fuzzy::fuzzy_cmp(word, it.first) <= 0.2)
+                    found = true;
+            }
+            
+            //if found with fuzzy-search, set check-variable to true.
+            if(found == true)
+                inMetadata = found;
+        }
+
+        if(inMetadata == false)
+            return false;
+    }
+    return inMetadata;
+}
+
+/**
+* @brief generates list of all pages from searched word, also checking fuzzy-matches
+* (but not grammatical matches (please check!!!))
+* @param[in] word to generate list of pages for.
+* @return list of pages
+*/
+std::vector<size_t> CBook::pages(std::string sWord, bool fuzzyness)
+{
+    //Use set to automatically erase duplicates.
+    std::set<size_t> pages;
+
+    //Obtain pages with exact match
     if(m_mapWordsPages.count(sWord) > 0)
-        pages = std::get<0>(m_mapWordsPages[sWord]);
-    else if(m_mapFuzzy.count(sWord) > 0) {
-        for(auto elem : m_mapFuzzy[sWord]) {
-            std::vector<size_t> foo = std::get<0>(m_mapWordsPages.at(elem.first));
-            pages.insert(pages.begin(), foo.begin(), foo.end());
+    {
+        std::vector<size_t> foo = std::get<0>(m_mapWordsPages.at(sWord));
+        pages.insert(foo.begin(), foo.end());
+    }
+
+    //Obtain pages from grammatical matches
+    if(m_mapFull.count(sWord) > 0)
+    {
+        for(auto elem : m_mapFull[sWord]) {
+            std::vector<size_t> foo = std::get<0>(m_mapWordsPages.at(elem));
+            pages.insert(foo.begin(), foo.end());
         }
     }
-    return pages;
+
+    //Obtain pages from fuzzy match.
+    if(m_mapFuzzy.count(sWord) > 0 && fuzzyness == true) 
+    {
+        for(auto elem : m_mapFuzzy[sWord]) {
+            std::vector<size_t> foo = std::get<0>(m_mapWordsPages.at(elem.first));
+            pages.insert(foo.begin(), foo.end());
+        }
+    }
+    
+    //convert set to vector.
+    std::vector<size_t> vec;
+    vec.assign(pages.begin(), pages.end());
+    return vec;
 }
 
 
 // **** GET PREVIEW FUNCTIONS **** //
+
 std::string CBook::getPreview(std::string sInput)
 {
     // *** Get First preview *** //
