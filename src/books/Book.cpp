@@ -18,7 +18,7 @@ CBook::CBook(nlohmann::json jMetadata) : m_metadata(jMetadata)
     m_hasImages = false;
 
     //Metadata
-    m_sAuthor = m_metadata.getAuthor();
+    m_sAuthor = m_metadata.getAuthor();                 
     if(m_sAuthor.size() == 0) m_sAuthor = "No Author";
     m_author_date = m_sAuthor;
     func::convertToLower(m_sAuthor);
@@ -90,7 +90,7 @@ bool CBook::getPublic() {
     tm *local_time = localtime(&ttime);
 
     if(m_metadata.getMetadata("rights","data") == "CLASfrei")
-	return true;
+	    return true;
 
     //Local time number of seconds elapsed since 1. January 1900. 
     if(getDate() == -1 || getDate() >= (local_time->tm_year+1800))
@@ -173,10 +173,12 @@ void CBook::createPages()
 
     std::string sBuffer = "", sLine = "";
 
-    //Check if book has old format (with page mark)
+    //Check if book has a mark for end/ beginning of page.
     bool pageMark = false;
-    for(size_t i=0; i<10; i++) {
+    for(size_t i=0; i<10; i++) 
+    {
         std::getline(read, sLine);
+        //check page, checks whether current line is of page-break-form
         if(func::checkPage(sLine) == true) {
             pageMark = true;
             break;
@@ -186,11 +188,11 @@ void CBook::createPages()
     read.clear();
     read.seekg(0, std::ios::beg); 
 
-    //Variable storing complete ocr, to convert to old format if necessary 
+    //Variable storing complete ocr, to convert to page-break-format if necessary 
     std::string sConvertToNormalLayout = "----- 0 / 999 -----\n\n";
     size_t page=1, pageCounter = 0, blanclines = 3;
-    while(!read.eof()) {
-
+    while(!read.eof()) 
+    {
         //Read line
         getline(read, sLine);
 
@@ -204,7 +206,7 @@ void CBook::createPages()
             //Add new page to map of pages and update values. Safe page to disc
             createPage(sBuffer, sConvertToNormalLayout, page, pageMark);
 
-            //Different handling for old and new format
+            //Different handling for page-break- and non-page-break-(new)-format
             if(pageMark == true)   
                 page = stoi(sLine.substr(6, sLine.find("/")-7));
             else
@@ -224,7 +226,7 @@ void CBook::createPages()
 
     read.close();
 
-    //Write old format to disc, if ocr was in new format.
+    //Write page-mark-format to disc, if ocr was in new format.
     if(pageMark == false)
     {
         //Move new format, so it is not overwritten.
@@ -234,7 +236,7 @@ void CBook::createPages()
             std::cout << e.what() << "\n";
         }
 
-        //Safe as old format
+        //Safe as page-break-format
         std::ofstream write (m_sPath + "/ocr.txt");
         write << sConvertToNormalLayout;
         write.close();
@@ -245,7 +247,16 @@ void CBook::createPages()
 }
 
 
-void CBook::createPage(std::string sBuffer, std::string& sConvert, size_t page, bool pageMark)
+/**
+* @brief function adding all words from one page to map of words. Writes the
+* page to disc as single file. Add the page break line to a string used to convert 
+* new format to old/ normal format. 
+* @param[in] sBuffer (string holding current page)
+* @param[in, out] sConvert (string holding copy of complete ocr in page-mark-format)
+* @param[in] page (number indexing current page)
+* @param[in] mark (page-mark-format yes/no)
+*/
+void CBook::createPage(std::string sBuffer, std::string& sConvert, size_t page, bool mark)
 {
     //Add entry, or update entry in map of words/ pages (new page + relevance)
     for(auto it : func::extractWordsFromString(sBuffer)) {
@@ -258,10 +269,13 @@ void CBook::createPage(std::string sBuffer, std::string& sConvert, size_t page, 
     write << func::returnToLower(sBuffer);
     write.close();
 
-    if(pageMark == false)
+    if(mark == false)
         sConvert += "\n\n----- "+std::to_string(page)+" / 999 -----\n\n" + sBuffer;
 }
 
+/**
+* @brief Find preview position for each word in map of words/pages.
+*/
 void CBook::createMapPreview()
 {
     std::cout << "Create map Prev." << std::endl;
@@ -272,34 +286,39 @@ void CBook::createMapPreview()
     
 
 /**
-* @brief safe map of all words and pages on which word occures to disc
+* @brief safe map of all words and pages to disc
 */
 void CBook::safePages()
 {
     std::cout << "Saving pages" << std::endl;
+    //Open file.
     std::ofstream write(m_sPath + "/intern/pages.txt");
     write << m_numPages << "\n";
 
+    //Iterate over map of words
     for(auto it : m_mapWordsPages)
     {
+        //Write word in converted format (replace a by ä, é by e ...)
         std::string sWord = it.first;
-        std::string sBuffer = func::convertStr(sWord);
-        sBuffer += ";";
+        std::string sBuffer = func::convertStr(sWord) + ";";
+
+        //Add all pages word occurs on
         for(size_t page : std::get<0>(it.second)) {
             sBuffer += std::to_string(page) + ",";
         }
+
+        //Add preview-position and relevance.
         sBuffer += ";" + std::to_string(std::get<1>(m_mapWordsPages[it.first]));
-        sBuffer += ";" + std::to_string(std::get<2>(m_mapWordsPages[it.first]));
-        sBuffer += "\n"; 
+        sBuffer += ";" + std::to_string(std::get<2>(m_mapWordsPages[it.first])) + "\n";
+
         write << sBuffer;
     }
-    
     write.close();
 }
 
 
 /**
-* @brief load words and pages on which word occures into map
+* @brief load words and pages on which word occurs into map
 */
 void CBook::loadPages()
 {
@@ -308,16 +327,14 @@ void CBook::loadPages()
     std::ifstream read(m_sPath + "/intern/pages.txt");
     std::string sBuffer;
 
-    //Read number of pages
+    //Read number of pages, if first lind does not indicate pages, recreate book.
     getline(read, sBuffer);
-
     if(std::isdigit(sBuffer[0]) == false) {
         createPages();
         createMapPreview();
         safePages();
         return;
     }
-
     m_numPages = stoi(sBuffer);
 
     //Read words, pages, and relevance, preview-position
@@ -325,7 +342,6 @@ void CBook::loadPages()
     {
         //Read new line
         getline(read, sBuffer);
-
         if(sBuffer.length() < 2)
             continue;
 
@@ -334,9 +350,9 @@ void CBook::loadPages()
 
         //Extract pages and convert to size_t
         std::vector<size_t> pages;
-        std::vector<std::string> vecPages = func::split2(vec[1], ",");
-        for(auto page : vecPages) 
+        for(auto page : func::split2(vec[1], ",")) 
         {
+            //Check if page actually is number, then add to pages
             if(isdigit(page[0]))
                 pages.push_back(std::stoi(page));
         }

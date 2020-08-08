@@ -133,20 +133,25 @@ public:
     * @brief function adding all words from one page to map of words. Writes the
     * page to disc as single file. Add the page break line to a string used to convert 
     * new format to old/ normal format. 
-    * 
+    * @param[in] sBuffer (string holding current page)
+    * @param[in, out] sConvert (string holding copy of complete ocr in page-mark-format)
+    * @param[in] page (number indexing current page)
+    * @param[in] mark (page-mark-format yes/no)
     */
-    void createPage(std::string sBuffer, std::string& sConvetr, size_t page, bool old);
+    void createPage(std::string sBuffer, std::string& sConvert, size_t page, bool mark);
 
-    ///Finds preview-position for all words.
+    /**
+    * @brief Find preview position for each word in map of words/pages.
+    */
     void createMapPreview();
 
     /**
-    * @brief safe map of all words and pages on which word occures to disc
+    * @brief safe map of all words and pages to disc
     */
     void safePages();
 
     /**
-    * @brief load words and pages on which word occures into map
+    * @brief load words and pages on which word occurs into map
     */
     void loadPages();
 
