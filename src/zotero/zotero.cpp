@@ -130,7 +130,7 @@ std::string Zotero::SendRequest(std::string requestURI)
 	try
 	{
 		Zotero zot;
-		return std::move(zot._sendRequest(std::move(requestURI)));
+		return zot._sendRequest(std::move(requestURI));
 	}
 	catch(...)
 	{
@@ -213,7 +213,7 @@ std::string Zotero::_sendRequest(std::string requestURI)
 		_requestJSON = "";
 	}
 	//Convert the json to an string and return it.
-	return std::move(js.dump());
+	return js.dump();
 }
 
 

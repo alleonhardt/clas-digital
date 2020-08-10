@@ -689,9 +689,7 @@ std::string CBook::getOnePreview(std::string sWord)
 std::string CBook::getPreviewText(std::string& sWord, size_t& pos, size_t& page)
 {
     // *** get match *** //
-    if(m_mapWordsPages.count(sWord) > 0)
-        sWord = sWord;
-    else if(m_mapFull.count(sWord) > 0)
+    if(m_mapFull.count(sWord) > 0)
     {
         sWord = m_mapFull[sWord].front();
         if(m_mapWordsPages.count(sWord) == 0)

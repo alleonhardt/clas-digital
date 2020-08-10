@@ -27,3 +27,7 @@ install:
 
 install_stable:
 	cd build && rm CMakeCache.txt && cmake .. -DSTABLE_INSTALL=TRUE && cmake --build . && sudo cmake --build . --target install && rm CMakeCache.txt 
+
+
+install_service:
+	sudo cp src/clas-digital.service /etc/systemd/system

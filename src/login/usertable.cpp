@@ -85,7 +85,7 @@ bool UserHandler::AddUser(std::string email, std::string password, int access)
 	if(m_userTable.find(email)!=m_userTable.end())
 		return false;	//User exists tell the user about the aborted operation
 	//Create the user with the specific email password and access
-	m_userTable[email] = std::move(std::make_shared<User>(email.c_str(),password.c_str(),access));
+	m_userTable[email] = std::make_shared<User>(email.c_str(),password.c_str(),access);
 	//Tell the user about the successfull operation
 	return true;
 }
@@ -204,7 +204,7 @@ std::shared_ptr<User> UserHandler::GetUserBySessid(std::string x)
 void UserHandler::RemoveSession(std::string x)
 {
 	//No lock before this functioN!!!!!! This will result in a deadlock
-	std::shared_ptr<User> ptr = std::move(GetUserBySessid(x));
+	std::shared_ptr<User> ptr = GetUserBySessid(x);
 	if(ptr)
 	{
 		//Lock the function now as we are changing something important

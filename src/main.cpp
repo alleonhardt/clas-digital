@@ -251,9 +251,7 @@ void get_sugg(const Request &req, Response &resp, CBookManager &manager, std::st
     try
     {
 	std::string sInput = req.get_param_value("q");
-	auto start = std::chrono::system_clock::now();
 	std::list<std::string>* listSugg = manager.getSuggestions(sInput, sType);
-	std::chrono::duration<double> elapsed_seconds = std::chrono::system_clock::now()-start;
 	nlohmann::json responseJson;
 	for(auto it=listSugg->begin(); it!=listSugg->end();it++)
 	    responseJson.push_back((*it)); 
