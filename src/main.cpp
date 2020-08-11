@@ -30,6 +30,11 @@ GlobalUpdateOperations gGlobalUpdateOperation = GlobalUpdateOperations::none;
 bool gGlobalSigShutdown = false;
 
 
+/**
+ * @brief Handles the SIGTERM signal which is issued when the system service is about to be stopped.
+ * Stops the message handling from the server and tells all threads that the server is about to be shutdown
+ * @param int the param is not important to us
+ */
 void sig_handler(int)
 {
     //Just stop the server when systemd wants to exit us.
@@ -37,6 +42,13 @@ void sig_handler(int)
     gGlobalSigShutdown = true;
 }
 
+
+/**
+ * @brief Updates all files on the harddisk with the new zotero metadata
+ *
+ * @param m The book manager containing all books on the disk
+ * @param zot The zotero json which contains all metadata of all books
+ */
 void update_all_files(CBookManager *m, nlohmann::json *zot)
 {
 
@@ -143,6 +155,9 @@ void update_all_files(CBookManager *m, nlohmann::json *zot)
 
 }
 
+/**
+ * @brief This function gets called very day at 1am, it will download the new metadata and restart the server
+ */
 void update_and_restart()
 {
     using std::chrono::system_clock;
@@ -202,6 +217,13 @@ void update_and_restart()
 
 
 
+/**
+ * @brief Creates for a given set of books the bibliography to copy into word for example
+ *
+ * @param req The request send by the user containing the set of books to include
+ * @param resp The response object through which the server communicates with the requester
+ * @param manager The book manager containing all books
+ */
 void do_createbiblio(const Request &req,Response &resp,CBookManager &manager)
 {
     try
@@ -246,6 +268,14 @@ void do_createbiblio(const Request &req,Response &resp,CBookManager &manager)
     }
 }
 
+/**
+ * @brief Gets suggestions for authors or words derived from a part string
+ *
+ * @param req The request from the user
+ * @param resp The response object through which the response is sent to the user
+ * @param manager The book manager containing all books and a list of authors
+ * @param sType The type of suggestions to make either author or words
+ */
 void get_sugg(const Request &req, Response &resp, CBookManager &manager, std::string sType)
 {
     try
@@ -263,6 +293,14 @@ void get_sugg(const Request &req, Response &resp, CBookManager &manager, std::st
 	resp.set_content("{}","application/json");
     }
 }
+
+/**
+ * @brief Gets the metadata for a specific book
+ *
+ * @param req The request send by the user
+ * @param resp The response object to answer the user thorugh
+ * @param manager The manager containing a map of all books
+ */
 void get_metadata(const Request &req, Response &resp, CBookManager &manager)
 {
     try
@@ -279,6 +317,12 @@ void get_metadata(const Request &req, Response &resp, CBookManager &manager)
     }
 }
 
+/**
+ * @brief Creates a cookie for a user if the login was successfull
+ *
+ * @param req The request containing password and name fields in order to determine if the user credentials are valid
+ * @param resp The response object through which the anser is sent
+ */
 void do_login(const Request& req, Response &resp)
 {
     URLParser parser(req.body);
@@ -300,6 +344,13 @@ void do_login(const Request& req, Response &resp)
     }
 }
 
+/**
+ * @brief Splits a string at a character into a vector of strings
+ *
+ * @param pill The string to split
+ * @param c The character at which to split the string
+ * @param vec The vector in which the functions loads the data
+ */
 void own_split(const std::string &pill, char c, std::vector<std::string> &vec)
 {	    auto start = 0;
     std::string tmp;
@@ -322,6 +373,13 @@ void own_split(const std::string &pill, char c, std::vector<std::string> &vec)
     }
 }
 
+/**
+ * @brief Performs a search inside a book and returns the results as json
+ *
+ * @param req The request containing the search parameters
+ * @param resp The response object used to send the response to the user
+ * @param manager The manager containing all the books on the server
+ */
 void do_searchinbook(const Request& req, Response &resp, CBookManager &manager)
 {
     try
@@ -373,6 +431,15 @@ void do_searchinbook(const Request& req, Response &resp, CBookManager &manager)
     }
 }
 
+/**
+ * @brief Performs a search inside all books to find the searched parameters
+ *
+ * @param req The request containing the search parameters used
+ * @param resp The response object used to communicate with the user
+ * @param fileSearchHtml The complete file search.html as a string the functions just appends a few parameters and sends back the response
+ * @param zoteroPillars The zotero pillars, this is used to determine the zotero pillars which are even possible
+ * @param manager The book manager containing a map of all books on the server
+ */
 void do_search(const Request& req, Response &resp, const std::string &fileSearchHtml, const nlohmann::json &zoteroPillars, CBookManager &manager)
 {
     //Is this a search query or just a request for the search main page?
@@ -491,6 +558,13 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
     }
 }
 
+/**
+ * @brief Tries to extract a user from a given cookie
+ *
+ * @param req The request the user send
+ *
+ * @return A shared_ptr to a User object or to nullptr otherwise
+ */
 std::shared_ptr<User> GetUserFromCookie(const Request &req)
 {
     const char *ptr = get_header_value(req.headers,"Cookie");
@@ -508,12 +582,26 @@ std::shared_ptr<User> GetUserFromCookie(const Request &req)
     return UserHandler::GetUserTable().GetUserBySessid(cookie);
 }
 
+/**
+ * @brief Checks if a string ends with a specific string
+ *
+ * @param value The string to search the end
+ * @param ending The ending to compare against
+ *
+ * @return true if the string ends with ending
+ */
 inline bool ends_with(std::string const & value, std::string const & ending)
 {
     if (ending.size() > value.size()) return false;
     return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
 }
 
+/**
+ * @brief Manages authorized access to ressources
+ *
+ * @param req The request the user send.
+ * @param resp The response object which is used to serve the user the response
+ */
 void do_authentification(const Request& req, Response &resp)
 {
     std::cout<<req.path<<std::endl;
@@ -551,6 +639,13 @@ void do_authentification(const Request& req, Response &resp)
     std::cout<<"Access granted!"<<std::endl;
 }
 
+/**
+ * @brief The upload function will try to upload a single file to the server
+ *
+ * @param req The request to upload a specific file into a specific book
+ * @param resp The response object used to serve the user the response
+ * @param manager The book manager containing a map of all books
+ */
 void do_upload(const Request& req, Response &resp, CBookManager &manager)
 {
     if(!User::AccessCheck(GetUserFromCookie(req),2))
@@ -810,6 +905,12 @@ void do_upload(const Request& req, Response &resp, CBookManager &manager)
     resp.status=200;
 }
 
+/**
+ * @brief Admin function, sends a list of all registered users in the json format
+ *
+ * @param req The request from the user
+ * @param resp The response object used to return the response to the right user
+ */
 void do_senduserlist(const Request &req, Response &resp)
 {
     //Check if the user has admin access
@@ -821,6 +922,12 @@ void do_senduserlist(const Request &req, Response &resp)
     resp.set_content(std::move(UserHandler::GetUserTable().toJSON()),"application/json");
 }
 
+/**
+ * @brief Admin function, updates, deletes modifies users.
+ *
+ * @param req The request from the user
+ * @param resp The response object used to serve the user.
+ */
 void do_usertableupdate(const Request &req, Response &resp)
 {
     //Check if the user has admin access
@@ -863,6 +970,12 @@ void do_usertableupdate(const Request &req, Response &resp)
 
 }
 
+/**
+ * @brief User with write access can execute this function, restarts the server
+ *
+ * @param req The request from the user to issue the restart
+ * @param resp The response object used to serve the user.
+ */
 void do_restart_server(const Request &req, Response &resp)
 {
     if(!User::AccessCheck(GetUserFromCookie(req),AccessRights::USR_WRITE))	
@@ -890,6 +1003,12 @@ void do_restart_server(const Request &req, Response &resp)
     srv.stop();
 }
 
+/**
+ * @brief Updates zotero, can be executed by all users with write access
+ *
+ * @param req The request to issue the zotero update
+ * @param resp The response object used to serve the response to the user
+ */
 void do_update_zotero(const Request &req, Response &resp)
 {
     std::unique_lock<std::mutex> lock(gGlobalUpdateOperationLock, std::try_to_lock);
@@ -943,6 +1062,14 @@ void do_update_zotero(const Request &req, Response &resp)
 }
 
 
+/**
+ * @brief The main function taking as only parameter the port to start on
+ *
+ * @param argc should always be 2 as the server needs to know the port to start on
+ * @param argv
+ *
+ * @return 0 on regular shutdown or -1 on restart server shutdown
+ */
 int main(int argc, char **argv)
 {
     if(argc < 2)
