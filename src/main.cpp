@@ -12,7 +12,7 @@
 #include <string_view>
 #include <filesystem>
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h" //Neeeded for image dimensions
+#include "stb_image.h" //Needed for image dimensions
 #include <sstream>
 #include "ocr/tesseract.hpp"
 #include "util/StaticWebpageCreator.hpp"

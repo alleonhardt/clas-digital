@@ -1,5 +1,39 @@
 # clas-digital
+A C++ implementation of a webserver providing a login/search/upload implementation to catalogue and categorize texts.
+
+## Table of contents
+1. [Installation](#Installation)
+2. [Programming concept](#Programming-concept)
+
+## Installation
+After a bit of consideration we decided to use the package manager [conan](#https://conan.io) to manage the dependencies. 
+
+__Why use a package manager at all?__
+When developing a huge project like clas-digital one tends to use a lot of third party libraries. Clas-digital for example uses tesseract. Tesseract depends on leptonica which depends on libtiff and libjpeg and libpng. As one can see it is a lot of work to always install all dependencies. Not even mentioning the pitfalls when intalling on diffrent linux distributions. In order to improve this dire process we decided to use a package manager. Conan seems to be one of the most advanced cross plattform package managers there are for C++.
+
+__Compilation has not been tested on Windows and Mac!__
+Installation prerequisites:
+- Working C++ compiler which supports at least C++17. Recommended (Linux: GCC), (Windows: CLang), (Mac: Clang)
+- Python 3 and pip
+- CMake version 2.8 or newer
+
+__Instructions for Linux like systems:__
+```
+mkdir build
+cd build
+conan install .. cppstd=17
+cmake ..
+cmake --build .
+cmake . --target install
+```
+
+
+## Programming concept
+
 C++ implementation of a ancient literature database
+
+
+
 
 map liste mit buechern sortieren
 
