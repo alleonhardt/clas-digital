@@ -81,7 +81,7 @@ int main()
         for(auto it=searchResults->begin(); it!=searchResults->end(); it++)
         {
             CBook* book = manager.getMapOfBooks()[(*it)];
-            std::cout << "\033[1;32m" << book->getKey() << ": " << book->getShow() << "\n";
+            std::cout << "\033[1;32m" << book->get_key() << ": " << book->getShow() << "\n";
             std::cout << "Preview: " << std::endl;
             std::cout << "\033[1;31m" << book->getPreview(sInput)<< "\n";
 

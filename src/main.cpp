@@ -60,7 +60,7 @@ void update_all_files(CBookManager *m, nlohmann::json *zot)
 		std::cout<<"Processed: "<<managedBooks<<"/"<<manager.getMapOfBooks().size()<<std::endl;
 	    for(auto &it2 : zoteroPillars)
 	    {
-		if(func::in(it2["key"],it.second->getMetadata().getCollections()))
+		if(func::in(it2["key"],it.second->get_metadata().GetCollections()))
 		{
 		    if(it2.count("books_managed")>0)
 			it2["books_managed"] = it2["books_managed"].get<int>()+1;
@@ -95,7 +95,7 @@ void update_all_files(CBookManager *m, nlohmann::json *zot)
 	    dir+="/info.json";
 	    std::ofstream json_write(dir.c_str(),std::ios::out);
 	    if(json_write.is_open())
-		json_write<<it.second->getMetadata().getMetadata();
+		  json_write<<it.second->get_metadata().get_json();
 	    json_write.close();
 
 	    StaticWebpageCreator webpage(it.second);
@@ -229,7 +229,7 @@ void do_createbiblio(const Request &req,Response &resp,CBookManager &manager)
 	    {
 		auto &book = mapBooks[key];
 		retval+= "<p>";
-		retval+= book->getMetadata().getMetadata()["citation"];
+		retval+= book->get_metadata().GetMetadata("citation");
 		retval+="</p>";
 	    }
 	    catch(...) {}
@@ -271,8 +271,8 @@ void get_metadata(const Request &req, Response &resp, CBookManager &manager)
     {
 	std::string scanId = req.get_param_value("scanId");
 	CBook *b = manager.getMapOfBooks().at(scanId);
-	nlohmann::json js = b->getMetadata().getMetadata();
-	js["has_ocr"] = b->hasOcr();
+	nlohmann::json js = b->get_metadata().get_json();
+	js["has_ocr"] = b->has_ocr();
 	resp.set_content(std::move(js.dump()),"application/json");
     }
     catch(...)
@@ -449,11 +449,11 @@ void do_search(const Request& req, Response &resp, const std::string &fileSearch
 		{
 		    auto &it = map.at(*iter);
 		    nlohmann::json entry;
-		    entry["scanId"] = it->getKey();
+		    entry["scanId"] = it->get_key();
 		    entry["copyright"] = !it->getPublic();
 		    entry["hasocr"] = it->hasContent();
 		    entry["description"] = it->getAuthorDateScanned();
-		    entry["bibliography"] = it->getMetadata().getMetadata("bib");
+		    entry["bibliography"] = it->get_metadata().GetMetadata("bib");
 		    entry["preview"] = it->getPreview(options.getSearchedWord());
 		    js["books"].push_back(std::move(entry));
 		    if(++counter==resultsperpage)
@@ -1046,7 +1046,7 @@ int main(int argc, char **argv)
 	    unsigned long numEntries = 0;
 	    for(auto it2 : manager.getMapOfBooks())
 	    {
-		auto vec = it2.second->getMetadata().getCollections();
+		auto vec = it2.second->get_metadata().GetCollections();
 		if(std::find(vec.begin(),vec.end(),it["key"].get<std::string>()) != vec.end())
 			numEntries++;
 	    }
@@ -1055,11 +1055,11 @@ int main(int argc, char **argv)
 
     for(auto it : manager.getMapOfBooks())
     {
-	if(it.second->hasOcr())
+	if(it.second->has_ocr())
 	{
 	    ++ocrcount;
 	    unsigned long cnt = 0;
-	    std::filesystem::path p = std::filesystem::path(it.second->getPath())/"pages";
+	    std::filesystem::path p = std::filesystem::path(it.second->get_path())/"pages";
 	    if(std::filesystem::exists(p))
 	    {
 	    for(auto &it2 : std::filesystem::directory_iterator(p))

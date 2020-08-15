@@ -17,7 +17,7 @@ find_package(CURL REQUIRED)
 include_directories(${Tesseract_INCLUDE_DIRS})
 
 set(SRC_FILES src/main.cpp src/login/user.cpp src/login/usertable.cpp src/util/URLParser.cpp src/zotero/zotero.cpp src/ocr/tesseract.cpp)
-set(SRC_FILES_BOOKS src/books/Book.cpp src/books/Bookmanager.cpp src/books/Metadata.cpp src/books/Search.cpp src/books/SearchOptions.cpp src/books/func.cpp src/books/fuzzy.cpp)
+set(SRC_FILES_BOOKS src/books/Book.cpp src/books/Bookmanager.cpp src/books/metadata_handler.cc src/books/Search.cpp src/books/SearchOptions.cpp src/books/func.cpp src/books/fuzzy.cpp)
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_HOME_DIRECTORY}/bin)
 add_executable(books.o EXCLUDE_FROM_ALL ${SRC_FILES_BOOKS} src/books/main.cpp)

@@ -48,27 +48,27 @@ void CBookManager::writeListofBooksWithBSB() {
 
     for(auto it : m_mapBooks)
     {
-        std::string info = it.second->getKey() + ": " + it.second->getMetadata().getShow2() + "\n";
-        if(it.second->hasOcr() == false)
+        std::string info = it.second->get_key() + ": " + it.second->get_metadata().GetShow2() + "\n";
+        if(it.second->has_ocr() == false)
         {
             //Check if book has a bsb-link (archiveLocation)
-            if(it.second->getMetadata().getMetadata("archiveLocation", "data") != "")
+            if(it.second->get_metadata().GetMetadata("archiveLocation", "data") != "")
                 inBSB_noOcr += info;
             
             //Check if book has tag: "GibtEsBeiBSB"
-            if(it.second->getMetadata().hasTag("GibtEsBeiBSB") == true)
+            if(it.second->get_metadata().HasTag("GibtEsBeiBSB") == true)
                 gibtEsBeiBSB_noOCR += info;
     
             //Check if book has tag: "BSBDownLoadFertig"
-            if(it.second->getMetadata().hasTag("BSBDownLoadFertig") == true)
+            if(it.second->get_metadata().HasTag("BSBDownLoadFertig") == true)
                 BSBDownLoadFertig_noOCR += info;
 
             //Check if book is in collection: "Geschichte des Tierwissens"
-            if(func::in("RFWJC42V", it.second->getMetadata().getCollections()) == true)
+            if(func::in("RFWJC42V", it.second->get_metadata().GetCollections()) == true)
                 tierwissen_noOCR += info;
         }
 
-        else if(it.second->getMetadata().hasTag("GibtEsBeiBSB") == true)
+        else if(it.second->get_metadata().HasTag("GibtEsBeiBSB") == true)
             gibtEsBeiBSB_OCR += info;
         
     }
@@ -194,7 +194,7 @@ void CBookManager::updateZotero(nlohmann::json j_items)
     {
         //If book already exists, simply change metadata of book
         if(m_mapBooks.count(it["key"]) > 0)
-            m_mapBooks[it["key"]]->getMetadata().setMetadata(it);
+            m_mapBooks[it["key"]]->get_metadata().set_json(it);
 
         //If it does not exits, create new book and add to map of all books
         else
@@ -291,7 +291,7 @@ std::list<std::string>* CBookManager::convertToList(std::map<std::string, double
         compFunctor =
             [this](const auto &elem1,const auto &elem2)
 			{
-                int date1=m_mapBooks[elem1.first]->getDate(), date2=m_mapBooks[elem2.first]->getDate();
+                int date1=m_mapBooks[elem1.first]->get_date(), date2=m_mapBooks[elem2.first]->get_date();
 			    if(date1==date2) return elem1.first < elem2.first;
 			    return date1 < date2;
 			};
@@ -301,8 +301,8 @@ std::list<std::string>* CBookManager::convertToList(std::map<std::string, double
 			{
 			    auto &bk1 = m_mapBooks[elem1.first];
 			    auto &bk2 = m_mapBooks[elem2.first];
-			    std::string s1= bk1->getAuthor();
-			    std::string s2= bk2->getAuthor();
+			    std::string s1= bk1->get_author();
+			    std::string s2= bk2->get_author();
 			    if(s1==s2)
 				return elem1.first < elem2.first;
 			    return s1 < s2;
@@ -329,12 +329,12 @@ void CBookManager::createMapWords()
     for(auto it=m_mapBooks.begin(); it!=m_mapBooks.end(); it++)
     {
         //Check whether book has ocr
-        if(it->second->hasOcr() == false)
+        if(it->second->has_ocr() == false)
             continue;
 
         //Iterate over all words in this book. Check whether word already exists in list off all words.
-        for(auto yt : it->second->getMapWordsPages())
-            m_mapWords[yt.first][it->first] = static_cast<double>(std::get<1>(it->second->getMapWordsPages()[yt.first]))/it->second->getNumPages();
+        for(auto yt : it->second->get_map_words_pages())
+            m_mapWords[yt.first][it->first] = static_cast<double>(std::get<1>(it->second->get_map_words_pages()[yt.first]))/it->second->get_num_pages();
     }
 
     createListWords(m_mapWords, m_listWords);
@@ -350,7 +350,7 @@ void CBookManager::createMapWordsTitle()
     for(auto it=m_mapBooks.begin(); it!=m_mapBooks.end(); it++)
     {
         //Get map of words of current book)
-        std::string sTitle = it->second->getMetadata().getTitle();
+        std::string sTitle = it->second->get_metadata().GetTitle();
         sTitle=func::convertStr(sTitle);
         std::map<std::string, int> mapWords = func::extractWordsFromString(sTitle);
 
@@ -359,7 +359,7 @@ void CBookManager::createMapWordsTitle()
             m_mapWordsTitle[yt->first][it->first] = 0.1;
 
         //Add author names and year
-        m_mapWordsTitle[std::to_string(it->second->getDate())][it->first] = 0.1;
+        m_mapWordsTitle[std::to_string(it->second->get_date())][it->first] = 0.1;
     }
 }
 
@@ -372,9 +372,9 @@ void CBookManager::createMapWordsAuthor()
     //or add book to list of books (if word already exists).
     for(auto it=m_mapBooks.begin(); it!=m_mapBooks.end(); it++)
     {
-        for(auto author : it->second->getMetadata().getAuthorsKeys())
+        for(auto author : it->second->get_metadata().GetAuthorsKeys())
         {
-            if(!it->second->getMetadata().isAuthorEditor(author["creatorType"]))
+            if(!it->second->get_metadata().IsAuthorEditor(author["creator_type"]))
                 continue;
             m_mapWordsAuthors[func::returnToLower(author["lastname"])][it->first] = 0.1;
             m_mapUniqueAuthors[author["key"]].push_back(it->first);

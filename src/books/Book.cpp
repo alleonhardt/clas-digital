@@ -10,122 +10,132 @@ CBook::CBook () {}
 * @param[in] sPath Path to book
 * @param[in] map map of words in book
 */
-CBook::CBook(nlohmann::json jMetadata) : m_metadata(jMetadata)
+CBook::CBook(nlohmann::json jMetadata) : metadata_(jMetadata)
 {
-    m_sKey = jMetadata["key"];
-    m_sPath = "web/books/"+m_sKey;
-    m_hasOcr = false;
-    m_hasImages = false;
+  key_ = jMetadata["key"];
+  path_ = "web/books/"+key_;
+  has_ocr_ = false;
+  has_images_ = false;
 
-    //Metadata
-    m_sAuthor = m_metadata.getAuthor();                 
-    if(m_sAuthor.size() == 0) m_sAuthor = "No Author";
-    m_author_date = m_sAuthor;
-    func::convertToLower(m_sAuthor);
-    m_date    = m_metadata.getDate();
-    m_collections = m_metadata.getCollections();
-    if(m_date != -1) m_author_date += ", " + std::to_string(m_date);
-    m_author_date += ".";
+  //Metadata
+  author_ = metadata_.GetAuthor();                 
+  if(author_.size() == 0) author_ = "No Author";
+  author_date_ = author_;
+  func::convertToLower(author_);
+  date_    = metadata_.GetDate();
+  collections_ = metadata_.GetCollections();
+  if(date_ != -1) author_date_ += ", " + std::to_string(date_);
+  author_date_ += ".";
 }
 
 // **** GETTER **** //
 
-///Return Key of the book, after extracting it from the path
-const std::string& CBook::getKey() { return m_sKey;}
-
-///Getter function to return the path to the directory of a book
-const std::string& CBook::getPath() {return m_sPath;}
-
-///Return Path to directory of the book
-std::string CBook::getOcrPath() {
-    std::string sPath = m_sPath;
-    sPath.append("/ocr.txt");
-    return sPath;
+const std::string& CBook::get_key() { 
+  return key_;
 }
 
-///Return Boolean, whether book contains ocr or not 
-bool CBook::hasOcr() const { return m_hasOcr;}
-
-///Returns whether book has images.
-bool CBook::hasImages() const { return m_hasImages; }
-
-///Return whether book has images or ocr
-bool CBook::hasContent() const { return m_hasImages || m_hasOcr; }
-
-///Return whether book has title, author or date
-bool CBook::checkJson() {
-    if(m_sAuthor == "" && m_metadata.getTitle() == "" && m_date == -1)
-        return false;
-    return true;
+const std::string& CBook::get_path() {
+  return path_;
 }
 
-///Return "[author], [date]" and add "book not yet scanned", when hasOcr == false
-std::string CBook::getAuthorDateScanned() {
-    if(m_hasOcr == true)
-        return m_author_date;
-    return m_author_date + "<span style='color:orange;font-size:80%'> Book is not yet scanned, sorry for that.</span>";
+std::string CBook::get_ocr_path() {
+  return path_ + "/ocr.txt";
 }
 
-///Return number of pages
-int CBook::getNumPages() { return m_numPages; }
-
-///Return metadata-class to access all metadata 
-CMetadata& CBook::getMetadata() { return m_metadata; } 
-
-///Return lastName, or Name of author
-std::string CBook::getAuthor() { return m_sAuthor; }
-
-///Return date or -1 if date does not exists or is currupted
-int CBook::getDate() { return m_date; }
-
-///Return collections the book is in
-std::vector<std::string> CBook::getCollections() { return m_collections; }
-
-///Return "[author], [date]"
-std::string CBook::getAuthorDate() { return m_author_date; }
-
-///Return whether book is publicly accessible 
-bool CBook::getPublic() {
-    std::time_t ttime = time(0);
-    tm *local_time = localtime(&ttime);
-
-    if(m_metadata.getMetadata("rights","data") == "CLASfrei")
-	    return true;
-
-    //Local time number of seconds elapsed since 1. January 1900. 
-    if(getDate() == -1 || getDate() >= (local_time->tm_year+1800))
-        return false;
-    else
-        return true;
+bool CBook::has_ocr() const { 
+  return has_ocr_;
 }
+
+bool CBook::has_images() const { 
+  return has_images_; }
+
+int CBook::get_num_pages() { 
+  return num_pages_; 
+}
+
+MetadataHandler& CBook::get_metadata() { 
+  return metadata_; 
+} 
+
+std::string CBook::get_author() { 
+  return author_; 
+}
+
+int CBook::get_date() { 
+  return date_; 
+}
+
+std::vector<std::string> CBook::get_collections() { 
+  return collections_; 
+}
+
+std::string CBook::get_author_date() { 
+  return author_date_; 
+}
+
 
 ///Get map of words with list of pages, preview-position and relevance.
-std::unordered_map<std::string, std::tuple<std::vector<size_t>,int,size_t>>& CBook::getMapWordsPages() { 
-    return m_mapWordsPages;
+std::unordered_map<std::string, std::tuple<std::vector<size_t>,int,size_t>>& 
+CBook::get_map_words_pages() { 
+  return map_words_pages_;
 }
 
 ///Return matches found with fuzzy-search
-std::unordered_map<std::string, std::list<std::pair<std::string, double>>>& CBook::getMapFuzzy() {
-    return m_mapFuzzy;
+std::unordered_map<std::string, std::list<std::pair<std::string, double>>>& 
+CBook::get_found_fuzzy_matches() {
+  return found_fuzzy_matches_;
 }
 
 ///Return matches found with contains-search
-std::unordered_map<std::string, std::list<std::string>>& CBook::getMapFull() {
-    return m_mapFull;
+std::unordered_map<std::string, std::list<std::string>>& CBook::get_found_grammatical_matches() {
+  return found_grammatical_matches_;
 }
 
-     
+///Return whether book has images or ocr
+bool CBook::hasContent() const { 
+  return has_images_ || has_ocr_; 
+}
+
+///Return whether book has title, author or date
+bool CBook::checkJson() {
+  if(author_ == "" && metadata_.GetTitle() == "" && date_ == -1)
+   return false;
+  return true;
+}
+
+///Return "[author], [date]" and add "book not yet scanned", when has_ocr == false
+std::string CBook::getAuthorDateScanned() {
+  if(has_ocr_ == true)
+    return author_date_;
+  return author_date_ + "<span style='color:orange;font-size:80%'> Book is not yet scanned, sorry for that.</span>";
+}    
+
+///Return whether book is publicly accessible 
+bool CBook::getPublic() {
+  std::time_t ttime = time(0);
+  tm *local_time = localtime(&ttime);
+
+  if(metadata_.GetMetadata("rights","data") == "CLASfrei")
+    return true;
+
+  //Local time number of seconds elapsed since 1. January 1900. 
+  if(get_date() == -1 || get_date() >= (local_time->tm_year+1800))
+    return false;
+  else
+    return true;
+}
 // **** SETTER **** //
 
-///Set path to book-directory.
-void CBook::setPath(std::string sPath) { m_sPath = sPath; }
+void CBook::setPath(std::string sPath) { 
+    path_ = sPath; 
+}
 
 
 // **** CREATE BOOK AND MAPS (PAGES, RELEVANCE, PREVIEW) **** // 
 
 /**
-* @brief sets m_hasOcr/Images, 
-* if hasOcr==true, safes json to disc creates/ loads map of words/pages.
+* @brief sets has_ocr_/Images, 
+* if has_ocr==true, safes json to disc creates/ loads map of words/pages.
 * @param[in] sPath (path to book)
 */
 void CBook::createBook(std::string sPath)
@@ -135,41 +145,41 @@ void CBook::createBook(std::string sPath)
     {
 	    (void)p;
         if(p.path().extension() == ".jpg" || p.path().extension() == ".bmp")
-            m_hasImages = true; 
+            has_images_ = true; 
     }
 
     //Open ocr, if it doesn't exist, end function -> book does not need to be "created".
-    if(!std::filesystem::exists(getOcrPath())) return;
-    m_hasOcr = true;
+    if(!std::filesystem::exists(get_ocr_path())) return;
+    has_ocr_ = true;
 
     //Write json to disc.
-    std::ofstream writeJson(m_sPath + "/info.json");
-    writeJson << m_metadata.getMetadata();
+    std::ofstream writeJson(path_ + "/info.json");
+    writeJson << metadata_.get_json();
     writeJson.close();
 
     //Check whether list of words_pages already exists, if yes load, otherwise, create
-    std::string path = m_sPath + "/intern/pages.txt";
-    if(!std::filesystem::exists(path) || std::filesystem::is_empty(path))
-    {
+    std::string path = path_ + "/intern/pages.txt";
+    //if(!std::filesystem::exists(path) || std::filesystem::is_empty(path))
+    //{
         //Create pages
-        createPages();
+        CreatePages();
         //Find (first) preview.
-        createMapPreview();
+        CreateMapPreview();
         //Safe to disc
-        safePages();
-    }
+        SafePages();
+    //}
     //Load pages
-    else
-        loadPages();
+    //else
+        //LoadPages();
 }
 
 ///Create map of all pages and safe.
-void CBook::createPages()
+void CBook::CreatePages()
 {
     std::cout << "Creating map of words... \n";
     //Load ocr and create ne directory "intern" for this book.
-    std::ifstream read(getOcrPath());
-    fs::create_directories(m_sPath + "/intern");
+    std::ifstream read(get_ocr_path());
+    fs::create_directories(path_ + "/intern");
 
     std::string sBuffer = "", sLine = "";
 
@@ -204,7 +214,7 @@ void CBook::createPages()
         if((func::checkPage(sLine) == true && pageMark == true) || ((blanclines == 4 || (blanclines >= 4 && blanclines % 2 == 1)) && pageMark == false))
         {
             //Add new page to map of pages and update values. Safe page to disc
-            createPage(sBuffer, sConvertToNormalLayout, page, pageMark);
+            CreatePage(sBuffer, sConvertToNormalLayout, page, pageMark);
 
             //Different handling for page-break- and non-page-break-(new)-format
             if(pageMark == true)   
@@ -222,7 +232,7 @@ void CBook::createPages()
 
     //If there is "something left", safe as new page.
     if(sBuffer.length() !=0)
-        createPage(sBuffer, sConvertToNormalLayout, page, pageMark);
+        CreatePage(sBuffer, sConvertToNormalLayout, page, pageMark);
 
     read.close();
 
@@ -231,19 +241,19 @@ void CBook::createPages()
     {
         //Move new format, so it is not overwritten.
         try {
-            std::filesystem::rename(m_sPath + "/ocr.txt", m_sPath + "/old_ocr.txt");
+            std::filesystem::rename(path_ + "/ocr.txt", path_ + "/old_ocr.txt");
         } catch (std::filesystem::filesystem_error& e) {
             std::cout << e.what() << "\n";
         }
 
         //Safe as page-break-format
-        std::ofstream write (m_sPath + "/ocr.txt");
+        std::ofstream write (path_ + "/ocr.txt");
         write << sConvertToNormalLayout;
         write.close();
     }
 
     //Set number of pages for this book.
-    m_numPages = pageCounter;
+    num_pages_ = pageCounter;
 }
 
 
@@ -256,16 +266,16 @@ void CBook::createPages()
 * @param[in] page (number indexing current page)
 * @param[in] mark (page-mark-format yes/no)
 */
-void CBook::createPage(std::string sBuffer, std::string& sConvert, size_t page, bool mark)
+void CBook::CreatePage(std::string sBuffer, std::string& sConvert, size_t page, bool mark)
 {
     //Add entry, or update entry in map of words/ pages (new page + relevance)
     for(auto it : func::extractWordsFromString(sBuffer)) {
-        std::get<0>(m_mapWordsPages[it.first]).push_back(page);
-        std::get<1>(m_mapWordsPages[it.first]) += it.second*(it.second+1) / 2;
+        std::get<0>(map_words_pages_[it.first]).push_back(page);
+        std::get<1>(map_words_pages_[it.first]) += it.second*(it.second+1) / 2;
     } 
 
     //Create new page
-    std::ofstream write(m_sPath + "/intern/page" + std::to_string(page) + ".txt");
+    std::ofstream write(path_ + "/intern/page" + std::to_string(page) + ".txt");
     write << func::returnToLower(sBuffer);
     write.close();
 
@@ -276,11 +286,11 @@ void CBook::createPage(std::string sBuffer, std::string& sConvert, size_t page, 
 /**
 * @brief Find preview position for each word in map of words/pages.
 */
-void CBook::createMapPreview()
+void CBook::CreateMapPreview()
 {
     std::cout << "Create map Prev." << std::endl;
-    for(auto it : m_mapWordsPages) {
-        std::get<2>(m_mapWordsPages[it.first]) = getPreviewPosition(it.first);
+    for(auto it : map_words_pages_) {
+        std::get<2>(map_words_pages_[it.first]) = GetPreviewPosition(it.first);
     }
 }
     
@@ -288,15 +298,15 @@ void CBook::createMapPreview()
 /**
 * @brief safe map of all words and pages to disc
 */
-void CBook::safePages()
+void CBook::SafePages()
 {
     std::cout << "Saving pages" << std::endl;
     //Open file.
-    std::ofstream write(m_sPath + "/intern/pages.txt");
-    write << m_numPages << "\n";
+    std::ofstream write(path_ + "/intern/pages.txt");
+    write << num_pages_ << "\n";
 
     //Iterate over map of words
-    for(auto it : m_mapWordsPages)
+    for(auto it : map_words_pages_)
     {
         //Write word in converted format (replace a by ä, é by e ...)
         std::string sWord = it.first;
@@ -308,8 +318,8 @@ void CBook::safePages()
         }
 
         //Add preview-position and relevance.
-        sBuffer += ";" + std::to_string(std::get<1>(m_mapWordsPages[it.first]));
-        sBuffer += ";" + std::to_string(std::get<2>(m_mapWordsPages[it.first])) + "\n";
+        sBuffer += ";" + std::to_string(std::get<1>(map_words_pages_[it.first]));
+        sBuffer += ";" + std::to_string(std::get<2>(map_words_pages_[it.first])) + "\n";
 
         write << sBuffer;
     }
@@ -320,22 +330,22 @@ void CBook::safePages()
 /**
 * @brief load words and pages on which word occurs into map
 */
-void CBook::loadPages()
+void CBook::LoadPages()
 {
-    std::cout << m_sKey << "Loading pages." << std::endl;
+    std::cout << key_ << "Loading pages." << std::endl;
     //Load map
-    std::ifstream read(m_sPath + "/intern/pages.txt");
+    std::ifstream read(path_ + "/intern/pages.txt");
     std::string sBuffer;
 
     //Read number of pages, if first lind does not indicate pages, recreate book.
     getline(read, sBuffer);
     if(std::isdigit(sBuffer[0]) == false) {
-        createPages();
-        createMapPreview();
-        safePages();
+        CreatePages();
+        CreateMapPreview();
+        SafePages();
         return;
     }
-    m_numPages = stoi(sBuffer);
+    num_pages_ = stoi(sBuffer);
 
     //Read words, pages, and relevance, preview-position
     while(!read.eof())
@@ -358,7 +368,7 @@ void CBook::loadPages()
         }
 
         //Add word and pages to map
-        m_mapWordsPages[vec[0]] = make_tuple(pages, std::stoi(vec[2]), std::stoi(vec[3]));
+        map_words_pages_[vec[0]] = make_tuple(pages, std::stoi(vec[2]), std::stoi(vec[3]));
     }
 
     read.close();
@@ -369,7 +379,7 @@ void CBook::loadPages()
 
 
 /**
-* @brief getPages calls findPages (extracting all pages from given word) for each 
+* @brief getPages calls FindPages (extracting all pages from given word) for each 
 * word searched and removes duplicates and/ or pages, where not all words searched
 * occur.
 * @param[in] sInput (list of searched words as a string, separated by ' ' or + 
@@ -381,7 +391,7 @@ std::map<int, std::vector<std::string>>* CBook::getPages(std::string sInput, boo
 {
     //Initialize new map and return empty map in case the book has no ocr.
     auto* mapPages = new std::map<int, std::vector<std::string>>;
-    if(m_hasOcr == false)
+    if(has_ocr_ == false)
         return mapPages;
 
     //Do some parsing, as user can use ' ' or + to indicate searching for several words.
@@ -389,16 +399,16 @@ std::map<int, std::vector<std::string>>* CBook::getPages(std::string sInput, boo
     std::vector<std::string> vWords = func::split2(func::returnToLower(sInput), "+");
 
     //Create map of pages and found words for first word
-    mapPages = findPages(vWords[0], fuzzyness);
+    mapPages = FindPages(vWords[0], fuzzyness);
 
     //Iterate over all 1..n words create list of pages, and remove words not on same page.
     for(size_t i=1; i<vWords.size(); i++) 
     {
         //Get pages from word i.
-        auto* mapPages2 = findPages(vWords[i], fuzzyness);
+        auto* mapPages2 = FindPages(vWords[i], fuzzyness);
 
         //Remove all elements from mapPages, which do not exist in results2. 
-        removePages(mapPages, mapPages2);
+        RemovePages(mapPages, mapPages2);
         delete mapPages2;
     }
     return mapPages;
@@ -411,7 +421,7 @@ std::map<int, std::vector<std::string>>* CBook::getPages(std::string sInput, boo
 * @param[in] fuzzyness (boolean indicating whether fuzziness is set or not)
 * @return map of all pages on which word was found.
 */
-std::map<int, std::vector<std::string>>* CBook::findPages(std::string sWord, bool fuzzyness)
+std::map<int, std::vector<std::string>>* CBook::FindPages(std::string sWord, bool fuzzyness)
 {
     //Create empty list of pages
     auto* mapPages = new std::map<int, std::vector<std::string>>;
@@ -420,16 +430,16 @@ std::map<int, std::vector<std::string>>* CBook::findPages(std::string sWord, boo
     if (fuzzyness == false) 
     {
         //Check for different grammatical forms.
-        if(m_mapFull.count(sWord) > 0) {
+        if(found_grammatical_matches_.count(sWord) > 0) {
             //Obtain pages from each word.
-            for(auto elem : m_mapFull[sWord]) {
-                for(auto page : std::get<0>(m_mapWordsPages.at(elem)))
+            for(auto elem : found_grammatical_matches_[sWord]) {
+                for(auto page : std::get<0>(map_words_pages_.at(elem)))
                     (*mapPages)[page].push_back(elem);
             }
         }
         //Obtains pages.
-        else if(m_mapWordsPages.count(sWord) > 0) {
-            for(auto page : std::get<0>(m_mapWordsPages.at(sWord)))
+        else if(map_words_pages_.count(sWord) > 0) {
+            for(auto page : std::get<0>(map_words_pages_.at(sWord)))
                 (*mapPages)[page].push_back(sWord);
         }
     }
@@ -438,10 +448,10 @@ std::map<int, std::vector<std::string>>* CBook::findPages(std::string sWord, boo
     else
     {
         //Check for words in map of fuzzy matches.
-        if(m_mapFuzzy.count(sWord) > 0) {
+        if(found_fuzzy_matches_.count(sWord) > 0) {
             //Obtain pages from each word found by fuzzy-search.
-            for(auto elem : m_mapFuzzy[sWord]) {
-                for(auto page : std::get<0>(m_mapWordsPages.at(elem.first)))
+            for(auto elem : found_fuzzy_matches_[sWord]) {
+                for(auto page : std::get<0>(map_words_pages_.at(elem.first)))
                     (*mapPages)[page].push_back(elem.first);
             }
         }
@@ -456,7 +466,7 @@ std::map<int, std::vector<std::string>>* CBook::findPages(std::string sWord, boo
 * @param[in] results2
 * @return map of pages and words found on this page
 */
-void CBook::removePages(std::map<int, std::vector<std::string>>* results1, std::map<int, std::vector<std::string>>* results2)
+void CBook::RemovePages(std::map<int, std::vector<std::string>>* results1, std::map<int, std::vector<std::string>>* results2)
 {
     //Iterate over results-1.
     for(auto it=results1->begin(); it!=results1->end();)
@@ -481,11 +491,11 @@ void CBook::removePages(std::map<int, std::vector<std::string>>* results1, std::
 bool CBook::onSamePage(std::vector<std::string> vWords, bool fuzzyness)
 {
     //Check if words occur only in metadata (Author, Title, Date)
-    if(metadata_cmp(vWords, fuzzyness) == true)
+    if(MetadataCmp(vWords, fuzzyness) == true)
         return true;
 
     //Get all pages, the first word is on
-    std::vector<size_t> pages1 = pages(vWords[0], fuzzyness);
+    std::vector<size_t> pages1 = PagesFromWord(vWords[0], fuzzyness);
 
     //If no pages or found, return false
     if(pages1.size() == 0) 
@@ -495,7 +505,7 @@ bool CBook::onSamePage(std::vector<std::string> vWords, bool fuzzyness)
     for(size_t i=1; i<vWords.size(); i++)
     {
         //get all pages of word i.
-        std::vector<size_t> pages2 = pages(vWords[i], fuzzyness);
+        std::vector<size_t> pages2 = PagesFromWord(vWords[i], fuzzyness);
 
         //Return false if pages are empty
         if(pages2.size() == 0) 
@@ -522,17 +532,17 @@ bool CBook::onSamePage(std::vector<std::string> vWords, bool fuzzyness)
 * @param[in] fuzzyness (fuzzy-search yes/ no)
 * @return boolean whether all words are in metadata or not.
 */
-bool CBook::metadata_cmp(std::vector<std::string> vWords, bool fuzzyness)
+bool CBook::MetadataCmp(std::vector<std::string> vWords, bool fuzzyness)
 {
     bool inMetadata = true;
             
     //Iterate over all words and check for occurrence in metadata
     for(const auto& word : vWords) {
-        std::string sTitle = m_metadata.getTitle(); func::convertToLower(sTitle);
-        std::string sAuthor = m_metadata.getAuthor(); func::convertToLower(sAuthor);
+        std::string sTitle = metadata_.GetTitle(); func::convertToLower(sTitle);
+        std::string sAuthor = metadata_.GetAuthor(); func::convertToLower(sAuthor);
 
         //If word occurs neither in author, title, or date, set inMetadata to false.
-        if(sAuthor.find(word) == std::string::npos && sTitle.find(word) == std::string::npos && std::to_string(m_date) != word) 
+        if(sAuthor.find(word) == std::string::npos && sTitle.find(word) == std::string::npos && std::to_string(date_) != word) 
             inMetadata = false;
 
         //Check title and author again with fuzzy search.
@@ -570,32 +580,32 @@ bool CBook::metadata_cmp(std::vector<std::string> vWords, bool fuzzyness)
 * @param[in] word to generate list of pages for.
 * @return list of pages
 */
-std::vector<size_t> CBook::pages(std::string sWord, bool fuzzyness)
+std::vector<size_t> CBook::PagesFromWord(std::string sWord, bool fuzzyness)
 {
     //Use set to automatically erase duplicates.
     std::set<size_t> pages;
 
     //Obtain pages with exact match
-    if(m_mapWordsPages.count(sWord) > 0)
+    if(map_words_pages_.count(sWord) > 0)
     {
-        std::vector<size_t> foo = std::get<0>(m_mapWordsPages.at(sWord));
+        std::vector<size_t> foo = std::get<0>(map_words_pages_.at(sWord));
         pages.insert(foo.begin(), foo.end());
     }
 
     //Obtain pages from grammatical matches
-    if(m_mapFull.count(sWord) > 0)
+    if(found_grammatical_matches_.count(sWord) > 0)
     {
-        for(auto elem : m_mapFull[sWord]) {
-            std::vector<size_t> foo = std::get<0>(m_mapWordsPages.at(elem));
+        for(auto elem : found_grammatical_matches_[sWord]) {
+            std::vector<size_t> foo = std::get<0>(map_words_pages_.at(elem));
             pages.insert(foo.begin(), foo.end());
         }
     }
 
     //Obtain pages from fuzzy match.
-    if(m_mapFuzzy.count(sWord) > 0 && fuzzyness == true) 
+    if(found_fuzzy_matches_.count(sWord) > 0 && fuzzyness == true) 
     {
-        for(auto elem : m_mapFuzzy[sWord]) {
-            std::vector<size_t> foo = std::get<0>(m_mapWordsPages.at(elem.first));
+        for(auto elem : found_fuzzy_matches_[sWord]) {
+            std::vector<size_t> foo = std::get<0>(map_words_pages_.at(elem.first));
             pages.insert(foo.begin(), foo.end());
         }
     }
@@ -613,7 +623,7 @@ std::string CBook::getPreview(std::string sInput)
 {
     // *** Get First preview *** //
     std::vector<std::string> searchedWords = func::split2(sInput, "+");
-    std::string prev = getOnePreview(searchedWords[0]);
+    std::string prev = GetOnePreview(searchedWords[0]);
 
     // *** Get second Preview (if second word) *** //
     for(size_t i=1; i<searchedWords.size(); i++)
@@ -630,7 +640,7 @@ std::string CBook::getPreview(std::string sInput)
         } 
         else
         {
-            std::string newPrev = getOnePreview(searchedWords[i]);
+            std::string newPrev = GetOnePreview(searchedWords[i]);
             if(newPrev != "No Preview.")
                 prev += "\n" + newPrev;
         }
@@ -644,17 +654,17 @@ std::string CBook::getPreview(std::string sInput)
 * @param fuzzyness
 * @return Preview
 */
-std::string CBook::getOnePreview(std::string sWord)
+std::string CBook::GetOnePreview(std::string sWord)
 {
     std::string sSource;
     size_t pos;
     size_t page=1000000;
 
     // *** get Source string and position *** //
-    if(m_hasOcr == true) 
-        sSource = getPreviewText(sWord, pos, page);
+    if(has_ocr_ == true) 
+        sSource = GetPreviewText(sWord, pos, page);
     else
-        sSource = getPreviewTitle(sWord, pos);
+        sSource = GetPreviewTitle(sWord, pos);
 
     if(sSource=="") return "No Preview.";
 
@@ -676,7 +686,7 @@ std::string CBook::getOnePreview(std::string sWord)
     finalResult.insert(pos, "<mark>");
 
     //*** Shorten preview if needed *** //
-    shortenPreview(finalResult);
+    ShortenPreview(finalResult);
 
     //*** Append [...] front and back *** //
     finalResult.insert(0, " \u2026"); 
@@ -686,44 +696,44 @@ std::string CBook::getOnePreview(std::string sWord)
         return finalResult += " \u2026";
 }
 
-std::string CBook::getPreviewText(std::string& sWord, size_t& pos, size_t& page)
+std::string CBook::GetPreviewText(std::string& sWord, size_t& pos, size_t& page)
 {
     // *** get match *** //
-    if(m_mapWordsPages.count(sWord) > 0)
+    if(map_words_pages_.count(sWord) > 0)
         sWord = sWord;
-    else if(m_mapFull.count(sWord) > 0)
+    else if(found_grammatical_matches_.count(sWord) > 0)
     {
-        sWord = m_mapFull[sWord].front();
-        if(m_mapWordsPages.count(sWord) == 0)
+        sWord = found_grammatical_matches_[sWord].front();
+        if(map_words_pages_.count(sWord) == 0)
         {
             std::cout << "Word in mapFull, which is not in mapWordPages.\n";
             return "";
         }
     }
-    else if(m_mapFuzzy.count(sWord) > 0) 
-        sWord = m_mapFuzzy[sWord].front().first;
+    else if(found_fuzzy_matches_.count(sWord) > 0) 
+        sWord = found_fuzzy_matches_[sWord].front().first;
     else 
         return "";
 
     // *** Get Page *** //
-    page = std::get<0>(m_mapWordsPages[sWord])[0];
+    page = std::get<0>(map_words_pages_[sWord])[0];
     if(page == 1000000)
         return "";
 
     // *** Get Source string *** //
-    std::ifstream read(m_sPath + "/intern/page" + std::to_string(page) + ".txt", std::ios::in);
+    std::ifstream read(path_ + "/intern/page" + std::to_string(page) + ".txt", std::ios::in);
     std::string sSource((std::istreambuf_iterator<char>(read)), std::istreambuf_iterator<char>());
 
     // *** Get Pos *** //
-    pos = std::get<2>(m_mapWordsPages[sWord]);
+    pos = std::get<2>(map_words_pages_[sWord]);
 
     return sSource;
 }
 
-std::string CBook::getPreviewTitle(std::string& sWord, size_t& pos)
+std::string CBook::GetPreviewTitle(std::string& sWord, size_t& pos)
 {
     // *** Get Source string *** //
-    std::string sTitle = m_metadata.getTitle() + " ";
+    std::string sTitle = metadata_.GetTitle() + " ";
     func::convertToLower(sTitle);
 
     // *** Find Pos *** //
@@ -749,13 +759,13 @@ std::string CBook::getPreviewTitle(std::string& sWord, size_t& pos)
 * @param[in] page (page on which match was found)
 * @return preview for this book
 */
-size_t CBook::getPreviewPosition(std::string sWord)
+size_t CBook::GetPreviewPosition(std::string sWord)
 {
-    std::vector<size_t> pages = std::get<0>(m_mapWordsPages[sWord]);
+    std::vector<size_t> pages = std::get<0>(map_words_pages_[sWord]);
     for(size_t i=0; i<pages.size(); i++) 
     {
         //Read ocr and kontent
-        std::ifstream read(m_sPath + "/intern/page" + std::to_string(pages[i]) + ".txt", std::ios::in);
+        std::ifstream read(path_ + "/intern/page" + std::to_string(pages[i]) + ".txt", std::ios::in);
         std::string sPage((std::istreambuf_iterator<char>(read)), std::istreambuf_iterator<char>());
 
         //Find match
@@ -770,7 +780,7 @@ size_t CBook::getPreviewPosition(std::string sWord)
 }
 
 
-void CBook::shortenPreview(std::string& str)
+void CBook::ShortenPreview(std::string& str)
 {
     //Delete invalid chars front
     for(;;)
@@ -795,11 +805,11 @@ void CBook::shortenPreview(std::string& str)
 
 void CBook::addPage(std::string sInput, std::string sPage, std::string sMaxPage)
 {
-    std::ofstream writePage(m_sPath+"/intern/add"+sPage+".txt");
+    std::ofstream writePage(path_+"/intern/add"+sPage+".txt");
     writePage << sInput;
     writePage.close();
 
-    fs::path p = getOcrPath();
+    fs::path p = get_ocr_path();
     fs::exists(p);
     std::string sSource;
     if(fs::exists(p) == false) {
@@ -811,7 +821,7 @@ void CBook::addPage(std::string sInput, std::string sPage, std::string sMaxPage)
     else {
         std::map<int, std::string> orderMap;
         std::cout << "Adding to existing ocr ... " << std::endl;
-        for(auto& p : fs::directory_iterator(m_sPath+"/intern")) {
+        for(auto& p : fs::directory_iterator(path_+"/intern")) {
             std::string filename=p.path().filename();
             if(filename.find("add")!=std::string::npos) {
                 std::string num = filename.substr(3, filename.length()-2-filename.find("."));
@@ -829,7 +839,7 @@ void CBook::addPage(std::string sInput, std::string sPage, std::string sMaxPage)
 
     std::cout << sSource << std::endl;
     
-    std::ofstream writeOcr(m_sPath + "/ocr.txt");
+    std::ofstream writeOcr(path_ + "/ocr.txt");
     writeOcr << sSource;
     writeOcr.close();
 }

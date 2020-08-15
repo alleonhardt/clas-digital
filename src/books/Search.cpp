@@ -166,12 +166,12 @@ void CSearch::myInsert(std::map<std::string, double>& found, std::string sMatch,
         (*m_mapSR)[it->first] += it->second*(1-value*5);
 
         //Add match to map
-        if(mapBooks[it->first]->hasOcr() == false)
+        if(mapBooks[it->first]->has_ocr() == false)
             continue;
-        if (mapBooks[it->first]->getMapFuzzy()[m_sWord].front().second > value)
-            mapBooks[it->first]->getMapFuzzy()[m_sWord].push_front({sMatch, value});
+        if (mapBooks[it->first]->get_found_fuzzy_matches()[m_sWord].front().second > value)
+            mapBooks[it->first]->get_found_fuzzy_matches()[m_sWord].push_front({sMatch, value});
         else
-            mapBooks[it->first]->getMapFuzzy()[m_sWord].push_back({sMatch, value});
+            mapBooks[it->first]->get_found_fuzzy_matches()[m_sWord].push_back({sMatch, value});
     }
 }
 
@@ -188,9 +188,9 @@ void CSearch::myInsert(std::map<std::string, double>& found, std::string sMatch,
         (*m_mapSR)[it->first] += it->second;
 
         //Add match to map
-        if(mapBooks[it->first]->hasOcr() == false)
+        if(mapBooks[it->first]->has_ocr() == false)
             continue;
-        mapBooks[it->first]->getMapFull()[m_sWord].push_back(sMatch);
+        mapBooks[it->first]->get_found_grammatical_matches()[m_sWord].push_back(sMatch);
     }
 }
 
@@ -216,23 +216,23 @@ void CSearch::removeBooks(map_books& mapBooks)
 bool CSearch::checkSearchOptions(CBook* book)
 {
     //*** check ocr ***//
-    if(m_sOpts->getOnlyOcr() == true && book->hasOcr() == false)
+    if(m_sOpts->getOnlyOcr() == true && book->has_ocr() == false)
         return false;
 
     //*** check author ***//
     if(m_sOpts->getLastName().length() > 0)
     {
-        if(book->getAuthor() != m_sOpts->getLastName())
+        if(book->get_author() != m_sOpts->getLastName())
             return false;
     }
 
     //*** check date ***//
-    if(book->getDate()==-1 || book->getDate()<m_sOpts->getFrom() || book->getDate()>m_sOpts->getTo())
+    if(book->get_date()==-1 || book->get_date()<m_sOpts->getFrom() || book->get_date()>m_sOpts->getTo())
         return false;
          
     //*** check pillars ***//
     for(auto const &collection : m_sOpts->getCollections()) {
-        if(func::in(collection, book->getCollections()) == true)
+        if(func::in(collection, book->get_collections()) == true)
             return true;
     }
     return false;
