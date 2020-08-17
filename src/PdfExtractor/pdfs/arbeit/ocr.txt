@@ -1,0 +1,1860 @@
+----- 0 / 39 -----
+
+    Zwischen Kritik und Affirmation
+    Zweite Natur und Befreiung bei Hegel und Nietzsche
+
+   Between Critique and Affirmation
+Second Natur and Liberation in the Philosophies of Hegel and
+                         Nietzsche
+
+           Goethe Universität Frankfurt am Main
+
+
+
+
+               Sommersemester 2020
+
+                       Jan van Dick
+                          6081227
+                 Betreuer: Dr. Jonas Heller
+
+                      14. August 2020
+
+
+----- 1 / 39 -----
+
+Inhaltsverzeichnis
+
+1 Einleitung                                                                   1
+
+2 Hauptteil                                                                    4
+  2.1 Zweite Natur bei Hegel . . . . . . . . . . . . . . . . . . . . . . .     7
+      2.1.1 (a) Autonomie und Sittlichkeit . . . . . . . . . . . . . . .       7
+      2.1.2 (b) Gewohnheit - Dialektik von Geist und Mechanismus .            13
+      2.1.3 (c) Dialektik von Kritik und Affirmation . . . . . . . . .        17
+      2.1.4 Zwischenfazit und Problembestimmung . . . . . . . . . .           21
+  2.2 Zweite Natur bei Nietzsche . . . . . . . . . . . . . . . . . . . . .    22
+      2.2.1 (a) Was bedeutet Schein? . . . . . . . . . . . . . . . . .        23
+      2.2.2 (b) Der Schauspieler und die Rolle . . . . . . . . . . . .        26
+      2.2.3 (c) Gott ist tot! . . . . . . . . . . . . . . . . . . . . . . .   28
+  2.3 Was heißt Befreiung aus der zweiten Natur . . . . . . . . . . . .       30
+  2.4 Das offene Meer? . . . . . . . . . . . . . . . . . . . . . . . . . .    31
+
+3 Fazit                                                                       34
+
+
+
+
+                                       i
+
+
+----- 2 / 39 -----
+
+Einleitung
+
+So, wie Friedrich Nietzsche in dem Aphorismus vom „[T]olle[n] Menschen“ 1 in
+Die fröhliche Wissenschaft die These vom Tode Gottes entfaltet, enthält sie
+weit mehr als die bloße Negation Gottes; indem Nietzsche hinzufügt, dass wir
+ihn getötet haben, gibt sie Zeugnis von der Verantwortung des Menschen für
+sowohl die Lebendigkeit, als auch die Tötung Gottes: Der Mensch hat Gott
+geschaffen, als dann außer ihm und selbstständig existierend, nur so konnte er
+ihn töten und damit sich von ihm wieder befreien.2 Somit liegt eine dialekti-
+sche Konzeption der Begriffe (zweite) Natur und Befreiung vor, die ich aus der
+Sicht Nietzsches, sowie der von Christoph Menke rekonstruierten Perspektive
+Hegels untersuchen möchte. Beide Begriffe entfalten sich in ihrem Doppel-
+charakter: zweite Natur als Kritik und Affirmation, Befreiung als Macht und
+Ohnmacht des Geistes. In der zweiten Natur schlägt Setzen in Sein um3 ; hierin
+liegt zum Einen die Verwirklichung des Geistes, zum Anderen seine In-Natur-
+Verkehrtheit.4 Ebenso verhält es sich mit dem Begriff der Befreiung: sie ist
+1. die Macht des Geistes neues Hervorzubringen und die scheinbare Notwen-
+digkeit des Bestehenden zu durchbrechen, 2. aber die Ohnmacht des Geistes,
+da die Befreiung nie abgeschlossen ist; sie ist nur Befreiung von der Natur
+durch das Setzen einer neuen, aus welcher der Geist sich dann erneut befreien
+muss.5 Doch während in Hegels Deutung der Geist in der Befreiung, auf Grund
+der Endlichkeit des menschlichen Geistes, wieder in Natur verfällt, scheint bei
+Nietzsche in der Metapher des „offene[n] Meer[es]“ 6 , die Perspektive die ewige
+   1
+     Vgl. Friedrich Nietzsche. Morgenröte. Idyllen aus Messina. Die fröhliche Wissenschaft.
+kritische Studienausgabe in 15 Bänden, KSA Band 3. München: Deutscher Taschenbuch
+Verlag, 1999, S. 481. Nachfolgend zitiert als KSA 3.
+   2
+     Vgl. ebd., S. 481.
+   3
+     Dass Setzen in Sein umschlägt bedeutet, dass das vom Menschen Gesetzte als Nichts-
+gesetzes, als Natur, oder Sein erscheint (Vgl. Christoph Menke. Autonomie und Befreiung:
+Studien zu Hegel. Erste Auflage. suhrkamp taschenbuch wissenschaft. Berlin: Suhrkamp,
+2018, S. 142. Nachfolgend zitiert als AuB.): Der Mensch hat Gott geschaffen, dieser wurde
+dann zu ihm gegenüber selbständiger seiender Natur.
+   4
+     Vgl. ebd., S. 145.
+   5
+     Vgl. ebd., S. 80.
+   6
+     Vgl. Nietzsche, KSA 3 , S. 574.
+
+
+                                            1
+
+
+----- 3 / 39 -----
+
+Jan van Dick                „Zweite Natur und Befreiung“                                 2
+
+
+Wiederholung der In-Natur-Verkehrtheit zu überwinden, vorhanden zu sein.
+Zugleich bezeichnen Hegel und Nietzsche Freiheit als nicht gegeben: Freiheit
+wird bei beiden so gedacht, dass man sie „nicht nur hat, sondern auch bestän-
+dig noch erwirbt und erwerben muss“ 7 . Mit Adorno ließe sich sagen: Freiheit
+ist die Befreiung aus der jeweiligen Unfreiheit.8 Die Dialektik von Freiheit und
+Notwendigkeit ist demnach Gegenstand meiner Arbeit, die Leitfrage der Arbeit
+also: gibt es in Nietzsches Philosophie eine Möglichkeit der Überwindung der
+Notwendig-in-Natur-Verkehrtheit des Geistes? Aus der Position des anfangs
+erwähnten »Tollen Menschen«9 liegt es nahe, diese Möglichkeit in einem Be-
+wusstsein vom Gewordensein der zweiten Natur zu suchen (Gott kann getötet
+werden, wenn erkannt wird, das er geschaffen ist). Dies werde ich im Verlauf
+auch als »Bewusstsein der Scheinhaftigkeit« bezeichnen. Zugleich, muss aber
+der Schein selbst „mich fühlen lassen, dass hier Schein [...] und nichts mehr
+ist“ 10 . Zu fragen wäre demnach, ob dieses Bewusstwerden eine Arbeit des ein-
+zelnen Individuums ist, oder ob es aus der Struktur der zweiten Natur selbst
+hervorgehen kann.
+
+    Nietzsches Aussage über den Tod Gottes bedeutet nach der Form-Seite die
+Überwindung der vom Menschen gesetzten zweiten Natur (Gott), der inhalt-
+lichen Seite nach aber, dass der Mensch Gott nicht mehr nötig hat und die
+Bestimmung des Gesetzes sich aus dem Menschen selbst entwickelt. Um al-
+so den Begriff der zweiten Natur zu erarbeiten, werde ich im ersten Schritt
+zunächst auf den Begriff der Autonomie eingehen, da hier der Versuch, Ge-
+setz und Freiheit zusammen und von Gott gelöst zu denken, seinen Ursprung
+nimmt. Der Begriff der zweiten Natur ergibt sich dann aus Hegels Kritik an
+Kants Autonomiebegriff. Hegels Ausweg besteht darin, Freiheit sozial zu ver-
+stehen.11 Aus dieser Perspektive werde ich Hegels Begriff der Sittlichkeit als
+soziale Teilhabe entwickeln (a). Hier wird sich das Paradox der Autonomie
+in dem Begriff der Gewohnheit wiederholen. Diese Wiederholung des Paradox
+   7
+     Nietzsche, KSA 3 , S. 636.
+   8
+     Vgl Theodor W. Adorno. Negative Dialektik. 1. Aufl. Gesammelte Schriften Bd. 6. Frank-
+furt am Main: Suhrkamp, 2003, S. 227.
+   9
+     Ich verwende Spitzzeichen, oder Guillements überall dort, wo ich Anführungszeichen in
+modalisierender Funktion verwende. D.h insbesondere dort, wo sie kein Zitat kennzeichnen.
+Außerdem verwende ich Guillements um deutsche Anführungszeichen innerhalb eines Zitates
+zu kennzeichnen.
+  10
+     Nietzsche, KSA 3 , S. 417.
+  11
+     Vgl. Terry Pinkard. Das Paradox der Autonomie. Kants Problem und Hegels Lösung.
+Hrsg. von Thomas Khurana und Christoph Menke. Paradoxien der Autonomie. Freiheit und
+Gesetz 1. Berlin: August Verlag, 2019, S. 49.
+
+
+----- 4 / 39 -----
+
+Jan van Dick                 „Zweite Natur und Befreiung“                     3
+
+
+werde ich anhand des Begriffs des „geistigen Mechanismus“ erläutern in wel-
+chem die Gewohnheit sich als „geistig oder frei“ und „mechanisch oder unfrei“ 12
+ergibt (b). Schließlich soll der Begriff der zweiten Natur in der Dialektik von
+Fall und Verwirklichung des Geistes und dem Doppelcharakter der zweiten Na-
+tur als Kritik und Affirmation seinen Abschluss finden (c). Darin ergibt sich
+die Grenze des von Menke erarbeiteten Begriffs der Befreiung: Macht und Ohn-
+macht der Befreiung – Freiheit und Unfreiheit bleiben untrennbar miteinander
+verbunden.
+    Durch die Hinzunahme Nietzsches soll versucht werden über diese Grenze
+hinauszugehen. Dazu soll in einem zweiten Schritt gezeigt werden, dass bei
+Nietzsche ein ähnlicher Begriff der zweiten Natur aufgezeigt werden kann. Zu-
+nächst soll der Begriff der zweiten Natur anhand von Nietzsches Begriff des
+Scheins erläutert werden (a). Die Befreiung aus dem (sog.) Schein wird darauf-
+folgend in der Unterscheidung des Schauspielers und der Rolle aufgegriffen (b).
+Abschließend sollen beide Begriffe nochmals in dem Absatz über den »Tollen
+Menschen« analysiert und zusammengebracht werden (c).
+    Im dritten Abschnitt soll versucht werden, das Problem der Befreiung aus
+der zweiten Natur zu erläutern da das »Wie« dieser Befreiung, im Vergleich
+zur Befreiung aus der ersten Natur, bei Hegel und Menke, und letztendlich
+auch bei Nietzsche, uneindeutig bleibt.
+    Im vierten und letzten Schritt werde ich abschließend anhand der Dis-
+kussion um das „offene Meer“, zur Beantwortung der Leitfrage kommen, d.h.
+die Frage beantworten ob und inwiefern es bei Nietzsche eine Möglichkeit der
+Überwindung der ewigen Wiederholung der Befreiung geben kann. Es wird sich
+schließlich ergeben, dass zwar in Nietzsches Konzeptionen auf diese Befreiung
+über die Befreiung hinaus hingedeutet wird, diese aber auch bei Nietzsche nicht
+verwirklicht ist.
+
+
+
+
+ 12
+      Vgl. Menke, AuB , S. 145.
+
+
+----- 5 / 39 -----
+
+Hauptteil
+
+Es sei hier ein Zitat Nietzsches vorangestellt, auf welches ich am Ende der
+Arbeit eingehen werde, aus dem sich aber zunächst einige zentrale Begriffe
+für die weitere Beschäftigung mit dem Thema Zweite Natur und Befreiung
+ergeben:
+
+      [. . .] so finden wir als reifste Frucht an ihrem [der Sittlichkeit] Baum das
+      s o u v e r a i n e I n d i v i d u u m, das nur sich selbst gleiche, das von der
+      Sittlichkeit der Sitte wieder losgekommene, das autonome übersittliche
+      Individuum (denn „autonom“ und „sittlich“ schliesst sich aus) [. . .]1
+
+Aus der Natur hervorgehen und sich von ihr unterscheiden
+
+Zunächst spricht Nietzsche im selben Abschnitt von der Sittlichkeit als eine
+„v o r h i s t o r i s c h e Arbeit“ 2 . Diese Sittlichkeit beschreibt Nietzsche als die
+Entwicklung des Menschen, in der er sich durch Zurichtung und Gewohnheit
+von seiner Natur befreit, die aber zugleich der Freiheit gegenübersteht, weil sie
+eine neue Form von inneren Zwang schafft („der Mensch [muss] [. . .] notwen-
+dig geworden sein“ 3 ). Darum ist die „reifste Frucht“ der Sittlichkeit dasjenige
+Individuum, welches sich von ihr wieder befreit. Dies erinnert stark an Hegels
+Begriff des Geistes, der dadurch bestimmt ist „aus der Natur herzukommen
+und sich von der Natur zu befreien“ 4 . Nach Thomas Khurana ist Geist nicht
+einmal aus der Natur hervorgegangen, sondern tut dies immer wieder auch in
+den höheren Stufen des Geistes.5 Wenn Geist wesentlich die Bewegung seiner
+Befreiung aus der Natur ist, dann ist die Frage welche Natur es ist, aus der
+   1
+     Friedrich Nietzsche. Jenseits von Gut und Böse. Zur Genealogie der Moral. Neuausgabe
+1999, 13. Auflage 2014. kritische Studienausgabe in 15 Bänden; KSA Band 5. München:
+Deutscher Taschenbuch Verlag, 2014, S. 293. Nachfolgend zitiert als KSA 5. Hervorhebung
+im Original. Sofern nicht anders vermerkt, sind im Verlauf alle Hervorhebungen im Original.
+   2
+     Ebd., S. 293.
+   3
+     Ebd., S. 292.
+   4
+     Thomas Khurana. Das Leben der Freiheit. Erste Auflage. suhrkamp taschenbuch wis-
+senschaft. Berlin, 2017, S. 294. Nachfolgend zitiert als LdF.
+   5
+     Vgl. ebd., S. 294.
+
+
+                                            4
+
+
+----- 6 / 39 -----
+
+Jan van Dick                „Zweite Natur und Befreiung“                                 5
+
+
+er sich immer wieder befreit. Es ergibt sich daraus, dass der Geist durch seine
+eigene Bestimmung zur Natur zurückgeführt wird und dass die Natur aus der
+er sich befreit, letztendlich eine Natur ist, die er sich selbst voraussetzt: zweite
+Natur.6 Genau das meint Nietzsches Rede vom Vorhistorischen: der Geist hat
+sich von der Natur befreit, indem er seine eigene (zweite) Natur, gesetzt hat.
+Das Nicht-Mehr-Vorhistorische ist, sich auch von dieser wieder zu befreien. Da-
+durch hat Freiheit auch bei Nietzsche explizit prozesshaften Charakter. Wie
+in der Einleitung bereits angedeutet, liegt hier die Leitfrage meiner Arbeit: in-
+wiefern kann dieser Prozess aufhören und zu einem Ende kommen? Nietzsche
+spricht diesen Ausweg ganz konkret an. Er spricht vom „Ende des ungeheuren
+Prozesses“ und vom „übersittliche[n] Individuum“, als Ergebnis dieses Prozes-
+ses.7 Schließlich wird sich ergeben, dass auch bei Nietzsche der übersittliche
+Mensche seine Autonomie nicht hat und der Prozess nicht schlicht zu einem
+Ende kommen kann: gerade das Im-Prozess-Begriffen-Sein bedeutet Freiheit,
+während ein vorgestelltes Ende für Nietzsche – wie für Hegel – das andere der
+Freiheit ist.
+
+
+
+Sittlichkeit als Kontrast zur Autonomie
+
+Meine Arbeit wird von dem Begriff der Autonomie ausgehen. Hier werde ich
+zunächst das Paradox, in welches sich die Autonomie verstrickt, und dann
+den Ausweg in der Sittlichkeit beschreiben. Nietzsche hingegen bestimmt Au-
+tonomie als den Schritt über die Sittlichkeit hinaus: Autonomie ist insofern
+der Anfang und das Ende des Prozesses. Nietzsche definiert Sittlichkeit als
+die „h e r k ö m m l i c h e Art zu handeln und abzuschätzen“ 8 , zu welcher der
+Mensch durch Disziplinierung erst kommen muss. Nur durch diese »Bildung«
+kommt der Mensch zu den „»guten Dinge[n]«“ 9 . So ist auch bei Hegel Sitt-
+lichkeit als handelnde Verwirklichung des Guten10 definiert. Und auch zu ihr
+kommt der Mensch nach Hegel nur durch Bildung11 . Nietzsche bewertet Sitt-
+lichkeit allerdings gänzlich anders als Hegel: Sittlichkeit ist ein notwendiger
+   6
+      Vgl. Khurana, LdF , S. 320.
+   7
+      Nietzsche, KSA 5 , S. 293.
+    8
+      Nietzsche, KSA 3 , S. 22. Nietzsche verweist im oben zitierten Abschnitt explizit auf
+diese Stelle der Morgenröte.
+    9
+      Nietzsche, KSA 5 , S. 297.
+  10
+      Vgl. Georg Wilhelm Friedrich Hegel. Grundlinien der Philosophie des Rechts: auf der
+Grundlage der Edition des Textes in den Gesammelten Werken Band 14. Philosophische
+Bibliothek Band 700. Hamburg: Felix Meiner Verlag, 2017, § 142, S. 161. Nachfolgend zitiert
+als Rph.
+  11
+      Vergleiche dazu etwa: Ebd., § 187 A, S. 191.
+
+
+----- 7 / 39 -----
+
+Jan van Dick              „Zweite Natur und Befreiung“                               6
+
+
+Schritt zur Freiheit, über den dann aber wieder hinausgegangen werden muss.
+Die Autonomie muss, so könnte man sagen, durch die Sittlichkeit hindurch.
+
+
+
+Kritik: Freiheit als das sich Bestimmende
+
+Der dritte Aspekt deutet sich genau an dieser Stelle an. Während Kants for-
+malistische Definition der Freiheit nach Hegel inhaltsleer bleibt, kann nach die-
+sem Freiheit nicht als reine Unbestimmtheit oder bloße Abstraktion verstanden
+werden. Neben dem Moment der bloßen Unbestimmtheit, ist die einfache Be-
+stimmung gleichsam ungenügend, da sie „eben so N e g a t i v i t ä t, Aufheben
+[ist] als das erste – es ist nämlich das Aufheben der ersten abstrakten Nega-
+tivität“ 12 . Khurana drückt dies so aus, dass das Subjekt einer Bestimmung
+bedarf, die dem Ich einen konkreten Inhalt gibt und selbst die Form des Ich
+enthält13 . Freiheit ergibt sich erst in der Einheit dieser beiden Momente und
+Freiheit des Willens ist eben das: sich „in Einem, sich als das Negative seiner
+selbst, nämlich als b e s t i m m t, b e s c h r ä n k t zu setzen und bei sich, d.i.
+in seiner I d e n t i t ä t mit sich und Allgemeinheit zu bleiben“ 14 .
+
+
+
+Bei-Sich-Sein-im-Anderen
+
+Hieraus kommt Khurana auf Hegels Formel des „Bei-Sich-Selbst-Sein-im-An-
+deren“ 15 . Das Setzen der Bestimmtheit geschieht nämlich, wie im obigen Zitat
+erläutert, „in Einem“, in dem „Negativen seiner selbst“ und dieses ist nach
+Khurana Natur. Genauer: die vom Geist selbst gesetzte, zweite Natur. Damit
+können wir den Bogen zurück zum ersten Aspekt schlagen: indem das Subjekt
+Natur setzt, ist es in der Natur bei sich, das ist Sittlichkeit. Obwohl Nietz-
+sche diesen Aspekt zu unterschlagen scheint, fasst er das Problem und auch
+die Möglichkeit der zweiten Natur mit Hegel richtig auf: sie ist Kritik und Af-
+firmation zugleich. Wie die Dialektik von Kritik und Affirmation zu denken,
+Nietzsche über die endlose Wiederholung der Befreiung hinausgeht und welche
+Probleme bei ihm und bei Hegel im Laufe der Entwicklung auftreten, darum
+wird es im Folgenden gehen.
+  12
+      Hegel, Grundlinien, § 6 A, S. 39.
+  13
+      Vgl. Khurana, LdF , S. 285.
+   14
+      Hegel, Grundlinien, § 7, S. 40.
+   15
+      Khurana, LdF , S. 283. Ich verwende hier und im Folgenden diese »kompakte« Formu-
+lierung Khuranas, welche inhaltlich aus §§5-7 der Rechtsphilosophie Hegels stammt.
+
+
+----- 8 / 39 -----
+
+Jan van Dick                  „Zweite Natur und Befreiung“                     7
+
+
+
+2.1.        Zweite Natur bei Hegel
+Ein Versuch Freiheit als diese Einheit von Freiheit und Bestimmung zu verste-
+hen ist der Begriff der Autonomie. Um den Begriff der Autonomie einzuführen
+und zu beschreiben, wie Hegel und Menke sich auf ihn beziehen, werde ich zu-
+nächst in Kürze auf Kants Versuch eingehen das Paradox der Autonomie auf-
+zulösen. Der Begriff der Autonomie, wie Kant ihn erarbeitet, nimmt schließlich
+eine positiven Realisation der Freiheit an. Freiheit jedoch so zu verstehen, dass
+man sie beständig noch erwerben muss16 , bedeutet Freiheit als Befreiung zu
+verstehen, also als einen Akt, der noch (oder immer wieder) geschehen muss,
+als einen Akt der Negation. Kants Ansatz Freiheit als eigene Gesetzgebung
+zu bestimmen, ist der Versuch, diesen Akt der Negation zum Verschwinden
+zu bringen17 . Zugleich ist es der Versuch das Paradox der Autonomie aufzu-
+lösen. Hegels Kritik der Autonomie versucht hingegen aufzuzeigen, dass sich
+dieses Paradox in der Selbstgesetzgebung auch bei Kant erneut wiederholt.
+Ich möchte zunächst anhand von Hegels Kritik der Autonomie den Begriff der
+Sittlichkeit erarbeiten. Aus diesem komme ich zur Gewohnheit, aus welcher
+sich das erneute Auftreten des Paradox in der Sittlichkeit ergibt. Schließlich
+werde ich die sich entfaltende Dialektik von Geist und Mechanismus, sowie
+Kritik und Affirmation beschreiben und daraus die Begriffe zweite Natur und
+Befreiung erarbeiten und an ihnen den Ausweg aus dem Paradox skizzieren.
+
+
+2.1.1        (a) Autonomie und Sittlichkeit
+Der Tod Gottes hat bei Nietzsche, wie in der Einleitung bereits erwähnt, nicht
+bloß die Bedeutung der Befreiung aus der zweiten Natur, sondern ist ebenso ei-
+ne Reflexion auf die Umwälzung innerhalb der (Moral-)Philosophie seines und
+des vorangegangenen Jahrhunderts. Waren doch die Gesetze der Moral durch
+Gott und die Freiheit als die Befolgung dieser göttlichen Gebote bestimmt, so
+entzieht die Überwindung Gottes diese Gesetze der außer dem Menschen lie-
+genden Macht. Der Tod Gottes beginnt deshalb auch dort, wo die Moral nicht
+mehr bloß durch ihn bestimmt ist. Der Begriff der Autonomie versucht nun
+zweierlei: er versucht die Bestimmung der Moral von Gott zu lösen und in den
+Menschen zurückzuführen, ohne jedoch den Schritt hinter Gott zurückzutre-
+ten und Freiheit durch blindes Bestimmt-Sein durch die Natur, die sinnlichen
+Triebfedern, zu sehen: nicht in dem blinden Folgen meiner sinnlichen Triebe,
+ 16
+      Vgl. Nietzsche, KSA 3 , S. 636.
+ 17
+      Vgl. Menke, AuB , S. 53.
+
+
+----- 9 / 39 -----
+
+Jan van Dick               „Zweite Natur und Befreiung“                                8
+
+
+sondern in dem Handeln nach dem selbst gegebenem Gesetz bin ich frei. 18 Au-
+tonomie bedeutet nach Menke, dass freies Wollen und verpflichtendes Sollen
+in eins fallen. Allerdings ist die Selbstgesetzgebung nur als heteronom zu den-
+ken: entweder folgt die Selbstgesetzgebung aus einem anderen, äußeren Gesetz
+(äußere Heteronomie) oder beruht auf der freien Willkür des Subjekts (innere
+Heteronomie) – das bezeichnet das »Paradox der Autonomie«.19
+    Kants Versuch das Paradox aufzulösen besteht darin, den Fokus von Selbst-
+Gesetzgebung zu eigener Gesetzgebung zu verlegen, wodurch es kein Wählen
+eines vorhandenen Gesetzes ist, sondern ein Gesetz des Subjekts selbst.20 Da-
+bei bestimmt sich das Gesetz, indem das Subjekt seine Maxime so wählt, dass
+es zugleich wollen kann, „dass sie zu einem allgemeinen Gesetz werde“ 21 . Statt
+sich ein Gesetz zu geben, gibt das Subjekt „seinen Trieben die Form des Ge-
+setzes“ 22 ; das Gesetz erhält dadurch allgemeinen Charakter.23 Autonomie ist
+durch die Freiheit der Wahl der Maxime, wie die Freiheit ebenso durch das
+Gesetz bestimmt, denn die Kausalität des freien Willens ist „die Eigenschaft
+des Willens, sich selbst ein Gesetz zu sein“ 24 . Damit ist bei Kant das erreicht,
+was ich als Bestimmung der Autonomie aufzeigte: das normative Gesetz ist
+zurück beim Menschen und obliegt nicht einer äußeren Macht (Gott), zugleich
+wird Freiheit nicht verstanden als blindes Unterliegen der sinnlichen Trieb-
+federn. Nach Hegel wiederholt sich hier das Paradox der Autonomie, da die
+Allgemeinheit des Gesetzes nur durch die Form bestimmt ist und selbst in-
+haltsleer bleibt: es „bleibt damit nur die abstrakte Allgemeinheit [...] oder das
+Abstrakte Positive, dass Bestimmungslose zu ihrer Bestimmung“ und Kants
+Autonomieformel verkommt zum „leeren Formalismus“.25 Kant geht mit seiner
+Verschiebung von Selbst- zu eigener Gesetzgebung und durch die Erhebung
+des Subjektiven zur objektiven Allgemeinheit, einen entscheidenden Schritt in
+Richtig Hegel, der Formalismus seines moralischen Freiheitsbegriffs zeigt sich
+  18
+      Vgl. Menke, AuB , S. 19, bzw. Thomas Khurana. Paradoxien der Autonomie zur Einlei-
+tung. Hrsg. von Thomas Khurana und Christoph Menke. Paradoxien der Autonomie. Freiheit
+und Gesetz 1. Berlin: August Verlag, 2019, S. 8.
+   19
+      Vgl. Menke, AuB , S. 19 - S. 20.
+   20
+      Vgl. ebd., S. 22.
+   21
+      Immanuel Kant. Kritik der praktischen Vernunft. Grundlegung zur Metaphysik der Sit-
+ten. 21. Aufl. Werkausgabe in 12 Bänden / Immanuel Kant. Hrsg. von Wilhelm Weischedel
+;[...] Frankfurt am Main: Suhrkamp, 2014, 51. Nachfolgend zitiert als Gms.
+   22
+      Menke, AuB , S. 24.
+   23
+      Vgl. Kant, Gms, S. 65. Auf Ähnliche Art und Weise beschreibt Hegel das Gute als die
+Einheit des besonderen und des Allgemeinen Willens. (Vgl. Hegel, Grundlinien, § 129, S.
+134.) Diese Einheit des objektiven und subjektiven Moments bildet ebenso die Bestimmung
+der Sittlichkeit.
+   24
+      Kant, Gms, S. 81.
+   25
+      Hegel, Grundlinien, § 135, S. 139.
+
+
+----- 10 / 39 -----
+
+Jan van Dick                „Zweite Natur und Befreiung“                                 9
+
+
+aber, indem sich hier das Paradox wiederholt, als noch ungenügend.
+
+    Worin genau besteht nun Hegels Ausweg aus dem Paradox? Die Kritik He-
+gels, an Kants Begriff der Autonomie, hat seinen Grund auch in dem, was ich
+als notwendige Verknüpfung von Abstraktion (Bestimmungslosigkeit) und Be-
+stimmung (sich einen Inhalt geben), nannte.26 Freiheit kann letztendlich nur
+dort herrschen, wo dieser Doppelcharakter verwirklicht ist. Dieser Doppelcha-
+rakter drückt sich in der Sittlichkeit aus, welche Hegel beschreibt als
+
+       die Idee der Freiheit, als das lebendige Gute, das in dem Selbstbewusst-
+       sein sein Wissen, Wollen und durch dessen Handeln seine Wirklichkeit,
+       sowie dieses an dem sittlichen Sein seine an und für sich seiende Grund-
+       lage und bewegende Zwecke hat [...]27
+
+Auch bei Kant ist das allgemeine Gute (formal) durch das subjektive Wollen
+bestimmt, und auch bei ihm existiert der Begriff der Handlung.28 Allerdings
+bestimmt sich nach Hegel, ob diese oder jene Handlung gut ist, nur durch das
+„Wissen [und] Wollen“ des einzelnen Subjekts. Indem dies nach Hegel ein nur
+gedachter Prozess ist, ist die Entscheidung darüber stets „sowohl fähig wahr,
+als bloße M e i n u n g und I r r t u m zu sein“ 29 . Nach Hegel können Hand-
+lungen nicht als die, des auf sich allein gestellten Individuums gesehen werden:
+vielmehr ist jede Handlung bei Hegel immer schon im sozialen Kontext gedacht
+und von ihm abhängig, denn: „sie hat an dem sittlichen Sein [...] ihre Grundla-
+ge“. Zu beurteilen, ob eine Handlung gut oder schlecht ist, bedeutet sie als eine
+Handlung innerhalb einer sozialen Praxis zu verstehen.30 Einfach gesprochen,
+ist eine soziale Praxis nichts anderes, als eine für eine bestimmte Gruppe an
+Individuen gemeinsame Art und Weise nach bestimmten Regeln zu handeln.
+Beurteilt wird also gemäß diesen Regeln der sozialen Praxis und diese sind
+nichts als der gemeinsame Konsens der Teilnehmenden: eine Handlung ist Teil
+einer Praxis, „genau dann, wenn die Gemeinschaft sie als solche aufnimmt“ 31 .
+Verstehe ich mich beispielsweise als einen Fußballspieler und nehme den Ball
+in die Hand und werfen ihn in das Tor, ist die Entscheidung darüber, ob diese
+  26
+      Vgl. Hegel, Grundlinien, § 7, S. 40. oder auch: oben S. 6.
+  27
+      Ebd., § 142, S. 161. Hervorhebung von mir.
+   28
+      „handle stets nach derjenigen Maxime von der du zugleichen wolle kannst, dass sie ein
+allgemeines Gesetz werde“ (Kant, Gms, S. 51. Hervorhebung von mir.).
+   29
+      Hegel, Grundlinien, § 132 A, S. 136.
+   30
+      Vgl Menke, AuB , S. 28.
+   31
+      Robert Brandom. Freiheit und Bestimmtsein durch Normen. Hrsg. von Thomas Khurana
+und Christoph Menke. Paradoxien der Autonomie. Freiheit und Gesetz 1. Berlin: August
+Verlag, 2019, S. 65.
+
+
+----- 11 / 39 -----
+
+Jan van Dick                „Zweite Natur und Befreiung“                                   10
+
+
+Handlung gemäß den Regeln des Fußballspiels gut oder mangelhaft ist, von
+nichts abhängig, als der Anerkennung, oder Nicht-Anerkennung der anderen
+Teilnehmenden der Praxis des Fußballs.32 Dem folgend, werden Urteile nach                        Formulierung?
+Menke gefällt, insofern sowohl Gegenstand als auch Autor des Urteils Teil einer
+(sozialen) Praxis sind33 , bzw. sich als Teil verstehen (wollen). Und sie „erfolgen
+mit Bezug auf die Gesetzte [...] die eine Praxis ausmachen; die also das jeweili-
+ge Gute spezifizieren“ 34 . Das »Gute« und was die Praxis ist, ihre Regeln (bzw.
+Gesetze), sind also ein und dasselbe und zugleich die Regeln des Teilnehmers
+der Praxis – er folgt „seinem eigenen Gesetz“.35 Das Gute ist somit kein »Sol-                   Zitat Bran-
+len«, sondern es ist in der Praxis schon wirklich, denn wie die Handlung an                      dom/ Menke/
+dem sittlichen Sein seine Grundlage hat, ist dieses in jener wirklich. Von der                   Nietzsche
+Seite der Teilnahme gedacht, ist so zu verstehen, inwiefern das Gute zu seinem
+Inhalt kommt: im Gegensatz nämlich zum „abstrakten Guten“ (bei Kant), ist
+das „objektiv Sittliche [...] durch die Subjektivität k o n k r e t e Substanz“ 36 :
+das Gesetz der Praxis konstituiert sich durch die Handlungen der Subjekte
+innerhalb der Praxis. Der Inhalt kommt somit nicht von außen dazu, sondern
+er ist bereits. Menke drückt dies auch so aus, dass das Gesetz überhaupt erst
+Verbindlichkeit besitzt, wenn es existiert und zwar „nicht nur gesollt, sondern
+schon wirklich ist“ 37 .
+    Dies Gesetz hat „eine [...] unendlich festere Autorität und Macht, als das
+Sein der Natur“ 38 . Unter diesem Gesetz, dieser neuen Autorität, erfährt das
+Subjekt zugleich die Befreiung von den bloßen Naturtrieben.39 Indem das ob-
+jektive Gesetz nun sozial, oder geistig bestimmt ist, befreit sich das Subjekt
+von der unmittelbaren Natur, ist aber zugleich dieser neuen Autorität un-
+terworfen. Dies kann, um einen ersten Bogen zu Nietzsche zu schlagen, an
+dem Beispiel Gottes verdeutlicht werden: indem der Mensch Gott, genauer:
+  32
+     Unter Umständen wäre es genauer dies als die Funktion des Schiedsrichters zu sehen,
+der von den Teilnehmenden die Funktion, die Praxis zu regulieren, zugewiesen bekommen
+hat. Im Falle eine Fußballspiels auf dem Bolzplatz ist allerdings nicht mal dieser nötig.
+  33
+     Vgl. Menke, AuB , S. 28.
+  34
+     Ebd., S. 28 - S. 29.
+  35
+     ebd., S. 29. Dies ist sein eigenes Gesetz, aber erst, wenn er sich die Regeln der Praxis
+angeeignet hat (Vgl. ebd., S. 32). Dieser Prozess der Aneignung ist einer, der auch in der
+Bildung und Disziplinierung geschieht. (Man stelle sich beispielsweise ein Kleinkind vor, wel-
+ches Fußballspielen will und ständig den Ball in die Hand nimmt o.ä. während seine Mutter
+es korrigieren muss. Dieser Prozess, ist der notwendige Prozess der Bildung/ Disziplinierung,
+durch den das Gesetzt zum Gesetzt des Subjekts erst wird, an deren Ende es schließlich auch
+Ausdruck seines Wesens ist. (Vgl. Hegel, Grundlinien, § 147, S. 162))
+  36
+     Ebd., § 144, S. 161.
+  37
+     Menke, AuB , S. 57.
+  38
+     Hegel, Grundlinien, § 146, S. 164.
+  39
+     Vlg. ebd., § 149, S. 164.
+
+
+----- 12 / 39 -----
+
+Jan van Dick                  „Zweite Natur und Befreiung“                                     11
+
+
+eine Gottesfiktion, durch sein Handeln (Beten, zur Kirche Gehen, etc.) schafft,
+schafft er ihn als ein Gesetz, welches das der Natur ersetzt. Wie ja wirklich die
+Macht der Natur durch Gott aufgehoben und dieser für z.B. Naturkatastro-
+phen, verantwortlich gemacht wird. Zugleich gibt Gott den Menschen Gesetze,
+die (mit eingehender Naturbeherrschung) für den Menschen tatsächlich eine
+„unendlich festere Autorität und Macht“ besitzen.40 In der sozialen Teilnahme
+an einer Praxis, und das ist das Entscheidende, konstruiert das Subjekt jedoch
+nicht nur das Gesetz, als ein ihm äußerliches, es ist „dem Subjekt nicht ein
+F r e m d e s, sondern es gibt das Z e u g n i s d e s G e i s t e s von ihnen als
+von s e i n e m e i g e n e n W e s e n“ 41 . Die Gesetze stehen dem Subjekt also
+1. nicht Fremd gegenüber, da sie durch seine eigene Handlung gesetzt sind und
+aus dem selben Grund konstituieren sie 2. das Subjekt, da es seine eigenen
+autonomen Handlungen sind; es wird konstituiert „durch eben die Gesetze, die
+die Praxis konstituieren“ 42 .
+    Sittlichkeit und soziale Teilhabe so verstanden, scheinen das Paradox der
+Autonomie aufzulösen, denn die Gesetze sind hier sowohl inhaltlich bestimmt,
+als auch frei gesetzt.43
+
+   Wie kehrt nun das Paradox in der Sittlichkeit zurück? Wie oben bereits
+in der Analogie zu Gott erwähnt, schafft der Mensch in der Sittlichkeit sich
+  40
+      Vgl. Theodor W. Adorno. Dialektik der Aufklärung. Frankfurt am Main: Suhrkamp,
+1981, S. 33. Auf das Motiv Gottes, als das Setzen einer ersten zweiten Natur, werde ich mich
+noch einige Male beziehen. Ich lasse hier grundsätzlich die mir ansonsten sehr einleuchtende
+Spezifizierung Khuranas aus, in welcher er drei Stufen unterscheidet, in denen das Hervor-
+gehen aus und das Setzen der Natur sich wiederholt: Anthropologie, Phänomenologie und
+Sittlichkeit. Erst die dritte dieser Stufen stellt die Sittlichkeit, als „der zur vorhandenen Welt
+und zur Natur des Selbstbewusstseins gewordene Begriff der Freiheit“ (Hegel, Grundlinien,
+§ 142, S. 161) dar. Nur auf diese beziehe ich mich hauptsächlich, während ich die anderen
+Stufen in meinen Ausführungen größtenteils auslasse, oder zusammendenken werde. Es ist
+nämlich gleichfalls so, dass diese Stufen nicht bloß nebeneinander stehen, sondern z.B. „die
+Form der Gewohnheit [...] alle Stufen des Geists“ (Khurana, LdF , S. 401) betrifft. Khurana
+unterscheidet von der Sittlichkeit 1. die Anthropologie, in der der Geist mittels der Ge-
+wohnheit aus seiner noch in Natur versenkten Form sich befreit und 2. die Phänomenologie,
+in welcher der Geist sich seiner selbst bewusst wird (ebd., S. 394 - S. 397). Die Schaffung
+Gottes, ist demnach eher in der ersten oder zweiten Stufe zu suchen, als in der Sittlichkeit.
+Um den Rahmen der Arbeit allerdings nicht zu sprengen, verweise ich hier nur auf diese
+Unterscheidungen und nutze Gott als ein allgemeines Beispiel, denn was damit aufgezeigt
+wird, trifft auf alle Stufen in gleicher Weise zu.
+   41
+      Hegel, Grundlinien, § 147, S. 162.
+   42
+      Menke, AuB , S. 30.
+   43
+      Ich verweise an dieser Stelle bereits darauf, dass Hegel den Moment, in welchem „das
+Sittliche die wirkliche Lebendigkeit des Selbstbewußtseins ist“, als „Verhältnis-lose Identität“
+(Hegel, Grundlinien, § 147 A, S. 163.) beschreibt. Von diesem Punkt aus ist es schwer
+sich eine Transformation des Bestehenden vorzustellen. Wie diese Transformation, oder die
+Befreiung in der Sittlichkeit zu denken ist, werde ich im dritten Abschnitt diskutieren.
+
+
+----- 13 / 39 -----
+
+Jan van Dick                 „Zweite Natur und Befreiung“                                     12
+
+
+Gesetze, die zwar 1. das Paradox der Autonomie aufheben, d.h. sie sind ei-
+gene, inhaltlich bestimmte und zugleich Wesens-konstituierende Gesetze, aber
+sie werden 2. zu einer Macht, die noch die Macht der Natur überbietet in
+der Autorität über den Menschen. D.h. das Schaffen (oder Setzen) von Gott,
+gibt den Menschen die Moral, aber versklavt ihn zugleich einer neuen, inneren
+Notwendigkeit: „das Sittliche [erscheint] als eine zweite Natur “.44
+    Im Gegensatz zu Kant, bei dem die moralisch verstandene Befreiung des
+Mensch den Bruch mit der äußeren Notwendigkeit (Triebe, natürliche Deter-
+mination etc.) bedeutet, kann bei Hegel die Befreiung nur darin liegen, die
+äußere Notwendigkeit, bzw. die Macht der ersten Natur, zu ersetzen, durch
+eine geistig selbst hervorgebrachte Notwendigkeit. Darum schreibt Hegel, die
+verwirklichte Freiheit ist aus dem Menschen hervorgebracht, als eine zweite
+Natur.45 Der Mensch kann demnach nur frei sein, indem er eine Form der Ver-
+knüpfung schafft, die nicht geistig, sondern natürlich ist. Menke beschreibt dies
+als die „eigene natürliche Verfassung des Geistes“, in der aber „das Werden sei-
+ner Autonomie“ 46 erst entstehen kann. Die Hervorbringung dieser natürlichen
+Verfassung ist Grundbedingung und Ergebnis von Sittlichkeit und Befreiung.
+Einen ähnlichen Gedanken, findet sich auch bei Nietzsche. Er schreibt, dass es
+nach dem Tod Gottes „noch Jahrtausende lang Höhlen geben [wird], in denen
+man seinen Schatten zeigt. – Und wir – wir müssen auch noch seinen Schatten
+besiegen!“ 47 Nietzsche beschreibt mit den Schatten die vom Menschen gesetz-
+ten Notwendigkeiten, die auch nach der Befreiung aus der (ersten) Natur noch
+bestehen. In der Metapher des Sonnenuntergangs, als vollständiger Zerfall alles
+Bestehenden, beschreibt Nietzsche allerdings zugleich die Gefahr, dass es keine
+neue Formen von (natürlichen) Verknüpfungen geben wird.48 Es muss die vom
+   44
+      Hegel, Grundlinien, § 151, S. 166. Wie hier der Begriff des „Erscheinens“ zu verstehen ist,
+ist mir etwas unschlüssig. Als Lesart schlage ich vor, dass Hegel so verstanden werden muss,
+dass Sittlichkeit als zweite Natur (nicht als zweite Natur) erscheint. Und sie erscheint, weil
+es zweite, vom Menschen gesetzte Natur ist, darum, denke ich, spricht Hegel von Erscheinen
+nicht von Sein. Auf ähnliche Art und Weise schreibt Menke später: „[d]as Gesetzte wird
+als Nichtgesetztes gesetzt“ (Menke, AuB , S. 142), und meint damit eben das Erscheinen
+des Gesetzten als Natur. Würde sie übrigens, damit greife ich auf den zweiten Abschnitt
+vor, als zweite Natur erscheinen, wäre in gewissermaßen erfüllt, was Nietzsche fordert: dass
+der Schein mich spüren lässt, dass er Schein und nichts weiter ist (Vlg. Nietzsche, KSA 3 ,
+S. 416.).
+   45
+      Vlg. Hegel, Grundlinien, § 4, S. 34.
+   46
+      Menke, AuB , 40. Hervorhebung von mir.
+   47
+      Nietzsche, KSA 3 , S. 467.
+   48
+      Die Sonnenfinsternis beschreibt Nietzsche als Folge von Zerstörung, Zerfall und Unbe-
+stimmtheit, welcher der wieder freie Horizont gegenübersteht. Die absolute Abstraktion, die
+„Zertrümmerung aller bestehenden gesellschaftlichen Ordnung“ (Hegel, Grundlinien, § 5 A,
+S. 39.) ist, wie wir schon in der Einleitung zu Hegels Freiheitsbegriff gesehen haben, auch
+bei Nietzsche problematisch und hängt eng zusammen mit dem Problem der zweiten Natur.
+
+
+----- 14 / 39 -----
+
+Jan van Dick                „Zweite Natur und Befreiung“                                 13
+
+
+Geist selbst hervorgebrachte Notwendigkeit, die zweite Natur (die Schatten)
+geben, von der wir uns dann erneut befreien müssen. Damit bedeutet Befrei-
+ung nicht nur die Befreiung aus der ersten, sondern ebenso die Befreiung aus
+der zweiten Natur.
+    In diesem Sinn ist auch zu verstehen, was es für Hegel heißt, Freiheit als
+„Reflexion des Geistigen in sich, seiner Unterscheidung von dem Natürlichen
+und seinem Reflexe auf dieses“ 49 zu verstehen: Geist bestimmt sich, wie zu
+Beginn des Hauptteils bereits gesehen, wesentlich dadurch: aus der Natur zu
+kommen und sich immer wieder von ihr zu unterscheiden, sich permanent
+aus dieser zu befreien – sei es von der Natur, als erste Natur, oder von der
+eigenen natürlichen Verfassung. Wir haben also die in sozialen Praktiken geistig
+produzierte, zweite Natur, einerseits selbst als das Mittel der Befreiung von
+der Natur zu verstehen, zugleich aber als das, wodurch sich die In-Natur-
+Verkehrtheit im Geist wiederholt.50 In diesem Sinne tritt hier das Paradox
+der Autonomie in der Sittlichkeit als Dialektik und Wechselwirkung zwischen
+Befreiung und zweiter Natur auf. Diese innere Dialektik der Befreiung und
+der zweiten Natur werde ich im Folgenden mit Menke als die Dialektik der
+Gewohnheit beschreiben.
+
+
+2.1.2      (b) Gewohnheit - Dialektik von Geist und Mecha-
+           nismus
+Wir konnten bisher sehen, dass sich in der Teilnahme an sozialen Praktiken,
+das objektive Sittliche auf eine Art und Weise konstituiert, dass es einerseits
+durch die Handlungen inhaltlich bestimmt ist und andererseits für die Subjek-
+te nicht äußerlich bleibt, sondern gewissermaßen das eigene Gesetz ist. Diese
+Identität von subjektiver Individualität und objektiver Sittlichkeit erscheint,
+wie wir weiter gesehen haben, als zweite Natur. Hegel schreibt: „das Sittli-
+che erscheint, als die allgemeine Handlungsweise derselben - als S i t t e, -
+die G e w o h n h e i t desselben als z w e i t e N a t u r“ 51 . Die angesproche-
+ne Wieder-in-Natur-Verkehrtheit des Geistes erklärt Hegel also ausgehend von
+der Gewohnheit. Daher werde ich im Folgenden anhand der Gewohnheit, na-
+Es deutet sich hier also bereits an, dass die Konzeption des „übersittlichen“ Menschen, wenn
+man Nietzsches gesamtes Werk in Betracht zieht, nicht so eindimensional sein kann, wie
+zuerst angenommen. Wie Sonnenfinsternis, Schatten und offenes Meer genauer verstanden
+werden müssen, werde ich im zweiten Abschnitt erläutern.
+  49
+     Hegel, Grundlinien, § 194 A, S. 197.
+  50
+     Vgl. Menke, AuB , S. 41.
+  51
+     Hegel, Grundlinien, § 151, S. 166.
+
+
+----- 15 / 39 -----
+
+Jan van Dick               „Zweite Natur und Befreiung“                                14
+
+
+he an Menkes Analyse, die innere Dialektik der zweiten Natur versuchen zu
+beschreiben. Dabei ist es zentral die Gewohnheit, wie sich in Menkes Begriff
+des „geistige[n] Mechanismus“ 52 bereits andeutet, selbst in dem Spannungsver-
+hältnis von Freiheit und Unfreiheit zu betrachten. Gewohnheit ist nach Menke
+zum Einen das Ergebnis von Bildung (also geistige Tätigkeit) und ermöglicht,
+indem sie uns von der bloßen naturmäßigen Verknüpfung befreit, erst Freiheit.
+Zum Anderen ist sie zugleich selbst eine Form natürlicher Verknüpfung und
+damit äußerlicher Notwendigkeit: sie macht den Menschen „einerseits frei, [...]
+doch andererseits zu ihrem Sklaven“ 53 . Nicht nur sind in der Gewohnheiten
+zwei scheinbar unvereinbare Seiten enthalten, Menke beschreibt sie außerdem
+als zentrale Gestalt des Geistes, die sowohl den Beginn des Geistes ausmacht,
+und sich ebenso fortwährend in allen Stufen des Geistes wiederfindet; der Geist
+kommt über sie nicht hinaus, sondern „bleibt wesentlich Gewohnheit“ 54 .
+    Menke erklärt den Begriff „geistige[r] Mechanismus“ daraus, dass die Hand-
+lungsweise der Gewohnheit 1. unbewusst, also im Vollzug der Handlung „nicht
+durch Gründe geleitet“ und 2. „kein bloß äußerlich determiniertes, kausal er-
+klärbares Geschehen“ 55 ist. Wie kann diese scheinbare Unvereinbarkeit aufge-
+löst werden? Ich habe oben bereits angedeutet, dass Menke die Gewohnheit
+als Ergebnis des Prozesses der Bildung beschreibt. So beschreibt Hegel 1. die
+Gewohnheit dadurch, dass sie ein solches Ergebnis eines geistigen Prozesses
+ist, selbst als geistig. Andererseits ist 2. der Geist in ihr wieder zurückgekehrt
+in eine bloß natürliche Verfassung: die Elemente der Gewohnheit sind „in bloß
+äußerlicher Notwendigkeit“ 56 verknüpft, daher ist sie mechanisch. Auf diese
+beiden Seiten werde ich nun etwas näher eingehen.
+
+
+
+1. Die Gewohnheit ist geistig
+
+Dass die Gewohnheit uns frei macht, ist am besten so zu verstehen, dass sie
+uns befreit. Sie befreit uns nämlich von dem bloß natürlichem Sein unseres
+Körpers. Musik ist ein gutes Beispiel dafür. Ohne durch Gewohnheit das No-
+tenlesen einstudiert, die Verknüpfung der Töne mit den Tasten des Klaviers
+und den Positionen meiner Finger eingeübt zu haben, bin ich nicht frei Kla-
+  52
+      Menke, AuB , S. 145.
+  53
+      Georg Wilhelm Friedrich Hegel. Enzyklopädie der philosophischen Wissenschaften. Bde.
+8-10. Frankfurt am Main: Suhrkamp, 1969, § 410 Z, S. 189. Nachfolgend zitiert als Enz.
+zitiert bei Menke, AuB , S. 127
+   54
+      Ebd., S. 129.
+   55
+      Ebd., S. 128.
+   56
+      Ebd., S. 129.
+
+
+----- 16 / 39 -----
+
+Jan van Dick                „Zweite Natur und Befreiung“                                 15
+
+
+vier zu spielen.57 Durch Übung und Eingewöhnung wird mein Körper in Besitz
+von Fähigkeiten gebracht, die mir dann als Möglichkeiten zur Verfügung ste-
+hen. Durch Gewohnheit distanziere ich mich einerseits von meinen natürlichen,
+und setze andererseits neue und eigene Bestimmungen. Es ist demnach „[d]ie
+wesentliche Bestimmung [der Gewohnheit] die Befreiung“ 58 . In diesem Sinne
+beschreibt Menke die Gewohnheit als „Praxis einer ontologischen Transforma-
+tion“ 59 : das natürliche Sein, welches mich bestimmt, transformiert sich auf
+eine Art und Weise, dass mein Körper nun mir zum Instrument wird. Hier
+wird ersichtlich, dass die durch Gewohnheit erworbenen Fähigkeiten nicht von
+Natur aus da sind, mein Leib ist nicht von der Natur dazu geschickt Klavier
+zu spielen, vielmehr muss ich ihn zu diesem Dienst erst bilden.60 Die Gewohn-
+heit ist somit eine künstliche und erworbene, dadurch geistige Fähigkeit. Dem
+ist in Anschluss an Khurana noch hinzuzufügen, dass durch die Gewohnheit,
+der Geist sich im und durch den Geist vergegenständlicht und ihm dadurch in
+der objektiven Welt ein Mittel zur Verfügung steht, mit dem er seine Zwecke
+verwirklichen kann, ohne sich selbst der Gewalt der Natur auszusetzen.61 Dies
+zeigt eindrücklich, inwieweit die Gewohnheit notwendig ist, für die Freiheit des
+Geistes.
+    Sie ist aber nicht nur in ihrem Resultat geistig, indem sie dem Geist be-
+stimmte Verhaltensweisen ermöglicht, sondern auch der Prozess ihrer Aneig-
+nung ist als geistiger zu verstehen. Betrachten wir jedenfalls die Gewohnheit
+in der Sittlichkeit, dann ist die Praxis selbst, aus der die Gewohnheit folgt,
+eine Praxis, die aus Gründen angeeignet wurde. Menke beschreibt, erst in der
+Einheit des Subjekts mit dessen Praxis, erst in der Sittlichkeit, kann von ihm
+als einer „Instanz des Handelns aus Gründen“ 62 gesprochen werden. Also die
+Gewohnheit, die ich mir in der Praxis aneigne, ist auch selbst eine aus Gründen
+angeeignete und somit geistig. Es ist eine „willentlich ausgeführte Bewegung“,
+die durch die Einübung zur „bewusstlos Gewollten“ wird.63 Das bestimmt die
+  57
+     Das Musikbeispiel ist deshalb interessant, weil hier deutlich wird, inwiefern die Musi-
+ker*in 1. immer wieder Gewohnheiten entwickeln muss (jedes neue Können muss Gewohnheit
+geworden sein) und 2. müssen sich gerade frei improvisierende Musiker*innen immer wie-
+der auch von ihren Gewohnheiten befreien (z.B. von gewohnten Tonlagen, oder bekannten
+Rhythmen) und dies tuen sie letztendlich nur durch die Ausbildung neuer Gewohnheiten
+(Vergleiche dazu auch: Georg Wilhelm Friedrich Hegel. Vorlesungen über die Philosophie
+der Religion I. Frankfurt am Main: Suhrkamp, 1986, S. 189).
+  58
+     Hegel, Enz III , § 410 A, S. 185.
+  59
+     Menke, AuB , S. 130.
+  60
+     Vgl. Hegel, Enz III , § 410 Z, S. 190.
+  61
+     Vgl. Khurana, LdF , S. 426.
+  62
+     Menke, AuB , S. 29.
+  63
+     Khurana, LdF , S. 414.
+
+
+----- 17 / 39 -----
+
+Jan van Dick                „Zweite Natur und Befreiung“                                  16
+
+
+Zwecke der Gewohnheiten für Hegel letztlich als „Zwecke des Geistes“ und die
+Gewohnheiten selbst als „Kunstwerk der Seele“ 64 .
+
+
+
+2. Die Gewohnheit ist mechanisch
+
+Eine erste Erklärung für das Mechanische an der Gewohnheit ist, dass die
+Handlungen automatisch ausgeführt werden.65 Diese Erklärung, Gewohnheit
+sei Automatismus, bleibt jedoch oberflächlich.66 Menke beschreibt, dass alle
+Fähigkeiten egal welcher Art immer „die logische Form einer Besonderung des
+Allgemeinen“ 67 haben. Gerade geistige Handlungen zeichnen sich dadurch aus,
+dass Handlung in der Situation ausgeführt werden. Und zwar auf eine Art und
+Weise, dass das Wahrnehmen der Situation Teil des Ausübens ist. Das Wissen,
+welches zum Ausüben gehört, ist also einerseits das allgemeine Wissen von der
+Fähigkeit und andererseits das, der besonderen Situation: „[e]s ist Wissen vom
+Allgemeinen im Besonderen“ 68 . Diese beiden Seiten des Wissen interagieren
+nach Menke auf eine Weise, dass „das allgemeine Wissen [...] in der – nicht:
+auf die – Wahrnehmung der besonderen Situation angewandt wird.“ 69 Menke
+beschreibt nun weiter, dass es der Gewohnheit genau an dieser Interaktion des
+Besonderen und Allgemeinen Wissens mangelt: die Gewohnheit ist „nur die aus
+der Wiederholung vieler Einzelheiten durch Reflexion hervorgebrachte abstrak-
+te Allgemeinheit“ 70 . Es mangelt der Gewohnheit also nicht an Allgemeinheit,
+sondern an Wahrnehmung des Besonderen, dadurch wiederholt sich in der Ge-
+wohnheit stets dasselbe: Sie kann nur der allgemeinen Regel folgen und diese
+nicht anwenden. Dadurch aber „ist das Selbst der Gewohnheit weder von au-
+ßen noch von innen determiniert, sondern es ist frei, denn es will.“ 71 . Dies
+macht auch Khurana deutlich, indem er die Gewohnheit als abstrakte Allge-
+meinheit beschreibt, welche von den Unterschieden im Einzelnen absieht.72 Die
+sich hieraus ergebende mechanische Gestalt der Gewohnheit führt letztendlich
+dazu, dass Gewohnheit Gefahr läuft, nicht nur selbst natürliche Verknüpfung
+  64
+     Menke, AuB , S. 131.
+  65
+     Kein Musiker muss sich noch beim Spielen eines Tons darauf konzentrieren ihn zu spielen,
+wie er es im Prozess des Lernens getan hat. Das Spielen selbst geschieht automatisch.
+  66
+     Vgl. Menke, AuB , S. 132.
+  67
+     Ebd., S. 132.
+  68
+     Ebd., S. 133.
+  69
+     Ebd., S. 133.
+  70
+     Hegel, Enz III , § 410 Z, S. 188.
+  71
+     Menke, AuB , S. 134.
+  72
+     Vgl. Khurana, LdF , S. 431.
+
+
+----- 18 / 39 -----
+
+Jan van Dick               „Zweite Natur und Befreiung“                              17
+
+
+zu sein, sondern den Geist „in Natur zurückschlagen zu lassen“ 73 ; darin liegt
+letztlich die Gefahr, dass die Gewohnheit „der Tod selbst ist“ 74 .
+
+    Um an dieser Stelle noch einen kleinen Bogen zu Nietzsche zu schlagen,
+lässt sich hiervon ausgehend verstehen, was Nietzsche damit meint, dass er die
+kurzen Gewohnheiten, als eine Abwehr gegen das Verfallen in Abstumpfung
+und Interessenlosigkeit, am meisten liebt. Die „d a u e r n d e n Gewohnheiten“
+dagegen „hasst“ er: „meine Lebensluft [..] v e r d i c k t“ sich.75 Schließlich ist für
+ihn „das eigentlich Fürchterliche“ aber „ein Leben ganz ohne Gewohnheiten“ 76 .
+Auch für Nietzsche stehen Gewohnheiten daher in einem vertrackten Verhältnis
+zwischen Befähigung und Freiheit einerseits und Stumpfheit und Unfreiheit
+andererseits. Auch für ihn sind sie eine Notwendigkeit des Geistes, die sich
+auch in den höheren Stufen des Geistes nicht überwinden lässt.
+
+
+2.1.3     (c) Dialektik von Kritik und Affirmation
+Menke greift auf Marx Unterscheidung von dogmatischer und „wahrhaft philo-
+sophischer“ Kritik zurück, nach der die dogmatische mit ihrem Gegenstand
+„kämpft“ oder ihm ihren Gegensatz äußerlich gegenüberstellt, während die
+wahrhafte Kritik ihn in ihrer inneren „Antinomie“ 77 begreift, und Menke teilt
+anhand dieser Unterscheidung die Kritik der zweiten Natur in eben diese Sei-
+ten: sie beschreibt 1., wie der Geist in der zweiten Natur im Widerspruch zu
+seinem eigenen Begriff steht, und 2., dass zweite Natur die Selbstverstellung
+des Geistes und damit Ausdruck der eben dieser inneren Antinomie ist. Wir
+hatten am Beispiel der Gewohnheit gesehen, inwieweit zweite Natur die Wie-
+derholung der Natur im Geist ist. Da der Geist aber seinem Begriff nach nichts
+ist, als „die Wirklichkeit der Freiheit“ 78 , erscheint die zweite Natur als eine
+Selbstverstellung des Geistes und steht im Widerspruch mit dem Begriff des
+Geistes: zweite Natur ist der „Tod des Geistes durch den Geist und im Geist“ 79 .
+Hier deutet sich bereits die zweite Seite an: es ist der Tod des Geistes durch
+den Geist. Die Naturverkehrtheit des Geistes wird nicht nur beschrieben, son-
+dern auch aus dem Begriff des Geistes immanent erklärt; sie wird erklärt als
+  73
+     Khurana, LdF , S. 430.
+  74
+     Ebd., S. 189.
+  75
+     Nietzsche, KSA 3 , S. 535.
+  76
+     Ebd., S. 535.
+  77
+     Karl Marx und Friedrich Engels. Zur Kritik der Hegelschen Rechtsphilosophie. Kritik
+des Hegelschen Staatsrechts. Werke Bd. 1. Berlin: Dietz, 1977, S. 296.
+  78
+     Menke, AuB , S. 137.
+  79
+     Ebd., S. 43.
+
+
+----- 19 / 39 -----
+
+Jan van Dick                „Zweite Natur und Befreiung“                                18
+
+
+Selbstverstellung des Geistes. Die Kritik der zweiten Natur ist also kritisch
+gegen den Geist selbst, nicht nur gegen die mangelhafte Form, die dieser in ihr
+annimmt, und erklärt zugleich den Geburtsakt der mangelnden Form des Geis-
+tes – und ihn als Geburtsakt durch den Geist.80 Menke zeigt weiter auf, dass
+die zuvor beschriebene Kritik an der Gewohnheit einen anthropologischen Ur-
+sprung hat und erklärt aus der folgenden anthropologischen Bestimmung zwei
+Seiten des endlichen Geistes, mit denen das Problem der zweiten Natur eine
+neue Bedeutung erhält. Dies möchte ich im Folgenden näher erläutern.
+
+    Dass die Wiederholung der Natur im Geist etwas Anthropologisches ist, be-
+deutet, dass die Selbstverkehrung des Geistes in Erscheinung tritt, auf Grund
+der endlichen Gestalt des menschlichen Geistes.81 Zweite Natur ist in gleicher-
+maßen mangelhaft und unvollständig, wie der Geist des Menschen endliche
+und menschliche Gestalt hat. Dies bedeutet zweierlei: 1. kann die Kritik der
+zweiten Natur in der menschlichen Gestalt, auf Grund seiner Endlichkeit nie-
+mals überwunden werden; der Mensch unterliegt notwendig der Wiederholung
+der Natur, 2. schafft die Bestimmung des Geistes als Grund für seine eigene
+Naturverfallenheit eine neue Perspektive: indem der Geist Grund für seinen
+Fall zurück in die Natur ist, unterliegt er diesem nicht nur, er bringt ihn selbst
+hervor. Diese Form genealogischer Kritik, die die Erklärung der Hervorbrin-
+gung mit erläutert, zeigt, dass „der Geist [..] immer schon mehr als der endliche
+Geist [ist], in den er sich verkehrt“ 82 . Dieses Mehr-als-endlicher-Geist ist nach
+Menke absoluter Geist, kann aber als Grund für die Selbstverkehrung des end-
+lichen Geistes nicht Jenseits des endlichen Geistes liegen.83 Damit nimmt der
+Begriff der zweiten Natur eine eigentümliche Weichenstellung zwischen end-
+lichem und absolutem Geist ein: Während der endliche Geist in der zweiten
+Natur durch die Selbstverkehrung bestimmt ist, vollzieht der absolute Geist aus
+Freiheit seine Selbstverkehrung in die zweite Natur: „[e]s ist daher das eigene
+Bewegungsgesetz des absoluten Geistes, in den endlichen Geist zu fallen“ 84 .
+    Diese eigentümliche Zwischenstellung lässt sich mit dem Begriff „Manifes-
+tation des Geistes“ 85 verstehen. Doch was meint Manifestation des Geistes?
+  80
+     Insofern bestimmt Menke die Kritik der zweiten Natur im Verlauf auch als genealogische
+Kritik.
+  81
+     Hegel drückt dies in der Enzyklopädie recht humorvoll aus: „Ungewohntheit und lange
+Fortsetzung des Denkens macht Kopfweh“ (Hegel, Enz III , § 410 A, S. 186).
+  82
+     Menke, AuB , S. 140.
+  83
+     Vgl. ebd., S. 140.
+  84
+     Vgl. ebd., S. 140.
+  85
+     Ebd., S. 140.
+
+
+----- 20 / 39 -----
+
+Jan van Dick                 „Zweite Natur und Befreiung“                      19
+
+
+Zunächst kann das so verstanden werden, dass der Geist sich in der Natur ma-
+nifestiert, also, dass der Geist seine Welt, (d.h. das von ihm Hervorgebrachte)
+setzt als Natur: der Geist offenbart sich (in der Natur), er vergegenständlicht
+sich.86 Ich hatte zu Begin beschrieben, dass Geist wesentlich Freiheit ist, dass
+es sich aber um eine Form der Freiheit handelt, die nicht bloße Negativität,
+sondern ebenso Bestimmtheit ist, eine Form der Bestimmtheit, die dem Ich
+einen konkreten Inhalt gibt. Diese Form von Bestimmtheit, ließ sich mit Hegel
+auf die Formel des „Bei-sich-Sein-im-Anderen“ bringen. Wir können nun die
+Manifestation des Geistes als eben diese Bestimmtheit sehen, durch die das
+Allgemeine sich besondert, aber dennoch Allgemeines bleibt und zur Identität
+mit sich selbst kommt. Das bedeutet, dass es bei der gesuchten Form der Be-
+stimmtheit nicht um diesen oder jenen Inhalt gehen kann, den der Geist sich
+gibt, sondern, dass es die Bewegung des Geistes, sich in der Natur zu offenba-
+ren, selbst ist, die diesen Inhalt ausmacht. Hegel beschreibt dieses Offenbaren
+weiter, als „Setzen der Natur als seiner Welt; ein Setzen, das [...] zugleich Vor-
+aussetzen der Welt als selbstständiger Natur ist.“ 87 In dem selbst gesetzten
+Sein kommt das Ich zu seiner Bestimmtheit, in der es bei sich ist; zugleich ist
+dies Gesetzte selbstständige Natur, und darum ist er bei sich im Anderen.
+    Hegel zeigt, in dem oben angeführten Zitat, zwei verschiedene Operatio-
+nen auf: das Setzen der Natur als Welt, sowie das Voraussetzen der Welt als
+Natur. Jenes ist als Aneignung, dieses als Verselbstständigung zu verstehen.88
+Es handelt sich aber keinesfalls um zwei verschiedene, sondern vielmehr um
+ein und dieselbe Operationen: das Setzten von Sein, welches zugleich beides
+hervorbringt. Zweite Natur bezeichnet genau diese doppelte Bedeutung: sie
+bezeichnet 1. als zweite Natur das „geistige Gesetztsein des selbstständig Sei-
+enden“ und 2. als zweite Natur „das Selbstständigsein [...] des durch den Geist
+Gesetzen“ 89 . Aber es sind eben keine zwei voneinander getrennten Momente,
+zweite Natur ist nicht einmal als zweite Natur und einmal als zweite Natur,
+sondern sie ist zweite Natur. Ebenso wenig ist das Setzen von Sein in diese
+zwei Momente zu unterteilen: das Voraussetzen ist ein Setzten, weil das vom
+Geist Hervorgebrachte als Natur gesetzt wird, ebenso muss das „Setzen der
+Natur als seiner Welt“ ein Voraussetzen sein, weil das was gesetzt wird sonst
+nicht Natur wäre: „das Gesetzte wird als Nichtgesetztes gesetzt“ 90 , also als
+ 86
+    Vgl. Menke, AuB , S. 143.
+ 87
+    Hegel, Enz III , § 384, S. 29.
+ 88
+    Vgl Menke, AuB , S. 141.
+ 89
+    Ebd., S. 142.
+ 90
+    Ebd., S. 142.
+
+
+----- 21 / 39 -----
+
+Jan van Dick                 „Zweite Natur und Befreiung“                                    20
+
+
+Natur vorausgesetzt, nur so kann es Aneignung von Natur sein.91 In diesem
+Sinne ist zweite Natur die Selbstverwirklichung des Geistes, weil das Setzen,
+ursprünglich rein begrifflich, das tatsächliche Erschaffen von Natur ist, aber
+das Erschaffene des Geistes. Diese Form der Selbstverwirklichung des Geistes
+ist die andere Seite der zweiten Natur: es ist die Affirmation der zweiten Na-
+tur, die Affirmation des Geistes.92
+
+    Ich hatte im vorherigen Absatz versucht aufzuzeigen, dass das Mehr, wel-
+ches der endliche Geist enthält, eigentlich das ausmacht, was Hegel den ab-
+soluten Geist nennt. Indem der Geist im Setzen von Sein „die Affirmation
+und Wahrheit seiner Freiheit sich gibt“ 93 , ist „[d]er absolute Geist zweite Na-
+tur“ 94 . Zweite Natur ist also gerade darin affirmativ, dass sie in ihrer Form
+die Struktur des absoluten Geistes enthält: „das vom Geist gesetzte [muß] zu-
+gleich als ein unmittelbares Seiendes gefaßt werden. Dies geschieht [...] auf dem
+Standpunkt des absoluten Geistes.“ 95 In der (affirmativen Seite der) zweiten
+Natur ist die Einheit von Setzen und Sein zusammen gedacht, dies macht den
+entscheidenden Unterschied zum endlichen Geist aus: dort fallen die beiden
+Seiten auseinander.96 Endlicher Geist ist zugleich „Sein gegen Setzung [...] und
+Sein durch Setzung“ 97 . In diesem Sinne ist der endliche Geist bestimmt von
+dem Widerspruch zwischen Begriff und Wirklichkeit. Während im absoluten
+Geist Setzen und Sein als Einheit zusammenfallen, erscheint diese im endlichen
+Geist stets als Setzung oder Sein, weil etwas in der Realität niemals zugleich
+als Natur und als geistig hervorgebracht ist.98 Menke schlussfolgert schließ-
+lich: „Endlicher Geist zu sein heißt, absoluter Geist gewesen zu sein. Aber
+ebenso notwendig heißt absoluter Geist zu sein, endlicher Geist zu werden“.99
+Einerseits bedeutet dies, dass im endlichen Geist die Affirmation des Geistes
+enthalten ist. Andererseits wird hier deutlich, dass wenn die Affirmation darin
+  91
+     Der Begriff der zweiten Natur als Kritik aufgefasst, entlarvt genau dieses Verhältnis: er
+zeigt auf, dass das als Nichtgesetztes Gesetzte, Gesetztes ist. Als Affirmativ aufgefasst, zeigt
+er die Macht des Geistes, Gesetztes als Nichtgesetztes zu setzen.
+  92
+     Vgl. Menke, AuB , S. 143.
+  93
+     Hegel, Enz III , § 384, S. 29.
+  94
+     Menke, AuB , S. 144.
+  95
+     Hegel, Enz III , § 385 Z, S. 34.
+  96
+     Vgl. Menke, AuB , S. 143 - S. 144.
+  97
+     Ebd., S. 144.
+  98
+     Interessant ist, um nochmals einen kleinen Bogen zu Nietzsche zu schlagen, dass nach
+Nietzsche zweite Natur, bzw. Schein ebenso diese Einheit von Setzen und Sein darstellen
+soll. Nach ihm ist Schein 1. Natur selbst und lässt sich 2. anmerken, dass er nur Geist ist.
+(Vgl. Nietzsche, KSA 3 , S. 417).
+  99
+     Menke, AuB , S. 144.
+
+
+----- 22 / 39 -----
+
+Jan van Dick                „Zweite Natur und Befreiung“                       21
+
+
+besteht, dass der Geist Natur setzt, das Gesetzte auch als Sein erscheinen muss.
+Dies kann es aber nur im endlichen Geist. Gewissermaßen kann also der abso-
+lute Geist seine eigene Setzung nur im endlichen Geist verwirklichen, da nur
+dort das Gesetzte als Nichtgesetztes erscheint. Damit, so müsste konsequent
+gefolgert werden, liegt die Einheit von Setzen und Sein auch dem absoluten
+Geist nicht vor.
+
+
+2.1.4      Zwischenfazit und Problembestimmung
+Wir sind ausgegangen von der Kritik der Autonomie, und haben eine erste Ret-
+tung der Freiheit im Begriff der Sittlichkeit erarbeitet. Als das lebendige Gute
+kommt das objektiv Sittliche und das Individuelle in der Teilhabe an einer
+sozialen Praxis zusammen. Dadurch konnten Gesetz und Freiheit zusammen
+gedacht, oder als durcheinander bestimmt gesehen werden, ohne inhaltsleer zu
+bleiben. Zugleich zeigte sich im Begriff der zweiten Natur, genauer: der Ge-
+wohnheit, die Wiederholung des Paradox der Autonomie. Gewohnheit ist einer-
+seits geistig, da sie durch Bildung willentlich angeeignet (ein Setzten) ist, aber
+indem sie zur bloßen Wiederholung, zum Mechanismus wird, ist sie Ausdruck
+von Unfreiheit. Unter Hinzunahme der Dialektik von Verwirklichung und Fall
+des Geistes, muss dieses Verhältnis allerdings ergänzt werden: der Umschlag
+von Setzen in Sein beschreibt nicht bloß kritisch den Fall, sondern zugleich
+affirmativ die Verwirklichung des Geistes. Dabei ist die affirmative Seite not-
+wendig auf die kritische bezogen: die Verwirklichung ist nur dort möglich, wo
+der Geist sich in Natur verkehrt. Menke beschreibt, dass der Freiheitsverlust
+zugleich die Selbstüberschreitung, bzw., dass diese nur durch jenen ist100 . Es
+sind somit beide Seiten der zweiten Natur, die kritische und die affirmative,
+untrennbar miteinander verbunden, allerdings nach Menke „zugleich einander
+strikt entgegengesetzt“ 101 . Untrennbar verbunden sind sie, indem die Verwirk-
+lichung des Geistes nur im Fall der Geistes möglich ist. Strikt voneinander
+getrennt sind sie aber, in den Übergängen von endlichen in absoluten und
+absoluten in endlichen Geist, weil sie sich gegenseitig bekämpfen: die Natur
+verschlingt die Welt des Geistes und reißt sie in die ewige mechanische Wie-
+derholung, während die neue Welt die Wiederholung aufbricht, unterbricht
+und neue Sinnzusammenhänge schafft.102 So beschreibt Menke die affirmative
+Seite der zweiten Natur nicht als positiv, sondern gleichfalls als negativ und
+ 100
+     Vgl. Menke, AuB , S. 145.
+ 101
+     Ebd., S. 147.
+ 102
+     Vgl. ebd., S. 147.
+
+
+----- 23 / 39 -----
+
+Jan van Dick               „Zweite Natur und Befreiung“                                22
+
+
+zerstörerisch: sie affirmiert nicht das Bestehende (denn das ist die Wieder-
+holung der Gewohnheit, welche sie ablehnt), sondern dessen Aufbrechen: die
+Affirmation ist als »neue« „die Zerstörung der falschen zweiten Natur“ 103 , und
+daher nicht positiv, sondern negativ. Damit sind Kritik und Affirmation jeweils
+auf positive und negative Weise affirmativ bzw. kritisch: die Affirmation ist 1.
+positiv die Kraft des Geistes Sein zu Setzen und 2. negative die Zerstörung,
+oder besser: Unterbrechung der Wiederholung. Die Kritik ist 1. negativ die
+Verurteilung der Wiederholung der Natur in der Gewohnheit, sogleich umfasst
+sie 2., qua Negation, positiv den Willen der Überwindung des Falls des Geistes.
+
+    Es findet sich bei Hegel also kein Ausweg aus der ewigen Wiederholung
+der Befreiung, bzw. der In-Natur-Verkehrtheit des Geistes: nicht nur ist die
+Befreiung ohne die Schaffung einer zweiten Natur nicht möglich, auch ist ohne
+die Wiederholung von Natur Freiheit nicht denkbar.104 Im nächsten Abschnitt
+werden wir einige Stellen aus Nietzsches Werken betrachten, um die Mög-
+lichkeit der Überwindung der Wiederholung bei Nietzsche zu untersuchen. Im
+Anschluss an die eben geführte Debatte, wollen wir bei Nietzsche Ausgang
+nehmen, von der Dialektik der zweiten Natur, bzw. der Dialektik des Scheins
+(denn so wird uns der Begriff bei Nietzsche begegnen). Diese Dialektik drückt
+sich nochmals zusammengefasst und auf Nietzsche bezogen so aus, dass der
+Schein einerseits Natur sein soll (damit die Kraft des Geistes, Natur zu setzen,
+verwirklicht ist), andererseits geistig sein soll, damit der Geist nicht wieder in
+Natur verfällt. Wir werden bei Nietzsche in der Betrachtung des Scheins und
+des Schauspielers, das Problem von der objektiven, wie von der subjektiven
+Seite aus erfahren.
+
+
+2.2.      Zweite Natur bei Nietzsche
+Bevor ich mich Nietzsche annähere, seien noch einige Worte zu der Frage »wie
+Nietzsche lesen?« gesagt. Mir ist wohl bewusst, dass die Rezeption Nietzsches
+sich schwierig gestaltet, da er nicht nur vom Nationalsozialismus und Den-
+kern dieser Tradition angeeignet wurde, sondern auch innerhalb der Linken
+umstritten ist. Umstritten scheint mir beispielweise die Annäherung Nietz-
+ 103
+     Menke, AuB , S. 148. Hervorhebung von mir. Diese Zerstörung bezeichnet Menke auch
+als „das plötzliche Hervortreten des Werkes, des Gedanken, der Tat“, welches „die immer
+gleiche Wiederholung der abstrakt imaginärer Identitäten [bekämpft]“ (ebd., S. 147).
+ 104
+     Im einen Fall gibt es Freiheit »eine Zeit lang«, bis sie sich dann in Natur verkehrt,
+während im zweiten Fall die Freiheit selbst nichts anders bedeutet, als das Natur-Werden
+des Gesetzten, denn nur dort ist der Geist bei sich im Anderen.
+
+
+----- 24 / 39 -----
+
+Jan van Dick                „Zweite Natur und Befreiung“                                23
+
+
+sches an (links) idealistische Positionen, welche Paul Stephan als die Nietzsche
+am wenigsten zuordenbare Strömung bezeichnet.105 Stephan stimmt, indem er
+Tucholsky zitiert106 , darin überein, dass es schwierig ist Nietzsche eine Haupt-
+lehre zu unterstellen, da es ihm oft an Eindeutigkeit fehlt, hält aber dagegen,
+dass diese Uneindeutigkeit bewusst gesetzte Methode ist.107 Was Nietzsche mit
+Sicherheit wollte, war: sich sein Werk für einen selbst fruchtbar machen. Das
+heißt: Nietzsches Gedanken nicht zu erstarrten Metaphern werden zu lassen,
+sondern sie für die Metaphern im eigentlichen Sinne zu nehmen – mit denen
+sich dann auch spielen, oder genauer: »tanzen« lässt.
+    In Anschluss an die Leitfrage, soll in diesem Abschnitt der Grundstein für
+die Möglichkeit der Befreiung aus der Befreiung gelegt werden. Dabei hatte ich
+zu Beginn der Arbeit angedeutet, dass diese dritte Befreiung eine Tat des In-
+dividuums sein, oder in den objektiven Verhältnissen liegen könnte. Die Frage
+nach dem Schein, sowie die des Schauspielers, stehen für die Betrachtung des
+Problems von der subjektiven, individuellen und der objektiv, sittlichen Seite.
+Diese beiden Seiten möchte ich schließlich in dem bereits zitierten Aufruf des
+»Tollen Menschen«: „Gott ist tot und wir haben ihn getötet!“ zusammenbrin-
+gen und damit am Ende zu unserem Ausgangspunkt zurückkehren.
+
+
+2.2.1      (a) Was bedeutet Schein?
+Nietzsche mag als Dynamit und Hammer und Zerstörer von Wahrheit und
+Metaphysik108 gelten:
+
+      die Wahrheiten sind Illusionen, von denen man vergessen hat, dass sie
+      welche sind, Metaphern, die abgenutzt und sinnlich kraftlos geworden
+      sind, Münzen, die ihr Bild verloren haben und nun als Metall, nicht
+      mehr als Münzen in Betracht kommen.109 .
+
+Aber was bedeutet es für Nietzsche genau, dass die Wahrheit eine bloße Il-
+lusion ist? Was bedeutet es, dass unsere Begriffe und Namen für die Dinge
+ihrem Wesen fremd sind? – Das Wort Metapher weißt bereits auf mehr als die
+ 105
+     Vgl. Paul Stephan. Links-Nietzscheanismus Eine Einführung. Stuttgart: Schmetterling-
+Verlag, 2019, S. 26. Nachfolgend zitiert als LN.
+ 106
+     „Sag mir, was du brauchst, und ich will dir dafür ein Nietzsche-Zitat besorgen.“ (Kurt
+Tucholsky. Gesammelte Werke in zehn Bänden. Reinbek bei Hamburg: Rowohlt Verlag, 1975
+Zitiert bei Stephan, LN , S. 17)
+ 107
+     Vgl. ebd., S. 18.
+ 108
+     Vgl. ebd., S. 59.
+ 109
+     Friedrich Nietzsche. Die Geburt der Tragödie. kritische Studienausgabe in 15 Bänden,
+KSA Band 1. München: Deutscher Taschenbuch Verlag, 1999, S. 881. Nachfolgend zitiert als
+KSA 1.
+
+
+----- 25 / 39 -----
+
+Jan van Dick                „Zweite Natur und Befreiung“                        24
+
+
+bloße Zerstörung von Wahrheit hin, denn, dass etwas eine Metapher ist, deutet
+immer auf einen Zusammenhang zwischen dem Ding und der Metapher und
+die Metapher schafft zugleich für das Ding eine neue Bedeutung. Versteht man
+Nietzsches Verwendung des Begriffs der Metapher auf diese Weise, dann stellt
+sich Nietzsches Wahrheitskritik als eine doppelte dar, die einerseits Kritik, an-
+dererseits Affirmation ist.
+
+    Mit der Kritik der Wahrheit, sie sei nichts als „[e]in bewegliches Herr von
+Metaphern“ 110 , meint Nietzsche mehrere Dinge, auf die ich zunächst einen
+Blick werfen möchte: erstens beschreibt er damit Wahrheit als etwas anthro-
+pomorphes, das nicht so in der Welt ist, sondern, was der Mensch erst festlegen
+musste: er „fixiert, was von nun an »Wahrheit« sein soll“ 111 . Zweitens klingt
+darin Nietzsches Begriffskritik mit an: die Wahrheit ist Metapher, also nur
+abgezogenes Bild von dem eigentlichen Ding, wie der Begriff niemals mit der
+Sache identisch ist, sondern stets durch „Gleichsetzen des Nicht-Gleichen“ 112
+entsteht. Schließlich betont Nietzsche drittens, dass der Mensch vergessen hat,
+dass seine Wahrheit immer nur perspektivisch113 , nur ein von ihm gemachtes
+Abbild ihrer ist. Dies lässt sich schließlich so zusammenfassen, dass der Mensch
+nur glaubt etwas von den Dingen zu wissen, oder anders: dass er „nach fester
+Convention [...], unbewusst und nach hundertjährigen Gewöhnungen“ 114 lügt.
+
+    In der fröhlichen Wissenschaft schreibt Nietzsche, dass es ihm schwer fiel
+einzusehen, dass „unsäglich mehr daran liegt, w i e d i e D i n g e h e i s s e n,
+als was sie sind“ 115 . Es wirkt als revidiere Nietzsche damit die Begriffskritik
+seiner Frühwerke. Dabei gerät jedoch die Doppeldeutigkeit der Metapher aus
+den Augen und, dass Nietzsche nur ihr Vergessen kritisiert, nicht ihre Verwen-
+dung im Allgemeinen. Wenn Nietzsche schreibt, dass es mehr darauf ankommt,
+„wie die Dinge heißen, als was sie sind“, dann ist dies eigentlich keine Revision
+seiner Kritik der Metapher, sondern die Unterstreichung dessen, was mit dem
+Ausruck Denken in Metaphern eigentlich gemeint ist. Nietzsche betont, dass
+der Mensch im Kreieren von Metaphern „k ü n s t l e r i s c h s c h a f f e n d e s
+Subjekt ist“ 116 . Er ist schaffendes Subjekt nicht nur indem er den Dingen
+ 110
+     Nietzsche, KSA 1 , S. 880.
+ 111
+     Ebd., S. 877.
+ 112
+     Ebd., S. 880.
+ 113
+     Vgl. Nietzsche, KSA 5 , S. 364.
+ 114
+     Nietzsche, KSA 1 , S. 881.
+ 115
+     Nietzsche, KSA 3 , S. 422.
+ 116
+     Nietzsche, KSA 1 , S. 883.
+
+
+----- 26 / 39 -----
+
+Jan van Dick                       „Zweite Natur und Befreiung“                  25
+
+
+(neue) Namen gibt, sondern auch, indem die von ihm geschaffenen Metaphern
+Wirklichkeit werden: „der Schein wird zuletzt immer als Wesen und w i r k t
+als Wesen.“ 117 . Damit wirkt das vom Menschen Geschaffene letztlich als Wesen
+und es ist demnach bedeutender, „wie die Dinge heißen, als was sie sind“, oder
+(ursprünglich) waren.
+    Der Schein enthält für Nietzsche also auf ähnliche Art und Weise ein kom-
+plexes Verhältnis, wie die Metapher: Schein ist einerseits vom Menschen pro-
+duziert, geistig und daher nicht unmittelbare, erste Natur, andererseits ist die-
+ser doch das selbstständig Seiende und Wirkende und dadurch Wirk lichkeit.
+Nietzsche betont, man könne von dem Wesen überhaupt nichts aussagen, als
+„die Prädicate [sic] seines Scheins“, deshalb ist der Schein nicht „der Gegensatz
+irgend eines Wesens“ 118 . Es liegt bei Nietzsche also nahe, dass es überhaupt
+nichts gibt, als Schein und er schreibt, dass Schein „das Wirkende und Lebende
+selber“ ist und mich wissen lässt, „dass hier Schein und Irrlicht und Geistertanz
+und nichts Mehr ist“ 119 . Indem der Schein selbst wirkend ist, ist er selbstständig
+dem Geist gegenüber, indem er seine eigene Natur (Schein zu sein) preisgibt,
+bekennt er sich, als geistig; Schein ist zugleich Natur und Geist. Nietzsche for-
+dert hier also die Paradoxe Einheit von Setzen und Sein, denn diese Einheit
+ist nicht, wie bei Menke, der Übergang von Verwirklichung in Entwirklichung,
+sondern sie ist zugleich Setzen und Sein und damit Vollendung des Geistes,
+ohne Fall des Geistes zu sein. Hinzu kommt, dass Nietzsche dies nicht nur for-
+dert, sondern, dass es sich nach ihm wirklich so verhält. Während bei Menke
+die Macht des Geistes, Sein zu setzen, sich nur in der Dialektik von endlichem
+und absolutem Geist ergeben kann, ist bei Nietzsche Schein Wesen und Be-
+wusstsein vom Nicht-Wesen-Sein zugleich. Was wir ausgehend von Hegel und
+Menke als unauflösbares Ineinander von Verwirklichung und Fall des Geistes
+annahmen, scheint bei Nietzsche in der Wirklichkeit aufgelöst zu sein.
+
+    Dieses Wissen von der Scheinhaftigkeit, welches ich im Folgenden als »Be-
+wusstsein der Scheinhaftigkeit« bezeichnen werde, stellt die explizite Gegenpo-
+sition dar, zum Vergessen der Illusion und zur kraftlos gewordenen Metapher.
+Nietzsche beschreibt, dass die ursprünglich anschauliche Metapher sich, gerät
+der Mensch unter die „Herrschaft der Abstractionen [sic]“, zum Begriff „ver-
+flüchtig[t]“.120 . Obwohl also der Schein wissen lässt, dass er Schein ist, scheint
+ 117
+     Nietzsche,   KSA   3,   S.   422.
+ 118
+     Nietzsche,   KSA   1,   S.   417.
+ 119
+     Nietzsche,   KSA   3,   S.   417.
+ 120
+     Nietzsche,   KSA   1,   S.   881.
+
+
+----- 27 / 39 -----
+
+Jan van Dick              „Zweite Natur und Befreiung“                              26
+
+
+es gleichfalls eine subjektive Komponente zu geben, welche den „Geistertanz“
+erkennen muss. Diese subjektive Komponente findet sich in Nietzsches Unter-
+scheidung vom Erkennenden mit und dem Erkennenden ohne Anführungszei-
+chen: letzterer lebt nur in der Welt des Scheines ohne ihr Geschaffen-Sein zu
+erkennen, während ersterer die Einheit von Setzen und Sein erkennt. Nietzsche
+schreibt, dass der Erkennende ein „Festordner“ ist, um „den irdischen Tanz in
+die Länge zu ziehen“ und d i e D a u e r d e s T r a u m e s a u f r e c h t z u
+e r h a l t e n121 . Der Traum (die Verwirklichung des Geistes, die im »Erken-
+nenden« wirklich ist) besteht also nur so lange fort, wie der Schein von dem
+Erkennenden auch für Natur genommen wird. Es bilden sich zwei Pole: auf
+der einen Seite steht das Verlieren in der Metapher, also das Versinken des
+Geistes in Natur und die daraus resultierende Hypostasierung des Bestehen-
+den. Auf der anderen Seite, die völlige Aufhebung alles dessen was ist, die
+»Entwertung aller Werte«, welche beidseitig als Vorläufer*innen des Faschis-
+mus gesehen werden können.122 . Beide Seiten fanden sich auch bei Hegel als
+problematisch: einerseits verfällt der Geist in Natur, andererseits beutet die
+bloße Willkür gleichfalls Abwesenheit von Freiheit.123
+
+   Ich habe versucht hier die objektive Seite zu beschreiben und wir haben
+gesehen, wie sie notwendig in die subjektive Seite übergeht und wollen diese
+im Folgenden näher betrachten.
+
+
+2.2.2     (b) Der Schauspieler und die Rolle
+Die Unterscheidung, des »Erkennenden« und des Erkennenden, werde ich an-
+hand von Nietzsches Konzeption des Schauspielers und der Rolle vertiefen.
+Der Erkennende hat sich als der gezeigt, welcher in dem Schein versunken
+bleibt und ihn für Natur nimmt, während der »Erkennende« in dem erkann-
+ten Schein dennoch seinen Traum tanzt.124 Wie der Erkennende den Schein
+für Natur nimmt, wird „aus der Rolle wirklich Charakter [...], aus der Kunst
+Natur“ 125 . Wie beschreibt Nietzsche diesen Wandeln? Für Nietzsche bedeutet
+Rolle etwas künstlich Geschaffenes, welches die Menschen, zum Beispiel im
+Zuge ihres Berufes – aus Zwang oder „anscheinender Freiheit“ 126 – annehmen.
+ 121
+     Nietzsche, KSA 3 , S. 417.
+ 122
+     Vergleiche dazu beispielsweise: Stephan, LN , S. 61, S. 69.
+ 123
+     Und auch Hegel hat diese Form der Willkür des Zerstörens von allem bestehenden mit
+den Schrecken der Jakobinerherrschaft vergleichen (Vgl. Hegel, Grundlinien, S. 39).
+ 124
+     Vgl. Nietzsche, KSA 3 , S. 417.
+ 125
+     Ebd., S. 595.
+ 126
+     Ebd., S. 595.
+
+
+----- 28 / 39 -----
+
+Jan van Dick                „Zweite Natur und Befreiung“                                27
+
+
+Dabei vergessen sie bald, dass es sich ursprünglich um eine angenommene, er-
+dachte Rolle handelte und es nur Zufall war, dass sie genau diese, und nicht
+eine aus unzähligen anderen Rollen »spielen«. Nietzsche erläutert, dass sie sich
+die Rolle auf Grund ihres „guten Spiels“ 127 so aneignen konnten: sie haben sich
+selbst so sehr in ihrem eigenen Schein verloren, dass „aus der Kunst Natur“ ge-
+worden ist. Diese Dauerhaftigkeit die aus dem Vergessen der Scheinhaftigkeit
+entsteht beschreibt Nietzsche als „einen Werth ersten Ranges“ 128 und drück
+damit einerseits aus, dass nur auf Grund dieses Vergessens der Mensch sich so
+ausbreiten und verwirklichen konnte, andererseits wirkt seine Aussage höchst
+ironisch, er kritisiert damit also eindeutig die Affirmation des Bestehenden.129
+
+    Dem Schauspieler hingegen liegt das gegenteilige Verhältnis zu Grunde: er
+ist derjenige, bei dem „alle Natur aufhört und Kunst wird“ 130 . Der Schauspieler
+erkennt nach Nietzsche den Schein, oder die „Falschheit“, aber spielt sie „mit
+gutem Gewissen“ 131 . Der Schauspiel befreit sich von der Natur, die ihn bin-
+det und erschafft einen Schein.132 Er tut dies nicht »einfach so«, sondern mit
+Lust. Diese „Lust an der Verstellung“ zeigt sich als eine „Macht“ 133 , welche sich
+darauf bezieht die (anscheinende) Natur beiseite zu schieben und sie in Kunst
+zu verkehren. Dem Schauspieler liegt somit das Moment des Sich-frei-Machens
+von der Natur zu Grunde. Er durchbricht in seiner Lebensweise den Schein
+der Notwendigkeit und das ist Befreiung.134 . Der Schauspieler vertritt, was ich
+als „Bewusstsein der Scheinhaftigkeit“ bezeichnete, die einerseits die Notwen-
+digkeit, andererseits die daraus folgende Veränderbarkeit des Scheins erkennt.
+Er Unterscheidet sich darin auch vom »Erkennenden«, da er dieses Verhältnis
+nicht nur erkennt sondern auch handelnd sich verwirklicht in der Durchbre-
+ 127
+      Nietzsche, KSA 3 , S. 595.
+ 128
+      Ebd., S. 595.
+  129
+      So ähnlich findet sich die Kritik ja auch im erstarren der Metaphern wieder.
+  130
+      Nietzsche, KSA 3 , S. 596.
+  131
+      Ebd., S. 608.
+  132
+      Nietzsche betont an dieser Stelle die Verdrängung des „sogenannter »Charakter[s]«“
+(ebd., S. 608). Für ihn ist selbst der Charakter nur Schein, nur „sogenannter“ Charakter.
+Dies macht eine gewisse Spannung auf, wenn es beispielsweise um Nietzsche Antifeminismus
+oder Sexismus geht, wo es sehr wohl so wirkt, als unterstelle er Frauen ein »Wesen«. Ste-
+phan schreibt hierzu, dass Nietzsche zwar zugesteht, dass es kein „natürliches Wesen“ der
+Frau gibt, sondern, „dass ihr »Wesen« Ergebnis ihrer patriarchaler Unterdrückung sei“ (Vgl.
+Stephan, LN , S. 50), sieht darin aber keine Rettung von Nietzsches offensichtlichem An-
+tifeminismus. Die Befreiung der Frau aus diesen Verhältnissen scheint Nietzsche vehement
+abzulehnen. Dennoch sind diese Aussagen Nietzsches „seiner philosophischen Grundhaltung
+nach als experimentelle Erfahrungswahrheiten, nicht als absolute Wahrheiten im metaphy-
+sischen Sinn zu verstehen“ (ebd., S. 61).
+  133
+      Nietzsche, KSA 3 , S. 608.
+  134
+      Vgl. Menke, AuB , S. 41.
+
+
+----- 29 / 39 -----
+
+Jan van Dick                „Zweite Natur und Befreiung“                         28
+
+
+chung des Bestehenden: er befreit sich. Der Schauspieler erkennt also 1. das
+Verhältnis von Schein und Wesen, gleich dem »Erkennenden« und 2. kann sei-
+ne Lebensweise als die der Befreiung aus der zweiten Natur bezeichnet werden.
+
+    Zuletzt will ich aus diesem Unterschied einen Bogen zurück zur Befreiung
+schlagen. Khurana schreibt zur Befreiung des Geistes, dieser „will sich befreien,
+als die Natur aus sich herausbildend“ 135 . Hier liegt das Verhältnis der Rolle vor:
+der Mensch setzt die Rolle als seine Natur: Die geistig geschaffene Rolle wird
+zur Natur. Dies ist die eine Seite der Befreiung. Die zweite ist der Schauspieler,
+der sich aus der Natur, der Rolle, die selbst nur zweite Natur, also Schein ist,
+befreit und stattdessen Kunst und Schein setzt. Aber mit dem entscheidenden
+Unterschied, dass dem Schauspieler seine Rolle nicht selbst wieder als Natur
+erscheint. Bildet damit auch der Schauspieler Natur aus sich heraus, die er (im
+Gegensatz zur Rolle) als von ihm geschaffen erkennt? Ist gerade der Schein,
+den der Schauspieler ausbildet auch der, der mich selbst wissen lässt, dass er
+Schein ist? Wie im vorherigen Abschnitt die objektive in die subjektive, geht
+hier die subjektive in die objektive Seite über.
+
+
+2.2.3      (c) Gott ist tot!
+Ich werde nun versuchen die gezeigte subjektive und objektive Seite in der
+Erzählung des »Tollen Menschen« zusammenzubringen.
+    Nietzsches These vom Tode Gottes, dass »wir« ihn getötet haben, ist mehr
+als bloße Negativität. „Müssen wir nicht selber zu Göttern werden“ 136 , um ihn
+getötet zu haben? Dass der Mensch selbst zum Gott wurde, gibt das Zeug-
+nis der Verantwortlichkeit für sowohl die Lebendigkeit, als auch die Tötung
+Gottes. Der Mensch ist Gott geworden, indem er ihn geschaffen hat, dadurch
+nur konnte er ihn töten. Gott ist vom Menschen selbst gesetzt, er ist Schein,
+der sich gegen ihn verselbstständigte, der lebendig und unabhängig vom Men-
+schen existierend wurde, denn nur als einmal lebendig gewesen, kann er auch
+ver wesen „– auch Götter verwesen!“ 137 Gott ist somit geistiges Produkt des
+Menschen, in welchem der Geist selbst wieder zur Natur sich verkehrte. Denn,
+wie bei Hegel erläutert, ist die Verwirklichung auch der Fall des Geistes. Das
+bedeutet hier, dass der Mensch vergessen hat, dass er Schöpfer des Schöpfers
+war und, dass dieser gegenüber jenem zu einer selbstständigen Macht wur-
+ 135
+     Khurana, LdF , S. 393.
+ 136
+     Nietzsche, KSA 3 , S. 481.
+ 137
+     Ebd., S. 481.
+
+
+----- 30 / 39 -----
+
+Jan van Dick                „Zweite Natur und Befreiung“                                 29
+
+
+de. Der Tod Gottes verweist also einerseits auf die Macht des Menschen Sein
+zu Setzen138 und ist andererseits die Befreiung aus der In-Natur-Verkehrtheit:
+Menke macht jedoch deutlich, dass die Befreiung stets das Schaffen einer neuen
+zweiten Natur ist. Die „plötzlich hervorbrechende Tat“, zerstört die „falsche“
+zweite Natur, gerade indem sie eine neue setzt. Ohne dieses neue Setzten wä-
+re die plötzliche Tat nichts als „der Fanatismus der Zertrümmerung“ 139 . Bei
+Nietzsche sind die Folgen der Befreiung nicht so eindeutig. Der »Tolle Mensch«
+spricht aus Angst vor der bloß zerstörerischen Tat: „Was thaten wir, als wir
+diese Erde von ihrer Sonne losketteten? [...] Müssen nicht Laternen am Vor-
+mittage angezündet werden?“ 140 Aber es gibt noch eine zweite Perspektive:
+zwar ist der Tod Gottes für die Einen eine untergegangene Sonne, aber für
+die Anderen, die „geborene Rästhselrather“, ein „offenes Meer“ 141 . Dies kön-
+nen wir mit dem Schauspieler und der Rolle zusammenbringen. Für diese ist
+der Schein Natur, dass Gott Illusion ist also vergessen, oder nie gewusst. Jede
+Zerstörung oder Umwälzung ist notwendig eine „Verdüsterung und Sonnenfins-
+ternis“ 142 . Der Schauspieler hingegen weiß, dass es bloß Geistertanz ist, für ihn
+ist dieser „Blitz und Donner“ 143 der Bote der „neuen Morgenröthe“, sie sagen:
+„ jede Wagniss des Erkennenden ist wieder erlaubt, das Meer, u n s e r Meer
+liegt wieder offen da, vielleicht gab es noch niemals ein so »offenes Meer«“ 144 .
+Der »Erkennende« und der Schauspieler sehen im Tod Gottes die Möglichkeit
+neue Wörter zu Schaffen und neuen Sinn zu stiften.145 . Für Nietzsche braucht
+es demnach das Bewusstsein der Scheinhaftigkeit, wie es beim »Erkennenden«
+vorliegt, um sich in einer Weise zu befreien, die sich nicht im Nichts verliert,
+sondern neue, wesensbestimmende Elemente setzt. Damit können wir die in
+der Einleitung aufgeworfene Frage, ob die Befreiung bei Nietzsche ein neues
+Moment in der Sittlichkeit hervorbringen kann, welches die Möglichkeit mit
+sich bringt, die ewige Wiederholung der Befreiung zu durchbrechen, beantwor-
+ten: der Schein enthält stets dieses Moment, wissen zu lassen, dass er Schein
+ist, aber eben nur für mich – was heißt: nur für den »Erkennenden«.146
+ 138
+     „Denn tausend Götter muss gebären/ Die Brust, die einen Gott aus sich erschuf“ (Lou
+Andreas-Salomé. Im Kampf um Gott. München: Dt. Taschenbuch-Verlag, 2007, S. 146).
+Bei Lou Andreas-Salomé fehlt allerdings die bei Nietzsche mitschwingende Dialektik von
+Verwirklichung und Entwirklichung.
+ 139
+     Hegel, Grundlinien, § 5 A, S. 39.
+ 140
+     Nietzsche, KSA 3 , S. 481.
+ 141
+     Ebd., S. 573 - S. 574.
+ 142
+     Ebd., S. 573.
+ 143
+     Ebd., S. 481.
+ 144
+     Ebd., S. 574.
+ 145
+     Vgl. Stephan, LN , S. 70.
+ 146
+     So schreibt Nietzsche ja: „Schein ist für mich das Wirkende und Lebende selber, dass so
+
+
+----- 31 / 39 -----
+
+Jan van Dick                „Zweite Natur und Befreiung“                                30
+
+
+
+2.3.      Was heißt Befreiung aus der zweiten Natur
+Befreiung bedeutet »Durchstoßen des Scheins der Notwendigkeit«147 . Bei Nietz-
+sche ist uns die Befreiung im Schauspieler begegnet, der sich von der Natur
+freimacht, indem er sich dem „sogenannten Charakter“ entledigt. Sowohl bei
+Nietzsche, als auch bei Menke, ist die Befreiung aber keine bloße Negation. Sie
+stellt der „falschen“ zweiten Natur eine neue entgegen. Damit läuft die Befrei-
+ung Gefahr, sich gegen den Geist zu verselbstständigen. Somit ist Befreiung
+zugleich Macht und Ohnmacht des Geistes. Sie ist die Macht des Durchstoßens
+der scheinbaren Notwendigkeit durch die Hervorbringung der zweiten Natur
+und zugleich die Ohnmacht des Geistes da das von ihm Hervorgebrachte, er-
+neut zur Natur wird, aus der er sich wieder befreien muss; die Befreiung ist
+nie abgeschlossen. Wie ist aber Befreiung aus der zweiten Natur überhaupt
+möglich, vor dem Hintergrund, dass Hegel die Sittlichkeit als „Verhältnis-lose
+Identität“ 148 beschreibt? Wie kann sich aus dieser verhältnislosen Identität eine
+Transformation des Bestehenden vollziehen? Wenn die Subjekte in der sozia-
+len Praxis eins sind mit dem Gesetz dem sie unterliegen, wie können sie dieses
+durchbrechen? Die Tat der Befreiung muss, indem sie die zweite Natur durch-
+bricht, schon über sie hinaus sein. Es muss ein Mehr an Handlungsfreiraum
+geben, welches nicht vollständig in dem Gesetz des Bestehenden aufgeht. Diese
+Frage erscheint mir einerseits als entscheidend bei der Behandlung dieses The-
+mas, andererseits als nur schwer beantwortbar. So beschreibt Menke zwar, dass
+Geist wesentlich darin besteht sich von der Natur zu befreien, indem den na-
+türlichen Verknüpfungen geistige entgegengesetzt werden (Herausbildung der
+zweiten Natur)149 , aber wie dies geschieht bleibt zunächst unklar. Es findet
+sich jedoch bei Menke im „asoziale[n] Effekt“ 150 ein Hinweis darauf, wie die
+Befreiung selbst gedacht werden kann: im Prozess der Bildung, in der sich der
+Mensch von der ersten, durch die Herausbildung der zweiten Natur befreit,
+verinnerlicht („oder »ästhetisiert«“ 151 ) er nach Menke die (erste) Natur, von
+der er sich befreite. Diese Verinnerlichung bringt zugleich die Kraft hervor,
+die zweite Natur, welche das Ergebnis der Bildung war, in Frage zu stellen,
+weit in seiner Selbstverspottung geht, mich fühlen zu lassen, dass hier Schein und Irrlicht
+und Geistertanz und nichts Mehr ist, – dass unter all diesen Träumenden auch ich, der
+»Erkennende«, meinen Tanz tanze [...]“ (Nietzsche, KSA 3 , S. 417, Hervorhebung von mir).
+ 147
+     Vgl. Menke, AuB , S. 41.
+ 148
+     Hegel, Grundlinien, § 147 (Anmerkung), S. 163.
+ 149
+     Vgl. Menke, AuB , S. 39.
+ 150
+     Ebd., S. 51.
+ 151
+     Ebd., S. 80.
+
+
+----- 32 / 39 -----
+
+Jan van Dick                „Zweite Natur und Befreiung“                       31
+
+
+indem sie die Möglichkeit mit sich bringt, das was ist in ihrem Gewordensein
+aufzuzeigen, womit dieses seine Notwendigkeit verliert.152 Menke beschreibt
+dies als einen Prozess der »Ästhetisierung«, welcher sich am Ende der Arbeit
+– auch im Anschluss an Nietzsche – insgesamt als eine Alternative, Befreiung
+weiterzudenken ergeben wird. Gleichfalls erscheint mir dieser Ansatz Menkes
+als eine Möglichkeit Befreiung überhaupt zu denken. Die Frage an dieser Stelle
+zu beantworten ist im Rahmen meiner Arbeit auf Grund des Umfangs, der sich
+ergeben würde, nicht möglich und schließt sich als mögliche Forschungsfrage
+an.
+
+
+2.4.      Das offene Meer?
+Gibt es in Nietzsches Philosophie eine Möglichkeit der Überwindung der not-
+wendigen In-Natur-Verkehrtheit des Geistes? Wir haben das „offene Meer“ als
+eine solche Möglichkeit vermutet. Im Anschluss an den Abschnitt 2.2.3 können
+wir nun fragen, was das „offene Meer“ genau ist. Wir hatten bei Nietzsche eine
+(neue) Qualität im Objektiven, als einen Ausweg aus der Wiederholung der
+Befreiung, vermutet. Ebenso verweist Khurana darauf, dass die Sittlichkeit et-
+was mit sich bringen muss, was ein neues Verhältnis zum Zurückfallen in die
+Unfreiheit erzeugt. Dazu schlägt er vor, dass das Gesetztsein sich in der neuen
+zweiten Natur zeigt, bzw. in ihr erhalten bleibt.153 Es liegt also nahe, das „of-
+fene Meer“ als diese Form der Sittlichkeit zu vermuten. Khurana schreibt nun
+allerdings weiter, dass die zweite Natur gerade die gegenteilige Tendenz enthält:
+das Gesetztsein geht im Sein unter, bzw. kommen Geist und Natur nur zu ei-
+ner unmittelbaren, nicht zu einer geistigen Einheit154 . Er schreibt, dass wir uns
+unsere Freiheit immer wieder aneignen müssen, wie wir auch bei Nietzsche im
+Schauspieler gesehen haben, dass es einen fortwährenden Prozess der Befreiung
+bedarf, einen Kontext der „laufenden Bildung und Umbildung“ 155 : die zweite
+Natur ist nie »fertig« und „[d]ie Befreiung steht immer noch aus“ 156 . Damit
+ist das Geistige nicht in der zweiten Natur, sondern eine ebenso unmittelba-
+re Einheit, wie zuvor und Freiheit kommt in die Unfreiheit nur vom Subjekt
+aus hinzu, in Form der Befreiung – die Befreiung bleibt partiell. Im Gegensatz
+dazu fand sich bei Nietzsche der Schein, der mich wissen lässt Schein zu sein.
+ 152
+     Vgl. Menke, AuB , S. 80.
+ 153
+     Vgl. Khurana, LdF , S. 401.
+ 154
+     Vgl. ebd., S. 402.
+ 155
+     Ebd., S. 402.
+ 156
+     Menke, AuB , S. 81.
+
+
+----- 33 / 39 -----
+
+Jan van Dick                „Zweite Natur und Befreiung“                                 32
+
+
+Befreiung wäre hier nicht nur Seinsweise des Subjekts, sondern in den Schein
+selbst eingeschrieben157 . Allerdings gilt diese Form des Scheins nur für den
+»Erkennenden«, der ein Bewusstsein hat von der Scheinhaftigkeit der Wirk-
+lichkeit, der gewissermaßen für sich den „Schein der Notwendigkeit“ bereits
+„[d]urchstoßen“ hat. Und diese Erfahrung lässt sich bei Nietzsche nicht verall-
+gemeinern: diejenigen, die die Scheinhaftigkeit nicht erkennen, sind notwendig,
+um die „Allgemeinverständlichkeit aller dieser Träumenden untereinander [...]
+a u f r e c h t z u e r h a l t e n“ 158 , ohne sie würde das Dasein in Nichts und
+Willkür zerfallen, es gäbe kein Bei-Sich-Selbst-Sein-im-Anderen mehr, denn
+die Einheit von Setzen und Sein würde notwendig zerfallen.159 Für den »Er-
+kennenden« jedoch, ist das Gesetztsein des Seins im Schein zugleich negiert
+und bewahrt, was bedeutet, dass für ihn die Einheit von Setzen und Sein vor-
+liegt: der »Erkennende« setzt die Natur als seine Welt und dieses Setzten ist
+zugleich ein „Voraussetzen der Welt als selbstständiger Natur“.
+     Diese These Nietzsches mag elitär anmuten, enthält aber zugleich eine
+eigentümliche Art des notwendigen Zusammenspiels, wie sie auch in „Ueber
+Wahrheit und Lüge im aussermoralischen Sinne“ im Gegensatz des „intuiti-
+ve[n]“ und „vernünftige[n] Mensch“ 160 zu finden ist: dieser lebt in der Welt der
+Abstraktionen, bei ihm verhärten sich die Metaphern und er baut mit ihnen
+aus „Vorsorge, Klugheit und Regelmäßigkeit“ seinen „großen Bau der Begrif-
+fe“ 161 . Jener zerreißt das „Begriffsgespinst [...] durch die Kunst“ 162 und erfin-
+det neue Metaphern. Aber auch die neuen Metaphern müssen wieder erstarren
+und so finden wir den intuitiven und den vernünftigen Menschen im ewigen
+Zusammenspiel von Befreiung und Erstarren.163 . Es zeigt sich bei Nietzsche
+im intuitiven Menschen, wie auch im Schauspieler eine Form des ästhetischen
+Umgangs mit dem Schein und damit auch der Befreiung.
+
+   Was ist also das „offene Meer“? Das offene Meer ist letztendlich nichts als
+der Punkt an dem der „Schein der Notwendigkeit“ durchstoßen ist und neue
+ 157
+     Vgl. Khurana, LdF , S. 339.
+ 158
+     Nietzsche, KSA 3 , S. 417.
+ 159
+     Somit wird auch Nietzsche Menkes Kritik an der zweiten Natur gerecht, dass sie Fall
+des Geistes ist, weil nur im Fall des Geistes das vom Geist Gesetzte als Sein erscheint.
+Allerdings bleibt für Nietzsche das für den Einzelnen eine Möglichkeit. Dass das Gesetzte
+als Nichtgesetztes erscheint ist somit bei Nietzsche nicht abhängig vom einzelnen Individuum
+sondern von dessen gesellschaftlichem Kontext.
+ 160
+     Nietzsche, KSA 1 , S. 889.
+ 161
+     Ebd., S. 882ff.
+ 162
+     Ebd., S. 877ff.
+ 163
+     Vergleiche dazu auch: Stephan, LN , S. 62.
+
+
+----- 34 / 39 -----
+
+Jan van Dick            „Zweite Natur und Befreiung“                         33
+
+
+Sinnzusammenhänge geknüpft werden. Das „offene Meer“ ist der Moment der
+Befreiung, die – und das ist Nietzsches Ergänzung gegenüber Hegel – als Befrei-
+ung wahrgenommen wird. Der Moment des Umbruchs, der vom „vernünftigen
+Menschen“ erlebt wird, erscheint ihm als „Verdüsterung und Sonnenfinsternis“.
+Für ihn ist Befreiung nicht Befrei ung und bedeutet immer Zerstörung seiner
+Wahrheiten, sie ist negativ. Für den Schauspieler, den intuitiven Menschen
+oder den »Erkennenden« bedeutet sie Freiheit. Folgt man allerdings Nietz-
+sches Rede vom Erkennenden als „Festordner“ oder auch Nietzsches Exkurs zu
+den kurzen und den dauernden Gewohnheiten, dann wird deutlich, dass das
+»offene Meer« für Nietzsche nicht bedeuten kann, die ewige Wiederholung der
+Befreiung zu durchbrechen, sondern es stellt nur einen Moment innerhalb die-
+ses Kreislaufs an Befreiungen dar. Damit muss die Leitfrage der Arbeit nach
+dem Überwinden der ewigen In-Natur-Verkehrtheit verneint werden: auch bei
+Nietzsche bleibt Befreiung partiell, sie bleibt Befreiung aus der jeweiligen Un-
+freiheit und damit prozesshaft.
+    Wie verhält es sich aber vor diesem Hintergrund mit dem „übersittlichen
+Individuum?“, welches sich aus der Sittlichkeit befreit? Begreifen wir Sittlich-
+keit als zweite Natur, dann kann Nietzsche zwei verschiedene Dinge meinen:
+entweder das übersittliche Individuum reiht sich ein mit dem Schauspieler und
+dem »Erkennenden«, dann steht es gleichfalls für die (partielle) Befreiung aus
+dieser Sittlichkeit, oder aus dieser zweiten Natur. Auf ähnliche Weise könn-
+te das übersittliche Individuum auch als der »Erkennende« gedeutet werden,
+der sich aus der Sittlichkeit befreit hat, dessen Erfahrung oder Lebensweise
+aber nicht verallgemeinert werden kann, da er an den Erkennenden als „Fest-
+ordner“ gebunden ist, welcher eine Form von Allgemeinheit durch seine In-
+Natur-Verkehrtheit aufrecht erhält. Oder aber Nietzsche meint tatsächlich das
+Zurücklassen der Sittlichkeit und der zweiten Natur als solche, was allerdings
+im Widerspruch zu stehen scheint mit dem bisher Erarbeiteten.
+    Es stellt sich daher die Frage, was es heißt, von der Sittlichkeit „wieder
+losgekommen[]“ zu sein? Welche Form der objektiven Allgemeinheit gäbe es
+jenseits der Sittlichkeit? Kann es bei Nietzsche überhaupt einen Weg völlig
+aus der Sittlichkeit geben oder ist das „übersittliche Individuum“ gar nicht der
+Gegenentwurf zur Sittlichkeit als solcher?
+
+
+----- 35 / 39 -----
+
+Fazit
+
+Zu Beginn der Arbeit suchten wir nach der Möglichkeit der Autonomie oder
+Freiheit und haben diese in der Sittlichkeit, dem Herausbilden einer zweiten
+Natur gefunden. Damit konnte Freiheit nur dort verwirklicht sein, wo das
+vom Geist Gesetzte ihm gegenüber selbstständig wird (Bei-Sich-Selbst-Sein-
+im-Anderen). Daraus erklärt sich die ewige Wiederholung von Befreiung und
+In-Natur-Verkehrtheit und zugleich die Bewegung der Verwirklichung und des
+Falls des Geistes. Wie die Freiheit im Gesetzten aufersteht, aber dort wieder
+droht zu versinken, ist auch die Verwirklichung des Geistes nur in seinem Fall
+möglich.
+    Wir haben bei Nietzsche, insbesondere im „offenen Meer“, nach einem Aus-
+weg aus der ewigen Wiederholung der Befreiung gesucht, aber konnten nur die
+Bewegung der Befreiung finden, wie sie auch bei Hegel vorlag. Damit kommt
+auch Nietzsche über die endlose Wiederholung der Befreiung nicht hinaus und
+auch für ihn bedeutet Freiheit Befreiung aus der jeweiligen Unfreiheit. Gerade
+bei Nietzsche deutet aber das „übersittliche Individuum“ über diese Wieder-
+holung hinaus, wie auch der Begriff der zweiten Natur, als kritischer verstan-
+den, die endlose Wiederholung »bekämpft«. Die Entscheidende Frage, die sich
+am Ende trotz der negativ Beantwortung der Leitfrage ergeben hat, ist, ob
+überhaupt eine Form von objektiver Wirklichkeit möglich ist, die weder Na-
+turverkehrtheit, noch freie Willkür ist und falls ja, wie könnte diese aussehen?
+Anschließend an Nietzsches ästhetischen Umgang, lässt sich nach neuen We-
+gen der Befreiung suchen.1 Gerade durch diese Perspektive, bietet das Projekt
+Nietzsche und Hegel gemeinsam zu diskutieren interessante Möglichkeiten, da
+Nietzsche trotz seiner Uneindeutigkeit, in Hinblick auf die Frage nach dem Ver-
+hältnis von Freiheit und Befreiung, sehr nahe an Hegels Grundthesen steht und
+zugleich gerade auf Grund seiner Uneindeutigkeit Anstöße gibt, Auflösungen
+der Widersprüche, zum Beispiel im Ästhetischen, aufzuzeigen.
+
+  1
+    Darauf verweist auch Menke: „Ästhetisierung und Politisierung sind die beiden Grund-
+formen der Befreiung“ (Menke, AuB , S. 50).
+
+
+                                          34
+
+
+----- 36 / 39 -----
+
+Literatur
+
+Adorno, Theodor W. Dialektik der Aufklärung. Frankfurt am Main: Suhrkamp,
+   1981.
+— Negative Dialektik. 1. Aufl. Gesammelte Schriften Bd. 6. Frankfurt am
+   Main: Suhrkamp, 2003.
+Andreas-Salomé, Lou. Im Kampf um Gott. München: Dt. Taschenbuch-Verlag,
+   2007.
+Brandom, Robert. Freiheit und Bestimmtsein durch Normen. Hrsg. von Tho-
+   mas Khurana und Christoph Menke. Paradoxien der Autonomie. Freiheit
+   und Gesetz 1. Berlin: August Verlag, 2019.
+Hegel, Georg Wilhelm Friedrich. Enzyklopädie der philosophischen Wissen-
+   schaften. Bde. 8-10. Frankfurt am Main: Suhrkamp, 1969.
+— Grundlinien der Philosophie des Rechts: auf der Grundlage der Edition des
+   Textes in den Gesammelten Werken Band 14. Philosophische Bibliothek
+   Band 700. Hamburg: Felix Meiner Verlag, 2017.
+— Vorlesungen über die Philosophie der Religion I. Frankfurt am Main: Suhr-
+   kamp, 1986.
+Kant, Immanuel. Kritik der praktischen Vernunft. Grundlegung zur Metaphysik
+   der Sitten. 21. Aufl. Werkausgabe in 12 Bänden / Immanuel Kant. Hrsg.
+   von Wilhelm Weischedel ;[...] Frankfurt am Main: Suhrkamp, 2014.
+Khurana, Thomas. Das Leben der Freiheit. Erste Auflage. suhrkamp taschen-
+   buch wissenschaft. Berlin, 2017.
+— Paradoxien der Autonomie zur Einleitung. Hrsg. von Thomas Khurana und
+   Christoph Menke. Paradoxien der Autonomie. Freiheit und Gesetz 1. Ber-
+   lin: August Verlag, 2019.
+Marx, Karl und Friedrich Engels. Zur Kritik der Hegelschen Rechtsphilosophie.
+   Kritik des Hegelschen Staatsrechts. Werke Bd. 1. Berlin: Dietz, 1977.
+Menke, Christoph. Autonomie und Befreiung: Studien zu Hegel. Erste Auflage.
+   suhrkamp taschenbuch wissenschaft. Berlin: Suhrkamp, 2018.
+
+
+
+                                     35
+
+
+----- 37 / 39 -----
+
+Jan van Dick           „Zweite Natur und Befreiung“                      36
+
+
+Nietzsche, Friedrich. Die Geburt der Tragödie. kritische Studienausgabe in 15
+   Bänden, KSA Band 1. München: Deutscher Taschenbuch Verlag, 1999.
+— Jenseits von Gut und Böse. Zur Genealogie der Moral. Neuausgabe 1999,
+   13. Auflage 2014. kritische Studienausgabe in 15 Bänden; KSA Band 5.
+   München: Deutscher Taschenbuch Verlag, 2014.
+— Morgenröte. Idyllen aus Messina. Die fröhliche Wissenschaft. kritische Stu-
+   dienausgabe in 15 Bänden, KSA Band 3. München: Deutscher Taschenbuch
+   Verlag, 1999.
+Pinkard, Terry. Das Paradox der Autonomie. Kants Problem und Hegels Lö-
+   sung. Hrsg. von Thomas Khurana und Christoph Menke. Paradoxien der
+   Autonomie. Freiheit und Gesetz 1. Berlin: August Verlag, 2019.
+Stephan, Paul. Links-Nietzscheanismus Eine Einführung. Stuttgart: Schmetterling-
+   Verlag, 2019.
+Tucholsky, Kurt. Gesammelte Werke in zehn Bänden. Reinbek bei Hamburg:
+   Rowohlt Verlag, 1975.
+
+

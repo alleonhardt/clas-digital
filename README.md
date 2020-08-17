@@ -1,5 +1,58 @@
 # clas-digital
+A C++ implementation of a webserver providing a login/search/upload implementation to catalogue and categorize texts.
+
+<br/>
+<br/>
+
+## Table of contents
+1. [Installation](#Installation)
+2. [Programming concept](#Programming-concept)
+
+<br/>
+<br/>
+
+## Installation
+After a bit of consideration we decided to use the package manager [conan](#https://conan.io) to manage the dependencies. 
+
+__Why use a package manager at all?__
+
+When developing a huge project like clas-digital one tends to use a lot of third party libraries. Clas-digital for example uses tesseract. Tesseract depends on leptonica which depends on libtiff and libjpeg and libpng. As one can see it is a lot of work to always install all dependencies. Not even mentioning the pitfalls when intalling on diffrent linux distributions. In order to improve this dire process we decided to use a package manager. Conan seems to be one of the most advanced cross plattform package managers there are for C++.
+
+__Compilation has not been tested on Windows and Mac!__
+
+Installation prerequisites:
+- Working C++ compiler which supports at least C++17. Recommended (Linux: GCC), (Windows: CLang), (Mac: Clang)
+- Python 3 and pip
+- CMake version 2.8 or newer
+
+__Instructions for Linux like systems:__
+```
+mkdir build
+cd build
+conan install .. cppstd=17
+cmake ..
+cmake --build .
+cmake . --target install
+```
+
+<br/>
+<br/>
+
+## Programming concept
+The programm itself is not a standalone webserver. It does the login management the authorization of content and handles searching and uploading of content. While the doing this, it would be unnecessary overload to also meddle with serving files and caching static content. In order to provide a full featured website one has to use another webserver like nginx or apache to serve the static content.
+### Book Manager
+### Book
+### CMetadata
+
+The programming concept part of the document should introduce the reader a bit to the logic and structure of the code of clas digital. This should help further maintainers to get themselves acquainted with the code. 
+
+### Book Management
+
+
 C++ implementation of a ancient literature database
+
+
+
 
 map liste mit buechern sortieren
 

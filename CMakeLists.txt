@@ -4,25 +4,29 @@ if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 endif()
 
 project(clas-digital)
+SET(CMAKE_CXX_COMPILER "/usr/bin/clang++")
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)  # Includes the contents of the conanbuildinfo.cmake file.
+conan_basic_setup()  # Prepares the CMakeList.txt for Conan.
 
 
 include_directories(
   "src"
   "deps")
-set(CMAKE_CXX_FLAGS "-O3 -Wall -Wextra -Werror -Wpedantic -march=native -std=c++17")
+set(CMAKE_CXX_FLAGS "-O3 -Wall -Werror -Wpedantic -std=c++17")
 
 
 find_package(Threads REQUIRED)
 find_package(CURL REQUIRED)
 include_directories(${Tesseract_INCLUDE_DIRS})
 
-set(SRC_FILES src/main.cpp src/login/user.cpp src/login/usertable.cpp src/util/URLParser.cpp src/zotero/zotero.cpp src/ocr/tesseract.cpp)
 set(SRC_FILES_BOOKS src/books/Book.cpp src/books/Bookmanager.cpp src/books/metadata_handler.cc src/books/Search.cpp src/books/SearchOptions.cpp src/books/func.cpp src/books/fuzzy.cpp)
+set(SRC_FILES src/main.cpp src/login/user.cpp src/login/usertable.cpp src/util/URLParser.cpp src/zotero/zotero.cpp src/ocr/tesseract.cpp src/util/ubuntu20matherror.cpp)
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_HOME_DIRECTORY}/bin)
 add_executable(books.o EXCLUDE_FROM_ALL ${SRC_FILES_BOOKS} src/books/main.cpp)
 add_executable(clas-digital.o ${SRC_FILES} ${SRC_FILES_BOOKS})
-target_link_libraries(clas-digital.o stdc++fs ${CURL_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} tesseract lept)
+message("Libs: ${CONAN_LIBS}")  
+target_link_libraries(clas-digital.o stdc++fs ${CONAN_LIBS})
 target_link_libraries(books.o stdc++fs ${CURL_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 if(STABLE_INSTALL) 
@@ -48,7 +52,6 @@ ADD_CUSTOM_TARGET(install_stable
   COMMAND ${CMAKE_COMMAND} ${CMAKE_SOURCE_DIR}
 )
 
-install(FILES src/clas-digital.service DESTINATION /etc/systemd/system)
 install(FILES web/books/metadata_template.html DESTINATION ${INSTALL_DIRS}/web/books)
 install(FILES web/books/pages_template.html DESTINATION ${INSTALL_DIRS}/web/books)
 install(FILES src/clas-digital-devel.service DESTINATION /etc/systemd/system)
