@@ -31,8 +31,10 @@ bool gGlobalSigShutdown = false;
 
 
 /**
- * @brief Handles the SIGTERM signal which is issued when the system service is about to be stopped.
- * Stops the message handling from the server and tells all threads that the server is about to be shutdown
+ * @brief Handles the SIGTERM signal which is issued when the system service is
+ * about to be stopped.
+ * Stops the message handling from the server and tells all threads that the 
+ * server is about to be shutdown
  * @param int the param is not important to us
  */
 void sig_handler(int)
@@ -278,20 +280,20 @@ void do_createbiblio(const Request &req,Response &resp,CBookManager &manager)
  */
 void get_sugg(const Request &req, Response &resp, CBookManager &manager, std::string sType)
 {
-    try
-    {
-	std::string sInput = req.get_param_value("q");
-	std::list<std::string>* listSugg = manager.getSuggestions(sInput, sType);
-	nlohmann::json responseJson;
-	for(auto it=listSugg->begin(); it!=listSugg->end();it++)
-	    responseJson.push_back((*it)); 
-	delete listSugg;
-	resp.set_content(responseJson.dump(),"application/json");
-    }
+  try
+  {
+    std::string sInput = req.get_param_value("q");
+    std::list<std::string>* listSugg = manager.getSuggestions(sInput, sType);
+    nlohmann::json responseJson;
+    for(auto it=listSugg->begin(); it!=listSugg->end();it++)
+      responseJson.push_back((*it)); 
+    delete listSugg;
+    resp.set_content(responseJson.dump(),"application/json");
+  }
 
-    catch(...) {
-	resp.set_content("{}","application/json");
-    }
+  catch(...) {
+    resp.set_content("{}","application/json");
+  }
 }
 
 /**
@@ -323,25 +325,27 @@ void get_metadata(const Request &req, Response &resp, CBookManager &manager)
  * @param req The request containing password and name fields in order to determine if the user credentials are valid
  * @param resp The response object through which the anser is sent
  */
-void do_login(const Request& req, Response &resp)
-{
-    URLParser parser(req.body);
-    auto &usrtable = UserHandler::GetUserTable();
-    auto ret = usrtable.DoLogin(parser["email"],parser["password"]); //Try to login the user with the provided credentials
-    if(ret!="")
-    {
-	//Tell the user to reload the page
-	resp.set_content("<html><head><script>window.location='/';</script></head><body></body></html>","text/html");
-	std::string cookie = "SESSID="+ret;
-	cookie+="; SECURE";
-	resp.set_header("Set-Cookie",cookie.c_str());
-    }
-    else
-    {
-	//Show the user the access denied formula
-	resp.set_content("<html><head></head><body><h1>Access Denied 403</body></html>","text/html");
-	resp.status = 403;
-    }
+void do_login(const Request& req, Response &resp) {
+
+  URLParser parser(req.body);
+  auto &usrtable = UserHandler::GetUserTable();
+  
+  //Try to login the user with the provided credentials
+  auto ret = usrtable.DoLogin(parser["email"], parser["password"]); 
+  if (ret!="") {
+    //Tell the user to reload the page
+    resp.set_content("<html><head><script>window.location='/';"
+                      + "</script></head><body></body></html>", "text/html");
+    std::string cookie = "SESSID=" + ret;
+    cookie += "; SECURE";
+    resp.set_header("Set-Cookie", cookie.c_str());
+  }
+  else {
+    //Show the user the access denied formula
+    resp.set_content("<html><head></head><body><h1>Access Denied 403</body></html>",
+                      "text/html");
+    resp.status = 403;
+  }
 }
 
 /**
@@ -1072,194 +1076,195 @@ void do_update_zotero(const Request &req, Response &resp)
  */
 int main(int argc, char **argv)
 {
-    if(argc < 2)
-	return 0;
-    int startPort = std::stoi(argv[1]);
-    std::cout<<"Starting on port: "<<startPort<<std::endl;
-
-    //Register for sigterm as it is send by systemd to stop the service.
-    signal(SIGTERM, sig_handler);
-    CBookManager manager;
-    StaticWebpageCreator creator;
-    creator.createSearchPage();
-    creator.createInformationPage();
-    creator.createAdminPage();
-    creator.createUploadPage();
-
-    //Load all pillars
-    nlohmann::json zoteroPillars;
-    try
-    {
-	zoteroPillars = Zotero::GetPillars();
-	std::ofstream write_pillars("web/pillars.json",std::ios::out);
-	if(write_pillars.is_open())
-	    write_pillars<<zoteroPillars;
-	write_pillars.close();
-    }
-    catch(...)
-    {
-	std::cout<<"Careful! You are running in offline mode now! Using last stable pillars for startup."<<std::endl;
-	zoteroPillars = nlohmann::json::parse("[{\"key\":\"XCFFDRQC\",\"name\":\"Forschung CLAS\"},{\"key\":\"RFWJC42V\",\"name\":\"Geschichte des Tierwissens\"}]");
-	std::cout<<"Offline pillars used: "<<zoteroPillars.dump()<<std::endl;
-    }
-    nlohmann::json metaData;
-    //If there are already metadata dont pull them again
-    std::ifstream meta("bin/zotero.json",std::ios::in);
-    if(!meta)
-    {
-	//For every collection in zotero pull all items from zotero and put them into one json
-	for(auto &it : zoteroPillars)
-	{
-	    auto entryjs = nlohmann::json::parse(Zotero::SendRequest(Zotero::Request::GetAllItemsFromCollection(it["key"])));
-	    unsigned long numEntries = 0;
-	    for(auto &it : entryjs)
-	    {
-		metaData.push_back(it);
-		numEntries++;
-	    }
-	    it["numEntries"] = numEntries;
-	}
-	//Save the collected data as it is the newest data available
-	std::ofstream o("bin/zotero.json",std::ios::out);
-	o<<metaData;
-	o.close();
-    }
-    else
-    {
-	//Ok we already got metadata so just load it
-	meta>>metaData;
-    }
-    meta.close();
-    std::cout<<"Start CBookmanager::UpdateZotero()"<<std::endl;
-    for(auto &entry : metaData)
-    {
-	    if(entry["data"]["key"].get<std::string>() == "QTYP6NYV")
-		    std::cout<<"Found everything!!!!!"<<std::endl;
-    }
-    manager.updateZotero(metaData);
-    std::cout<<"Finished CBookmanager::UpdateZotero()"<<std::endl;
-
-    if(manager.initialize())
-	std::cout<<"CBookmanager::initialize() finished and successfull!"<<std::endl;
-    else
-    {	std::cout<<"ERROR in CBookmanager::initialize()"<<std::endl; return 0;}
-
-
-
-    //Load the only dynamic page in the server the search.html
-    std::ifstream srchFile("web/Search.html",std::ios::in);
-    std::string fileSearchHtml;
-    if(!srchFile)
-	std::cout<<"Major error could not find Search.html"<<std::endl;
-    else
-    {
-	//read the whole file in one go
-	fileSearchHtml = std::string((std::istreambuf_iterator<char>(srchFile)), std::istreambuf_iterator<char>());
-    }
-    srchFile.close();
-
-    nlohmann::json statistics;
-    unsigned long ocrcount = 0;
-    unsigned long pagecount = 0;
-    unsigned long books300 = 0;
-    unsigned long books500 = 0;
-    unsigned long books1000 = 0;
-    unsigned long books1000plus = 0;
-
-    for(auto &it : zoteroPillars)
-    {
-	    unsigned long numEntries = 0;
-	    for(auto it2 : manager.getMapOfBooks())
-	    {
-		auto vec = it2.second->get_metadata().GetCollections();
-		if(std::find(vec.begin(),vec.end(),it["key"].get<std::string>()) != vec.end())
-			numEntries++;
-	    }
-	    it["numEntries"] = numEntries;
-    }
-
-    for(auto it : manager.getMapOfBooks())
-    {
-	if(it.second->has_ocr())
-	{
-	    ++ocrcount;
-	    unsigned long cnt = 0;
-	    std::filesystem::path p = std::filesystem::path(it.second->get_path())/"pages";
-	    if(std::filesystem::exists(p))
-	    {
-	    for(auto &it2 : std::filesystem::directory_iterator(p))
-	    {
-		if(it2.path().extension() == ".jpg" || it2.path().extension() == ".png" || it2.path().extension() == ".bmp")
-		{
-		    ++pagecount;
-		    ++cnt;
-		}
-	    }
-	    }
-	    
-	    if(cnt != 0)
-	    {
-		if(cnt<300)
-		    books300++;
-		else if(cnt < 500)
-		    books500++;
-		else if(cnt < 1000)
-		    books1000++;
-		else
-		    books1000plus++;
-	    }
-	}
-    }
-    
-
-    statistics["BookOcrCount"] = ocrcount;
-    statistics["BookPageCount"] = pagecount;
-    statistics["BookMetadataCount"] = manager.getMapOfBooks().size();
-    statistics["Books300"] = books300;
-    statistics["Books500"] = books500;
-    statistics["Books1000"] = books1000;
-    statistics["Books1000plus"] = books1000plus;
-    statistics["collections"] = nlohmann::json::array();
-
-    for(auto &it : zoteroPillars)
-    {
-    	nlohmann::json jk;
-    	jk["name"] = it["name"];
-    	jk["size"] = it["numEntries"];
-    	statistics["collections"].push_back(jk);
-    }
-    
-    inja::Environment env;
-    inja::Template temp = env.parse_template("web/statistics/template.html");
-    std::string result = env.render(temp,statistics);
-    atomic_write_file("web/statistics/index.html",result);
-
-
-    srv.Post("/login",&do_login);
-    srv.Get("/search",[&](const Request &req, Response &resp) { do_search(req,resp,fileSearchHtml,zoteroPillars,manager);});
-    srv.Get("/searchinbook",[&](const Request &req, Response &resp) { do_searchinbook(req,resp,manager);});
-    srv.Get("/createbibliography",[&](const Request &req, Response &resp) { do_createbiblio(req,resp,manager);});
-    srv.Get("/api/v1/typeahead/corpus",[&](const Request &req, Response &resp) { get_sugg(req,resp,manager, "corpus");});
-    srv.Get("/api/v1/typeahead/author",[&](const Request &req, Response &resp) { get_sugg(req,resp,manager,"author");});
-    srv.Get("/api/v1/shutdown",&do_restart_server);
-    srv.Get("/api/v1/update_zotero",&do_update_zotero);
-    srv.Get("/getmetadata", [&](const Request &req, Response &resp) { get_metadata(req,resp,manager);});
-    srv.Get(R"(/authenticate.*)",&do_authentification);
-    srv.Get("/userlist",&do_senduserlist);
-    srv.Post("/userlist",&do_usertableupdate);
-    srv.Post("/upload",[&](const Request &req, Response &resp){do_upload(req,resp,manager);});
-    std::cout<<"C++ Api server startup successfull!"<<std::endl;
-
-    std::thread restart_thread(&update_and_restart);
-    restart_thread.detach();
-
-    std::thread update_files(&update_all_files,&manager,&zoteroPillars);
-    srv.listen("localhost", startPort);
-    update_files.join();
-    if(gGlobalUpdateOperation == GlobalUpdateOperations::restart_server)
-	return -1;
+  if (argc < 2)
     return 0;
+  int startPort = std::stoi(argv[1]);
+  std::cout << "Starting on port: " << startPort << std::endl;
+
+  //Register for sigterm as it is send by systemd to stop the service.
+  signal(SIGTERM, sig_handler);
+  CBookManager manager;
+  StaticWebpageCreator creator;
+  creator.createSearchPage();
+  creator.createInformationPage();
+  creator.createAdminPage();
+  creator.createUploadPage();
+
+  //Load all pillars
+  nlohmann::json zoteroPillars;
+  try {
+    zoteroPillars = Zotero::GetPillars();
+    std::ofstream write_pillars("web/pillars.json",std::ios::out);
+    if(write_pillars.is_open())
+      write_pillars<<zoteroPillars;
+    write_pillars.close();
+  }
+  catch (...) {
+    std::cout << "Careful! You are running in offline mode now! Using last stable"
+              << " pillars for startup." <<std::endl;
+    zoteroPillars = nlohmann::json::parse("[{\"key\":\"XCFFDRQC\",\"name\":"
+                      + "\"Forschung CLAS\"},{\"key\":\"RFWJC42V\",\"name\":"
+                      + "\"Geschichte des Tierwissens\"}]");
+    std::cout << "Offline pillars used: " << zoteroPillars.dump() << std::endl;
+  }
+
+  nlohmann::json metaData;
+  
+  //If there are already metadata dont pull them again
+  std::ifstream meta("bin/zotero.json",std::ios::in);
+  if (!meta) {
+    //For every collection in zotero pull all items from zotero and put 
+    //them into one json
+    for(auto &it : zoteroPillars) {
+      auto entryjs = nlohmann::json::parse(Zotero::SendRequest(Zotero::Request::
+            GetAllItemsFromCollection(it["key"])));
+      unsigned long numEntries = 0;
+
+      for(auto &it : entryjs) {
+        metaData.push_back(it);
+        numEntries++;
+      }
+      it["numEntries"] = numEntries;
+    }
+    //
+    //Save the collected data as it is the newest data available
+    std::ofstream o("bin/zotero.json",std::ios::out);
+    o<<metaData;
+    o.close();
+  }
+
+  //Ok we already got metadata so just load it
+  else
+    meta>>metaData;
+  
+  meta.close();
+  std::cout << "Start CBookmanager::UpdateZotero()" << std::endl;
+  for(auto &entry : metaData) {
+    if(entry["data"]["key"].get<std::string>() == "QTYP6NYV")
+      std::cout << "Found everything!!!!!" << std::endl;
+  }
+  manager.updateZotero(metaData);
+  std::cout << "Finished CBookmanager::UpdateZotero()" << std::endl;
+
+  if(manager.initialize())
+    std::cout << "CBookmanager::initialize() finished and successfull!" << std::endl;
+  else {
+  	std::cout << "ERROR in CBookmanager::initialize()" << std::endl; 
+    return 0;
+  }
+
+
+
+  //Load the only dynamic page in the server the search.html
+  std::ifstream srchFile("web/Search.html",std::ios::in);
+  std::string fileSearchHtml;
+  if (!srchFile)
+    std::cout<<"Major error could not find Search.html"<<std::endl;
+  else {
+    //read the whole file in one go
+    fileSearchHtml = std::string((std::istreambuf_iterator<char>(srchFile)), 
+                        std::istreambuf_iterator<char>());
+  }
+  srchFile.close();
+
+  nlohmann::json statistics;
+  unsigned long ocrcount = 0;
+  unsigned long pagecount = 0;
+  unsigned long books300 = 0;
+  unsigned long books500 = 0;
+  unsigned long books1000 = 0;
+  unsigned long books1000plus = 0;
+
+  for (auto &it : zoteroPillars) {
+    unsigned long numEntries = 0;
+    for (auto it2 : manager.getMapOfBooks()) {
+      auto vec = it2.second->get_metadata().GetCollections();
+      if (std::find(vec.begin(),vec.end(),it["key"].get<std::string>()) != vec.end())
+        numEntries++;
+    }
+    it["numEntries"] = numEntries;
+  }
+
+  for (auto it : manager.getMapOfBooks()) {
+    if (it.second->has_ocr()) {
+      ++ocrcount;
+      unsigned long cnt = 0;
+      std::filesystem::path p = std::filesystem::path(it.second->get_path())/"pages";
+      if (std::filesystem::exists(p)) {
+        for (auto &it2 : std::filesystem::directory_iterator(p)) {
+          if(it2.path().extension() == ".jpg" 
+              || it2.path().extension() == ".png" 
+              || it2.path().extension() == ".bmp") {
+            ++pagecount;
+            ++cnt;
+          }
+        }
+      }
+    
+      if (cnt != 0) {
+        if (cnt<300)
+          books300++;
+        else if (cnt < 500)
+          books500++;
+        else if (cnt < 1000)
+          books1000++;
+        else
+          books1000plus++;
+      }
+    }
+  }
+  
+  statistics["BookOcrCount"] = ocrcount;
+  statistics["BookPageCount"] = pagecount;
+  statistics["BookMetadataCount"] = manager.getMapOfBooks().size();
+  statistics["Books300"] = books300;
+  statistics["Books500"] = books500;
+  statistics["Books1000"] = books1000;
+  statistics["Books1000plus"] = books1000plus;
+  statistics["collections"] = nlohmann::json::array();
+
+  for (auto &it : zoteroPillars) {
+    nlohmann::json jk;
+    jk["name"] = it["name"];
+    jk["size"] = it["numEntries"];
+    statistics["collections"].push_back(jk);
+  }
+  
+  inja::Environment env;
+  inja::Template temp = env.parse_template("web/statistics/template.html");
+  std::string result = env.render(temp,statistics);
+  atomic_write_file("web/statistics/index.html",result);
+
+
+  srv.Post("/login",&do_login);
+  srv.Get("/search",[&](const Request &req, Response &resp) 
+      { do_search(req,resp,fileSearchHtml,zoteroPillars,manager);});
+  srv.Get("/searchinbook",[&](const Request &req, Response &resp) 
+      { do_searchinbook(req,resp,manager);});
+  srv.Get("/createbibliography",[&](const Request &req, Response &resp) 
+      { do_createbiblio(req,resp,manager);});
+  srv.Get("/api/v1/typeahead/corpus",[&](const Request &req, Response &resp) 
+      { get_sugg(req,resp,manager, "corpus");});
+  srv.Get("/api/v1/typeahead/author",[&](const Request &req, Response &resp) 
+      { get_sugg(req,resp,manager,"author");});
+  srv.Get("/api/v1/shutdown",&do_restart_server);
+  srv.Get("/api/v1/update_zotero",&do_update_zotero);
+  srv.Get("/getmetadata", [&](const Request &req, Response &resp) 
+      { get_metadata(req,resp,manager);});
+  srv.Get(R"(/authenticate.*)",&do_authentification);
+  srv.Get("/userlist",&do_senduserlist);
+  srv.Post("/userlist",&do_usertableupdate);
+  srv.Post("/upload",[&](const Request &req, Response &resp)
+      {do_upload(req,resp,manager);});
+  std::cout << "C++ Api server startup successfull!" << std::endl;
+
+  std::thread restart_thread(&update_and_restart);
+  restart_thread.detach();
+
+  std::thread update_files(&update_all_files,&manager,&zoteroPillars);
+  srv.listen("localhost", startPort);
+  update_files.join();
+  if (gGlobalUpdateOperation == GlobalUpdateOperations::restart_server)
+    return -1;
+  return 0;
 }
-
-
-
