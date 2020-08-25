@@ -8,15 +8,7 @@ include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)  # Includes the contents of th
 conan_basic_setup()  # Prepares the CMakeList.txt for Conan.
 
 
-include_directories(
-  "src"
-  "deps")
-set(CMAKE_CXX_FLAGS "-O3 -Wall -Werror -Wpedantic -std=c++17")
-
-
 find_package(Threads REQUIRED)
-find_package(CURL REQUIRED)
-include_directories(${Tesseract_INCLUDE_DIRS})
 set(CMAKE_CXX_STANDARD 17)
 
 set(SRC_FILES_SEARCH src/search/book_manager/Book.cpp src/search/book_manager/Bookmanager.cpp src/search/search/Search.cpp src/search/search/SearchOptions.cpp src/search/main.cpp src/shared/metadata_handler.cc src/shared/util/func.cpp src/shared/util/fuzzy.cpp)
@@ -25,6 +17,18 @@ set(SRC_FILES_SERVER src/shared/metadata_handler.cc src/shared/util/URLParser.cp
 
 add_executable(clas_digital_server.o ${SRC_FILES_SERVER})
 add_executable(clas_digital_search.o  ${SRC_FILES_SEARCH})
+
+target_include_directories(clas_digital_server.o PUBLIC
+  "src/shared"
+  "src/shared/util"
+  "src/server"
+)
+
+target_include_directories(clas_digital_server.o PUBLIC
+  "src/shared"
+  "src/shared/util"
+  "src/search"
+)
 
 target_link_libraries(clas_digital_server.o stdc++fs ${CONAN_LIBS})
 target_link_libraries(clas_digital_search.o stdc++fs)
