@@ -159,18 +159,18 @@ void CBook::createBook(std::string sPath)
 
     //Check whether list of words_pages already exists, if yes load, otherwise, create
     std::string path = path_ + "/intern/pages.txt";
-    //if(!std::filesystem::exists(path) || std::filesystem::is_empty(path))
-    //{
+    if(!std::filesystem::exists(path) || std::filesystem::is_empty(path))
+    {
         //Create pages
         CreatePages();
         //Find (first) preview.
         CreateMapPreview();
         //Safe to disc
         SafePages();
-    //}
+    }
     //Load pages
-    //else
-        //LoadPages();
+    else
+        LoadPages();
 }
 
 ///Create map of all pages and safe.
