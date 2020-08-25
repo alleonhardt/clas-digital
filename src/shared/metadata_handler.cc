@@ -366,3 +366,24 @@ bool MetadataHandler::HasTag(std::string tag)
   }
   return false;
 }
+
+///Return whether book is publicly accessible 
+bool MetadataHandler::GetPublic() {
+  std::time_t ttime = time(0);
+  tm *local_time = localtime(&ttime);
+
+  if(GetMetadata("rights","data") == "CLASfrei")
+    return true;
+
+  //Local time number of seconds elapsed since 1. January 1900. 
+  if(GetDate() == -1 || GetDate() >= (local_time->tm_year+1800))
+    return false;
+  return true;
+}
+
+///Return whether book has title, author or date
+bool MetadataHandler::CheckJson() {
+  if(GetAuthor() == "" && GetTitle() == "" && GetDate() == -1)
+   return false;
+  return true;
+}

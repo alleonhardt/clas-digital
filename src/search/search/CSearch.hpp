@@ -1,14 +1,20 @@
+/**
+ * @author fux
+*/
+
+#ifndef CLASDIGITAL_SRC_SEARCH_SEARCH_SEARCH_H
+#define CLASDIGITAL_SRC_SEARCH_SEARCH_SEARCH_H
+
 #include <iostream>
-#include <string>
 #include <list>
 #include <map>
 #include <set>
-#include "CBook.hpp"
-#include "CSearchOptions.hpp"
+#include <string>
+
+#include "book_manager/CBook.hpp"
 #include "func.hpp"
 #include "fuzzy.hpp"
-
-#pragma once 
+#include "search/CSearchOptions.hpp"
 
 class CSearch
 {
@@ -121,3 +127,5 @@ public:
     */
     bool checkSearchOptions(CBook* book);
 };
+
+#endif

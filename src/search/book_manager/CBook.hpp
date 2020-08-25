@@ -2,19 +2,21 @@
 * @author Jan van Dick
 */
 
-#include <iostream> 
+#ifndef CLASDIGITAL_SRC_SEARCH_BOOKMANAGER_BOOK_H_
+#define CLASDIGITAL_SRC_SEARCH_BOOKMANAGER_BOOK_H_
+
 #include <fstream>
 #include <filesystem>
-#include <string>
-#include <map>
+#include <iostream> 
 #include <list>
-#include <vector>
+#include <map>
+#include <string>
 #include <set>
+#include <vector>
+
 #include "func.hpp"
 #include "fuzzy.hpp"
 #include "metadata_handler.h"
-
-#pragma once 
 
 class CBook
 {
@@ -49,15 +51,8 @@ public:
     std::unordered_map<std::string, std::list<std::string>>& 
     get_found_grammatical_matches();
     
-    
-    ///Return whether book is publicly accessible 
-    bool getPublic();
-
     ///Return whether book has images or ocr
     bool hasContent() const;
-
-    ///Return whether book has title, author or date
-    bool checkJson();
 
     ///Return "[author], [date]" and add "book not yet scanned", when hasOcr == false
     std::string getAuthorDateScanned();
@@ -232,3 +227,5 @@ private:
     size_t GetPreviewPosition(std::string sWord);
     void ShortenPreview(std::string& finalResult);
 };
+
+#endif

@@ -1,5 +1,4 @@
 #include "CBookManager.hpp"
-#include "debug/debug.hpp"
 
 //Constructor
 CBookManager::CBookManager()
@@ -201,13 +200,9 @@ void CBookManager::updateZotero(nlohmann::json j_items)
             m_mapBooks[it["key"]] = new CBook(it);
 
         //If book's json does not contain the most relevant information, delete again
-        if(m_mapBooks[it["key"]]->checkJson() == false)
-        {
-            std::cout << "Found empty entry.\n";
+        if(m_mapBooks[it["key"]]->get_metadata().checkJson() == false) {
             delete m_mapBooks[it["key"]];
-            std::cout << "Deleted.\n";
             m_mapBooks.erase(it["key"]);
-            std::cout << "Erased.\n";
         }
     }
 }

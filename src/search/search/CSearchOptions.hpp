@@ -1,10 +1,15 @@
-#pragma once
+/**
+ * @author fux
+ */
+
+#ifndef CLASDIGITAL_SRC_SEARCH_SEARCH_SEARCHOPTIONS_H_
+#define CLASDIGITAL_SRC_SEARCH_SEARCH_SEARCHOPTIONS_H_
 
 #include <iostream>
 #include <string>
 #include <vector>
-#include "func.hpp"
 
+#include "func.hpp"
 
 class CSearchOptions
 {
@@ -100,6 +105,4 @@ public:
     void setSearchedWord (std::string searchedWord);
 };
 
-    
-
-    
+#endif 

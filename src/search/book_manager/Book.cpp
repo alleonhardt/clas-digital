@@ -96,13 +96,6 @@ bool CBook::hasContent() const {
   return has_images_ || has_ocr_; 
 }
 
-///Return whether book has title, author or date
-bool CBook::checkJson() {
-  if(author_ == "" && metadata_.GetTitle() == "" && date_ == -1)
-   return false;
-  return true;
-}
-
 ///Return "[author], [date]" and add "book not yet scanned", when has_ocr == false
 std::string CBook::getAuthorDateScanned() {
   if(has_ocr_ == true)
@@ -110,20 +103,6 @@ std::string CBook::getAuthorDateScanned() {
   return author_date_ + "<span style='color:orange;font-size:80%'> Book is not yet scanned, sorry for that.</span>";
 }    
 
-///Return whether book is publicly accessible 
-bool CBook::getPublic() {
-  std::time_t ttime = time(0);
-  tm *local_time = localtime(&ttime);
-
-  if(metadata_.GetMetadata("rights","data") == "CLASfrei")
-    return true;
-
-  //Local time number of seconds elapsed since 1. January 1900. 
-  if(get_date() == -1 || get_date() >= (local_time->tm_year+1800))
-    return false;
-  else
-    return true;
-}
 // **** SETTER **** //
 
 void CBook::setPath(std::string sPath) { 
