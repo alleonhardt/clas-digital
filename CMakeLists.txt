@@ -17,45 +17,27 @@ set(CMAKE_CXX_FLAGS "-O3 -Wall -Werror -Wpedantic -std=c++17")
 find_package(Threads REQUIRED)
 find_package(CURL REQUIRED)
 include_directories(${Tesseract_INCLUDE_DIRS})
+set(CMAKE_CXX_STANDARD 17)
 
-set(SRC_FILES_BOOKS src/books/Book.cpp src/books/Bookmanager.cpp src/books/metadata_handler.cc src/books/Search.cpp src/books/SearchOptions.cpp src/books/func.cpp src/books/fuzzy.cpp)
-set(SRC_FILES src/main.cpp src/login/user.cpp src/login/usertable.cpp src/util/URLParser.cpp src/zotero/zotero.cpp src/ocr/tesseract.cpp src/util/ubuntu20matherror.cpp)
+set(SRC_FILES_SEARCH src/search/book_manager/Book.cpp src/search/book_manager/Bookmanager.cpp src/search/search/Search.cpp src/search/search/SearchOptions.cpp src/search/main.cpp src/shared/metadata_handler.cc src/shared/util/func.cpp src/shared/util/fuzzy.cpp)
+set(SRC_FILES_SERVER src/shared/metadata_handler.cc src/shared/util/URLParser.cpp src/shared/util/ubuntu20matherror.cpp src/shared/util/func.cpp src/server/main.cpp src/server/login/user.cpp src/server/login/usertable.cpp src/server/ocr/tesseract.cpp src/server/zotero/zotero.cpp)
 
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_HOME_DIRECTORY}/bin)
-add_executable(books.o EXCLUDE_FROM_ALL ${SRC_FILES_BOOKS} src/books/main.cpp)
-add_executable(clas-digital.o ${SRC_FILES} ${SRC_FILES_BOOKS})
-message("Libs: ${CONAN_LIBS}")  
-target_link_libraries(clas-digital.o stdc++fs ${CONAN_LIBS})
-target_link_libraries(books.o stdc++fs ${CURL_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
-if(STABLE_INSTALL) 
-	message("Installing to the stable version!")
-else()
-	message("Installing to development version")
-endif()
+add_executable(clas_digital_server.o ${SRC_FILES_SERVER})
+add_executable(clas_digital_search.o  ${SRC_FILES_SEARCH})
 
-if(NOT STABLE_INSTALL)
-    set(INSTALL_DIRS /etc/clas-digital-devel)
-    set(SERVICE_TARGET clas-digital-devel)
-else()
-    set(INSTALL_DIRS /etc/clas-digital)
-    set(SERVICE_TARGET clas-digital)
-endif()
+target_link_libraries(clas_digital_server.o stdc++fs ${CONAN_LIBS})
+target_link_libraries(clas_digital_search.o stdc++fs)
 
-ADD_CUSTOM_TARGET(install_stable
-  COMMAND ${CMAKE_COMMAND} -DSTABLE_INSTALL=TRUE ${CMAKE_SOURCE_DIR}
-  COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}
-  COMMENT "Installing to stable version"
-  COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target install
-  COMMAND rm ${CMAKE_BINARY_DIR}/CMakeCache.txt
-  COMMAND ${CMAKE_COMMAND} ${CMAKE_SOURCE_DIR}
-)
+set(INSTALL_DIRS /etc/clas-digital-devel)
+set(SERVICE_TARGET clas-digital-devel)
 
 install(FILES web/books/metadata_template.html DESTINATION ${INSTALL_DIRS}/web/books)
 install(FILES web/books/pages_template.html DESTINATION ${INSTALL_DIRS}/web/books)
-install(FILES src/clas-digital-devel.service DESTINATION /etc/systemd/system)
+install(FILES src/server/${SERVICE_TARGET}.service DESTINATION /etc/systemd/system)
 install(FILES src/default DESTINATION /etc/nginx/sites-available)
-install(PROGRAMS bin/clas-digital.o DESTINATION ${INSTALL_DIRS})
+install(PROGRAMS build/bin/clas_digital_server.o DESTINATION ${INSTALL_DIRS})
+install(PROGRAMS build/bin/clas_digital_search.o DESTINATION ${INSTALL_DIRS})
 install(DIRECTORY web DESTINATION ${INSTALL_DIRS} PATTERN "web/books/*" EXCLUDE)
 install(DIRECTORY bin/trainingdata DESTINATION ${INSTALL_DIRS})
 install(CODE "MESSAGE(\"Installing files done. Restarting nginx and the service ${SERVICE_TARGET}\")")

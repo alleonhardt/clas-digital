@@ -2,6 +2,9 @@
 tesseract/4.1.1
 libcurl/7.71.1
 inja/3.0.0
+cpp-httplib/0.7.0 
+nlohmann_json/3.9.1 
+stb/20200203 
 
 [generators]
 cmake

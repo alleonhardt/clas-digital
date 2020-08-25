@@ -1,0 +1,105 @@
+<!doctype html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <!--<link rel="stylesheet" href="style.css">-->
+    <link rel="canonical" href="https://www.clas-digital.uni-frankfurt.de/private/admin/Administration.html" />
+    <title>Administration - clas digital</title>
+
+<style>
+
+html {
+    margin:0;
+}
+body {
+    margin:0;
+}
+
+.smallerButton {
+	padding: 0.35em 0.35em;
+	font-size: 0.85em;
+}
+</style>
+
+
+<script src="/user.js"></script>
+<script src="Administration.js"></script>
+
+
+<link href="/topnav.css" rel="stylesheet" type="text/css">
+  </head>
+<body>
+   <nav id='tpnav' class="topnav">
+	<a  id='homelink' href='/information/'>Information</a>
+	<a  id='searchlink' href='/search'>Search</a>
+	<div class='dropdown'>
+		<a id='statisticslink'  href='/catalogue'>Catalogue</a>
+		<div class='dropdown-content'>
+			<a href="/catalogue/books">Books</a>
+			<a href="/catalogue/authors">Authors</a>
+			<a href="/catalogue/collections">Collections</a>
+			<a href="/catalogue/years">Years</a>
+		</div>
+	</div>
+	<a id='administrationlink' class='classifiedContent classifiedContent active' href='/private/admin/Administration.html' data-acc=4>Administration</a>
+	<a id='uploadbooklink' class='classifiedContent ' href='/private/write/UploadBook.html' data-acc=2>Upload Books</a>
+
+	<div class='topnav-right-in' id='loggedintopnav'>
+		<span id='LoggedInAs'>Logged in</span>
+		<input id="logoutBut" type='submit' value="Logout" class='loginbutton' onclick="DoLogout();return true;"/>
+	</div>
+	<div class='topnav-right-out' id='loggedouttopnav'>
+		<form id ="LoginForm" class='loginform'>
+			<input id="EmailType" class="emailinput" type="email" name="email" placeholder="Email" aria-label="Email" required>
+			<input id="PasswordType" class="passwordinput" type="password" name="password" placeholder="Password" aria-label="Password" required>
+			<input id="LoginButton" type='submit' value="Log In" class='loginbutton' onclick="ExecuteLogin();return true;"/>
+			<div id="LoaderButton" class='loader'></div>
+		</form>
+	</div>
+
+</nav>
+<footer style="position: fixed; bottom: 20px; right: 40px; color: grey; font-size:11px">
+    <dl>
+        <dt>Generated:</dt>
+        <dd itemprop="dataModified" content="2020-08-25T14:14:41Z">
+            <time datetime="2020-08-25T14:14:41Z">2020-08-25 14:14:41</time>
+        </dd>
+    </dl>
+</footer>
+
+ 
+
+<div id="StateBanner"></div>
+<ul id="CreateUser" class="list-group list-group-flush">
+    <li class="list-group-item">
+    <div class="row">
+        <div class="col-sm-3"><b>User Name</b></div>
+        <div class="col-sm-3"><b>User Password</b></div>
+        <div class="col-sm-3"><b>Repeat Password</b></div>
+    </div>
+    </li>
+    <li class="list-group-item">
+    <div class="row">
+        <div class="col-sm-3"><input id="NUsrName" type="email" placeholder="Email" required></input></div>
+        <div class="col-sm-3"><input id="NUsrPW" type="password" placeholder="Password"></input></div>
+        <div class="col-sm-3"><input id ="NUsrPW2" type="password" placeholder="Repeat Password"></input></div>
+        <div class="col-sm-3"><button class='btn btn-success' onclick="CreateNewUser()">Create User</button></div>
+    </div>
+    </li>
+</ul>
+
+<ul id="UserList" class="list-group list-group-flush">
+    <li class="list-group-item" id="saveClassGroup">
+    <div class="row">
+        <div class="col-sm-4"><b>Accounts</b></div>
+        <div class="col-sm-2"><b>Read access</b></div>
+        <div class="col-sm-2"><b>Write access</b></div> 
+        <div class="col-sm-2"><b>Admin access</b></div>
+        <div class="col-sm-2"><b>Delete User</b></div>
+    </div>
+    </li>
+</ul>
+<center><button class='btn btn-outline-danger my2 my-sm-0' id="SaveUserButton" onclick='return ShutdownServer();'>Restart server</button>
+    <button class='btn btn-outline-success my2 my-sm-0' id="SaveUserButton" style='margin-left: 2rem;' onclick='return UpdateZotero();'>Update zotero</button></center>
+</body>

@@ -1066,6 +1066,8 @@ void do_update_zotero(const Request &req, Response &resp)
 }
 
 
+
+
 /**
  * @brief The main function taking as only parameter the port to start on
  *
@@ -1076,7 +1078,6 @@ void do_update_zotero(const Request &req, Response &resp)
  */
 int main(int argc, char **argv)
 {
-  return 0;
   if (argc < 2)
     return 0;
   int startPort = std::stoi(argv[1]);
