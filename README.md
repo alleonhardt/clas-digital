@@ -41,6 +41,7 @@ cmake . --target install
 ## Programming concept
 The programm itself is not a standalone webserver. It does the login management the authorization of content and handles searching and uploading of content. While the doing this, it would be unnecessary overload to also meddle with serving files and caching static content. In order to provide a full featured website one has to use another webserver like nginx or apache to serve the static content.
 ### Book Manager
+
 ### Book
 ### CMetadata
 
