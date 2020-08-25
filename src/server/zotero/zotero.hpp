@@ -3,12 +3,16 @@
  * @brief Contains the zotero interface, with which the server communicates with the zotero server
  *
  */
-#pragma once
+#ifndef CLASDIGITAL_SRC_SERVER_ZOTERO_ZOTERO_H
+#define CLASDIGITAL_SRC_SERVER_ZOTERO_ZOTERO_H
+
 #include <curl/curl.h>
 #include <fstream>
 #include <streambuf>
+#include <nlohmann/json.hpp>
+
+
 #include "debug/debug.hpp"
-#include "json.hpp"
 
 constexpr const char ZOTERO_API_ADDR[] = "https://api.zotero.org"; ///<The zotero api server address where to send all requests to
 constexpr const char ZOTERO_API_KEY_FILE_PATH[] = "bin/zoteroKey.json";	///<The file path at which the access key and the group number can be found
@@ -95,3 +99,5 @@ class Zotero
 		friend size_t zoteroHeaderReader(char *, size_t, size_t, void *); ///< Needed as curl callback on header receiving
 		friend size_t zoteroReadBuffer(void *, size_t, size_t, void *);  ///< Needed as curl callback on data receiving
 };
+
+#endif

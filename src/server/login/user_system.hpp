@@ -4,12 +4,15 @@
  * This file defines the interface for the basic user class
  *
  */
+#ifndef CLASDIGITAL_SRC_SERVER_LOGIN_USER_SYSTEM_H
+#define CLASDIGITAL_SRC_SERVER_LOGIN_USER_SYSTEM_H
+
 #include <string>
 #include <map>
 #include <shared_mutex>
 #include <memory>
 #include "debug/debug.hpp"
-#include "json.hpp"
+#include <nlohmann/json.hpp>
 
 /**
  * @brief Defines the basic a access rights a user can have at the moment
@@ -202,3 +205,6 @@ class UserHandler
 			return usrHandler;
 		}
 };
+
+
+#endif

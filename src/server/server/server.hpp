@@ -1,0 +1,12 @@
+#ifndef CLASDIGITAL_SRC_SERVER_SERVER_SERVER_HPP
+#define CLASDIGITAL_SRC_SERVER_SERVER_SERVER_HPP
+
+class CLASServer
+{
+  public:
+
+
+};
+
+
+#endif
