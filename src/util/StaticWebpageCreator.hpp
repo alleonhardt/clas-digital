@@ -13,17 +13,11 @@ static void atomic_write_file(std::string filename, const std::string &data)
 	global_lock_write.lock();
 
 	std::cout<<"Filename : "<<filename<<std::endl;
-	std::ofstream ofs("main.tmp",std::ios::out);
+	
+	std::ofstream ofs(filename.c_str(),std::ios::out);
 	ofs<<data;
 	ofs.close();
-	std::error_code ec;
-	std::filesystem::rename("main.tmp",filename.c_str(),ec);
-	if( ec )
-	{
-		std::cout<<"Error code, rename : "<<ec<<std::endl;
-		global_lock_write.unlock();
-		throw 0;
-	}
+
 	global_lock_write.unlock();
 }
 

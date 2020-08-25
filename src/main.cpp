@@ -334,7 +334,7 @@ void do_login(const Request& req, Response &resp) {
   auto ret = usrtable.DoLogin(parser["email"], parser["password"]); 
   if (ret!="") {
     //Tell the user to reload the page
-    resp.set_content("<html><head><script>window.location='/';"
+    resp.set_content(std::string("<html><head><script>window.location='/';")
                       + "</script></head><body></body></html>", "text/html");
     std::string cookie = "SESSID=" + ret;
     cookie += "; SECURE";
@@ -1076,6 +1076,7 @@ void do_update_zotero(const Request &req, Response &resp)
  */
 int main(int argc, char **argv)
 {
+  return 0;
   if (argc < 2)
     return 0;
   int startPort = std::stoi(argv[1]);
@@ -1102,8 +1103,8 @@ int main(int argc, char **argv)
   catch (...) {
     std::cout << "Careful! You are running in offline mode now! Using last stable"
               << " pillars for startup." <<std::endl;
-    zoteroPillars = nlohmann::json::parse("[{\"key\":\"XCFFDRQC\",\"name\":"
-                      + "\"Forschung CLAS\"},{\"key\":\"RFWJC42V\",\"name\":"
+    zoteroPillars = nlohmann::json::parse(std::string("[{\"key\":\"XCFFDRQC\",\"name\":")
+                      + std::string("\"Forschung CLAS\"},{\"key\":\"RFWJC42V\",\"name\":")
                       + "\"Geschichte des Tierwissens\"}]");
     std::cout << "Offline pillars used: " << zoteroPillars.dump() << std::endl;
   }
