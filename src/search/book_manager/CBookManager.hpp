@@ -1,20 +1,27 @@
-#include <iostream>
+/**
+ * @author fux
+*/
+
+#ifndef CLASDIGITAL_SRC_SEARCH_BOOKMANAGER_H_
+#define CLASDIGITAL_SRC_SEARCH_BOOKMANAGER_H_
+
+#include <algorithm> 
+#include <dirent.h>
 #include <experimental/filesystem>
-#include <string>
+#include <functional> 
+#include <fstream>
+#include <iostream>
 #include <list>
 #include <map>
 #include <set>
-#include <functional> 
-#include <algorithm> 
-#include <fstream>
-#include <dirent.h>
 #include <shared_mutex>
-#include "CBook.hpp"
-#include "CSearch.hpp"
-#include "CSearchOptions.hpp"
-#include "func.hpp"
+#include <string>
 
-#pragma once 
+#include "book_manager/CBook.hpp"
+#include "func.hpp"
+#include "search/CSearch.hpp"
+#include "search/CSearchOptions.hpp"
+
 
 class CBookManager
 {
@@ -118,5 +125,5 @@ public:
     std::list<std::string>* getSuggestions(std::string sWord, sortedList& listWords);
 }; 
 
-
+#endif
 

@@ -38,7 +38,7 @@ target_include_directories(clas_digital_server_test.o PUBLIC
   "src/server"
 )
 
-target_include_directories(clas_digital_server.o PUBLIC
+target_include_directories(clas_digital_search.o PUBLIC
   "src/shared"
   "src/shared/util"
   "src/search"

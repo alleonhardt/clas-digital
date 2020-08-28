@@ -170,6 +170,12 @@ public:
   * @return return whether book has a given tag
   */
   bool HasTag(std::string sTag);
+  
+  ///Return whether book is publicly accessible 
+  bool getPublic();
+  
+  ///Return whether book has title, author or date
+  bool checkJson();
 
 private:
   nlohmann::json metadata_;  ///< Json with book metadata
