@@ -6,7 +6,7 @@
 #include <string>
 #include <map>
 #include <list>
-#include <locale>
+#include <clocale>
 #include <regex>
 #include <codecvt>
 

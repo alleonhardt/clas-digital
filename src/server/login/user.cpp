@@ -19,7 +19,7 @@ std::string User::toJSON() const
 
 int User::GetAccessRights() const
 {
-	return reinterpret_cast<int>(_accessRights);
+	return static_cast<int>(_accessRights);
 }
 
 void User::SetAccessRights(int acc)
