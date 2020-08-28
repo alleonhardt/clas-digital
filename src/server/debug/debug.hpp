@@ -1,49 +1,103 @@
-#pragma once
+#ifndef CLASIDIGITAL_SRC_SERVER_DEBUG_DEBUG_H
+#define CLASIDIGITAL_SRC_SERVER_DEBUG_DEBUG_H
+
+
 #include <iostream>
-#define DBG_INF_MSG_EXIT(x,y) std::cerr<<x<<std::endl;std::cerr<<"Error in FILE: "<<__FILE__<<"\nIn Line: "<<__LINE__<<"\nIn Function: "<<__PRETTY_FUNCTION__<<std::endl;exit(EXIT_FAILURE);
-#define DBG_INF_MSG(x) std::cerr<<x<<std::endl;std::cerr<<"Error in FILE: "<<__FILE__<<"\nIn Line: "<<__LINE__<<"\nIn Function: "<<__PRETTY_FUNCTION__<<std::endl;
-#define DBG_INF() std::cerr<<"Error in FILE: "<<__FILE__<<"\nIn Line: "<<__LINE__<<"\nIn Function: "<<__PRETTY_FUNCTION__<<std::endl;
+#include <cstdio>
+#include <termcolor/termcolor.hpp>
 
 namespace debug
 {
 	static inline volatile bool gGlobalShutdown = false;
-	/**
-	 * @brief This structure prints everything in order given to the constructor of the class and an endline at the end of all prints
-	 */
-	struct print
-	{
-		/**
-		 * @brief Overloaded constructor prints all arguments in order to stdout
-		 *
-		 * @param t1 The argument to print now
-		 * @param args The arguments to print next
-		 */
-		template<typename ...Args,typename T>print(T t1, Args... args) : print(args...)
-		{
-			std::cout<<t1;
-		}
-		template<typename T>print(T t1)
-		{
-			std::cout<<t1;
-		}
-	};
+ 
 
-	/**
-	 * @brief This structure does not do anything with its constructor arguments it also does not print them
-	 */
-	struct empty
-	{
-		/**
-		 * @brief This function does not do anything at all
-		 */
-  		template<typename ...Args>empty(Args... /*args*/)
-  		{}
-	};
+  enum class LOG_LEVEL 
+  {
+    ALL = 0,
+    DEBUG = 1,
+    WARNING = 2,
+    ERRORS = 4,
+    NONE = 8
+  };
+
+  static inline LOG_LEVEL gLogLevel = LOG_LEVEL::ALL;
+
+  enum class ExitType
+  {
+    OK = 0,
+    FAILURE = -1
+  };
+
+  template<typename ...variadic>
+  void print_exit(ExitType tp,variadic ...args)
+  {
+    printf(args...);
+    std::exit((int)tp);
+  }
+
+  template<typename ...variadic>
+  void print_exit(std::ostream& (&val)(std::ostream&), ExitType tp, variadic ...args)
+  {
+    val(std::cout).flush();
+    print_exit(tp, args...);
+    termcolor::reset(std::cout).flush();
+  }
+
+  template<typename ...args>
+  void print(args ...arg)
+  {
+    printf(arg...);
+  }
+
+  template<typename ...args>
+  void print(std::ostream& (&val)(std::ostream&),args ...arg)
+  {
+    val(std::cout).flush();
+    print(arg...);
+    termcolor::reset(std::cout).flush();
+  }
+
+  template<typename ...args>
+  void log(args ...arg)
+  {
+    printf(arg...);
+  }
+  
+  template<>
+  inline void print<const char*>(const char *arg)
+  {
+    puts(arg);
+  }
+
+  template<>
+  inline void log<const char*>(const char *arg)
+  {
+    puts(arg);
+  }
+  
+  template<typename ...args>
+  void log(LOG_LEVEL lvl,args ...arg)
+  {
+    if((int)lvl >= (int)gLogLevel)
+    {
+      if(lvl == LOG_LEVEL::ERRORS)
+      {
+        termcolor::red(std::cout).flush();
+      }
+      else if(lvl == LOG_LEVEL::WARNING)
+      {
+        termcolor::yellow(std::cout).flush();
+      }
+      else if(lvl == LOG_LEVEL::DEBUG)
+      {
+        termcolor::magenta(std::cout).flush();
+      }
+      print(arg...);
+      termcolor::reset(std::cout).flush();
+    }
+  }
 }
 
-//Dont use the DBG_MSG by default
-#define DBG_MSG debug::empty
 
-#ifdef _DEBUG_
-#define DBG_MSG debug::print
+
 #endif

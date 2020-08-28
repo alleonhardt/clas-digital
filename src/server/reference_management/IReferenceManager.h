@@ -19,16 +19,14 @@ class IReferenceManager
      * credentials, url, cache options whatever, look into the documentation of
      * the concrete implementation
      */
-    virtual void UpdateCorpus(nlohmann::json details) = 0;
-
+    virtual bool UpdateCorpus() = 0;
 
     /**
-     * @brief Returns the 
+     * @brief Returns the reference management of the texts
      *
-     * @return 
+     * @return All references to all managed items
      */
-    nlohmann::json &references() = 0;
-
+    virtual nlohmann::json &references() = 0;
 };
 
 

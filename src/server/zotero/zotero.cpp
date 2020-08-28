@@ -1,289 +1,178 @@
 #include "zotero/zotero.hpp"
+#include "debug/debug.hpp"
+#include <fstream>
+#include <chrono>
+#include <thread>
 
-size_t zoteroReadBuffer(void *pReceiveData, size_t pSize, size_t pNumBlocks, void *userData)
+using namespace Zotero;
+
+
+
+Connection::Connection(std::string apiKey, std::string api_addr, std::string baseUri) : baseURI_(baseUri),connection_(api_addr.c_str())
 {
-	Zotero *zot = (Zotero*)userData;
-	zot->ReceiveBytes(reinterpret_cast<char*>(pReceiveData),pSize*pNumBlocks);
-	return pSize*pNumBlocks;
+  // Sets the default headers for every Zotero request
+  // Every Zotero request must include the api version and the api key
+  // associated with the user that makes the request
+  connection_.set_default_headers({
+              { "Zotero-API-Version", "3" },
+              { "Zotero-API-Key",apiKey}
+  });
 }
 
-size_t zoteroHeaderReader(char *pReceiveData, size_t pSize, size_t pNumBlocks, void *userData)
+std::string Connection::SendRequest(std::string uri)
 {
-	//We put the Zotero pointer inside user data so cast it back to the original class
-	Zotero *zot = (Zotero*)userData;
+  // Do a request to the base uri which is probably /groups/913432/ or
+  // /user/324324/ added to the real uri that is asked for
+  auto resp = connection_.Get((baseURI_+uri).c_str());
 
-	//Load the string with one line from the http header,
-	//The function zoteroHeaderReader will get called for each header in the http request
-	std::string ass;
-	ass.assign(pReceiveData,pSize*pNumBlocks);
+  // If the status is not 200 an error occured return an empty string
+  if (resp->status != 200)
+  {
+    debug::log(debug::LOG_LEVEL::ERRORS,"Zotero api request error received status %d\n",resp->status);
+    return "";
+  }
 
-	//Look if there is a link to follow in order to download the whole json
-	if(ass.find("Link: ")!=std::string::npos)
-	{
-		//Ok so there is a link to the next chunk of the json so extract the link
-		//Link format:
-		//		Link:	something, <https://new_address&start=x> rel="next", something
-		auto pos = ass.find("rel=\"next\"");
+  // Check if the zotero api is overloaded, if so back of for the specified
+  // amount of time
+  if (resp->has_header("Backoff"))
+  {
+    auto seconds = resp->get_header_value("Backoff");
+    debug::log(debug::LOG_LEVEL::DEBUG,"Zotero api backoff for %s seconds.\n",seconds);
+    std::this_thread::sleep_for(std::chrono::seconds(std::stoi(seconds.c_str())));
+  }
+  
+  // Retry after is send while the zotero server has maintenance therefore wait
+  // the specified amount of time when encountering such an header
+  if (resp->has_header("Retry-After"))
+  {
+    auto seconds = resp->get_header_value("Retry-After");
+    debug::log(debug::LOG_LEVEL::DEBUG,"Zotero api retry after for %s seconds.\n",seconds);
+    std::this_thread::sleep_for(std::chrono::seconds(std::stoi(seconds.c_str())));
+  }
+
+  if(resp->body.find("An error occurred")!=std::string::npos)
+  {
+    auto retry = SendRequest(uri);
+
+    // If we have the same error again stop trying and return an empty string
+    if(retry.find("An error occurred")!=std::string::npos)
+    {
+      debug::log(debug::LOG_LEVEL::WARNING,"Received multiple times An error occured from zotero api!\n");
+      return "";
+    }
+
+    // Ok we got the new body change the body of the failed request
+    *const_cast<std::string*>(&resp->body) = std::move(retry);
+  }
+
+  // If there is an link in the response the whole response is not parsed yet,
+  // continue with the next response
+  if (resp->has_header("Link"))
+  {
+    auto link = resp->get_header_value("Link");
+
+    // The format is Link: something; <https://somelink> rel="next"; something
+    // Therefore try to find the next link there is
+    auto pos = link.find("rel=\"next\"");
+
+    // If there is no next link the response is finished
 		if(pos!=std::string::npos)
 		{
-			auto pos1 = ass.rfind("<",pos);
-			auto pos2 = ass.rfind(">",pos);
+      // Try to determine the positions of the next link location
+			auto pos1 = link.rfind("<",pos);
+			auto pos2 = link.rfind(">",pos);
 			//Extract the next address to do a request to and set it in the zotero
 			//class
-			std::string st2 = ass.substr(pos1+1,pos2-(pos1+1));
-			zot->SetNextLink(std::move(st2));
+			std::string st2 = link.substr(pos1+1,pos2-(pos1+1));
+
+      // Return the whole response back to the requester
+			return resp->body + SendRequest(st2);
 		}
-	}
+  }
 
-	//If there is either an Backoff or an Retry-After header
-	//zotero wants us to stop doing request for a few seconds
-	//TODO: Handle the headers instead of exiting the programm on finding
-	//those headers
-	if(ass.find("Backoff: ")!=std::string::npos)
-	{
-		DBG_INF_MSG_EXIT("Backoff request from zotero!",EXIT_FAILURE);
-	}
-	else if(ass.find("Retry-After: ")!=std::string::npos)
-	{
-		DBG_INF_MSG_EXIT("Retry after request from zotero!",EXIT_FAILURE);
-	}
-	//Tell libcurl how many bytes we processed.
-	return pSize*pNumBlocks;
+  // Return the response
+  return resp->body;
 }
 
-void Zotero::SetNextLink(std::string str)
+ReturnCode Zotero::ReferenceManager::Initialise(std::filesystem::path p)
 {
-	_nextLink = std::move(str);
-}
+  // Try to load the file from the specified path
+  nlohmann::json js;
+  std::ifstream ifs(p,std::ios::in);
 
-Zotero::Zotero()
-{
-	_nextLink="";
-	//Init the interface to libcurl
-	_curl = curl_easy_init();
+  // If the file does not exist return the corresponding error
+  if(ifs.fail())
+    return ReturnCode::JSON_FILE_DOES_NOT_EXIST;
 
-	//If we cant get a connection to libcurl exit the programm with an
-	//appropriate error message
-	if(!_curl)
-	{
-		DBG_INF_MSG_EXIT("Could not create curl interface!",EXIT_FAILURE);
-	}
+  try
+  {
+    // Try to load and parse the json from disk
+    ifs>>js;
+  }
+  catch(...)
+  {
+    // Something went wrong, probably the JSON was not valid
+    return ReturnCode::NOT_A_VALID_JSON;
+  }
 
-	//Try to load the file with the API Key from zotero and the group number
-	//to perform requests to the zotero api interface
-	std::ifstream ifs(ZOTERO_API_KEY_FILE_PATH,std::ios::in);
-	nlohmann::json zotAccess;
-	if(!ifs.is_open())
-	{
-		std::cout<<"[Could not open: "<<ZOTERO_API_KEY_FILE_PATH<<" for reading the zotero apikey]\n";
-		throw 0;
-	}
-
-	//As the data is crucial for the programm exit the programm when there is an
-	//error with reading this data
-	try
-	{
-		ifs>>zotAccess;
-	}
-	catch(...)
-	{
-		std::cout<<"[Faulty json read as Zotero API Key from: "<<ZOTERO_API_KEY_FILE_PATH<<"]\n";
-		throw 0;
-	}
-	ifs.close();
-
-
-	//Calculate the base url of every zotero request which is:
-	//https://api.zotero.org/groups/$(our_group_number)
-	_baseRequest = ZOTERO_API_ADDR;
-	_baseRequest += "/groups/";
-	_baseRequest += zotAccess["groupnumber"];
-
-	//Tell libcurl that we use a custom function to read the bytes from the socket
-	curl_easy_setopt(_curl, CURLOPT_WRITEFUNCTION, zoteroReadBuffer);
-
-	//Set the headers used in every request to zotero, like the api version and
-	//the access key to the library
-	struct curl_slist *headers = NULL;
-	headers = curl_slist_append(headers, "Zotero-API-Version: 3"); 
-	std::string st = "Zotero-API-Key: ";
-	st+=zotAccess["uniqueaccesskey"];
-	headers = curl_slist_append(headers, st.c_str());
-	//Transmit the custom headers to libcurl
-	curl_easy_setopt(_curl,CURLOPT_HTTPHEADER,headers);
-
-	//Set a custom Data pointer to give to our custom write function
-	curl_easy_setopt(_curl,CURLOPT_WRITEDATA,this);
-
-	//Set a custom callback function for reading the headers of the response
-	//from zotero used for processing, Link, Backoff and Retry-After headers
-	curl_easy_setopt(_curl,CURLOPT_HEADERFUNCTION,zoteroHeaderReader);
-
-	//Set a the custom data pointer given to the header function to this class
-	curl_easy_setopt(_curl,CURLOPT_HEADERDATA,this);
+  // Close the file input and intialise with the given settings
+  ifs.close();
+  return Initialise(js);
 }
 
 
-
-std::string Zotero::SendRequest(std::string requestURI)
+ReturnCode Zotero::ReferenceManager::Initialise(nlohmann::json details)
 {
-	try
-	{
-		Zotero zot;
-		return zot._sendRequest(std::move(requestURI));
-	}
-	catch(...)
-	{
-		return "";
-	}
+  // Check if there is an API Key, this is REQUIRED for an connection to zotero
+  if (details.count("api_key") == 0)
+    return ReturnCode::NO_API_KEY;
+  else
+    apiKey_ = details["api_key"];
+
+  // Check if there is an group id that the implementation will use to do
+  // requests to
+  if (details.count("group_id") == 0)
+  {
+    // If there is neither an group id nor an user id return an error
+    if (details.count("user_id") == 0)
+      return ReturnCode::NO_GROUP_ID_OR_USER_ID;
+
+    //TODO: Access the users database
+    baseUri_ = "/users/";
+    baseUri_ += details["user_id"];
+  }
+  else
+  {
+    // If there is an user id as well there is no way to know what to use
+    // therefore return an error
+    if (details.count("user_id") != 0)
+      return ReturnCode::USER_ID_AND_GROUP_ID;
+    
+    // Construct the basic uri from the group id and the basi format of zotero
+    // for requests to an group 
+    baseUri_ = "/groups/";
+    baseUri_ += details["group_id"];
+  }
+
+  // Everything went well!
+  return ReturnCode::OK;
 }
-std::string Zotero::_sendRequest(std::string requestURI)
+
+std::unique_ptr<Connection> ReferenceManager::GetConnection()
 {
-	//Try to build the request to zotero
-	//_baseRequest = https://api.zotero.org/groups/$(our_group_number)
-	std::string st = _baseRequest+requestURI;
-
-
-	//Create the json class to start filling
-	nlohmann::json js;
-	while(true)
-	{
-		std::cout<<"Zotero request to url: "<<st<<std::endl;
-
-		//Set the request url
-		curl_easy_setopt(_curl, CURLOPT_URL, st.c_str());
-		curl_easy_setopt(_curl, CURLOPT_TIMEOUT, 30L);
-
-
-		//Do the request, this request is sequential so it will only terminate
-		//after the request is done. This function calls all the custom functions
-		//defined in the constructor like zoteroReadBuffer and zoteroHeaderReader
-		CURLcode result = curl_easy_perform(_curl);
-		//If there is a fault show it in the standard error output and return an empty string
-		if(result != CURLE_OK)
-		{
-			std::cout<<"[Could not perform request to zotero api!]\n";
-			_requestJSON = "";
-			return std::move(_requestJSON);
-		}
-
-		//We could receive a corrupted json file
-		//to handle all error catch all error and try to process them
-		try
-		{
-			//If there is nothing in the json yet create a new json
-			if(js.size()==0)
-				js = nlohmann::json::parse(_requestJSON);
-			else
-			{
-				//If there is some data in the json yet expand the json by all the
-				//new elements in the newest received json
-				auto j3 = nlohmann::json::parse(_requestJSON); 
-				for (auto& el : j3.items()) {
-					js.push_back(el.value());
-				}
-			}
-		}
-		catch(...)
-		{
-
-			if(_requestJSON.find("An error occurred")!=std::string::npos)
-			{
-				_requestJSON="";
-				continue;
-			}
-			//TODO: Some error handling at the moment the programm just exits with an
-			//error code
-			return "";
-		}
-
-		//If the custom header function set the link to the next chunk of the json
-		//follow the link by looping over the new url
-		if(_nextLink!="")
-		{
-			st = std::move(_nextLink);
-		}
-		else
-		{
-			//No link to follow? Close the programm.
-			break;
-		}
-
-		//Clear the buffer so we dont process data multiple times
-		_requestJSON = "";
-	}
-	//Convert the json to an string and return it.
-	return js.dump();
+  // Create a new connection to the zotero api server with the required
+  // parameters
+  std::unique_ptr<Connection> ptr(new Connection(apiKey_,ZOTERO_API_ADDR,baseUri_));
+  return ptr;
 }
 
 
-Zotero::~Zotero()
+bool ReferenceManager::UpdateCorpus()
 {
-	//If there is something to clean up, clean up and reset the pointer
-	if(_curl)
-	{
-		curl_easy_cleanup(_curl);
-		_curl = nullptr;
-	}
+  return true;
 }
 
-void Zotero::ReceiveBytes(char *pBytes, size_t pNumBytes)
+nlohmann::json &ReferenceManager::references()
 {
-	//Load the new data in the buffer for it
-	for(size_t i = 0; i < pNumBytes; i++)
-		_requestJSON += pBytes[i];
-}
-
-std::string Zotero::Request::GetSpecificItem(std::string key)
-{
-	std::string ret = "/items/";
-	ret+=key;
-	ret+="?format=json&include=data,bib,citation&style=kritische-ausgabe";
-	return ret;
-}
-
-std::string Zotero::Request::GetItemsInSpecificPillar(std::string key)
-{
-	std::string ret = "/collections/";
-	ret+=key;
-	ret+="/items?format=json&include=bib,citation,data&style=kritische-ausgabe";
-	return ret;
-}
-std::string Zotero::Request::GetAllItemsFromCollection(std::string collKey)
-{
-	std::string ret = "/collections/";
-	ret+=collKey;
-	ret+="/items/top?format=json&include=bib,citation,data&style=kritische-ausgabe&limit=100";
-	return ret;
-}
-
-const nlohmann::json &Zotero::GetPillars()
-{
-	static bool pill=true;
-	static nlohmann::json ret;
-	if(pill)
-	{
-		ret.clear();
-		std::cout<<"Trying to detect zotero pillars... ";
-		try
-		{
-			nlohmann::json js = nlohmann::json::parse(Zotero::SendRequest(Zotero::Request::GetAllPillars));
-			for(const auto &it : js)
-			{
-				nlohmann::json entry;
-				entry["key"] = it["data"]["key"].get<std::string>();
-				entry["name"] = it["data"]["name"].get<std::string>();
-				ret.push_back(std::move(entry));
-			}
-		}
-		catch(...)
-		{
-			std::cout<<"[Could not detect zotero pillars, exiting...]"<<std::endl;
-			throw 0;
-		}
-		pill = false;
-		std::cout<<"done.\n";
-		std::cout<<"Detected following pillars: "<<ret.dump()<<std::endl;
-	}
-	return ret;
+  return references_;
 }

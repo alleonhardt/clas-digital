@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
+
 if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     set (CMAKE_INSTALL_PREFIX /etc/clas-digital CACHE PATH whatever FORCE)
 endif()
@@ -12,13 +13,26 @@ find_package(Threads REQUIRED)
 set(CMAKE_CXX_STANDARD 17)
 
 set(SRC_FILES_SEARCH src/search/book_manager/Book.cpp src/search/book_manager/Bookmanager.cpp src/search/search/Search.cpp src/search/search/SearchOptions.cpp src/search/main.cpp src/shared/metadata_handler.cc src/shared/util/func.cpp src/shared/util/fuzzy.cpp)
-set(SRC_FILES_SERVER src/shared/metadata_handler.cc src/shared/util/URLParser.cpp src/shared/util/ubuntu20matherror.cpp src/shared/util/func.cpp src/server/main.cpp src/server/login/user.cpp src/server/login/usertable.cpp src/server/ocr/tesseract.cpp src/server/zotero/zotero.cpp)
+set(SRC_FILES_SERVER src/shared/metadata_handler.cc src/shared/util/URLParser.cpp src/shared/util/ubuntu20matherror.cpp src/shared/util/func.cpp src/server/login/user.cpp src/server/login/usertable.cpp src/server/ocr/tesseract.cpp src/server/zotero/zotero.cpp)
 
 
-add_executable(clas_digital_server.o ${SRC_FILES_SERVER})
+set(SRC_FILES_SERVER_TEST src/server/test/main.cc
+  src/server/zotero/tests/zotero.cc)
+
+add_executable(clas_digital_server.o ${SRC_FILES_SERVER} src/server/main.cpp)
+add_executable(clas_digital_server_test.o ${SRC_FILES_SERVER}
+  ${SRC_FILES_SERVER_TEST})
+
+
 add_executable(clas_digital_search.o  ${SRC_FILES_SEARCH})
 
 target_include_directories(clas_digital_server.o PUBLIC
+  "src/shared"
+  "src/shared/util"
+  "src/server"
+)
+
+target_include_directories(clas_digital_server_test.o PUBLIC
   "src/shared"
   "src/shared/util"
   "src/server"
@@ -31,6 +45,7 @@ target_include_directories(clas_digital_server.o PUBLIC
 )
 
 target_link_libraries(clas_digital_server.o stdc++fs ${CONAN_LIBS})
+target_link_libraries(clas_digital_server_test.o stdc++fs ${CONAN_LIBS})
 target_link_libraries(clas_digital_search.o stdc++fs)
 
 set(INSTALL_DIRS /etc/clas-digital-devel)
