@@ -33,6 +33,9 @@ jobs:
             pip install conan
 
     - name: Install Dependencies
+      shell: bash
+      env:
+        CXX: ${{ matrix.cc }}
       run:  |
             cd build
             export PATH=$PATH:/home/runner/.local/bin
@@ -42,6 +45,9 @@ jobs:
             conan install ..
 
     - name: Build clas-digital on ${{ matrix.os }}
+      shell: bash
+      env:
+        CXX: ${{ matrix.cc }}
       run:  |
             cd build
             cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE
