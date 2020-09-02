@@ -30,7 +30,8 @@ jobs:
             pip3 install setuptools
             pip3 install conan
             export PATH=$PATH:/home/runner/.local/bin
-            conan install ..
+            conan profile update settings.compiler.libcxx=libstdc++11 default
+            conan install ${{runner.workspace}}
 
     - name: Configure CMake
       # Use a bash shell so we can use the same syntax for environment variable
