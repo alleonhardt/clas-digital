@@ -173,9 +173,8 @@ public:
   
   ///Return whether book is publicly accessible 
   bool getPublic();
-  
-  ///Return whether book has title, author or date
   bool checkJson();
+  
 
 private:
   nlohmann::json metadata_;  ///< Json with book metadata

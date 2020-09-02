@@ -55,8 +55,8 @@ target_include_directories(clas_digital_search.o PUBLIC
   "src/search"
 )
 
-target_link_libraries(clas_digital_server.o ${CONAN_LIBS})
-target_link_libraries(clas_digital_server_test.o ${CONAN_LIBS})
+target_link_libraries(clas_digital_server.o ${CONAN_LIBS} stdc++)
+target_link_libraries(clas_digital_server_test.o ${CONAN_LIBS} stdc++)
 target_link_libraries(clas_digital_search.o)
 
 set(INSTALL_DIRS /etc/clas-digital-devel)

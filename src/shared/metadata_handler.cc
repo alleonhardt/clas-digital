@@ -366,3 +366,9 @@ bool MetadataHandler::HasTag(std::string tag)
   }
   return false;
 }
+
+
+bool MetadataHandler::checkJson()
+{
+  return true;
+}
