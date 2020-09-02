@@ -33,3 +33,4 @@ jobs:
             conan install ..
             cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE
             cmake --build . --config $BUILD_TYPE
+            bin/clas_digital_server_test.o
