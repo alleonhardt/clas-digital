@@ -24,7 +24,6 @@ jobs:
     - name: Install Conan
       shell: bash
       env:
-        CC: ${{ matrix.cc }}
         CXX: ${{ matrix.cc }}
       run:  |
             mkdir build
@@ -36,7 +35,6 @@ jobs:
     - name: Install Dependencies
       shell: bash
       env:
-        CC: ${{ matrix.cc }}
         CXX: ${{ matrix.cc }}
       run:  |
             cd build
@@ -48,7 +46,6 @@ jobs:
     - name: Build clas-digital on ${{ matrix.os }}
       shell: bash
       env:
-        CC: ${{ matrix.cc }}
         CXX: ${{ matrix.cc }}
       run:  |
             cd build

@@ -28,6 +28,8 @@ add_executable(clas_digital_server.o $<TARGET_OBJECTS:clas_server_lib> src/serve
 add_executable(clas_digital_server_test.o $<TARGET_OBJECTS:clas_server_lib>
   ${SRC_FILES_SERVER_TEST})
 
+set(CXX_STDLIB "")
+
 
 add_executable(clas_digital_search.o  ${SRC_FILES_SEARCH})
 
@@ -35,7 +37,7 @@ if(MSVC)
   add_compile_options(/W4 /WX)
 else()
   add_compile_options(-Wall -Wextra -pedantic -Werror)
-  link_libraries(stdc++)
+  set(CXX_STDLIB stdc++)
 endif()
 
 target_include_directories(clas_server_lib PUBLIC
@@ -62,9 +64,9 @@ target_include_directories(clas_digital_search.o PUBLIC
   "src/search"
 )
 
-target_link_libraries(clas_digital_server.o ${CONAN_LIBS})
-target_link_libraries(clas_digital_server_test.o ${CONAN_LIBS})
-target_link_libraries(clas_digital_search.o)
+target_link_libraries(clas_digital_server.o ${CONAN_LIBS} ${CXX_STDLIB})
+target_link_libraries(clas_digital_server_test.o ${CONAN_LIBS} ${CXX_STDLIB})
+target_link_libraries(clas_digital_search.o ${CXX_STDLIB})
 
 set(INSTALL_DIRS /etc/clas-digital-devel)
 set(SERVICE_TARGET clas-digital-devel)
