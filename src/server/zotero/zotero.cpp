@@ -169,6 +169,7 @@ std::unique_ptr<Connection> ReferenceManager::GetConnection()
 
 bool ReferenceManager::UpdateCorpus()
 {
+  //TODO: implement the update corpus function
   return true;
 }
 

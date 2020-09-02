@@ -13,11 +13,15 @@ find_package(Threads REQUIRED)
 set(CMAKE_CXX_STANDARD 17)
 
 set(SRC_FILES_SEARCH src/search/book_manager/Book.cpp src/search/book_manager/Bookmanager.cpp src/search/search/Search.cpp src/search/search/SearchOptions.cpp src/search/main.cpp src/shared/metadata_handler.cc src/shared/util/func.cpp src/shared/util/fuzzy.cpp)
-set(SRC_FILES_SERVER src/shared/metadata_handler.cc src/shared/util/URLParser.cpp src/shared/util/ubuntu20matherror.cpp src/shared/util/func.cpp src/server/login/user.cpp src/server/login/usertable.cpp src/server/ocr/tesseract.cpp src/server/zotero/zotero.cpp)
+set(SRC_FILES_SERVER src/shared/metadata_handler.cc
+  src/shared/util/URLParser.cpp src/shared/util/ubuntu20matherror.cpp
+  src/shared/util/func.cpp src/server/login/user.cpp
+  src/server/login/usertable.cpp src/server/ocr/tesseract.cpp
+  src/server/zotero/zotero.cpp src/server/server/server.cc)
 
 
 set(SRC_FILES_SERVER_TEST src/server/test/main.cc
-  src/server/zotero/tests/zotero.cc)
+  src/server/zotero/tests/zotero.cc src/server/server/tests/server_test.cc)
 
 add_executable(clas_digital_server.o ${SRC_FILES_SERVER} src/server/main.cpp)
 add_executable(clas_digital_server_test.o ${SRC_FILES_SERVER}
@@ -25,6 +29,13 @@ add_executable(clas_digital_server_test.o ${SRC_FILES_SERVER}
 
 
 add_executable(clas_digital_search.o  ${SRC_FILES_SEARCH})
+
+if(MSVC)
+  add_compile_options(/W4 /WX)
+else()
+  add_compile_options(-Wall -Wextra -pedantic -Werror)
+endif()
+
 
 target_include_directories(clas_digital_server.o PUBLIC
   "src/shared"
