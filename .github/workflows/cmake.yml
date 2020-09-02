@@ -2,6 +2,7 @@ name: CMake
 
 on: [push]
 
+
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
@@ -12,25 +13,39 @@ jobs:
     # well on Windows or Mac.  You can convert this to a matrix build if you need
     # cross-platform coverage.
     # See: https://docs.github.com/en/actions/configuring-and-managing-workflows/configuring-a-workflow#configuring-a-build-matrix
-    runs-on: ubuntu-latest
-
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        cc: [gcc-9, clang-9]
     steps:
     - uses: actions/checkout@v2
 
     - name: Install Conan
       shell: bash
+      env:
+        CXX: ${{ matrix.cc }}
       run:  |
-            ls
             mkdir build
             cd build
-            pip3 install wheel
-            pip3 install setuptools
-            pip3 install conan
+            pip install wheel
+            pip install setuptools
+            pip install conan
+
+    - name: Install Dependencies
+      run:  |
+            cd build
             export PATH=$PATH:/home/runner/.local/bin
             export CXX=gcc-9
             conan config init
             conan profile update settings.compiler.libcxx=libstdc++11 default
             conan install ..
+
+    - name: Build clas-digital on ${{ matrix.os }}
+      run:  |
+            cd build
             cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE
             cmake --build . --config $BUILD_TYPE
-            bin/clas_digital_server_test.o
+
+    - name: Do tests on ${{ matrix.os }}
+      run:  build/bin/clas_digital_server_test.o

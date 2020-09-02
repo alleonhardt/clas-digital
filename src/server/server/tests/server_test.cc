@@ -10,9 +10,6 @@ TEST(CLASServer, Constructor) {
 
 TEST(CLASServer, Start) {
   CLASServer &srv = CLASServer::GetInstance();
-  srv.Start("localhost", 1409);
-  EXPECT_EQ(srv.Status(CLASServer::StatusBits::SERVER_STARTED),true);
-
-  srv.Stop();
   EXPECT_EQ(srv.Status(CLASServer::StatusBits::SERVER_STARTED),false);
+  EXPECT_EQ(srv.Status(CLASServer::StatusBits::GLOBAL_SHUTDOWN),false);
 }
