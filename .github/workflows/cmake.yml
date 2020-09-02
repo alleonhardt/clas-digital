@@ -40,7 +40,6 @@ jobs:
             cd build
             export PATH=$PATH:/home/runner/.local/bin
             conan config init
-            conan profile update settings.compiler.libcxx=libstdc++11 default
             conan install .. --build=missing
 
     - name: Build clas-digital on ${{ matrix.os }}
