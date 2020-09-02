@@ -1,3 +1,0 @@
-
-exec git diff --cached --name-status
-puts "POLICY"
