@@ -8,23 +8,20 @@ env:
   BUILD_TYPE: Release
 
 jobs:
-  build_ubuntu:
+  build_ubuntu_gcc:
     # The CMake configure and build commands are platform agnostic and should work equally
     # well on Windows or Mac.  You can convert this to a matrix build if you need
     # cross-platform coverage.
     # See: https://docs.github.com/en/actions/configuring-and-managing-workflows/configuring-a-workflow#configuring-a-build-matrix
     runs-on: ubuntu-latest
-    name: Build on Ubuntu 20
-    strategy:
-      matrix:
-        cc: [gcc-9,clang-9]
+    name: Build on Ubuntu 20 with gcc-9
     steps:
     - uses: actions/checkout@v2
 
     - name: Install Conan
       shell: bash
       env:
-        CXX: ${{ matrix.cc }}
+        CXX: gcc-9
       run:  |
             mkdir build
             cd build
@@ -35,25 +32,68 @@ jobs:
     - name: Install Dependencies
       shell: bash
       env:
-        CXX: ${{ matrix.cc }}
+        CXX: gcc-9
       run:  |
             cd build
             export PATH=$PATH:/home/runner/.local/bin
             conan config init
             conan install .. --build=missing -s compiler.libcxx=libstdc++11
 
-    - name: Build clas-digital on ${{ matrix.os }}
+    - name: Build clas-digital
       shell: bash
       env:
-        CXX: ${{ matrix.cc }}
+        CXX: gcc-9
       run:  |
             cd build
             cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE
             cmake --build . --config $BUILD_TYPE
 
-    - name: Do tests on ${{ matrix.os }}
+    - name: Do tests
       run:  build/bin/clas_digital_server_test.o
   
+  build_ubuntu_clang:
+    # The CMake configure and build commands are platform agnostic and should work equally
+    # well on Windows or Mac.  You can convert this to a matrix build if you need
+    # cross-platform coverage.
+    # See: https://docs.github.com/en/actions/configuring-and-managing-workflows/configuring-a-workflow#configuring-a-build-matrix
+    runs-on: ubuntu-latest
+    name: Build on Ubuntu 20 with clang-9
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install Conan
+      shell: bash
+      env:
+        CXX: clang-9
+      run:  |
+            mkdir build
+            cd build
+            pip install wheel
+            pip install setuptools
+            pip install conan
+
+    - name: Install Dependencies
+      shell: bash
+      env:
+        CXX: clang-9
+      run:  |
+            cd build
+            export PATH=$PATH:/home/runner/.local/bin
+            conan config init
+            conan install .. --build=missing
+
+    - name: Build clas-digital
+      shell: bash
+      env:
+        CXX: clang-9
+      run:  |
+            cd build
+            cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+            cmake --build . --config $BUILD_TYPE
+
+    - name: Do tests
+      run:  build/bin/clas_digital_server_test.o
+
   build_mac:
     # The CMake configure and build commands are platform agnostic and should work equally
     # well on Windows or Mac.  You can convert this to a matrix build if you need
