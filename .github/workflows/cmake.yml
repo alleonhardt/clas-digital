@@ -30,6 +30,7 @@ jobs:
             pip3 install setuptools
             pip3 install conan
             export PATH=$PATH:/home/runner/.local/bin
+            conan info
             conan profile update settings.compiler.libcxx=libstdc++11 default
             conan install ${{runner.workspace}}
 
