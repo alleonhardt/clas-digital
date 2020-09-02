@@ -20,7 +20,7 @@ jobs:
     - name: Install Conan
       shell: bash
       run:  |
-            cd clas-digital
+            ls
             mkdir build
             cd build
             pip3 install wheel
