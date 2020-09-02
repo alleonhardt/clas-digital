@@ -42,7 +42,7 @@ jobs:
             export CXX=gcc-9
             conan config init
             conan profile update settings.compiler.libcxx=libstdc++11 default
-            conan install ..
+            conan install .. --build=missing
 
     - name: Build clas-digital on ${{ matrix.os }}
       shell: bash
