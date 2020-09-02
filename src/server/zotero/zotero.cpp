@@ -37,7 +37,7 @@ std::string Connection::SendRequest(std::string uri)
   if (resp->has_header("Backoff"))
   {
     auto seconds = resp->get_header_value("Backoff");
-    debug::log(debug::LOG_LEVEL::DEBUG,"Zotero api backoff for %s seconds.\n",seconds);
+    debug::log(debug::LOG_LEVEL::DEBUG,"Zotero api backoff for %s seconds.\n",seconds.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(std::stoi(seconds.c_str())));
   }
   
@@ -46,7 +46,7 @@ std::string Connection::SendRequest(std::string uri)
   if (resp->has_header("Retry-After"))
   {
     auto seconds = resp->get_header_value("Retry-After");
-    debug::log(debug::LOG_LEVEL::DEBUG,"Zotero api retry after for %s seconds.\n",seconds);
+    debug::log(debug::LOG_LEVEL::DEBUG,"Zotero api retry after for %s seconds.\n",seconds.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(std::stoi(seconds.c_str())));
   }
 
