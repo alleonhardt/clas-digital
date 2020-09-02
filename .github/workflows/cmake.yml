@@ -8,16 +8,16 @@ env:
   BUILD_TYPE: Release
 
 jobs:
-  build:
+  build_ubuntu:
     # The CMake configure and build commands are platform agnostic and should work equally
     # well on Windows or Mac.  You can convert this to a matrix build if you need
     # cross-platform coverage.
     # See: https://docs.github.com/en/actions/configuring-and-managing-workflows/configuring-a-workflow#configuring-a-build-matrix
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
+    name: Build on Ubuntu 20
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
-        cc: [gcc-9]
+        cc: [gcc-9,clang-9]
     steps:
     - uses: actions/checkout@v2
 
@@ -41,7 +41,6 @@ jobs:
       run:  |
             cd build
             export PATH=$PATH:/home/runner/.local/bin
-            export CXX=gcc-9
             conan config init
             conan profile update settings.compiler.libcxx=libstdc++11 default
             conan install .. --build=missing
@@ -51,6 +50,83 @@ jobs:
       env:
         CC: ${{ matrix.cc }}
         CXX: ${{ matrix.cc }}
+      run:  |
+            cd build
+            cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+            cmake --build . --config $BUILD_TYPE
+
+    - name: Do tests on ${{ matrix.os }}
+      run:  build/bin/clas_digital_server_test.o
+  
+  build_mac:
+    # The CMake configure and build commands are platform agnostic and should work equally
+    # well on Windows or Mac.  You can convert this to a matrix build if you need
+    # cross-platform coverage.
+    # See: https://docs.github.com/en/actions/configuring-and-managing-workflows/configuring-a-workflow#configuring-a-build-matrix
+    runs-on: macos-latest
+    name: Build on MacOS 10.04
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install Conan
+      shell: bash
+      run:  |
+            mkdir build
+            cd build
+            pip install wheel
+            pip install setuptools
+            pip install conan
+
+    - name: Install Dependencies
+      shell: bash
+      run:  |
+            cd build
+            export PATH=$PATH:/home/runner/.local/bin
+            conan config init
+            conan profile update settings.compiler.libcxx=libstdc++11 default
+            conan install .. --build=missing
+
+    - name: Build clas-digital on ${{ matrix.os }}
+      shell: bash
+      run:  |
+            cd build
+            cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+            cmake --build . --config $BUILD_TYPE
+
+    - name: Do tests on ${{ matrix.os }}
+      run:  build/bin/clas_digital_server_test.o
+
+
+  build_windows:
+    # The CMake configure and build commands are platform agnostic and should work equally
+    # well on Windows or Mac.  You can convert this to a matrix build if you need
+    # cross-platform coverage.
+    # See: https://docs.github.com/en/actions/configuring-and-managing-workflows/configuring-a-workflow#configuring-a-build-matrix
+    runs-on: windows-latest
+    name: Build on Windows Server
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install Conan
+      shell: bash
+      run:  |
+            mkdir build
+            cd build
+            pip install wheel
+            pip install setuptools
+            pip install conan
+
+    - name: Install Dependencies
+      shell: bash
+      run:  |
+            cd build
+            export PATH=$PATH:/home/runner/.local/bin
+            conan config init
+            conan profile update settings.compiler.libcxx=libstdc++11 default
+            conan install .. --build=missing
+
+    - name: Build clas-digital on ${{ matrix.os }}
+      shell: bash
       run:  |
             cd build
             cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE
