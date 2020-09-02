@@ -6,7 +6,6 @@
 #define CLASDIGITAL_SRC_SEARCH_BOOKMANAGER_H_
 
 #include <algorithm> 
-#include <dirent.h>
 #include <filesystem>
 #include <functional> 
 #include <fstream>

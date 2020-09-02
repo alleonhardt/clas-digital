@@ -150,6 +150,7 @@ void CBookManager::writeListofBooksWithBSB() {
 */
 bool CBookManager::initialize()
 {
+  /*
     std::cout << "Starting initializing..." << std::endl;
 
     //Load directory of all books 
@@ -178,7 +179,7 @@ bool CBookManager::initialize()
     std::cout << "Map title:   " << m_mapWordsTitle.size() << "\n";
     std::cout << "Map authors: " << m_mapWordsAuthors.size() << "\n";
 
-    writeListofBooksWithBSB();
+    writeListofBooksWithBSB();*/
     return true;
 }
 
