@@ -7,8 +7,5 @@ stb/20200203
 gtest/1.10.0
 termcolor/1.0.1
 
-[options]
-gtest:shared=True
-
 [generators]
 cmake
