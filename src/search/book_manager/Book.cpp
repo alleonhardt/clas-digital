@@ -801,10 +801,10 @@ void CBook::addPage(std::string sInput, std::string sPage, std::string sMaxPage)
         std::map<int, std::string> orderMap;
         std::cout << "Adding to existing ocr ... " << std::endl;
         for(auto& p : fs::directory_iterator(path_+"/intern")) {
-            std::string filename=p.path().filename();
+            std::string filename=p.path().filename().string();
             if(filename.find("add")!=std::string::npos) {
                 std::string num = filename.substr(3, filename.length()-2-filename.find("."));
-                orderMap[stoi(num)] = p.path();
+                orderMap[stoi(num)] = p.path().string();
             }
         }
 
