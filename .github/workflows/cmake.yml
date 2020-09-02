@@ -18,9 +18,9 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Install Conan
-      working-directory: ${{runner.workspace}}
       shell: bash
       run:  |
+            cd clas-digital
             mkdir build
             cd build
             pip3 install wheel
