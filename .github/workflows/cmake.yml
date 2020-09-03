@@ -37,7 +37,7 @@ jobs:
             cd build
             export PATH=$PATH:/home/runner/.local/bin
             conan config init
-            conan install .. --build=missing -s compiler.libcxx=libstdc++11 -s compiler.cppstd=17
+            conan install .. --build=missing -s compiler.libcxx=libstdc++11
 
     - name: Build clas-digital
       shell: bash
@@ -80,7 +80,7 @@ jobs:
             cd build
             export PATH=$PATH:/home/runner/.local/bin
             conan config init
-            conan install .. --build=missing -s compiler.cppstd=17
+            conan install .. --build=missing
 
     - name: Build clas-digital
       shell: bash
