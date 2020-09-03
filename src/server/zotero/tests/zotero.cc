@@ -21,13 +21,16 @@ TEST_CASE("InitialiseFromJSON", "[ZoteroReferenceManager]") {
 TEST_CASE("InitialiseFromJSONFile", "[ZoteroReferenceManager]") {
   Zotero::ReferenceManager ref;
 
+  // Check the error code when the file does not exist
   REQUIRE(ref.Initialise(std::filesystem::path("whatever.json")) == Zotero::ReturnCode::JSON_FILE_DOES_NOT_EXIST);
 
 
+  // Create a test file and put flawed json inside
   std::ofstream ofs("test_file.json",std::ios::out);
   ofs<<"Hallo";
   ofs.close();
 
+  // Check the error code
   REQUIRE(ref.Initialise(std::filesystem::path("test_file.json")) == Zotero::ReturnCode::NOT_A_VALID_JSON);
 
 
@@ -35,7 +38,9 @@ TEST_CASE("InitialiseFromJSONFile", "[ZoteroReferenceManager]") {
   ofs<<"{ \"api_key\": \"Hallo\", \"group_id\": \"ok\" }";
   ofs.close();
 
+  // Try a valid json and check the return code
   REQUIRE(ref.Initialise(std::filesystem::path("test_file.json")) == Zotero::ReturnCode::OK);
 
+  // Clean up the files created
   std::filesystem::remove("test_file.json");
 }

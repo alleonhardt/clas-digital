@@ -84,14 +84,17 @@ namespace debug
       if(lvl == LOG_LEVEL::ERRORS)
       {
         termcolor::red(std::cout).flush();
+        printf("[ERROR]: ");
       }
       else if(lvl == LOG_LEVEL::WARNING)
       {
         termcolor::yellow(std::cout).flush();
+        printf("[WARNING]: ");
       }
       else if(lvl == LOG_LEVEL::DEBUG)
       {
-        termcolor::magenta(std::cout).flush();
+        termcolor::blue(std::cout).flush();
+        printf("[DEBUG]: ");
       }
       print(arg...);
       termcolor::reset(std::cout).flush();

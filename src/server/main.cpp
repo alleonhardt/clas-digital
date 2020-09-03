@@ -11,13 +11,10 @@
 
 #include <signal.h>
 
-#include "login/user_system.hpp"
 #include "URLParser.hpp"
 #include "zotero/zotero.hpp"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h" //Needed for image dimensions
-#include "ocr/tesseract.hpp"
-//#include "html_creator/StaticWebpageCreator.hpp"
 
 
 using namespace httplib;

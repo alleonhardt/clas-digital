@@ -17,12 +17,12 @@ set(SRC_FILES_SEARCH src/search/book_manager/Book.cpp src/search/book_manager/Bo
 add_library(clas_server_lib OBJECT src/shared/metadata_handler.cc
   src/shared/util/URLParser.cpp src/shared/util/ubuntu20matherror.cpp
   src/shared/util/func.cpp src/server/login/user.cpp
-  src/server/login/usertable.cpp src/server/ocr/tesseract.cpp
   src/server/zotero/zotero.cpp src/server/server/server.cc)
 
 
 set(SRC_FILES_SERVER_TEST src/server/test/main.cc
-  src/server/server/tests/server_test.cc src/server/zotero/tests/zotero.cc)
+  src/server/server/tests/server_test.cc src/server/zotero/tests/zotero.cc
+  src/server/login/tests/users_test.cc)
 
 add_executable(clas_digital_server.o $<TARGET_OBJECTS:clas_server_lib> src/server/main.cpp)
 add_executable(clas_digital_server_test.o $<TARGET_OBJECTS:clas_server_lib>
