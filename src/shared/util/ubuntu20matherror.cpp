@@ -31,5 +31,6 @@ float __remainderf_finite(float x, double y)  { return remainderf(x,y); }
 #ifdef __linux__
 #include <fcntl.h>
 __asm__("fcntl64: jmp fcntl");
+__asm__(".global fcntl64");
 #endif
 }
