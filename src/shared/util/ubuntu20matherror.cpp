@@ -30,6 +30,6 @@ double __remainder_finite(double x, double y) { return remainder(x,y); }
 float __remainderf_finite(float x, double y)  { return remainderf(x,y); }
 #ifdef __linux__
 #include <fcntl.h>
-int fcntl64(int fd, int cmd,...){return fcntl(fd,cmd);};
+extern int __REDIRECT (fcntl64, (int __fd, int __cmd, ...), fcntl);
 #endif
 }
