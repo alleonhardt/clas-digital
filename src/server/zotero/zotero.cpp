@@ -28,7 +28,7 @@ std::string Connection::SendRequest(std::string uri)
   // If the status is not 200 an error occured return an empty string
   if (resp->status != 200)
   {
-    debug::log(debug::LOG_LEVEL::ERRORS,"Zotero api request error received status %d\n",resp->status);
+    debug::log(debug::LOG_ERROR,"Zotero api request error received status ",resp->status,"\n");
     return "";
   }
 
@@ -37,7 +37,7 @@ std::string Connection::SendRequest(std::string uri)
   if (resp->has_header("Backoff"))
   {
     auto seconds = resp->get_header_value("Backoff");
-    debug::log(debug::LOG_LEVEL::DEBUG,"Zotero api backoff for %s seconds.\n",seconds.c_str());
+    debug::log(debug::LOG_DEBUG,"Zotero api backoff for ",seconds.c_str()," seconds.\n");
     std::this_thread::sleep_for(std::chrono::seconds(std::stoi(seconds.c_str())));
   }
   
@@ -46,7 +46,7 @@ std::string Connection::SendRequest(std::string uri)
   if (resp->has_header("Retry-After"))
   {
     auto seconds = resp->get_header_value("Retry-After");
-    debug::log(debug::LOG_LEVEL::DEBUG,"Zotero api retry after for %s seconds.\n",seconds.c_str());
+    debug::log(debug::LOG_DEBUG,"Zotero api retry after for ",seconds.c_str()," seconds.\n");
     std::this_thread::sleep_for(std::chrono::seconds(std::stoi(seconds.c_str())));
   }
 
@@ -57,7 +57,7 @@ std::string Connection::SendRequest(std::string uri)
     // If we have the same error again stop trying and return an empty string
     if(retry.find("An error occurred")!=std::string::npos)
     {
-      debug::log(debug::LOG_LEVEL::WARNING,"Received multiple times An error occured from zotero api!\n");
+      debug::log(debug::LOG_WARNING,"Received multiple times An error occured from zotero api!\n");
       return "";
     }
 

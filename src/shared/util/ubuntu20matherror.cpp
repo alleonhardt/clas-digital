@@ -1,5 +1,10 @@
 //This is a workaround for a ubuntu 20.0 math error
 #include <math.h>
+#include "debug/debug.hpp"
+#include <cstdarg>
+#include <bit>
+
+
 
 extern "C"
 {
@@ -30,7 +35,20 @@ double __remainder_finite(double x, double y) { return remainder(x,y); }
 float __remainderf_finite(float x, double y)  { return remainderf(x,y); }
 #ifdef __linux__
 #include <fcntl.h>
-__asm__("fcntl64: jmp fcntl");
-__asm__(".global fcntl64");
+
+int fcntl64(int fd, int cmd,...)
+{
+  
+  debug::log(debug::LOG_DEBUG,DBG_EXT_LOG,"Using wrapper for fcntl64 for old glibc versions, this is extremely dangerous!\n");
+  if(cmd == F_GETFD || cmd == F_GET_SEALS || cmd == F_GETPIPE_SZ || cmd == F_GETLEASE
+      || cmd == F_GETSIG || cmd == F_GETOWN || cmd == F_GETFL)
+    return fcntl(fd,cmd);
+
+  va_list argptr;
+  va_start(argptr,cmd);
+  int ret = fcntl(fd,cmd,va_arg(argptr,void*));
+  va_end(argptr);
+  return ret;
+}
 #endif
 }

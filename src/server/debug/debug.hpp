@@ -4,103 +4,67 @@
 
 
 #include <iostream>
-#include <cstdio>
+#include <filesystem>
 #include <termcolor/termcolor.hpp>
 
 namespace debug
 {
 	static inline volatile bool gGlobalShutdown = false;
+  
+
+  static inline int gLogLevel = 0;
  
-
-  enum class LOG_LEVEL 
+  class LogLevel
   {
-    ALL = 0,
-    DEBUG = 1,
-    WARNING = 2,
-    ERRORS = 4,
-    NONE = 8
+    public:
+      LogLevel(int value, const char *tag, decltype(termcolor::red) color) : level_(value), tag_(tag),color_(color)
+      {
+      }
+
+      bool IsActive()
+      {
+        return level_ >= gLogLevel;
+      }
+      friend std::ostream& operator<<(std::ostream& os, const LogLevel &lvl);
+
+    private:
+      int level_;
+      const char *tag_;
+      std::ostream& (*color_)(std::ostream&);
   };
 
-  static inline LOG_LEVEL gLogLevel = LOG_LEVEL::ALL;
-
-  enum class ExitType
+  inline std::ostream& operator<<(std::ostream& os, const LogLevel &lvl)
   {
-    OK = 0,
-    FAILURE = -1
-  };
-
-  template<typename ...variadic>
-  void print_exit(ExitType tp,variadic ...args)
-  {
-    printf(args...);
-    std::exit((int)tp);
+    
+    return os<<lvl.color_<<lvl.tag_;
   }
 
-  template<typename ...variadic>
-  void print_exit(std::ostream& (&val)(std::ostream&), ExitType tp, variadic ...args)
+  static inline LogLevel LOG_ERROR{16,"[ERROR] ",termcolor::red};
+  static inline LogLevel LOG_WARNING{32,"[YELLOW] ",termcolor::yellow};
+  static inline LogLevel LOG_DEBUG{64,"[DEBUG] ",termcolor::blue};
+
+  template<typename T>
+  void log_int(T t1)
   {
-    val(std::cout).flush();
-    print_exit(tp, args...);
-    termcolor::reset(std::cout).flush();
+    std::cout<<t1;
   }
 
-  template<typename ...args>
-  void print(args ...arg)
+  template<typename T, typename ...args>
+  void log_int(T t1, args... arguments)
   {
-    printf(arg...);
-  }
-
-  template<typename ...args>
-  void print(std::ostream& (&val)(std::ostream&),args ...arg)
-  {
-    val(std::cout).flush();
-    print(arg...);
-    termcolor::reset(std::cout).flush();
-  }
-
-  template<typename ...args>
-  void log(args ...arg)
-  {
-    printf(arg...);
-  }
-  
-  template<>
-  inline void print<const char*>(const char *arg)
-  {
-    puts(arg);
-  }
-
-  template<>
-  inline void log<const char*>(const char *arg)
-  {
-    puts(arg);
+    std::cout<<t1;
+    log_int(arguments...);
   }
   
   template<typename ...args>
-  void log(LOG_LEVEL lvl,args ...arg)
+  void log(args... arguments)
   {
-    if((int)lvl >= (int)gLogLevel)
-    {
-      if(lvl == LOG_LEVEL::ERRORS)
-      {
-        termcolor::red(std::cout).flush();
-        printf("[ERROR]: ");
-      }
-      else if(lvl == LOG_LEVEL::WARNING)
-      {
-        termcolor::yellow(std::cout).flush();
-        printf("[WARNING]: ");
-      }
-      else if(lvl == LOG_LEVEL::DEBUG)
-      {
-        termcolor::blue(std::cout).flush();
-        printf("[DEBUG]: ");
-      }
-      print(arg...);
-      termcolor::reset(std::cout).flush();
-    }
+    log_int(arguments...);
+    std::cout<<termcolor::reset;
   }
 }
+#define DBG_FULL_LOG "[",__FILE__,":",__LINE__,"] "
+#define DBG_EXT_LOG "[",std::filesystem::path(__FILE__).filename().string().c_str(),":",__LINE__,"] "
 
 
 
