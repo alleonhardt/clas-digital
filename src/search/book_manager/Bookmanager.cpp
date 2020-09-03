@@ -150,23 +150,14 @@ void CBookManager::writeListofBooksWithBSB() {
 */
 bool CBookManager::initialize()
 {
-  /*
     std::cout << "Starting initializing..." << std::endl;
 
-    //Load directory of all books 
-    DIR *dir_allItems;
-    struct dirent* e_allItems;
-    dir_allItems = opendir("web/books");
-
-    //Check whether files where found
-    if(!dir_allItems)
-        return false;
-    
     std::cout << "extracting books." << std::endl;
     //Go though all books and create book
-    while((e_allItems = readdir(dir_allItems)) != NULL) {
-        if(m_mapBooks.count(e_allItems->d_name) > 0)
-            addBook(e_allItems->d_name);
+    for (const auto& p : std::filesystem::directory_iterator("web/books")) {
+      std::string filename = p.path().stem();
+      if (m_mapBooks.count(filename) > 0)
+        addBook(filename);
     }
 
     std::cout << "Creating map of books." << std::endl;
@@ -179,7 +170,7 @@ bool CBookManager::initialize()
     std::cout << "Map title:   " << m_mapWordsTitle.size() << "\n";
     std::cout << "Map authors: " << m_mapWordsAuthors.size() << "\n";
 
-    writeListofBooksWithBSB();*/
+    writeListofBooksWithBSB();
     return true;
 }
 
