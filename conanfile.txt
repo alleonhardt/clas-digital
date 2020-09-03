@@ -8,8 +8,6 @@ catch2/2.13.0
 termcolor/1.0.1
 sqlite3/3.32.3
 
-[options]
-sqlite3:shared=True
 
 [generators]
 cmake
