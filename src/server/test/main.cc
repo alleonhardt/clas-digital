@@ -1,4 +1,6 @@
 #include <gtest/gtest.h>
+#include "zotero/tests/zotero.cc"
+#include "server/tests/server_test.cc"
 
 
 int main(int argc, char **argv)
