@@ -21,7 +21,8 @@ add_library(clas_server_lib OBJECT src/shared/metadata_handler.cc
   src/server/zotero/zotero.cpp src/server/server/server.cc)
 
 
-set(SRC_FILES_SERVER_TEST src/server/test/main.cc)
+set(SRC_FILES_SERVER_TEST src/server/test/main.cc
+  src/server/server/tests/server_test.cc src/server/zotero/tests/zotero.cc)
 
 add_executable(clas_digital_server.o $<TARGET_OBJECTS:clas_server_lib> src/server/main.cpp)
 add_executable(clas_digital_server_test.o $<TARGET_OBJECTS:clas_server_lib>

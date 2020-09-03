@@ -1,15 +1,15 @@
 #include "server/server.hpp"
-#include <gtest/gtest.h>
+#include <catch2/catch.hpp>
 
 
-TEST(CLASServer, Constructor) {
+TEST_CASE("Constructor", "[CLASServer]") {
   CLASServer &srv = CLASServer::GetInstance();
-  EXPECT_EQ(&srv, &CLASServer::GetInstance());
+  REQUIRE(&srv == &CLASServer::GetInstance());
 }
 
 
-TEST(CLASServer, Start) {
+TEST_CASE("Initialise", "[CLASServer]") {
   CLASServer &srv = CLASServer::GetInstance();
-  EXPECT_EQ(srv.Status(CLASServer::StatusBits::SERVER_STARTED),false);
-  EXPECT_EQ(srv.Status(CLASServer::StatusBits::GLOBAL_SHUTDOWN),false);
+  REQUIRE(srv.Status(CLASServer::StatusBits::SERVER_STARTED) == false);
+  REQUIRE(srv.Status(CLASServer::StatusBits::GLOBAL_SHUTDOWN) == false);
 }

@@ -1,10 +1,3 @@
-#include <gtest/gtest.h>
-#include "zotero/tests/zotero.cc"
-#include "server/tests/server_test.cc"
+#define CATCH_CONFIG_MAIN
+#include <catch2/catch.hpp>
 
-
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}
