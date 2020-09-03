@@ -21,6 +21,7 @@ jobs:
     - name: Install Conan
       shell: bash
       env:
+        CC: gcc-9
         CXX: gcc-9
       run:  |
             mkdir build
@@ -32,6 +33,7 @@ jobs:
     - name: Install Dependencies
       shell: bash
       env:
+        CC: gcc-9
         CXX: gcc-9
       run:  |
             cd build
@@ -42,6 +44,7 @@ jobs:
     - name: Build clas-digital
       shell: bash
       env:
+        CC: gcc-9
         CXX: gcc-9
       run:  |
             cd build
@@ -64,6 +67,7 @@ jobs:
     - name: Install Conan
       shell: bash
       env:
+        CC: clang-9
         CXX: clang-9
       run:  |
             mkdir build
@@ -75,6 +79,7 @@ jobs:
     - name: Install Dependencies
       shell: bash
       env:
+        CC: clang-9
         CXX: clang-9
       run:  |
             cd build
@@ -85,6 +90,7 @@ jobs:
     - name: Build clas-digital
       shell: bash
       env:
+        CC: clang-9
         CXX: clang-9
       run:  |
             cd build
