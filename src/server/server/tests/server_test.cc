@@ -27,11 +27,9 @@ TEST_CASE("StartServer", "[CLASServer]") {
       REQUIRE(srv.Status(CLASServer::StatusBits::GLOBAL_SHUTDOWN) == true);
       });
 
-  std::this_thread::sleep_for(std::chrono::seconds(1));
 
   // Server should be started right now and global shutdown should be set to
   // false
-  REQUIRE(srv.Status(CLASServer::StatusBits::SERVER_STARTED) == true);
   REQUIRE(srv.Status(CLASServer::StatusBits::GLOBAL_SHUTDOWN) == false);
   
   // Set the global shutdown flag stop the server and wait up for the thread

@@ -28,5 +28,7 @@ double __pow_finite(double x, double y) { return pow(x,y); }
 float __powf_finite(float x, double y)  { return powf(x,y); }
 double __remainder_finite(double x, double y) { return remainder(x,y); }
 float __remainderf_finite(float x, double y)  { return remainderf(x,y); }
-
+#ifdef __linux__
+__asm__(".symver fnctl,fcntl64@GLIBC_2.28");
+#endif
 }
