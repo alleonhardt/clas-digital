@@ -1,5 +1,6 @@
 //This is a workaround for a ubuntu 20.0 math error
 #include <math.h>
+
 extern "C"
 {
 double __acos_finite(double x) { return acos(x); }
@@ -27,4 +28,5 @@ double __pow_finite(double x, double y) { return pow(x,y); }
 float __powf_finite(float x, double y)  { return powf(x,y); }
 double __remainder_finite(double x, double y) { return remainder(x,y); }
 float __remainderf_finite(float x, double y)  { return remainderf(x,y); }
+
 }
