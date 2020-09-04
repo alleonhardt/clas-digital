@@ -11,14 +11,14 @@ namespace debug
 {
   enum class LogLevel
   {
-    ALWAYS = 0,
-    ERROR = 1,
-    WARNING = 2,
-    DEBUG = 3,
-    NONE = 4
+    DBG_ALWAYS = 0,
+    DBG_ERROR = 1,
+    DBG_WARNING = 2,
+    DBG_DEBUG = 3,
+    DBG_NONE = 4
   };
   
-  static inline LogLevel gLogLevel = LogLevel::ALWAYS;
+  static inline LogLevel gLogLevel = LogLevel::DBG_ALWAYS;
  
   class LogClass
   {
@@ -45,9 +45,9 @@ namespace debug
     return os<<lvl.color_<<lvl.tag_;
   }
 
-  static inline LogClass LOG_ERROR{LogLevel::ERROR,"[ERROR] ",termcolor::red};
-  static inline LogClass LOG_WARNING{LogLevel::WARNING,"[WARNING] ",termcolor::yellow};
-  static inline LogClass LOG_DEBUG{LogLevel::DEBUG,"[DEBUG] ",termcolor::blue};
+  static inline LogClass LOG_ERROR{LogLevel::DBG_ERROR,"[ERROR] ",termcolor::red};
+  static inline LogClass LOG_WARNING{LogLevel::DBG_WARNING,"[WARNING] ",termcolor::yellow};
+  static inline LogClass LOG_DEBUG{LogLevel::DBG_DEBUG,"[DEBUG] ",termcolor::blue};
 
   template<typename T>
   void log_int(T t1)
