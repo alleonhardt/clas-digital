@@ -39,7 +39,7 @@ float __remainderf_finite(float x, double y)  { return remainderf(x,y); }
 int fcntl64(int fd, int cmd,...)
 {
   
-  debug::log(debug::LogClass(debug::LogLevel::DBG_ALWAYS,"[TODO] ",termcolor::magenta),DBG_EXT_LOG,"Providing fcntl64 wrapper, this is dangerous pls fix!\n");
+  debug::log(debug::LogClass(debug::LogLevel::DBG_TODO,"[TODO] ",termcolor::magenta),DBG_EXT_LOG,"Providing fcntl64 wrapper, this is dangerous pls fix!\n");
   if(cmd == F_GETFD || cmd == F_GET_SEALS || cmd == F_GETPIPE_SZ || cmd == F_GETLEASE
       || cmd == F_GETSIG || cmd == F_GETOWN || cmd == F_GETFL)
     return fcntl(fd,cmd);

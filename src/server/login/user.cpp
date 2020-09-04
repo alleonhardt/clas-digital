@@ -62,7 +62,7 @@ UserTable::ReturnCodes UserTable::AddUser(std::string email, std::string passwor
   sqlite3_stmt *stmt = nullptr;
   int err = sqlite3_prepare_v2(user_database_,create_command,-1,&stmt,0);
   if( err != SQLITE_OK ) {
-    debug::log(debug::LOG_ERROR,"Could not prepare SQL statment.\n");
+    debug::log(debug::LOG_WARNING,"Could not prepare SQL statment.\n");
     sqlite3_finalize(stmt);
     return ReturnCodes::UNKNOWN_ERROR;
   }
@@ -74,10 +74,37 @@ UserTable::ReturnCodes UserTable::AddUser(std::string email, std::string passwor
 
   err = sqlite3_step(stmt);
   if(err != SQLITE_DONE ) {
-    debug::log(debug::LOG_ERROR,"Could not prepare execute SQL Statement to insert user!\n");
+    debug::log(debug::LOG_WARNING,"Could not execute SQL Statement to insert user!\n");
     sqlite3_finalize(stmt);
     return ReturnCodes::USER_EXISTS;
   }
+
+  debug::log(debug::LOG_DEBUG, "Added new user \"",email,"\" with access \"",(int)acc,"\".\n");
+
+  sqlite3_finalize(stmt);
+  return ReturnCodes::OK;
+}
+
+UserTable::ReturnCodes UserTable::RemoveUser(std::string email)
+{
+  const char create_command[] = "DELETE FROM USERS WHERE EMAIL=?";
+
+  sqlite3_stmt *stmt = nullptr;
+  int err = sqlite3_prepare_v2(user_database_,create_command,-1,&stmt,0);
+  if( err != SQLITE_OK ) {
+    debug::log(debug::LOG_WARNING,"Could not prepare SQL statment.\n");
+    sqlite3_finalize(stmt);
+    return ReturnCodes::UNKNOWN_ERROR;
+  }
+
+  sqlite3_bind_text(stmt, 1, email.c_str(), -1,nullptr);
+  err = sqlite3_step(stmt);
+  if(err != SQLITE_DONE ) {
+    debug::log(debug::LOG_WARNING,"Could not remove user \"",email,"\".\n");
+    sqlite3_finalize(stmt);
+    return ReturnCodes::UNKNOWN_ERROR;
+  }
+  debug::log(debug::LOG_DEBUG, "Removed user \"",email,"\".\n");
 
   sqlite3_finalize(stmt);
   return ReturnCodes::OK;

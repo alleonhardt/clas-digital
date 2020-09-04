@@ -23,8 +23,11 @@ class UserTable
     };
 
     UserTable();
+    
     ReturnCodes Load(std::filesystem::path database_path);
     ReturnCodes AddUser(std::string email, std::string password, std::string name, UserAccess acc);
+    ReturnCodes RemoveUser(std::string email);
+
     ~UserTable();
 
   private:

@@ -15,10 +15,10 @@ namespace debug
     DBG_ERROR = 1,
     DBG_WARNING = 2,
     DBG_DEBUG = 3,
-    DBG_NONE = 4
+    DBG_TODO = 4
   };
   
-  static inline LogLevel gLogLevel = LogLevel::DBG_ALWAYS;
+  static inline LogLevel gLogLevel = LogLevel::DBG_DEBUG;
  
   class LogClass
   {
@@ -29,7 +29,7 @@ namespace debug
 
       bool IsActive()
       {
-        return (int)level_ >= (int)gLogLevel;
+        return (int)level_ <= (int)gLogLevel;
       }
       friend std::ostream& operator<<(std::ostream& os, const LogClass &lvl);
 
@@ -55,13 +55,23 @@ namespace debug
     std::cout<<t1;
   }
 
+
   template<typename T, typename ...args>
   void log_int(T t1, args... arguments)
   {
     std::cout<<t1;
     log_int(arguments...);
   }
-  
+ 
+  template<typename ...args>
+  void log_int(LogClass lvl, args... arguments)
+  {
+    if(!lvl.IsActive())
+      return;
+    std::cout<<lvl;
+    log_int(arguments...);
+  }
+
   template<typename ...args>
   void log(args... arguments)
   {
