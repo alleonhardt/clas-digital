@@ -14,6 +14,9 @@ TEST_CASE("Creating Usertable and inserting values","[UserTable]") {
     REQUIRE( tbl.AddUser("alex","pw","Alexander Leonhardt",UserAccess::ADMIN) == UserTable::ReturnCodes::OK);
 
     REQUIRE( tbl.AddUser("alex","pwas","Alexander Leonhardtasd",UserAccess::READ) == UserTable::ReturnCodes::USER_EXISTS);
+
+
+    REQUIRE( tbl.RemoveUser("alex") == UserTable::ReturnCodes::OK);
   }
 
   std::filesystem::remove("users.db",ec);

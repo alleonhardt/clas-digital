@@ -1,5 +1,5 @@
 # clas-digital
-[![GitHub Actions Build status](https://github.com/ShadowItaly/clas-digital/workflows/build/badge.svg)](https://github.com/ShadowItaly/clas-digital/actions "GitHhub Actions Build status")
+[![GitHub Actions Build status](https://github.com/ShadowItaly/clas-digital/workflows/CMake/badge.svg)](https://github.com/ShadowItaly/clas-digital/actions "GitHhub Actions Build status")
 
 A C++ implementation of a webserver providing a login/search/upload implementation to catalogue and categorize texts.
 
