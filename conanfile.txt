@@ -6,7 +6,7 @@ nlohmann_json/3.9.1
 stb/20200203 
 catch2/2.13.0
 termcolor/1.0.1
-sqlite3/3.32.3
+sqlitecpp/2.5.0
 
 
 [generators]

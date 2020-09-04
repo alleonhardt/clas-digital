@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <filesystem>
+#include <functional>
 #include <termcolor/termcolor.hpp>
 
 namespace debug
@@ -78,7 +79,24 @@ namespace debug
     log_int(arguments...);
     std::cout<<termcolor::reset;
   }
+
+  class CleanupDtor
+  {
+    public:
+      CleanupDtor(std::function<void()> &&fnc)
+      {
+        func_ = fnc;
+      }
+
+      ~CleanupDtor()
+      {
+        func_();
+      }
+    private:
+      std::function<void()> func_;
+  };
 }
+
 #define DBG_FULL_LOG "[",__FILE__,":",__LINE__,"] "
 #define DBG_EXT_LOG "(",std::filesystem::path(__FILE__).filename().string().c_str(),":",__LINE__,") "
 
