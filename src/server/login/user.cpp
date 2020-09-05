@@ -160,7 +160,7 @@ std::string UserTable::LogIn(std::string email, std::string password)
     insert_cmd.bind(1,email.c_str());
     insert_cmd.bind(2,sha3_512(password).c_str());
     insert_cmd.executeStep();
-    User us(insert_cmd.getColumn(0).getString(),(UserAccess)insert_cmd.getColumn(1).getInt());
+    User us(insert_cmd.getColumn(0),(UserAccess)insert_cmd.getColumn(1).getInt());
     std::string cookie = CreateRandomString(32);
     logged_in_.insert({cookie, us});
     return cookie;
