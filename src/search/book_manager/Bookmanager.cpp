@@ -155,7 +155,7 @@ bool CBookManager::initialize()
     std::cout << "extracting books." << std::endl;
     //Go though all books and create book
     for (const auto& p : std::filesystem::directory_iterator("web/books")) {
-      std::string filename = p.path().stem();
+      std::string filename = p.path().stem().string();
       if (m_mapBooks.count(filename) > 0)
         addBook(filename);
     }
