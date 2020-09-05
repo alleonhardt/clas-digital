@@ -13,6 +13,12 @@ CLASServer &CLASServer::GetInstance()
 void CLASServer::Start(std::string listenAddress, int startPort)
 {
   Status(StatusBits::SERVER_STARTED,true);
+  
+  server_.Post(("/api/v2/server/login",&do_login);
+  server_.Get("/api/v2/server/get_userlist",&do_senduserlist);
+  server_.Post("/api/v2/server/update_userlist",&do_usertableupdate);
+
+
   server_.listen(listenAddress.c_str(),startPort);
 }
 
