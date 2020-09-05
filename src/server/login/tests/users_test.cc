@@ -77,7 +77,6 @@ TEST_CASE("Check UserTable to json","[UserTable]") {
     REQUIRE( js.size() == tbl.GetNumUsers());
     bool root_exists = false;
     for(auto &i : js) {
-      std::cout<<i.dump()<<std::endl;
       if(i["email"].get<std::string>() == "root") {
         root_exists = true;
         break;
