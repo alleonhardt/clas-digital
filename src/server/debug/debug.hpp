@@ -19,7 +19,7 @@ namespace debug
     DBG_TODO = 4
   };
   
-  static inline LogLevel gLogLevel = LogLevel::DBG_DEBUG;
+  static inline LogLevel gLogLevel = LogLevel::DBG_ALWAYS;
  
   class LogClass
   {

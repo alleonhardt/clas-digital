@@ -5,6 +5,7 @@
 #include <queue>
 #include <thread>
 #include <mutex>
+#include <map>
 #include <condition_variable>
 #include <filesystem>
 
@@ -15,39 +16,17 @@ enum class UserAccess
   ADMIN = 4
 };
 
-template <typename T>
-class ThreadSafeQueue
+class User
 {
- public:
- 
-  T pop()
-  {
-    std::unique_lock<std::mutex> mlock(mutex_);
-    while (queue_.empty())
-    {
-      cond_.wait(mlock);
-    }
-    auto item = queue_.front();
-    queue_.pop();
-    return item;
-  }
- 
-  void push(const T item)
-  {
-    std::unique_lock<std::mutex> mlock(mutex_);
-    queue_.push(item);
-    mlock.unlock();
-    cond_.notify_one();
-  }
- 
- 
- private:
-  std::queue<T> queue_;
-  std::mutex mutex_;
-  std::condition_variable cond_;
+  public:
+    User(std::string email, UserAccess acc);
+    std::string Email();
+    UserAccess Access();
+
+  private:
+    std::string email_;
+    UserAccess access_;
 };
-
-
 
 class UserTable
 {
@@ -62,13 +41,20 @@ class UserTable
     ReturnCodes Load(std::filesystem::path database_path);
     ReturnCodes AddUser(std::string email, std::string password, std::string name, UserAccess acc);
     ReturnCodes RemoveUser(std::string email);
+    
+    std::string LogIn(std::string email, std::string password);
+    User *GetUserFromCookie(const std::string &cookie);
+    void RemoveCookie(const std::string &cookie);
+    int GetNumUsers();
 
     ~UserTable();
     UserTable();
 
   private:
-    ThreadSafeQueue<SQLite::Database*> connections_;
-    bool initialised_;
+    SQLite::Database* connection_;
+    std::mutex class_lock_;
+    
+    std::map<std::string, User> logged_in_;
 };
 
 #endif
