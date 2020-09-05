@@ -4,7 +4,6 @@
 #include "debug/debug.hpp"
 
 
-
 CLASServer &CLASServer::GetInstance()
 {
   static CLASServer server;
@@ -37,6 +36,38 @@ void CLASServer::SendUserList(const httplib::Request &req, httplib::Response &re
     resp.set_content(users_.GetAsJSON().dump(),"application/json");
 }
 
+void CLASServer::UpdateUserList(const httplib::Request &req, httplib::Response &resp)
+{
+  const User *usr = GetUserFromCookie(req.get_header_value("Cookie"));
+  if(!usr || usr->Access() != UserAccess::ADMIN)
+    resp.status = 403;
+  else
+  {
+    try
+    {
+      auto js = nlohmann::json::parse(req.body);
+      for(auto &it : js)
+      {
+        if(it["action"]=="DELETE")
+	      {
+		      //Remove the user if the action is delete if one of the necessary variables does not exist then throw an error and return an error not found
+          users_.RemoveUser(it["email"]);
+	      }
+	      else if(it["action"]=="CREATE")
+	      {
+		      //Create the user with the specified email password and access
+          users_.AddUser(it["email"], it["password"], "Unknown", it["access"]);
+	      }
+      }
+    }
+    catch(...)
+    {
+      resp.status = 400;
+    }
+  }
+}
+
+
 const User *CLASServer::GetUserFromCookie(const std::string &cookie_ptr)
 {
   if(cookie_ptr=="") return nullptr;
@@ -67,7 +98,7 @@ CLASServer::ReturnCodes CLASServer::Start(std::string listenAddress, int startPo
 
   server_.Get("/api/v2/server/userlist",[this](const httplib::Request &req, httplib::Response &resp){this->SendUserList(req,resp);});
 
-  //  server_.Post("/api/v2/server/userlist",&do_usertableupdate);
+  server_.Post("/api/v2/server/userlist",[this](const httplib::Request &req, httplib::Response &resp){this->UpdateUserList(req,resp);});
 
 
   int port_binding_tries = 0;
