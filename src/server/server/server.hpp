@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <mutex>
 #include <bitset>
+#include "login/user.hpp"
 
 class CLASServer
 {
@@ -35,11 +36,15 @@ class CLASServer
     bool Status(StatusBits bit);
 
 
+    void HandleLogin(const httplib::Request& req, httplib::Response &resp);
+
+
   private:
     httplib::Server server_;
     int startPort_;
     std::bitset<32> status_;
     std::mutex exclusive_section_;
+    UserTable users_;
 
     CLASServer();
 };
