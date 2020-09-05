@@ -6,10 +6,16 @@
 #include <algorithm>
 #include <mutex>
 #include <bitset>
+#include "login/user.hpp"
 
 class CLASServer
 {
   public:
+    enum class ReturnCodes {
+      OK = 0,
+      ERR_USERTABLE_INITIALISE = 1,
+      ERR_PORT_BINDING = 2
+    };
     static CLASServer &GetInstance();
 
     
@@ -21,7 +27,7 @@ class CLASServer
      * local "localhost" for only local connections
      * @param startPort The port to start the server on
      */
-    void Start(std::string listenAddress, int startPort);
+    ReturnCodes Start(std::string listenAddress, int startPort);
     void Stop();
     
 
@@ -35,11 +41,18 @@ class CLASServer
     bool Status(StatusBits bit);
 
 
+    void HandleLogin(const httplib::Request& req, httplib::Response &resp);
+    void SendUserList(const httplib::Request& req, httplib::Response &resp);
+    const User *GetUserFromCookie(const std::string &cookie);
+
+
+
   private:
     httplib::Server server_;
     int startPort_;
     std::bitset<32> status_;
     std::mutex exclusive_section_;
+    UserTable users_;
 
     CLASServer();
 };

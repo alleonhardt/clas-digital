@@ -1,64 +1,223 @@
 #include "user.hpp"
 #include <debug/debug.hpp>
-
-UserTable::UserTable() {
-
-  user_database_ = nullptr;
-
-}
-
-bool UserTable::Load(std::filesystem::path database_path) {
-
-  bool new_database_exists = std::filesystem::exists(database_path);
-  int err = sqlite3_open(database_path.string().c_str(),&user_database_);
-  char *gErrorMessage = nullptr;
-
-  if (err) {
-    debug::log(debug::LOG_ERROR,"Could not open user table database! Error string ",sqlite3_errmsg(user_database_),"\n");
-    return false;
-  }
-
-  if(!new_database_exists) {
-    debug::log(debug::LOG_WARNING,"Could not open user table database at ",database_path.string().c_str(),", creating new one!\n");
+#include <sstream>
+#include <openssl/evp.h>
+#include <openssl/sha.h>
+#include <random>
 
 
-    const char create_user_table_command[] = "CREATE TABLE USERS("
-                                              "EMAIL CHAR(60) PRIMARY KEY NOT NULL,"
-                                              "PASSWORD CHAR(64) NOT NULL,"
-                                              "NAME CHAR(60) NOT NULL,"
-                                              "ACCESS INT);";
 
-    err = sqlite3_exec(user_database_, create_user_table_command, nullptr, 0, &gErrorMessage);
-   
-   if ( err != SQLITE_OK ) {
-     debug::log(debug::LOG_ERROR,"Could not create table users! Error string ",gErrorMessage,"\n");
-      sqlite3_free(gErrorMessage);
-      return false;
-   }
+std::string sha3_512(const std::string& input)
+{
+    unsigned int digest_length = SHA512_DIGEST_LENGTH;
+    const EVP_MD* algorithm = EVP_sha3_512();
+    uint8_t* digest = static_cast<uint8_t*>(OPENSSL_malloc(digest_length));
+    debug::CleanupDtor dtor([digest](){OPENSSL_free(digest);});
+
+
+    EVP_MD_CTX* context = EVP_MD_CTX_new();
+    EVP_DigestInit_ex(context, algorithm, nullptr);
+    EVP_DigestUpdate(context, input.c_str(), input.size());
+    EVP_DigestFinal_ex(context, digest, &digest_length);
+    EVP_MD_CTX_destroy(context);
     
-   debug::log(debug::LOG_DEBUG,"Successfully created the table users in the database\n");
+    std::stringstream stream;
 
+    for(auto b : std::vector<uint8_t>(digest,digest+digest_length))
+      stream << std::setw(2) << std::hex << std::setfill('0') << b;
 
-   const char create_root_command[] = "INSERT INTO USERS(EMAIL,PASSWORD,NAME,ACCESS) "
-                                      "VALUES ('root','password','Admin',7);";
-  
-   err = sqlite3_exec(user_database_, create_root_command, nullptr, 0, &gErrorMessage);
-   
-   if ( err != SQLITE_OK ) {
-     debug::log(debug::LOG_ERROR,"Could not create root user! Error string ",gErrorMessage,"\n");
-      sqlite3_free(gErrorMessage);
-      return false;
-   }
-  
-   debug::log(debug::LOG_DEBUG,"Successfully created the root user.\n");
-  }
-   return true;
+    return stream.str();
 }
+
+std::string CreateRandomString(int len) {
+  std::string str;
+	static const char alphanum[] =
+		"0123456789"
+		"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		"abcdefghijklmnopqrstuvwxyz"
+		"_";
+  std::random_device dev;
+  //Create random alphanumeric cookie
+  for(int i = 0; i < len; i++)
+    str += alphanum[dev()%(sizeof(alphanum)-1)];
+  return str;
+}
+
+
+User::User(std::string email, UserAccess acc) : email_(email),access_(acc) {}
+
+const std::string &User::Email() const {
+  return email_;
+}
+
+UserAccess User::Access() const {
+  return access_;
+}
+
+
+
+
+UserTable::UserTable() : connection_(nullptr) {}
+
+UserTable::ReturnCodes UserTable::Load() {
+  return Load(":memory:");
+}
+
+UserTable::ReturnCodes UserTable::Load(std::filesystem::path database_path) {
+  try {
+    std::lock_guard lck(class_lock_);
+    debug::log(debug::LOG_DEBUG, "Opening database at path: ",database_path.string(),"\n");
+    connection_ = new SQLite::Database(database_path.string().c_str(),SQLite::OPEN_READWRITE|SQLite::OPEN_CREATE);
+    SQLite::Statement query(*connection_,"SELECT name FROM sqlite_master WHERE type='table' AND name='users';");
+    bool exists = false;
+    while(query.executeStep()) {
+      exists = true;
+    }
+
+    if(!exists) {
+      SQLite::Transaction act(*connection_);
+      connection_->exec( "CREATE TABLE users("
+                  "email TEXT PRIMARY KEY NOT NULL,"
+                  "password TEXT NOT NULL,"
+                  "name TEXT NOT NULL,"
+                  "access INT);");
+
+      std::string cmd = "INSERT INTO USERS(email,password,name,access) VALUES ('root','";
+      cmd+=sha3_512("password");
+      cmd+="','Admin',4);";
+
+      connection_->exec(cmd.c_str());
+
+      act.commit();
+      debug::log(debug::LOG_DEBUG, "Created the table users and the root user.\n");
+    }
+    
+  }
+  catch(SQLite::Exception &e) {
+    debug::log(debug::LOG_ERROR,"Caught exception in ",__FUNCTION__," error \"",e.getErrorStr(),"\"\n");
+    return ReturnCodes::UNKNOWN_ERROR;
+  }
+  return ReturnCodes::OK;
+}
+
+UserTable::ReturnCodes UserTable::AddUser(std::string email, std::string password, std::string name, UserAccess acc) {
+  try {
+    std::lock_guard lck(class_lock_);
+    SQLite::Statement insert_cmd(*connection_, "INSERT INTO users(email,password,name,access) "
+                                  "VALUES (?,?,?,?);");
+    insert_cmd.bind(1,email.c_str());
+    insert_cmd.bind(2,sha3_512(password).c_str());
+    insert_cmd.bind(3,name.c_str());
+    insert_cmd.bind(4,(int)acc);
+    insert_cmd.exec();
+    debug::log(debug::LOG_DEBUG,"Added new user \"",email,"\" with access \"",(int)acc,"\"\n");
+  }
+  catch(SQLite::Exception &e) {
+    debug::log(debug::LOG_ERROR,"Could not add user \"",email,"\" to table users. Error string: \"",e.getErrorStr(),"\"\n");
+    
+    if(e.getExtendedErrorCode() == SQLITE_CONSTRAINT_PRIMARYKEY)
+      return ReturnCodes::USER_EXISTS;
+
+    return ReturnCodes::UNKNOWN_ERROR;
+  }
+  return ReturnCodes::OK;
+}
+
+UserTable::ReturnCodes UserTable::RemoveUser(std::string email)
+{
+  try {
+    std::lock_guard lck(class_lock_);
+    SQLite::Statement insert_cmd(*connection_, "DELETE FROM users WHERE email=?;");
+
+    insert_cmd.bind(1,email.c_str());
+    insert_cmd.exec();
+    debug::log(debug::LOG_DEBUG,"Removed new user \"",email,"\"\n");
+  }
+  catch(SQLite::Exception &e) {
+
+    debug::log(debug::LOG_ERROR,"Could not remove user \"",email,"\" from table users. Error string: \"",e.getErrorStr(),"\"\n");
+    return ReturnCodes::UNKNOWN_ERROR;
+  }
+  return ReturnCodes::OK;
+}
+
+
+int UserTable::GetNumUsers() {
+  try {
+    std::lock_guard lck(class_lock_);
+    SQLite::Statement st(*connection_,"SELECT COUNT(*) FROM users;");
+    
+    st.executeStep();
+    return st.getColumn(0).getInt();
+  }
+  catch(SQLite::Exception &e) {
+    debug::log(debug::LOG_ERROR,"Could not get number of users! Error string: \"",e.getErrorStr(),"\"\n");
+  }
+
+  return -1;
+}
+
+std::string UserTable::LogIn(std::string email, std::string password)
+{
+  try {
+    std::lock_guard lck(class_lock_);
+    SQLite::Statement insert_cmd(*connection_, "SELECT email,access FROM users WHERE email=? AND password=?");
+    insert_cmd.bind(1,email.c_str());
+    insert_cmd.bind(2,sha3_512(password).c_str());
+    insert_cmd.executeStep();
+    User us(insert_cmd.getColumn(0).getText(),(UserAccess)insert_cmd.getColumn(1).getInt());
+    std::string cookie = CreateRandomString(32);
+    logged_in_.insert({cookie, us});
+    return cookie;
+  }
+  catch(SQLite::Exception &e) { }
+  return "";
+}
+
+User *UserTable::GetUserFromCookie(const std::string &cookie) {
+  try {
+    std::lock_guard lck(class_lock_);
+    return &logged_in_.at(cookie);
+  }
+  catch(...) { }
+  return nullptr;
+}
+
+nlohmann::json UserTable::GetAsJSON() {
+  try {
+    std::lock_guard lck(class_lock_);
+    SQLite::Statement query_cmd(*connection_, "SELECT email,access FROM users;");
+    nlohmann::json js;
+    while(query_cmd.executeStep())
+    {
+      nlohmann::json entry;
+      entry["email"] = query_cmd.getColumn(0).getText();
+      entry["access"] = query_cmd.getColumn(1).getInt();
+      js.push_back(entry);
+    }
+
+    return js;
+  }
+  catch(...) {
+    return nlohmann::json::array();
+  }
+}
+
+
+void UserTable::RemoveCookie(const std::string &cookie) {
+ try {
+    std::lock_guard lck(class_lock_);
+    if(logged_in_.size() == 1)
+      logged_in_.clear();
+    else
+      logged_in_.erase(cookie);
+  }
+  catch(...) { }
+}
+
 
 UserTable::~UserTable() {
-  if(user_database_)
-  {
-    sqlite3_close(user_database_);
-    user_database_ = nullptr;
-  }
+  std::lock_guard lck(class_lock_);
+  if(connection_)
+    delete connection_;
 }
