@@ -39,7 +39,7 @@ std::string CreateRandomString(int len) {
   std::random_device dev;
   //Create random alphanumeric cookie
   for(int i = 0; i < len; i++)
-    str += alphanum[dev()%sizeof(alphanum)];
+    str += alphanum[dev()%(sizeof(alphanum)-1)];
   return str;
 }
 
@@ -59,9 +59,14 @@ UserAccess User::Access() {
 
 UserTable::UserTable() : connection_(nullptr) {}
 
+UserTable::ReturnCodes UserTable::Load() {
+  return Load(":memory:");
+}
+
 UserTable::ReturnCodes UserTable::Load(std::filesystem::path database_path) {
   try {
     std::lock_guard lck(class_lock_);
+    debug::log(debug::LOG_DEBUG, "Opening database at path: ",database_path.string(),"\n");
     connection_ = new SQLite::Database(database_path.string().c_str(),SQLite::OPEN_READWRITE|SQLite::OPEN_CREATE);
     SQLite::Statement query(*connection_,"SELECT name FROM sqlite_master WHERE type='table' AND name='users';");
     bool exists = false;

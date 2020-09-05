@@ -1,6 +1,8 @@
 #include "server.hpp"
 #include <mutex>
 #include "util/URLParser.hpp"
+#include "debug/debug.hpp"
+
 
 
 
@@ -22,8 +24,8 @@ void CLASServer::HandleLogin(const httplib::Request &req, httplib::Response &res
   else {
     std::string set_cookie = "SESSID=" + cookie;
     set_cookie += "; SECURE";
-    resp.set_header("Set-Cookie", set_cookie.c_str());
     resp.status = 200;
+    resp.set_header("Set-Cookie", std::move(set_cookie));
   }
 }
 
@@ -31,15 +33,14 @@ void CLASServer::HandleLogin(const httplib::Request &req, httplib::Response &res
 void CLASServer::Start(std::string listenAddress, int startPort)
 {
   Status(StatusBits::SERVER_STARTED,true);
-  httplib::Server::Handler handler = std::bind(&CLASServer::HandleLogin, this, std::placeholders::_1,std::placeholders::_2); 
-  server_.Post("/api/v2/server/login",std::move(handler));
+  server_.Post("/api/v2/server/login",[this](const httplib::Request &req, httplib::Response &resp){this->HandleLogin(req, resp);});
 
 
 //  server_.Get("/api/v2/server/get_userlist",&do_senduserlist);
 //  server_.Post("/api/v2/server/update_userlist",&do_usertableupdate);
 
 
-  server_.listen(listenAddress.c_str(),startPort);
+  while(!server_.listen(listenAddress.c_str(),startPort)){}
 }
 
 
@@ -66,5 +67,8 @@ CLASServer::CLASServer()
 {
   status_.reset();
   startPort_ = 1409;
-  users_.Load("users.db");
+  if(users_.Load() != UserTable::ReturnCodes::OK) {
+    debug::log(debug::LOG_ERROR,"Could not create user table in RAM!\n");
+    std::exit(-1);
+  }
 }

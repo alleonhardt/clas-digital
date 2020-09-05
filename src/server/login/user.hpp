@@ -38,6 +38,7 @@ class UserTable
       UNKNOWN_ERROR = 3,
     };
 
+    ReturnCodes Load();
     ReturnCodes Load(std::filesystem::path database_path);
     ReturnCodes AddUser(std::string email, std::string password, std::string name, UserAccess acc);
     ReturnCodes RemoveUser(std::string email);

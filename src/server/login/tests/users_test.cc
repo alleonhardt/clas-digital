@@ -3,11 +3,8 @@
 #include <debug/debug.hpp>
 
 TEST_CASE("Creating Usertable and inserting values","[UserTable]") {
-  std::error_code ec;
-  std::filesystem::remove("users.db",ec);
-  {
     UserTable tbl;
-    REQUIRE(tbl.Load("users.db") == UserTable::ReturnCodes::OK);
+    REQUIRE(tbl.Load() == UserTable::ReturnCodes::OK);
     //Let the destructor run to write changes on disk!
     //
     
@@ -20,18 +17,12 @@ TEST_CASE("Creating Usertable and inserting values","[UserTable]") {
     REQUIRE( tbl.AddUser("alex","pwas","Alexander Leonhardtasd",UserAccess::READ) == UserTable::ReturnCodes::OK);
 
     REQUIRE( tbl.GetNumUsers() == 2 );
-  }
 }
 
 
 TEST_CASE("Threading user table test","[UserTable]") {
-  debug::gLogLevel = debug::LogLevel::DBG_ALWAYS;
-  std::error_code ec;
-  std::filesystem::remove("users2.db",ec);
-
-  {
     UserTable tbl;
-    REQUIRE(tbl.Load("users2.db") == UserTable::ReturnCodes::OK);
+    REQUIRE(tbl.Load() == UserTable::ReturnCodes::OK);
     //Let the destructor run to write changes on disk!
     
     std::thread t1([&tbl](){
@@ -54,17 +45,11 @@ TEST_CASE("Threading user table test","[UserTable]") {
     t3.join();
 
     REQUIRE( tbl.GetNumUsers() == 1501 ); 
-  }
 }
 
 TEST_CASE("Check root user","[UserTable]") {
-  debug::gLogLevel = debug::LogLevel::DBG_ALWAYS;
-  std::error_code ec;
-  std::filesystem::remove("users3.db",ec);
-
-  {
     UserTable tbl;
-    REQUIRE(tbl.Load("users3.db") == UserTable::ReturnCodes::OK);
+    REQUIRE(tbl.Load() == UserTable::ReturnCodes::OK);
     //Let the destructor run to write changes on disk!
     
     REQUIRE( tbl.GetNumUsers() == 1);
@@ -78,5 +63,4 @@ TEST_CASE("Check root user","[UserTable]") {
     REQUIRE(usr != nullptr);
     REQUIRE(usr->Email() == "root");
     REQUIRE(usr->Access() == UserAccess::ADMIN); 
-  }
 }
