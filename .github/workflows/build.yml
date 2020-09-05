@@ -85,7 +85,7 @@ jobs:
             cd build
             export PATH=$PATH:/home/runner/.local/bin
             conan config init
-            conan install .. --build=missing
+            conan install .. --build=missing --build sqlitecpp
 
     - name: Build clas-digital
       shell: bash
