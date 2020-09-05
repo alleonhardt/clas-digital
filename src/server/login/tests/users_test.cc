@@ -64,3 +64,25 @@ TEST_CASE("Check root user","[UserTable]") {
     REQUIRE(usr->Email() == "root");
     REQUIRE(usr->Access() == UserAccess::ADMIN); 
 }
+
+TEST_CASE("Check UserTable to json","[UserTable]") {
+    UserTable tbl;
+    REQUIRE(tbl.Load() == UserTable::ReturnCodes::OK);
+    //Let the destructor run to write changes on disk!
+    
+    REQUIRE( tbl.GetNumUsers() == 1);
+    nlohmann::json js = tbl.GetAsJSON();
+
+    REQUIRE( js.dump() != "[]" );
+    REQUIRE( js.size() == tbl.GetNumUsers());
+    bool root_exists = false;
+    for(auto &i : js) {
+      std::cout<<i.dump()<<std::endl;
+      if(i["email"].get<std::string>() == "root") {
+        root_exists = true;
+        break;
+      }
+    }
+
+    REQUIRE(root_exists == true);
+}

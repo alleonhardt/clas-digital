@@ -8,6 +8,7 @@
 #include <map>
 #include <condition_variable>
 #include <filesystem>
+#include <nlohmann/json.hpp>
 
 enum class UserAccess
 {
@@ -47,6 +48,7 @@ class UserTable
     User *GetUserFromCookie(const std::string &cookie);
     void RemoveCookie(const std::string &cookie);
     int GetNumUsers();
+    nlohmann::json GetAsJSON();
 
     ~UserTable();
     UserTable();

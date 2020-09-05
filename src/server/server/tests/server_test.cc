@@ -47,6 +47,13 @@ TEST_CASE("Login","[CLASServer]") {
       }
       });
 
-  srv.Start("localhost",9786);
+  while(srv.Start("localhost",9786) == CLASServer::ReturnCodes::ERR_PORT_BINDING) {
+  }
   t1.join();
+}
+
+
+
+TEST_CASE("NoReuseSocket","[CLASServer]") {
+
 }

@@ -11,6 +11,11 @@
 class CLASServer
 {
   public:
+    enum class ReturnCodes {
+      OK = 0,
+      ERR_USERTABLE_INITIALISE = 1,
+      ERR_PORT_BINDING = 2
+    };
     static CLASServer &GetInstance();
 
     
@@ -22,7 +27,7 @@ class CLASServer
      * local "localhost" for only local connections
      * @param startPort The port to start the server on
      */
-    void Start(std::string listenAddress, int startPort);
+    ReturnCodes Start(std::string listenAddress, int startPort);
     void Stop();
     
 

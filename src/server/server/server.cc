@@ -5,7 +5,6 @@
 
 
 
-
 CLASServer &CLASServer::GetInstance()
 {
   static CLASServer server;
@@ -30,8 +29,13 @@ void CLASServer::HandleLogin(const httplib::Request &req, httplib::Response &res
 }
 
 
-void CLASServer::Start(std::string listenAddress, int startPort)
+CLASServer::ReturnCodes CLASServer::Start(std::string listenAddress, int startPort)
 {
+  if(users_.Load() != UserTable::ReturnCodes::OK) {
+    debug::log(debug::LOG_ERROR,"Could not create user table in RAM!\n");
+    return ReturnCodes::ERR_USERTABLE_INITIALISE;
+  }
+
   Status(StatusBits::SERVER_STARTED,true);
   server_.Post("/api/v2/server/login",[this](const httplib::Request &req, httplib::Response &resp){this->HandleLogin(req, resp);});
 
@@ -40,7 +44,14 @@ void CLASServer::Start(std::string listenAddress, int startPort)
 //  server_.Post("/api/v2/server/update_userlist",&do_usertableupdate);
 
 
-  while(!server_.listen(listenAddress.c_str(),startPort)){}
+  int port_binding_tries = 0;
+  while(!server_.listen(listenAddress.c_str(),startPort))
+  {
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    if(port_binding_tries++ > 3)
+      return ReturnCodes::ERR_PORT_BINDING;
+  }
+  return ReturnCodes::OK;
 }
 
 
@@ -67,8 +78,4 @@ CLASServer::CLASServer()
 {
   status_.reset();
   startPort_ = 1409;
-  if(users_.Load() != UserTable::ReturnCodes::OK) {
-    debug::log(debug::LOG_ERROR,"Could not create user table in RAM!\n");
-    std::exit(-1);
-  }
 }

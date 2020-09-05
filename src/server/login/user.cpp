@@ -183,6 +183,26 @@ User *UserTable::GetUserFromCookie(const std::string &cookie) {
   return nullptr;
 }
 
+nlohmann::json UserTable::GetAsJSON() {
+  try {
+    std::lock_guard lck(class_lock_);
+    SQLite::Statement query_cmd(*connection_, "SELECT email,access FROM users;");
+    nlohmann::json js;
+    while(query_cmd.executeStep())
+    {
+      nlohmann::json entry;
+      entry["email"] = query_cmd.getColumn(0).getText();
+      entry["access"] = query_cmd.getColumn(1).getInt();
+      js.push_back(entry);
+    }
+
+    return js;
+  }
+  catch(...) {
+    return {};
+  }
+}
+
 
 void UserTable::RemoveCookie(const std::string &cookie) {
  try {
