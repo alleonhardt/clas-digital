@@ -11,7 +11,7 @@ int main( int argc, char* argv[] ) {
  
 
   for(int i = 0; i < 100; i++) {
-    std::cout<<termcolor::blue<<"[CATCH2]: -- Iteration "<<i+1<<"/100."<<std::endl;
+    std::cout<<termcolor::blue<<"[CATCH 2]: -- Iteration "<<i+1<<"/100."<<std::endl;
     int result = session.run();
     if(result != 0)
       return result;

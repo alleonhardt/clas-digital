@@ -46,11 +46,11 @@ std::string CreateRandomString(int len) {
 
 User::User(std::string email, UserAccess acc) : email_(email),access_(acc) {}
 
-std::string User::Email() {
+const std::string &User::Email() const {
   return email_;
 }
 
-UserAccess User::Access() {
+UserAccess User::Access() const {
   return access_;
 }
 
@@ -199,7 +199,7 @@ nlohmann::json UserTable::GetAsJSON() {
     return js;
   }
   catch(...) {
-    return {};
+    return nlohmann::json::array();
   }
 }
 

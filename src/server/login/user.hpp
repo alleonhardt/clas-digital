@@ -21,8 +21,8 @@ class User
 {
   public:
     User(std::string email, UserAccess acc);
-    std::string Email();
-    UserAccess Access();
+    const std::string &Email() const;
+    UserAccess Access() const;
 
   private:
     std::string email_;

@@ -42,6 +42,9 @@ class CLASServer
 
 
     void HandleLogin(const httplib::Request& req, httplib::Response &resp);
+    void SendUserList(const httplib::Request& req, httplib::Response &resp);
+    const User *GetUserFromCookie(const std::string &cookie);
+
 
 
   private:

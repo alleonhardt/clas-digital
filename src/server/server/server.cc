@@ -28,10 +28,36 @@ void CLASServer::HandleLogin(const httplib::Request &req, httplib::Response &res
   }
 }
 
+void CLASServer::SendUserList(const httplib::Request &req, httplib::Response &resp)
+{
+  const User *usr = GetUserFromCookie(req.get_header_value("Cookie"));
+  if(!usr || usr->Access() != UserAccess::ADMIN)
+    resp.status = 403;
+  else
+    resp.set_content(users_.GetAsJSON().dump(),"application/json");
+}
+
+const User *CLASServer::GetUserFromCookie(const std::string &cookie_ptr)
+{
+  if(cookie_ptr=="") return nullptr;
+
+  auto pos = cookie_ptr.find("SESSID=");
+  auto pos2 = cookie_ptr.find(";",pos);
+  std::string cookie = "";
+
+  if(pos2==std::string::npos)
+	  cookie = cookie_ptr.substr(pos+7);
+  else
+	  cookie = cookie_ptr.substr(pos+7,pos2);
+
+  return users_.GetUserFromCookie(cookie);
+}
+
 
 CLASServer::ReturnCodes CLASServer::Start(std::string listenAddress, int startPort)
 {
-  if(users_.Load() != UserTable::ReturnCodes::OK) {
+  if(users_.Load() != UserTable::ReturnCodes::OK) 
+  {
     debug::log(debug::LOG_ERROR,"Could not create user table in RAM!\n");
     return ReturnCodes::ERR_USERTABLE_INITIALISE;
   }
@@ -39,9 +65,9 @@ CLASServer::ReturnCodes CLASServer::Start(std::string listenAddress, int startPo
   Status(StatusBits::SERVER_STARTED,true);
   server_.Post("/api/v2/server/login",[this](const httplib::Request &req, httplib::Response &resp){this->HandleLogin(req, resp);});
 
+  server_.Get("/api/v2/server/userlist",[this](const httplib::Request &req, httplib::Response &resp){this->SendUserList(req,resp);});
 
-//  server_.Get("/api/v2/server/get_userlist",&do_senduserlist);
-//  server_.Post("/api/v2/server/update_userlist",&do_usertableupdate);
+  //  server_.Post("/api/v2/server/userlist",&do_usertableupdate);
 
 
   int port_binding_tries = 0;

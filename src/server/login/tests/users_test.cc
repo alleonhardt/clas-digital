@@ -73,7 +73,7 @@ TEST_CASE("Check UserTable to json","[UserTable]") {
     REQUIRE( tbl.GetNumUsers() == 1);
     nlohmann::json js = tbl.GetAsJSON();
 
-    REQUIRE( js.dump() != "[]" );
+    REQUIRE( js.dump() != "{}" );
     REQUIRE( js.size() == tbl.GetNumUsers());
     bool root_exists = false;
     for(auto &i : js) {
