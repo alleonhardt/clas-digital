@@ -79,7 +79,7 @@ UserTable::ReturnCodes UserTable::Load(std::filesystem::path database_path) {
 
       std::string cmd = "INSERT INTO USERS(email,password,name,access) VALUES ('root','";
       cmd+=sha3_512("password");
-      cmd+="','Admin',7);";
+      cmd+="','Admin',4);";
 
       connection_->exec(cmd.c_str());
 
