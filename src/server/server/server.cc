@@ -20,9 +20,9 @@ void CLASServer::HandleLogin(const httplib::Request &req, httplib::Response &res
     resp.status = 403;
   }
   else {
-    cookie = "SESSID=" + cookie;
-    cookie += "; SECURE";
-    resp.set_header("Set-Cookie", cookie.c_str());
+    std::string set_cookie = "SESSID=" + cookie;
+    set_cookie += "; SECURE";
+    resp.set_header("Set-Cookie", set_cookie.c_str());
     resp.status = 200;
   }
 }

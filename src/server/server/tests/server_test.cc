@@ -32,6 +32,16 @@ TEST_CASE("Login","[CLASServer]") {
         //Check the default root user used in every user database
         resp = cl.Post("/api/v2/server/login", {}, "email=root&password=password", "application/x-www-form-urlencoded");
         REQUIRE( resp->status == 200 );
+
+        //check if a cookie was send with the response;
+        REQUIRE(resp->get_header_value("Set-Cookie").length() > 32);
+        std::string ck = resp->get_header_value("Set-Cookie");
+        auto pos = ck.find(";");
+
+        httplib::Headers headers = {
+          { "Cookie", resp->get_header_value("Set-Cookie").substr(0,pos+1) }
+        };
+        cl.set_default_headers(headers);
         srv.Stop();
         break;
       }
