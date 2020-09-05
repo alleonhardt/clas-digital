@@ -42,6 +42,11 @@ TEST_CASE("Login","[CLASServer]") {
           { "Cookie", resp->get_header_value("Set-Cookie").substr(0,pos+1) }
         };
         cl.set_default_headers(headers);
+
+        resp = cl.Get("/api/v2/server/userlist");
+        REQUIRE( resp->status == 200 );
+        REQUIRE( resp->body.length() > 0 );
+
         srv.Stop();
         break;
       }

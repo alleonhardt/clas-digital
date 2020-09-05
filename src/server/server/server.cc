@@ -48,7 +48,7 @@ const User *CLASServer::GetUserFromCookie(const std::string &cookie_ptr)
   if(pos2==std::string::npos)
 	  cookie = cookie_ptr.substr(pos+7);
   else
-	  cookie = cookie_ptr.substr(pos+7,pos2);
+	  cookie = cookie_ptr.substr(pos+7,pos2-(pos+7));
 
   return users_.GetUserFromCookie(cookie);
 }
