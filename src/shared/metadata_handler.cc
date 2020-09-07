@@ -367,8 +367,24 @@ bool MetadataHandler::HasTag(std::string tag)
   return false;
 }
 
+///Return whether book is publicly accessible 
+bool MetadataHandler::GetPublic() {
+  std::time_t ttime = time(0);
+  tm *local_time = localtime(&ttime);
 
-bool MetadataHandler::checkJson()
-{
+  //Check if rights are set in metadata.
+  if (GetMetadata("rights", "data") == "CLASfrei")
+    return true;
+
+  //Check for year books is published in. 
+  if (GetDate() == -1 || GetDate() >= local_time->tm_year+1800)
+    return false;
+  return true;
+}
+
+///Return whether the basic metadata is set
+bool MetadataHandler::CheckJsonSet() {
+  if (GetAuthor() == "" && GetTitle() == "" && GetDate() == -1)
+    return false;
   return true;
 }

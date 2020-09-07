@@ -192,7 +192,7 @@ void CBookManager::updateZotero(nlohmann::json j_items)
             m_mapBooks[it["key"]] = new CBook(it);
 
         //If book's json does not contain the most relevant information, delete again
-        if(m_mapBooks[it["key"]]->get_metadata().checkJson() == false) {
+        if(m_mapBooks[it["key"]]->get_metadata().CheckJsonSet() == false) {
             delete m_mapBooks[it["key"]];
             m_mapBooks.erase(it["key"]);
         }

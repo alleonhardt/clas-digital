@@ -172,8 +172,10 @@ public:
   bool HasTag(std::string sTag);
   
   ///Return whether book is publicly accessible 
-  bool getPublic();
-  bool checkJson();
+  bool GetPublic();
+
+  ///Return whether the basic metadata is set
+  bool CheckJsonSet();
   
 
 private:
