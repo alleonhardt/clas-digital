@@ -303,6 +303,11 @@ namespace debug
         return error_code_;
       }
 
+      void SetErrorCode(T new_val)
+      {
+        error_code_ = new_val;
+      }
+
     protected:
       T error_code_;
       std::shared_ptr<PrintableError> next_;
