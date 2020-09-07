@@ -3,7 +3,6 @@
  */
 
 #include <chrono>
-#include <filesystem>
 #include <iostream>
 #include <string>
 
@@ -12,7 +11,6 @@
 #include "book_manager/CBookManager.hpp"
 
 using namespace httplib;
-namespace fs = std::filesystem;
 
 /**
  * Search in all entries in corpus. And all metadata.
@@ -237,9 +235,6 @@ int main()
 {
   //Create server.
   Server srv;
-
-  for (auto &p : fs::directory_iterator())
-    std::cout << p.path() << std::endl;
 
   //Load corpus metadata from disc.
   //TODO (fux): location should be specified by a config file.
