@@ -234,11 +234,107 @@ namespace debug
       ///< The function to execute as soon as the class gets destroyed
       std::function<void()> func_;
   };
+
+
+
+  class PrintableError
+  {
+    public:
+      virtual void print(int index=0,std::ostream &os=std::cout)
+      {
+        os<<color_;
+        for(int i = 0; i < index; i++)
+          os<<"==";
+        if(index!=0)
+          os<<"> ";
+        os<<error_message_;
+        os<<termcolor::reset;
+      }
+    protected:
+      std::string error_message_;
+      std::ostream& (*color_)(std::ostream&);
+  };
+
+  template<typename T>
+  class StackableError : public PrintableError
+  {
+    public:
+      StackableError(T err, std::string error_message = "",decltype(termcolor::red) color=termcolor::red) : error_code_(err) 
+    {
+      color_ = color;
+      if(error_message == "")
+      {
+        if((int)err == 0)
+        {
+          error_message_ = "Error code 0. No error occured.\n";
+          color_ = termcolor::reset;
+        }
+        else
+          error_message_ = "Error Code: "+std::to_string((int)err)+".\n";
+      }
+      else
+      {
+        error_message_ = "Error Code "+std::to_string((int)err)+": \""+error_message+"\"\n";
+      }
+    }
+
+      StackableError<T> &Trace(const char *function = "", const char *file=__FILE__, int line = __LINE__)
+      {
+        if(error_message_.find("[TRACE ") == std::string::npos)
+        {
+          std::string err_trace_ = "[TRACE ";
+          err_trace_ += function;
+          err_trace_ += " ";
+          err_trace_ += std::filesystem::path(file).filename().string().c_str();
+          err_trace_ += " l.";
+          err_trace_ += std::to_string(line);
+          err_trace_ += "] ";
+          error_message_ = err_trace_+error_message_;
+        }
+        return *this;
+      }
+
+      void print(int index = 0, std::ostream &os=std::cout) override
+      {
+        PrintableError::print(index,os);
+        if(next_)
+          next_->print(index+1,os);
+      }
+
+      operator bool() const
+      {
+        return (int)error_code_ != 0;
+      }
+
+      template<typename Y>
+      StackableError<T> &Next(StackableError<Y> &ptr)
+      {
+        next_.reset(new StackableError<Y>(std::move(ptr)));
+        return *this;
+      }
+
+      T GetErrorCode()
+      {
+        return error_code_;
+      }
+
+    protected:
+      T error_code_;
+      std::shared_ptr<PrintableError> next_;
+  };
+
+  template<typename T>
+  using Error = StackableError<T>;
+
+#ifdef _WIN32
+#define Trace() Trace(__FUNCSIG__,__FILE__,__LINE__)
+#else
+#define Trace() Trace(__PRETTY_FUNCTION__,__FILE__,__LINE__)
+#endif
 }
 
 #define DBG_FULL_LOG "[",__FILE__,":",__LINE__,"] "
 #define DBG_EXT_LOG "(",std::filesystem::path(__FILE__).filename().string().c_str(),":",__LINE__,") "
-
 
 
 #endif

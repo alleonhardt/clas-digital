@@ -85,3 +85,33 @@ TEST_CASE("Check UserTable to json","[UserTable]") {
 
     REQUIRE(root_exists == true);
 }
+
+using namespace debug;
+
+Error<int> Check()
+{
+  return Error<int>(0);
+}
+
+Error<int> Check2()
+{
+  auto err = Check();
+  return Error<int>(9,"Cant initialise user table").Trace().Next(err);
+}
+
+Error<UserTable::ReturnCodes> Check3()
+{
+  auto err = Check2();
+  return Error<UserTable::ReturnCodes>(UserTable::ReturnCodes::USER_EXISTS,"Initialise server failed").Trace().Next(err);
+}
+
+
+TEST_CASE("Debug StackableError test","[err_test]")
+{
+  debug::StackableError err(1, "Bad error message");
+  REQUIRE(err == true);
+  
+  auto ch = Check3();
+  REQUIRE(ch.GetErrorCode() == UserTable::ReturnCodes::USER_EXISTS);
+  ch.print();
+}

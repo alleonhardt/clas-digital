@@ -168,6 +168,12 @@ void CLASServer::Stop()
   Status(StatusBits::SERVER_STARTED,false);
 }
 
+
+bool CLASServer::IsRunning()
+{
+  return server_.is_running();
+}
+
 CLASServer::CLASServer()
 {
   //Reset all bits in the status bit field

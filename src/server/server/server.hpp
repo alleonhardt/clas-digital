@@ -94,6 +94,7 @@ class CLASServer
     void SendUserList(const httplib::Request& req, httplib::Response &resp);
     void UpdateUserList(const httplib::Request& req, httplib::Response &resp);
 
+    bool IsRunning();
 
     /**
      * @brief Helper function to extract the cookie from a request.

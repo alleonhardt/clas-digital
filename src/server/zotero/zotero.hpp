@@ -181,7 +181,6 @@ namespace Zotero
        */
       nlohmann::json pillars_;
   };
-
 }
 
 #endif
