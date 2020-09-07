@@ -120,6 +120,10 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::Start(std::string listenAddres
 
   server_.Post("/api/v2/server/userlist",[this](const httplib::Request &req, httplib::Response &resp){this->UpdateUserList(req,resp);});
 
+  for(auto &it : cfg_.mount_points_)
+  {
+    server_.set_mount_point("/", it.string().c_str());
+  }
 
   // Check how many times we tried to bind the port
   int port_binding_tries = 0;
