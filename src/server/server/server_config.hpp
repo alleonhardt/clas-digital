@@ -29,6 +29,9 @@ struct ServerConfig
   std::vector<std::filesystem::path> upload_points_;
   std::filesystem::path cert_;
   std::filesystem::path key_;
+
+  std::string reference_manager_;
+  nlohmann::json zotero_config_;
 };
 
 #endif

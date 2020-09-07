@@ -52,7 +52,9 @@ jobs:
             cmake --build . --config $BUILD_TYPE
 
     - name: Do tests
-      run:  build/bin/clas_digital_server_test.o
+      run:  |
+            cd build
+            bin/clas_digital_server_test.o
   
   build_ubuntu_clang:
     # The CMake configure and build commands are platform agnostic and should work equally
@@ -98,7 +100,9 @@ jobs:
             cmake --build . --config $BUILD_TYPE
 
     - name: Do tests
-      run:  build/bin/clas_digital_server_test.o
+      run:  |
+            cd build
+            bin/clas_digital_server_test.o
 
   build_mac:
     # The CMake configure and build commands are platform agnostic and should work equally
@@ -135,7 +139,9 @@ jobs:
             cmake --build . --config $BUILD_TYPE
 
     - name: Do tests on ${{ matrix.os }}
-      run:  build/bin/clas_digital_server_test.o
+      run:  |
+            cd build
+            bin/clas_digital_server_test.o
 
 
   build_windows:
@@ -173,4 +179,6 @@ jobs:
             cmake --build . --config $BUILD_TYPE
 
     - name: Do tests on ${{ matrix.os }}
-      run:  build/bin/clas_digital_server_test.o
+      run:  |
+            cd build
+            bin/clas_digital_server_test.o

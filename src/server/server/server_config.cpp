@@ -54,6 +54,14 @@ Error<ServerConfigReturnCodes> ServerConfig::LoadFromString(std::string config)
         upload_points_.push_back(p);
       }
     }
+
+    if(js.count("zotero_config") > 0)
+    {
+      zotero_config_ = js["zotero_config"];
+      reference_manager_ = "zotero";
+    }
+
+    debug::log(debug::LOG_WARNING,"No valid reference manager found, using own id system!");
   }
   catch(nlohmann::json::exception &e)
   {

@@ -157,8 +157,7 @@ namespace Zotero
        */
       std::unique_ptr<Connection> GetConnection();
 
-    private:
-     
+    private:     
       /**
        * @brief The base uri to access e. g.
        * https://api.zotero.com/groups/812332 for example
