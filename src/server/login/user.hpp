@@ -9,6 +9,7 @@
 #include <condition_variable>
 #include <filesystem>
 #include <nlohmann/json.hpp>
+#include <debug/debug.hpp>
 
 /**
  * @brief Describes the different level of user access
@@ -93,7 +94,7 @@ class UserTable
      * @return ReturnCodes::OK if everything went well. else check the other
      * return codes
      */
-    ReturnCodes Load();
+    debug::Error<ReturnCodes> Load();
 
 
     /**
@@ -104,9 +105,10 @@ class UserTable
      * @return ReturnCodes::OK if everything went well, else check the other
      * return codes.
      */
-    ReturnCodes Load(std::filesystem::path database_path);
-    ReturnCodes AddUser(std::string email, std::string password, std::string name, UserAccess acc);
-    ReturnCodes RemoveUser(std::string email);
+    debug::Error<ReturnCodes> Load(std::filesystem::path database_path);
+  
+    debug::Error<ReturnCodes> AddUser(std::string email, std::string password, std::string name, UserAccess acc);
+    debug::Error<ReturnCodes> RemoveUser(std::string email);
     
     std::string LogIn(std::string email, std::string password);
     User *GetUserFromCookie(const std::string &cookie);

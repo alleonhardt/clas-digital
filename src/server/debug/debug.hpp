@@ -256,10 +256,10 @@ namespace debug
   };
 
   template<typename T>
-  class StackableError : public PrintableError
+  class Error : public PrintableError
   {
     public:
-      StackableError(T err, std::string error_message = "",decltype(termcolor::red) color=termcolor::red) : error_code_(err) 
+      Error(T err, std::string error_message = "",decltype(termcolor::red) color=termcolor::red) : error_code_(err) 
     {
       color_ = color;
       if(error_message == "")
@@ -278,22 +278,6 @@ namespace debug
       }
     }
 
-      StackableError<T> &Trace(const char *function = "", const char *file=__FILE__, int line = __LINE__)
-      {
-        if(error_message_.find("[TRACE ") == std::string::npos)
-        {
-          std::string err_trace_ = "[TRACE ";
-          err_trace_ += function;
-          err_trace_ += " ";
-          err_trace_ += std::filesystem::path(file).filename().string().c_str();
-          err_trace_ += " l.";
-          err_trace_ += std::to_string(line);
-          err_trace_ += "] ";
-          error_message_ = err_trace_+error_message_;
-        }
-        return *this;
-      }
-
       void print(int index = 0, std::ostream &os=std::cout) override
       {
         PrintableError::print(index,os);
@@ -306,10 +290,11 @@ namespace debug
         return (int)error_code_ != 0;
       }
 
+
       template<typename Y>
-      StackableError<T> &Next(StackableError<Y> &ptr)
+      Error<T> &Next(Error<Y> &ptr)
       {
-        next_.reset(new StackableError<Y>(std::move(ptr)));
+        next_.reset(new Error<Y>(std::move(ptr)));
         return *this;
       }
 
@@ -323,14 +308,7 @@ namespace debug
       std::shared_ptr<PrintableError> next_;
   };
 
-  template<typename T>
-  using Error = StackableError<T>;
 
-#ifdef _WIN32
-#define Trace() Trace(__FUNCSIG__,__FILE__,__LINE__)
-#else
-#define Trace() Trace(__PRETTY_FUNCTION__,__FILE__,__LINE__)
-#endif
 }
 
 #define DBG_FULL_LOG "[",__FILE__,":",__LINE__,"] "

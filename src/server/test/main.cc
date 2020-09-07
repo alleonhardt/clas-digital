@@ -10,7 +10,7 @@ int main( int argc, char* argv[] ) {
     return returnCode;
  
 
-  for(int i = 0; i < 100; i++) {
+  for(int i = 0; i < 10; i++) {
     std::cout<<termcolor::blue<<"[CATCH 2]: -- Iteration "<<i+1<<"/100."<<std::endl;
     int result = session.run();
     if(result != 0)

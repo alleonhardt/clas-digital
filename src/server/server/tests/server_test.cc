@@ -9,14 +9,6 @@ TEST_CASE("Constructor", "[CLASServer]") {
   REQUIRE(&srv == &CLASServer::GetInstance());
 }
 
-
-TEST_CASE("Initialise", "[CLASServer]") {
-  CLASServer &srv = CLASServer::GetInstance();
-  // Check the initialisation state
-  REQUIRE(srv.Status(CLASServer::StatusBits::SERVER_STARTED) == false);
-  REQUIRE(srv.Status(CLASServer::StatusBits::GLOBAL_SHUTDOWN) == false);
-}
-
 TEST_CASE("Login","[CLASServer]") {
   CLASServer &srv = CLASServer::GetInstance();
 
@@ -53,7 +45,11 @@ TEST_CASE("Login","[CLASServer]") {
       srv.Stop();
       });
 
-  while(srv.Start("localhost",9786) == CLASServer::ReturnCodes::ERR_PORT_BINDING) {
+  nlohmann::json server_config;
+  server_config["port"] = 9786;
+  REQUIRE(srv.InitialiseFromString(server_config.dump(), ":memory:").GetErrorCode() == CLASServer::ReturnCodes::OK);
+
+  while(srv.Start("localhost").GetErrorCode() == CLASServer::ReturnCodes::ERR_PORT_BINDING) {
   }
   t1.join();
 }
@@ -120,7 +116,11 @@ TEST_CASE("Update User List","[CLASServer]") {
       return;
       });
 
-  while(srv.Start("localhost",9786) == CLASServer::ReturnCodes::ERR_PORT_BINDING) {
-  }
+  nlohmann::json server_config;
+  server_config["port"] = 9786;
+  REQUIRE(srv.InitialiseFromString(server_config.dump(),":memory:").GetErrorCode() == CLASServer::ReturnCodes::OK);
+  while(srv.Start("localhost").GetErrorCode() == CLASServer::ReturnCodes::ERR_PORT_BINDING)
+  {}
+
   t1.join();
 }

@@ -108,15 +108,10 @@ const User *CLASServer::GetUserFromCookie(const std::string &cookie_ptr)
 }
 
 
-CLASServer::ReturnCodes CLASServer::Start(std::string listenAddress, int startPort)
+debug::Error<CLASServer::ReturnCodes> CLASServer::Start(std::string listenAddress)
 {
-  // Try to load the user table, if this fails notify the user and stop
-  // initialising
-  if(users_.Load() != UserTable::ReturnCodes::OK) 
-  {
-    debug::log(debug::LOG_ERROR,"Could not create user table in RAM!\n");
-    return ReturnCodes::ERR_USERTABLE_INITIALISE;
-  }
+  if(!initialised_)
+    return debug::Error(ReturnCodes::ERR_SERVER_NOT_INITIALISED,"The server was not initialised yet");
 
   //Register all the URI Handler.
   server_.Post("/api/v2/server/login",[this](const httplib::Request &req, httplib::Response &resp){this->HandleLogin(req, resp);});
@@ -129,43 +124,60 @@ CLASServer::ReturnCodes CLASServer::Start(std::string listenAddress, int startPo
   // Check how many times we tried to bind the port
   int port_binding_tries = 0;
   
-  // Set the server started bit to true
-  Status(StatusBits::SERVER_STARTED,true);
-
   //Try to bind the port 3 times always waiting 50 milliseconds in between. If
   //this fails return ERR_PORT_BINDING
-  while(!server_.listen(listenAddress.c_str(),startPort))
+  while(!server_.listen(listenAddress.c_str(),cfg_.server_port_))
   {
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
     if(port_binding_tries++ > 3)
-      return ReturnCodes::ERR_PORT_BINDING;
+      return debug::Error(ReturnCodes::ERR_PORT_BINDING);
   }
-  return ReturnCodes::OK;
+  return debug::Error(ReturnCodes::OK);
 }
 
 
-
-void CLASServer::Status(StatusBits bit, bool value)
+debug::Error<CLASServer::ReturnCodes> CLASServer::InitialiseFromFile(std::filesystem::path config_file, std::filesystem::path user_db_file)
 {
-  // Set the bit to the new values, the lock guard
-  // guarantees thread safety for this operation
-  std::lock_guard lck(exclusive_section_);
-  status_.set((int)bit,value);
+  std::string config;
+  std::ifstream ifs(config_file.string(), std::ios::in);
+  if(ifs.is_open())
+    return Error(ReturnCodes::ERR_CONFIG_FILE_INITIALISE,"Could not load config file at " + config_file.string());
+  ifs>>config;
+  ifs.close();
+
+  return InitialiseFromString(config,user_db_file);
 }
 
-bool CLASServer::Status(StatusBits bit)
+debug::Error<CLASServer::ReturnCodes> CLASServer::InitialiseFromString(std::string config_file, std::filesystem::path user_db_file)
 {
-  //Return the status for a given bit. the lock guard
-  //ensures thread safety for this operation
-  std::lock_guard lck(exclusive_section_);
-  return status_[(int)bit];
+  {
+    auto err = cfg_.LoadFromString(config_file);
+    if(err)
+    {
+      return Error(ReturnCodes::ERR_CONFIG_FILE_INITIALISE,"Could not load config file.").Next(err);
+    }
+  }
+
+  // Try to load the user table, if this fails notify the user and stop
+  // initialising
+  auto err = users_.Load(user_db_file);
+  if(err.GetErrorCode() != UserTable::ReturnCodes::OK)
+  {
+    debug::log(debug::LOG_ERROR,"Could not create user table in RAM!\n");
+    return debug::Error(ReturnCodes::ERR_USERTABLE_INITIALISE,"Could not initialise user table subsytem").Next(err);
+  }
+
+  initialised_ = true;
+
+  return Error(ReturnCodes::OK);
 }
+
+
 
 void CLASServer::Stop()
 {
   // Stop the server and tell the status bit about the changed status
   server_.stop();
-  Status(StatusBits::SERVER_STARTED,false);
 }
 
 
@@ -176,9 +188,5 @@ bool CLASServer::IsRunning()
 
 CLASServer::CLASServer()
 {
-  //Reset all bits in the status bit field
-  status_.reset();
-  
-  // Use this as the standard port to open the server on.
-  startPort_ = 1409;
+  initialised_ = false;
 }

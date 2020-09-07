@@ -59,11 +59,11 @@ UserAccess User::Access() const {
 
 UserTable::UserTable() : connection_(nullptr) {}
 
-UserTable::ReturnCodes UserTable::Load() {
+debug::Error<UserTable::ReturnCodes> UserTable::Load() {
   return Load(":memory:");
 }
 
-UserTable::ReturnCodes UserTable::Load(std::filesystem::path database_path) {
+debug::Error<UserTable::ReturnCodes> UserTable::Load(std::filesystem::path database_path) {
   try {
     std::lock_guard lck(class_lock_);
     debug::log(debug::LOG_DEBUG, "Opening database at path: ",database_path.string(),"\n");
@@ -95,12 +95,12 @@ UserTable::ReturnCodes UserTable::Load(std::filesystem::path database_path) {
   }
   catch(SQLite::Exception &e) {
     debug::log(debug::LOG_ERROR,"Caught exception in ",__FUNCTION__," error \"",e.getErrorStr(),"\"\n");
-    return ReturnCodes::UNKNOWN_ERROR;
+    return debug::Error(ReturnCodes::UNKNOWN_ERROR,e.getErrorStr());
   }
-  return ReturnCodes::OK;
+  return debug::Error(ReturnCodes::OK);
 }
 
-UserTable::ReturnCodes UserTable::AddUser(std::string email, std::string password, std::string name, UserAccess acc) {
+debug::Error<UserTable::ReturnCodes> UserTable::AddUser(std::string email, std::string password, std::string name, UserAccess acc) {
   try {
     std::lock_guard lck(class_lock_);
     SQLite::Statement insert_cmd(*connection_, "INSERT INTO users(email,password,name,access) "
@@ -113,17 +113,15 @@ UserTable::ReturnCodes UserTable::AddUser(std::string email, std::string passwor
     debug::log(debug::LOG_DEBUG,"Added new user \"",email,"\" with access \"",(int)acc,"\"\n");
   }
   catch(SQLite::Exception &e) {
-    debug::log(debug::LOG_ERROR,"Could not add user \"",email,"\" to table users. Error string: \"",e.getErrorStr(),"\"\n");
-    
     if(e.getExtendedErrorCode() == SQLITE_CONSTRAINT_PRIMARYKEY)
-      return ReturnCodes::USER_EXISTS;
+      return debug::Error(ReturnCodes::USER_EXISTS,"The user "+email+" exists already!");
 
-    return ReturnCodes::UNKNOWN_ERROR;
+    return debug::Error(ReturnCodes::UNKNOWN_ERROR, e.getErrorStr());
   }
-  return ReturnCodes::OK;
+  return debug::Error(ReturnCodes::OK);
 }
 
-UserTable::ReturnCodes UserTable::RemoveUser(std::string email)
+debug::Error<UserTable::ReturnCodes> UserTable::RemoveUser(std::string email)
 {
   try {
     std::lock_guard lck(class_lock_);
@@ -131,14 +129,12 @@ UserTable::ReturnCodes UserTable::RemoveUser(std::string email)
 
     insert_cmd.bind(1,email.c_str());
     insert_cmd.exec();
-    debug::log(debug::LOG_DEBUG,"Removed new user \"",email,"\"\n");
+    debug::log(debug::LOG_DEBUG,"Removed user \"",email,"\"\n");
   }
   catch(SQLite::Exception &e) {
-
-    debug::log(debug::LOG_ERROR,"Could not remove user \"",email,"\" from table users. Error string: \"",e.getErrorStr(),"\"\n");
-    return ReturnCodes::UNKNOWN_ERROR;
+    return debug::Error(ReturnCodes::UNKNOWN_ERROR, e.getErrorStr());
   }
-  return ReturnCodes::OK;
+  return debug::Error(ReturnCodes::OK);
 }
 
 

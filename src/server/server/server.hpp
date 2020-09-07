@@ -7,6 +7,7 @@
 #include <mutex>
 #include <bitset>
 #include "login/user.hpp"
+#include "server/server_config.hpp"
 
 /**
  * @brief The main server class, starts the http server and registers all uri
@@ -27,7 +28,11 @@ class CLASServer
 
       ///< The port specified is still in use or could not be accessed with the
       //current access rights.
-      ERR_PORT_BINDING = 2
+      ERR_PORT_BINDING = 2,
+
+      ERR_CONFIG_FILE_INITIALISE = 3,
+
+      ERR_SERVER_NOT_INITIALISED = 4
     };
 
     
@@ -38,6 +43,10 @@ class CLASServer
      */
     static CLASServer &GetInstance();
 
+
+    debug::Error<ReturnCodes> InitialiseFromFile(std::filesystem::path config_file, std::filesystem::path user_db_file);
+
+    debug::Error<ReturnCodes> InitialiseFromString(std::string config_file, std::filesystem::path user_db_file);
     
     /**
      * @brief Initialises the server starts the server on the specified port and
@@ -47,7 +56,7 @@ class CLASServer
      * local "localhost" for only local connections
      * @param startPort The port to start the server on
      */
-    ReturnCodes Start(std::string listenAddress, int startPort);
+    debug::Error<ReturnCodes> Start(std::string listenAddress);
 
 
     /**
@@ -55,39 +64,6 @@ class CLASServer
      */
     void Stop();
     
-
-    /**
-     * @brief The current server status describes the current state of the
-     * server
-     */
-    enum class StatusBits
-    {
-      ///< The server has been started and is currently listening for new
-      //connections
-      SERVER_STARTED = 1,
-
-      ///< The global shutdown bit indiciates if the server is trying to shut
-      //down at the moment
-      GLOBAL_SHUTDOWN = 2
-    };
-
-    /**
-     * @brief Sets the status bit to the given value.
-     *
-     * @param bit The bit to set to a new value
-     * @param value The value to set the bit to
-     */
-    void Status(StatusBits bit, bool value);
-
-
-    /**
-     * @brief Returns the current value of the bit back to the caller
-     *
-     * @param bit The bit to ask about
-     *
-     * @return The value of the specified bit
-     */
-    bool Status(StatusBits bit);
 
 
     void HandleLogin(const httplib::Request& req, httplib::Response &resp);
@@ -113,11 +89,8 @@ class CLASServer
     ///< The http server forwards all requests to handlers
     httplib::Server server_;
 
-    ///< The port to start the server on
-    int startPort_;
     
-    ///< Contains all current and future used bits.
-    std::bitset<32> status_;
+    bool initialised_;
 
     ///< The mutex synchronises atomic actions on the status
     std::mutex exclusive_section_;
@@ -125,6 +98,8 @@ class CLASServer
     ///< The User table load the users from disk and handles
     //login/create/delete/change user requests
     UserTable users_;
+
+    ServerConfig cfg_;
 
     
     /**

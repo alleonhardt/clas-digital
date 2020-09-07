@@ -4,17 +4,17 @@
 
 TEST_CASE("Creating Usertable and inserting values","[UserTable]") {
     UserTable tbl;
-    REQUIRE(tbl.Load() == UserTable::ReturnCodes::OK);
+    REQUIRE(tbl.Load().GetErrorCode() == UserTable::ReturnCodes::OK);
     //Let the destructor run to write changes on disk!
     //
     
-    REQUIRE( tbl.AddUser("alex","pw","Alexander Leonhardt",UserAccess::ADMIN) == UserTable::ReturnCodes::OK);
+    REQUIRE( tbl.AddUser("alex","pw","Alexander Leonhardt",UserAccess::ADMIN).GetErrorCode() == UserTable::ReturnCodes::OK);
 
-    REQUIRE( tbl.AddUser("alex","pwas","Alexander Leonhardtasd",UserAccess::READ) == UserTable::ReturnCodes::USER_EXISTS);
+    REQUIRE( tbl.AddUser("alex","pwas","Alexander Leonhardtasd",UserAccess::READ).GetErrorCode() == UserTable::ReturnCodes::USER_EXISTS);
 
 
-    REQUIRE( tbl.RemoveUser("alex") == UserTable::ReturnCodes::OK);
-    REQUIRE( tbl.AddUser("alex","pwas","Alexander Leonhardtasd",UserAccess::READ) == UserTable::ReturnCodes::OK);
+    REQUIRE( tbl.RemoveUser("alex") == false );
+    REQUIRE( tbl.AddUser("alex","pwas","Alexander Leonhardtasd",UserAccess::READ) == false);
 
     REQUIRE( tbl.GetNumUsers() == 2 );
 }
@@ -22,7 +22,7 @@ TEST_CASE("Creating Usertable and inserting values","[UserTable]") {
 
 TEST_CASE("Threading user table test","[UserTable]") {
     UserTable tbl;
-    REQUIRE(tbl.Load() == UserTable::ReturnCodes::OK);
+    REQUIRE(tbl.Load().GetErrorCode() == UserTable::ReturnCodes::OK);
     //Let the destructor run to write changes on disk!
     
     std::thread t1([&tbl](){
@@ -49,7 +49,7 @@ TEST_CASE("Threading user table test","[UserTable]") {
 
 TEST_CASE("Check root user","[UserTable]") {
     UserTable tbl;
-    REQUIRE(tbl.Load() == UserTable::ReturnCodes::OK);
+    REQUIRE(tbl.Load().GetErrorCode() == UserTable::ReturnCodes::OK);
     //Let the destructor run to write changes on disk!
     
     REQUIRE( tbl.GetNumUsers() == 1);
@@ -67,7 +67,7 @@ TEST_CASE("Check root user","[UserTable]") {
 
 TEST_CASE("Check UserTable to json","[UserTable]") {
     UserTable tbl;
-    REQUIRE(tbl.Load() == UserTable::ReturnCodes::OK);
+    REQUIRE(tbl.Load().GetErrorCode() == UserTable::ReturnCodes::OK);
     //Let the destructor run to write changes on disk!
     
     REQUIRE( tbl.GetNumUsers() == 1);
@@ -96,19 +96,19 @@ Error<int> Check()
 Error<int> Check2()
 {
   auto err = Check();
-  return Error<int>(9,"Cant initialise user table").Trace().Next(err);
+  return Error<int>(9,"Cant initialise user table").Next(err);
 }
 
 Error<UserTable::ReturnCodes> Check3()
 {
   auto err = Check2();
-  return Error<UserTable::ReturnCodes>(UserTable::ReturnCodes::USER_EXISTS,"Initialise server failed").Trace().Next(err);
+  return Error<UserTable::ReturnCodes>(UserTable::ReturnCodes::USER_EXISTS,"Initialise server failed").Next(err);
 }
 
 
 TEST_CASE("Debug StackableError test","[err_test]")
 {
-  debug::StackableError err(1, "Bad error message");
+  debug::Error err(1, "Bad error message");
   REQUIRE(err == true);
   
   auto ch = Check3();
