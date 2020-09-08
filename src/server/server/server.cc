@@ -125,13 +125,8 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::Start(std::string listenAddres
     server_.set_mount_point("/", it.string().c_str());
   }
 
-  debug::log(debug::LOG_DEBUG,"Initialise finished, starting to load plugins now...\n");
-  int i = 0;
-  for(auto &it : cfg_.plugins_)
-  {
-    plugin_manager_.LoadPlugin(std::to_string(i++), it, this);
-  }
-
+  event_manager_.TriggerEvent(cl_events::Events::ON_SERVER_START, this, (void*)&server_);
+  
   // Check how many times we tried to bind the port
   int port_binding_tries = 0;
   
@@ -169,6 +164,13 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::InitialiseFromString(std::stri
     }
   }
 
+  debug::log(debug::LOG_DEBUG,"Config loaded, loading plugins now...\n");
+  int i = 0;
+  for(auto &it : cfg_.plugins_)
+  {
+    plugin_manager_.LoadPlugin(std::to_string(i++), it, this);
+  }
+
   // Try to load the user table, if this fails notify the user and stop
   // initialising
   if(!users_)
@@ -180,6 +182,8 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::InitialiseFromString(std::stri
     debug::log(debug::LOG_ERROR,"Could not create user table in RAM!\n");
     return debug::Error(ReturnCodes::ERR_USERTABLE_INITIALISE,"Could not initialise user table subsytem").Next(err);
   }
+
+  event_manager_.TriggerEvent(cl_events::Events::AFTER_INITIALISE, this, nullptr);
   
   initialised_ = true;
 

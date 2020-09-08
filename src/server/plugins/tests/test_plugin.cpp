@@ -1,4 +1,3 @@
-#define CLASDIGITAL_PLUGIN
 #include "plugins/PlugInManager.hpp"
 #include "server/server.hpp"
 
@@ -34,5 +33,3 @@ extern "C" void UnloadPlugin()
   if(test_case < 2)
     *globalx = 0; 
 }
-
-

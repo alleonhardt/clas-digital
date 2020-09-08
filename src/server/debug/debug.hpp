@@ -8,17 +8,6 @@
 #include <functional>
 #define WIN32_LEAN_AND_MEAN
 
-#ifdef _WIN32
-
-#ifdef CLASDIGITAL_PLUGIN
-#define DLL_IMPORT _declspec(dllimport)
-#else
-#define DLL_IMPORT
-#endif
-
-#else
-#define DLL_IMPORT
-#endif
 #include <termcolor/termcolor.hpp>
 
 namespace debug

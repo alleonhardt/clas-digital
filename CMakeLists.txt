@@ -59,7 +59,11 @@ set(SRC_FILES_SERVER_TEST src/server/test/main.cc
   src/server/plugins/tests/event_manager_test.cpp
   src/server/plugins/tests/plug_in_manager_test.cpp)
 
-add_library(test_plugin SHARED src/server/plugins/tests/test_plugin.cpp $<TARGET_OBJECTS:clas_server_lib>)
+if(MSVC)
+  add_library(test_plugin SHARED src/server/plugins/tests/test_plugin.cpp $<TARGET_OBJECTS:clas_server_lib>)
+else()
+  add_library(test_plugin SHARED src/server/plugins/tests/test_plugin.cpp)
+endif()
 
 add_executable(clas_digital_server.o $<TARGET_OBJECTS:clas_server_lib> src/server/main.cpp)
 add_executable(clas_digital_server_test.o $<TARGET_OBJECTS:clas_server_lib>
@@ -72,6 +76,7 @@ add_executable(clas_digital_search.o  ${SRC_FILES_SEARCH})
 
 if(MSVC)
   add_compile_options(/W4 /WX)
+  target_link_libraries(test_plugin ${CONAN_LIBS} ${CXX_STDLIB})
 else()
   add_compile_options(-Wall -Wextra -pedantic -Werror)
 
@@ -112,7 +117,6 @@ target_include_directories(clas_digital_search.o PUBLIC
   "src/search"
 )
 
-target_link_libraries(test_plugin ${CONAN_LIBS} ${CXX_STDLIB})
 target_link_libraries(clas_digital_server.o ${CONAN_LIBS} ${CXX_STDLIB})
 target_link_libraries(clas_digital_server_test.o ${CONAN_LIBS} ${CXX_STDLIB})
 target_link_libraries(clas_digital_search.o ${CONAN_LIBS} ${CXX_STDLIB})

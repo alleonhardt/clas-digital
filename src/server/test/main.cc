@@ -5,7 +5,7 @@
 
 int main( int argc, char* argv[] ) {
 
-  version::print_version();
+  clas_digital::print_version();
   Catch::Session session; // There must be exactly one instance
 
   int returnCode = session.applyCommandLine( argc, argv );

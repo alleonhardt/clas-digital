@@ -17,7 +17,7 @@ enum class ServerConfigReturnCodes
 
 using debug::Error;
 
-struct DLL_IMPORT ServerConfig
+struct ServerConfig
 {
   Error<ServerConfigReturnCodes> LoadFromFile(std::filesystem::path configfile);
   Error<ServerConfigReturnCodes> LoadFromString(std::string configfile);

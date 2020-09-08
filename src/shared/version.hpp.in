@@ -3,7 +3,7 @@
 #include <string>
 #include <termcolor/termcolor.hpp>
 
-namespace version
+namespace clas_digital
 {
   inline const char gGitSha[] = "@GIT_SHA1@";
   inline const char gDate[] = "@GIT_DATE@";

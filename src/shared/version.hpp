@@ -3,11 +3,11 @@
 #include <string>
 #include <termcolor/termcolor.hpp>
 
-namespace version
+namespace clas_digital
 {
-  inline const char gGitSha[] = "d043c34fdf89f58272fd2f8c8e37078335e420ee-dirty";
-  inline const char gDate[] = "Tue Sep 8 11:42:09 2020";
-  inline const char gCommitSubject[] = "Improved library detection for mac and improved compilation on windows";
+  inline const char gGitSha[] = "a0bee1667a2290eca000e42f5f760801be205e11-dirty";
+  inline const char gDate[] = "Tue Sep 8 12:12:29 2020";
+  inline const char gCommitSubject[] = "Working on a working dll in windows";
 
   inline void print_version()
   {

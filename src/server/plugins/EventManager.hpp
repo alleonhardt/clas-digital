@@ -13,9 +13,11 @@ namespace cl_events
   enum class Events
   {
     ON_UPDATE_REFERENCE = 0,
+    AFTER_INITIALISE,
+    ON_SERVER_START
   };
 
-  constexpr unsigned long NumberOfEvents = 1;
+  constexpr unsigned long NumberOfEvents = 3;
 
   enum class EventReturn
   {

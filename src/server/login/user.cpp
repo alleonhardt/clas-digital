@@ -166,7 +166,7 @@ std::string UserTable::LogIn(std::string email, std::string password)
     logged_in_.insert({cookie, us});
     return cookie;
   }
-  catch(SQLite::Exception &e) { }
+  catch(SQLite::Exception &) { }
   return "";
 }
 
