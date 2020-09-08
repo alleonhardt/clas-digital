@@ -22,7 +22,7 @@ namespace cl_events
     OK = 0,
     OK_ABORT_FOLLOWING = 1,
     ERR_ABORT_FOLLOWING = 2,
-    ERROR,
+    ERROR_EVENT_FAILED,
     ERROR_EVENT_DOES_NOT_EXIST
   };
 
