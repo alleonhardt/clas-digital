@@ -1,6 +1,6 @@
+#include "server/server.hpp"
 #include "plugins/PlugInManager.hpp"
 #include <catch2/catch.hpp>
-#include "server/server.hpp"
 #include <debug/debug.hpp>
 
 TEST_CASE("Load Plugin InitialisePlugin changes int unload changes it again","[PlugInManager]")

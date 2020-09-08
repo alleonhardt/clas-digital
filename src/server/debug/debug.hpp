@@ -6,6 +6,7 @@
 #include <iostream>
 #include <filesystem>
 #include <functional>
+#define WIN32_LEAN_AND_MEAN
 #include <termcolor/termcolor.hpp>
 
 namespace debug
