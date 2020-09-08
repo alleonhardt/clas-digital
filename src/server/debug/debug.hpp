@@ -7,6 +7,12 @@
 #include <filesystem>
 #include <functional>
 #define WIN32_LEAN_AND_MEAN
+#ifdef _WIN32
+
+#define DLL_IMPORT _declspec(dllimport)
+#else
+#define DLL_IMPORT
+#endif
 #include <termcolor/termcolor.hpp>
 
 namespace debug

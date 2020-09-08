@@ -59,21 +59,11 @@ set(SRC_FILES_SERVER_TEST src/server/test/main.cc
   src/server/plugins/tests/event_manager_test.cpp
   src/server/plugins/tests/plug_in_manager_test.cpp)
 
-IF(APPLE)
-    SET(LIBRARY_TARGET MODULE)
-ELSE(APPLE)
-    SET(LIBRARY_TARGET SHARED)
-ENDIF(APPLE)
-
-add_library(test_plugin ${LIBRARY_TARGET} src/server/plugins/tests/test_plugin.cpp)
+add_library(test_plugin SHARED src/server/plugins/tests/test_plugin.cpp)
 
 add_executable(clas_digital_server.o $<TARGET_OBJECTS:clas_server_lib> src/server/main.cpp)
 add_executable(clas_digital_server_test.o $<TARGET_OBJECTS:clas_server_lib>
   ${SRC_FILES_SERVER_TEST})
-
-IF(APPLE)
-  target_compile_options(test_plugin PUBLIC -bundle -Wall -Wextra -pedantic -Werror)
-ENDIF(APPLE)
 
 set(CXX_STDLIB "")
 
@@ -83,7 +73,7 @@ add_executable(clas_digital_search.o  ${SRC_FILES_SEARCH})
 if(MSVC)
   add_compile_options(/W4 /WX)
 else()
-  add_compile_options(-Wall -Wextra -pedantic -Werror)
+  add_compile_options(-Wall -Wextra -pedantic -Werror -undefined dynamic_lookup)
   set(CXX_STDLIB stdc++)
 endif()
 

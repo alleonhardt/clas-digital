@@ -5,9 +5,9 @@
 
 namespace version
 {
-  inline const char gGitSha[] = "3c3c6a82a4f20b950dc60f640c39e9f8e1f125a6-dirty";
-  inline const char gDate[] = "Tue Sep 8 08:34:17 2020";
-  inline const char gCommitSubject[] = "Still trying to fix errors on windows and apple";
+  inline const char gGitSha[] = "d8663db9b8eed3bbe04d29251386cbe2f648427a-dirty";
+  inline const char gDate[] = "Tue Sep 8 10:54:50 2020";
+  inline const char gCommitSubject[] = "Trying another time to fix errors on windows and mac";
 
   inline void print_version()
   {
