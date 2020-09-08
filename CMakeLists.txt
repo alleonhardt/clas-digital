@@ -59,7 +59,13 @@ set(SRC_FILES_SERVER_TEST src/server/test/main.cc
   src/server/plugins/tests/event_manager_test.cpp
   src/server/plugins/tests/plug_in_manager_test.cpp)
 
-add_library(test_plugin SHARED src/server/plugins/tests/test_plugin.cpp)
+IF(APPLE)
+    SET(LIBRARY_TARGET "MODULE")
+ELSE(APPLE)
+    SET(LIBRARY_TARGET "SHARED")
+ENDIF(APPLE)
+
+add_library(test_plugin ${LIBRARY_TARGET} src/server/plugins/tests/test_plugin.cpp)
 
 add_executable(clas_digital_server.o $<TARGET_OBJECTS:clas_server_lib> src/server/main.cpp)
 add_executable(clas_digital_server_test.o $<TARGET_OBJECTS:clas_server_lib>
