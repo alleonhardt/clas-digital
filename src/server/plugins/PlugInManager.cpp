@@ -51,7 +51,11 @@ bool PlugInManager::LoadPlugin(std::string alias_name, std::filesystem::path lib
   {
     if(library_path.extension() == "")
     {
+#ifdef __APPLE__
+      library_path.replace_extension(".dylib");
+#else
       library_path.replace_extension(".so");
+#endif
 
       if(!std::filesystem::exists(library_path))
       {

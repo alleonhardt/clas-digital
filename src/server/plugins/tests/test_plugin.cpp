@@ -1,3 +1,4 @@
+#define CLASDIGITAL_PLUGIN
 #include "plugins/PlugInManager.hpp"
 #include "server/server.hpp"
 
