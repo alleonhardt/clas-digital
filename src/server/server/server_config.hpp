@@ -27,6 +27,7 @@ struct ServerConfig
   unsigned short server_port_;
   std::vector<std::filesystem::path> mount_points_;
   std::vector<std::filesystem::path> upload_points_;
+  std::vector<std::filesystem::path> plugins_;
   std::filesystem::path cert_;
   std::filesystem::path key_;
 

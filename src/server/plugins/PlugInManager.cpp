@@ -1,7 +1,7 @@
 #include "PlugInManager.hpp"
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
+#include <libloaderapi.h>
 using plugin_handle_type = HMODULE;
 #else
 #include <dlfcn.h>
@@ -51,11 +51,7 @@ bool PlugInManager::LoadPlugin(std::string alias_name, std::filesystem::path lib
   {
     if(library_path.extension() == "")
     {
-#ifdef __APPLE__
-      library_path.replace_extension(".dylib");
-#else
       library_path.replace_extension(".so");
-#endif
 
       if(!std::filesystem::exists(library_path))
       {
@@ -97,25 +93,30 @@ bool PlugInManager::UnloadPlugin(std::string alias_name)
   try
   {
 #ifdef _WIN32
-  plugin_handle_type handle = (plugin_handle_type)loaded_plugins_.at(alias_name);
-  auto symbol = GetProcAddress(handle,"UnloadPlugin");
-  if(symbol != nullptr)
-  {
-    unload_plugin unload = (unload_plugin)symbol;
-    (*unload)();
-  }
-  FreeLibrary(handle);
+    plugin_handle_type handle = (plugin_handle_type)loaded_plugins_.at(alias_name);
+    auto symbol = GetProcAddress(handle,"UnloadPlugin");
+    if(symbol != nullptr)
+    {
+      unload_plugin unload = (unload_plugin)symbol;
+      (*unload)();
+    }
+    FreeLibrary(handle);
 
 #else
-  plugin_handle_type handle = loaded_plugins_.at(alias_name);
-  auto symbol = dlsym(handle,"UnloadPlugin");
-  if(symbol != nullptr)
-  {
-    unload_plugin unload = (unload_plugin)symbol;
-    (*unload)();
-  }
-  dlclose(handle);
+    plugin_handle_type handle = loaded_plugins_.at(alias_name);
+    auto symbol = dlsym(handle,"UnloadPlugin");
+    if(symbol != nullptr)
+    {
+      unload_plugin unload = (unload_plugin)symbol;
+      (*unload)();
+    }
+    dlclose(handle);
 #endif
+
+    if(loaded_plugins_.size() == 1)
+      loaded_plugins_.clear();
+    else
+      loaded_plugins_.erase(alias_name);
   }
   catch(...)
   {

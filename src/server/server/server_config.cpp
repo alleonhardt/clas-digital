@@ -55,6 +55,15 @@ Error<ServerConfigReturnCodes> ServerConfig::LoadFromString(std::string config)
       }
     }
 
+    if(js.count("plugins") > 0)
+    {
+      for(auto &i : js["plugins"])
+      {
+        std::filesystem::path p = i.get<std::string>();
+        plugins_.push_back(p);
+      }
+    }
+
     if(js.count("zotero_config") > 0)
     {
       zotero_config_ = js["zotero_config"];

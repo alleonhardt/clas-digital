@@ -125,6 +125,13 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::Start(std::string listenAddres
     server_.set_mount_point("/", it.string().c_str());
   }
 
+  debug::log(debug::LOG_DEBUG,"Initialise finished, starting to load plugins now...\n");
+  int i = 0;
+  for(auto &it : cfg_.plugins_)
+  {
+    plugin_manager_.LoadPlugin(std::to_string(i++), it, this);
+  }
+
   // Check how many times we tried to bind the port
   int port_binding_tries = 0;
   
