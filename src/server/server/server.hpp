@@ -83,6 +83,8 @@ class CLASServer
      */
     const User *GetUserFromCookie(const std::string &cookie);
 
+    ServerConfig &GetServerConfig();
+
 
 
   private:

@@ -184,6 +184,11 @@ void CLASServer::Stop()
   server_.stop();
 }
 
+ServerConfig &CLASServer::GetServerConfig()
+{
+  return cfg_;
+}
+
 
 bool CLASServer::IsRunning()
 {

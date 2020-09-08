@@ -25,7 +25,7 @@ debug::Error<EventReturn> EventManager::TriggerEvent(Events event, CLASServer* s
       err.SetErrorCode(EventReturn::OK);
       return err;
     }
-    else if(err.GetErrorCode() == EventReturn::ERROR)
+    else if(err.GetErrorCode() == EventReturn::ERROR_EVENT_FAILED)
     {
       err.print();
     }

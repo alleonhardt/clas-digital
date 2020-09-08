@@ -109,3 +109,13 @@ bool PlugInManager::UnloadPlugin(std::string alias_name)
   }
   return true;
 }
+
+
+
+PlugInManager::~PlugInManager()
+{
+  for(auto &it : loaded_plugins_)
+  {
+    UnloadPlugin(it.first);
+  }
+}

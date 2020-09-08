@@ -24,6 +24,7 @@ class PlugInManager
   public:
     bool LoadPlugin(std::string alias_name, std::filesystem::path library_path,CLASServer *server);
     bool UnloadPlugin(std::string alias_name);
+    ~PlugInManager();
 
   private:
     typedef bool (*init_plugin)(CLASServer*);
