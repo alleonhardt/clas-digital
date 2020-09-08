@@ -17,7 +17,7 @@ void CLASServer::HandleLogin(const httplib::Request &req, httplib::Response &res
   URLParser parser(req.body);
 
   // Try to do a login with the obtained data
-  auto cookie = users_.LogIn(parser["email"], parser["password"]);
+  auto cookie = users_->LogIn(parser["email"], parser["password"]);
 
   //No cookie created deny access
   if(cookie == "") {
@@ -42,7 +42,7 @@ void CLASServer::SendUserList(const httplib::Request &req, httplib::Response &re
   if(!usr || usr->Access() != UserAccess::ADMIN)
     resp.status = 403;
   else
-    resp.set_content(users_.GetAsJSON().dump(),"application/json");
+    resp.set_content(users_->GetAsJSON().dump(),"application/json");
 }
 
 void CLASServer::UpdateUserList(const httplib::Request &req, httplib::Response &resp)
@@ -65,12 +65,12 @@ void CLASServer::UpdateUserList(const httplib::Request &req, httplib::Response &
         if(it["action"]=="DELETE")
 	      {
 		      //Remove the user if the action is delete if one of the necessary variables does not exist then throw an error and return an error not found
-          users_.RemoveUser(it["email"]);
+          users_->RemoveUser(it["email"]);
 	      }
 	      else if(it["action"]=="CREATE")
 	      {
 		      //Create the user with the specified email password and access
-          users_.AddUser(it["email"], it["password"], "Unknown", it["access"]);
+          users_->AddUser(it["email"], it["password"], "Unknown", it["access"]);
 	      }
       }
     }
@@ -104,7 +104,7 @@ const User *CLASServer::GetUserFromCookie(const std::string &cookie_ptr)
   else
 	  cookie = cookie_ptr.substr(pos+7,pos2-(pos+7));
 
-  return users_.GetUserFromCookie(cookie);
+  return users_->GetUserFromCookie(cookie);
 }
 
 
@@ -125,6 +125,8 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::Start(std::string listenAddres
     server_.set_mount_point("/", it.string().c_str());
   }
 
+  event_manager_.TriggerEvent(cl_events::Events::ON_SERVER_START, this, (void*)&server_);
+  
   // Check how many times we tried to bind the port
   int port_binding_tries = 0;
   
@@ -162,15 +164,27 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::InitialiseFromString(std::stri
     }
   }
 
+  debug::log(debug::LOG_DEBUG,"Config loaded, loading plugins now...\n");
+  int i = 0;
+  for(auto &it : cfg_.plugins_)
+  {
+    plugin_manager_.LoadPlugin(std::to_string(i++), it, this);
+  }
+
   // Try to load the user table, if this fails notify the user and stop
   // initialising
-  auto err = users_.Load(user_db_file);
+  if(!users_)
+    users_.reset(new UserTable);
+
+  auto err = users_->Load(user_db_file);
   if(err.GetErrorCode() != UserTable::ReturnCodes::OK)
   {
     debug::log(debug::LOG_ERROR,"Could not create user table in RAM!\n");
     return debug::Error(ReturnCodes::ERR_USERTABLE_INITIALISE,"Could not initialise user table subsytem").Next(err);
   }
 
+  event_manager_.TriggerEvent(cl_events::Events::AFTER_INITIALISE, this, nullptr);
+  
   initialised_ = true;
 
   return Error(ReturnCodes::OK);
@@ -182,6 +196,16 @@ void CLASServer::Stop()
 {
   // Stop the server and tell the status bit about the changed status
   server_.stop();
+}
+
+ServerConfig &CLASServer::GetServerConfig()
+{
+  return cfg_;
+}
+
+cl_events::EventManager &CLASServer::GetEventManager()
+{
+  return event_manager_;
 }
 
 

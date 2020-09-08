@@ -6,6 +6,8 @@
 #include <iostream>
 #include <filesystem>
 #include <functional>
+#define WIN32_LEAN_AND_MEAN
+
 #include <termcolor/termcolor.hpp>
 
 namespace debug
@@ -301,6 +303,11 @@ namespace debug
       T GetErrorCode()
       {
         return error_code_;
+      }
+
+      void SetErrorCode(T new_val)
+      {
+        error_code_ = new_val;
       }
 
     protected:
