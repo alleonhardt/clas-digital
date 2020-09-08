@@ -94,7 +94,7 @@ class UserTable
      * @return ReturnCodes::OK if everything went well. else check the other
      * return codes
      */
-    debug::Error<ReturnCodes> Load();
+    virtual debug::Error<ReturnCodes> Load();
 
 
     /**
@@ -105,16 +105,17 @@ class UserTable
      * @return ReturnCodes::OK if everything went well, else check the other
      * return codes.
      */
-    debug::Error<ReturnCodes> Load(std::filesystem::path database_path);
+    virtual debug::Error<ReturnCodes> Load(std::filesystem::path database_path);
   
-    debug::Error<ReturnCodes> AddUser(std::string email, std::string password, std::string name, UserAccess acc);
-    debug::Error<ReturnCodes> RemoveUser(std::string email);
+    virtual debug::Error<ReturnCodes> AddUser(std::string email, std::string password, std::string name, UserAccess acc);
     
-    std::string LogIn(std::string email, std::string password);
-    User *GetUserFromCookie(const std::string &cookie);
-    void RemoveCookie(const std::string &cookie);
-    int GetNumUsers();
-    nlohmann::json GetAsJSON();
+    virtual debug::Error<ReturnCodes> RemoveUser(std::string email);
+    
+    virtual std::string LogIn(std::string email, std::string password);
+    virtual User *GetUserFromCookie(const std::string &cookie);
+    virtual void RemoveCookie(const std::string &cookie);
+    virtual int GetNumUsers();
+    virtual nlohmann::json GetAsJSON();
 
     ~UserTable();
     UserTable();

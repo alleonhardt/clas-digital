@@ -33,6 +33,8 @@ struct ServerConfig
 
   std::string reference_manager_;
   nlohmann::json zotero_config_;
+
+  void *additional_data_;
 };
 
 #endif

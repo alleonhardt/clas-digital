@@ -175,7 +175,7 @@ jobs:
       shell: bash
       run:  |
             cd build
-            cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+            cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE -DBUILD_SHARED_LIBS=TRUE
             cmake --build . --config $BUILD_TYPE
 
     - name: Do tests on ${{ matrix.os }}

@@ -17,7 +17,7 @@ void CLASServer::HandleLogin(const httplib::Request &req, httplib::Response &res
   URLParser parser(req.body);
 
   // Try to do a login with the obtained data
-  auto cookie = users_.LogIn(parser["email"], parser["password"]);
+  auto cookie = users_->LogIn(parser["email"], parser["password"]);
 
   //No cookie created deny access
   if(cookie == "") {
@@ -42,7 +42,7 @@ void CLASServer::SendUserList(const httplib::Request &req, httplib::Response &re
   if(!usr || usr->Access() != UserAccess::ADMIN)
     resp.status = 403;
   else
-    resp.set_content(users_.GetAsJSON().dump(),"application/json");
+    resp.set_content(users_->GetAsJSON().dump(),"application/json");
 }
 
 void CLASServer::UpdateUserList(const httplib::Request &req, httplib::Response &resp)
@@ -65,12 +65,12 @@ void CLASServer::UpdateUserList(const httplib::Request &req, httplib::Response &
         if(it["action"]=="DELETE")
 	      {
 		      //Remove the user if the action is delete if one of the necessary variables does not exist then throw an error and return an error not found
-          users_.RemoveUser(it["email"]);
+          users_->RemoveUser(it["email"]);
 	      }
 	      else if(it["action"]=="CREATE")
 	      {
 		      //Create the user with the specified email password and access
-          users_.AddUser(it["email"], it["password"], "Unknown", it["access"]);
+          users_->AddUser(it["email"], it["password"], "Unknown", it["access"]);
 	      }
       }
     }
@@ -104,7 +104,7 @@ const User *CLASServer::GetUserFromCookie(const std::string &cookie_ptr)
   else
 	  cookie = cookie_ptr.substr(pos+7,pos2-(pos+7));
 
-  return users_.GetUserFromCookie(cookie);
+  return users_->GetUserFromCookie(cookie);
 }
 
 
@@ -162,6 +162,9 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::InitialiseFromFile(std::filesy
 debug::Error<CLASServer::ReturnCodes> CLASServer::InitialiseFromString(std::string config_file, std::filesystem::path user_db_file)
 {
   {
+    event_manager_.TriggerEvent(cl_events::Events::BEFORE_SERVER_INITIALISE, this, nullptr);
+
+    event_manager_.TriggerEvent(cl_events::Events::ON_CONFIG_LOAD, this, (void*)&config_file);
     auto err = cfg_.LoadFromString(config_file);
     if(err)
     {
@@ -171,7 +174,10 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::InitialiseFromString(std::stri
 
   // Try to load the user table, if this fails notify the user and stop
   // initialising
-  auto err = users_.Load(user_db_file);
+  if(!users_)
+    users_.reset(new UserTable);
+
+  auto err = users_->Load(user_db_file);
   if(err.GetErrorCode() != UserTable::ReturnCodes::OK)
   {
     debug::log(debug::LOG_ERROR,"Could not create user table in RAM!\n");

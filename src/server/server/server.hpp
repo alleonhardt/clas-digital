@@ -102,7 +102,7 @@ class CLASServer
 
     ///< The User table load the users from disk and handles
     //login/create/delete/change user requests
-    UserTable users_;
+    std::unique_ptr<UserTable> users_;
 
     ServerConfig cfg_;
     cl_events::EventManager event_manager_;

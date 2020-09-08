@@ -72,7 +72,7 @@ add_executable(clas_digital_server_test.o $<TARGET_OBJECTS:clas_server_lib>
   ${SRC_FILES_SERVER_TEST})
 
 IF(APPLE)
-  target_compile_options(test_plugin PUBLIC -bundle_loader -std=c++17 -Wall -Wextra -pedantic -Werror)
+  target_compile_options(test_plugin PUBLIC -bundle -Wall -Wextra -pedantic -Werror)
 ENDIF(APPLE)
 
 set(CXX_STDLIB "")
