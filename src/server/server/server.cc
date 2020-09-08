@@ -189,6 +189,11 @@ ServerConfig &CLASServer::GetServerConfig()
   return cfg_;
 }
 
+cl_events::EventManager &CLASServer::GetEventManager()
+{
+  return event_manager_;
+}
+
 
 bool CLASServer::IsRunning()
 {

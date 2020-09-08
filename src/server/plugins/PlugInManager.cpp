@@ -1,4 +1,12 @@
 #include "PlugInManager.hpp"
+#ifdef _WIN32
+#include <Windows.h>
+using plugin_handle_type = HMODULE;
+#else
+#include <dlfcn.h>
+using plugin_handle_type = void*;
+#endif
+
 
 bool PlugInManager::LoadPlugin(std::string alias_name, std::filesystem::path library_path, CLASServer *server)
 {
@@ -42,7 +50,12 @@ bool PlugInManager::LoadPlugin(std::string alias_name, std::filesystem::path lib
   {
     if(library_path.extension() == "")
     {
+#ifdef __APPLE__
+      library_path.replace_extension(".dylib");
+#else
       library_path.replace_extension(".so");
+#endif
+
       if(!std::filesystem::exists(library_path))
       {
         library_path.replace_filename("lib"+library_path.filename().string());
@@ -73,7 +86,7 @@ bool PlugInManager::LoadPlugin(std::string alias_name, std::filesystem::path lib
     return false;
   }
 
-  loaded_plugins_.insert({alias_name,handle});
+  loaded_plugins_.insert({alias_name,(void*)handle});
 #endif
   return true;
 }
@@ -83,7 +96,7 @@ bool PlugInManager::UnloadPlugin(std::string alias_name)
   try
   {
 #ifdef _WIN32
-  plugin_handle_type handle = loaded_plugins_.at(alias_name);
+  plugin_handle_type handle = (plugin_handle_type)loaded_plugins_.at(alias_name);
   auto symbol = GetProcAddress(handle,"UnloadPlugin");
   if(symbol != nullptr)
   {

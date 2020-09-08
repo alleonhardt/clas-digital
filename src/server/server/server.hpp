@@ -8,6 +8,7 @@
 #include <bitset>
 #include "login/user.hpp"
 #include "server/server_config.hpp"
+#include "plugins/EventManager.hpp"
 
 /**
  * @brief The main server class, starts the http server and registers all uri
@@ -84,6 +85,7 @@ class CLASServer
     const User *GetUserFromCookie(const std::string &cookie);
 
     ServerConfig &GetServerConfig();
+    cl_events::EventManager &GetEventManager();
 
 
 
@@ -102,6 +104,7 @@ class CLASServer
     UserTable users_;
 
     ServerConfig cfg_;
+    cl_events::EventManager event_manager_;
 
     
     /**

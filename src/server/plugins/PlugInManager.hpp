@@ -7,13 +7,6 @@
 #include <map>
 #include "debug/debug.hpp"
 
-#ifdef _WIN32
-#include <Windows.h>
-using plugin_handle_type = HMODULE;
-#else
-#include <dlfcn.h>
-using plugin_handle_type = void*;
-#endif
 
 class CLASServer;
 
@@ -29,7 +22,7 @@ class PlugInManager
   private:
     typedef bool (*init_plugin)(CLASServer*);
     typedef void (*unload_plugin)();
-    std::map<std::string,plugin_handle_type> loaded_plugins_;
+    std::map<std::string,void*> loaded_plugins_;
 };
 
 
