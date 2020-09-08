@@ -1,5 +1,6 @@
 #include "PlugInManager.hpp"
 #ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 using plugin_handle_type = HMODULE;
 #else
