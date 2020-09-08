@@ -48,13 +48,18 @@ add_library(clas_server_lib OBJECT src/shared/metadata_handler.cc
   src/shared/util/func.cpp src/server/login/user.cpp
   src/server/zotero/zotero.cpp src/server/server/server.cc
   src/server/server/server_config.cpp
-  src/server/plugins/EventManager.cpp)
+  src/server/plugins/EventManager.cpp
+  src/server/plugins/PlugInManager.cpp)
 
 
 set(SRC_FILES_SERVER_TEST src/server/test/main.cc
   src/server/server/tests/server_test.cc src/server/zotero/tests/zotero.cc
   src/server/login/tests/users_test.cc
-  src/server/server/tests/server_config_test.cc)
+  src/server/server/tests/server_config_test.cc
+  src/server/plugins/tests/event_manager_test.cpp
+  src/server/plugins/tests/plug_in_manager_test.cpp)
+
+add_library(test_plugin SHARED src/server/plugins/tests/test_plugin.cpp)
 
 add_executable(clas_digital_server.o $<TARGET_OBJECTS:clas_server_lib> src/server/main.cpp)
 add_executable(clas_digital_server_test.o $<TARGET_OBJECTS:clas_server_lib>
@@ -79,6 +84,12 @@ target_include_directories(clas_server_lib PUBLIC
 )
 
 target_include_directories(clas_digital_server.o PUBLIC
+  "src/shared"
+  "src/shared/util"
+  "src/server"
+)
+
+target_include_directories(test_plugin PUBLIC
   "src/shared"
   "src/shared/util"
   "src/server"
