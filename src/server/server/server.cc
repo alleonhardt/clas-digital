@@ -162,9 +162,6 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::InitialiseFromFile(std::filesy
 debug::Error<CLASServer::ReturnCodes> CLASServer::InitialiseFromString(std::string config_file, std::filesystem::path user_db_file)
 {
   {
-    event_manager_.TriggerEvent(cl_events::Events::BEFORE_SERVER_INITIALISE, this, nullptr);
-
-    event_manager_.TriggerEvent(cl_events::Events::ON_CONFIG_LOAD, this, (void*)&config_file);
     auto err = cfg_.LoadFromString(config_file);
     if(err)
     {
@@ -183,7 +180,7 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::InitialiseFromString(std::stri
     debug::log(debug::LOG_ERROR,"Could not create user table in RAM!\n");
     return debug::Error(ReturnCodes::ERR_USERTABLE_INITIALISE,"Could not initialise user table subsytem").Next(err);
   }
-
+  
   initialised_ = true;
 
   return Error(ReturnCodes::OK);

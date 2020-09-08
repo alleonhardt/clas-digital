@@ -73,9 +73,14 @@ add_executable(clas_digital_search.o  ${SRC_FILES_SEARCH})
 if(MSVC)
   add_compile_options(/W4 /WX)
 else()
-  add_compile_options(-Wall -Wextra -pedantic -Werror -undefined dynamic_lookup)
+  add_compile_options(-Wall -Wextra -pedantic -Werror)
+
   set(CXX_STDLIB stdc++)
 endif()
+
+if(APPLE)
+  target_link_options(test_plugin PUBLIC -undefined dynamic_lookup)
+ENDIF(APPLE)
 
 target_include_directories(clas_server_lib PUBLIC
   "src/shared"
