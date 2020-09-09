@@ -120,7 +120,7 @@ TEST_CASE("Update User List","[CLASServer]") {
         nlohmann::json change_table;
         nlohmann::json entry;
         entry["action"] = "DELETE";
-        entry["key"] = "root";
+        entry["email"] = "root";
         change_table.push_back(entry);
 
         resp = cl.Post("/api/v2/server/userlist",change_table.dump(),"application/json");

@@ -19,7 +19,7 @@ TEST_CASE("Creating Usertable and inserting values","[UserTable]") {
     REQUIRE( tbl.AddUser(cr).GetErrorCode() == UserTable::RET_USER_EXISTS);
 
 
-    REQUIRE( tbl.RemoveUser("alex") == false );
+    REQUIRE( tbl.RemoveUserByKey("alex") == false );
     REQUIRE( tbl.AddUser(cr) == false);
 
     REQUIRE( tbl.GetNumUsers() == 1 );

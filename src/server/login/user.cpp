@@ -45,10 +45,14 @@ namespace clas_digital
   }
 }
 
-bool User::ConstructFromJSON(const nlohmann::json &js)
+bool User::ConstructFromJSON(const nlohmann::json &js, ConstructFlags flags)
 {
   email_ = js.value("email","");
   password_ = js.value("password","");
+
+  if(flags == CONSTRUCT_NEW_USER)
+    password_ = sha3_512(password_);
+
   access_ = js.value("access",0);
   return email_ != "";
 }
@@ -71,9 +75,20 @@ nlohmann::json User::ExportToJSON(ExportPurpose purpose)
   return js;
 }
 
+void User::UpdateFromJSON(const nlohmann::json &js)
+{
+  std::string passw = js.value("password","");
+  if(passw=="")
+    password_ = sha3_512(passw);
+
+  int acc = js.value("access",-1);
+  if(acc!=-1)
+    access_ = acc;
+}
+
 bool User::CheckCredentials(nlohmann::json options)
 {
-  if(options.value("email","") == email_ && options.value("password","") == password_)
+  if(options.value("email","") == email_  && sha3_512(options.value("password","")) == password_)
     return true;
   else return false;
 }
@@ -101,11 +116,23 @@ UserTable::UserTable()
   create_user_ = [](){
     return new User;
   };
+
+  primary_key_field = "email";
+}
+
+UserTable::~UserTable()
+{
+  SaveUserTable();
 }
 
 void UserTable::SetCreateUserCallback(std::function<IUser*()> fnc)
 {
   create_user_ = fnc;
+}
+
+void UserTable::SetPrimaryKeyFieldName(std::string primary_key_field_name)
+{
+  primary_key_field = primary_key_field_name;
 }
 
 
@@ -140,25 +167,39 @@ debug::Error<UserTable::ReturnValues> UserTable::Load(std::filesystem::path data
 
   for(auto &it : js)
   {
-    std::shared_ptr<IUser> ptr(create_user_());
-    auto ret = ptr->ConstructFromJSON(it);
-    if(ret)
-      return debug::Error(RET_USER_FILE_CORRUPTED,"The user file is corrupted cant call ConstructFromJSON() on user\n");
-
-    if(users_.count(ptr->GetPrimaryKey())>0)
-      return debug::Error(RET_USER_EXISTS,"Multiple users with the same primary key in user file!");
-
-    users_.insert({ptr->GetPrimaryKey(),ptr});
+    auto err = __AddUser(it,IUser::ConstructFlags::CONSTRUCT_LOAD_FROM_FILE);
+    if(err) return err;
   }
   save_file_ = database_path;
   return RET_OK;
 }
 
+debug::Error<UserTable::ReturnValues> UserTable::Update(nlohmann::json update_info)
+{
+  std::string email = update_info.value(primary_key_field,"");
+  if(email=="")
+    return debug::Error(RET_MISSING_PRIMARY_KEY,"Missing primary key field in json. Primary key field name: "+primary_key_field);
+
+  auto ptr = GetUserFromPrimaryKey(email);
+  if(ptr)
+  {
+    ptr->UpdateFromJSON(update_info);
+    return debug::Error(RET_OK);
+  }
+
+  return debug::Error(RET_USER_DOES_NOT_EXIST,"Cant change user attributes as the user does not exist. User: "+email);
+}
+
 debug::Error<UserTable::ReturnValues> UserTable::AddUser(nlohmann::json create_credentials)
+{
+  return __AddUser(std::move(create_credentials), IUser::ConstructFlags::CONSTRUCT_NEW_USER);
+}
+
+debug::Error<UserTable::ReturnValues> UserTable::__AddUser(nlohmann::json create_credentials, User::ConstructFlags flags)
 {
   std::unique_lock lock(users_lock_);
   auto usr = create_user_();
-  auto ret = usr->ConstructFromJSON(create_credentials);
+  auto ret = usr->ConstructFromJSON(create_credentials,flags);
   if(!ret)
     return debug::Error(RET_USER_FILE_CORRUPTED,"The user credentials are corrupted cant call ConstructFromJSON() on user\n");
 
@@ -169,7 +210,15 @@ debug::Error<UserTable::ReturnValues> UserTable::AddUser(nlohmann::json create_c
   return debug::Error(RET_OK);
 }
 
-debug::Error<UserTable::ReturnValues> UserTable::RemoveUser(std::string primary_key)
+
+
+debug::Error<UserTable::ReturnValues> UserTable::RemoveUser(nlohmann::json remove_info)
+{
+  std::string primary_key = remove_info.value(primary_key_field,"");
+  return RemoveUserByKey(primary_key);
+}
+
+debug::Error<UserTable::ReturnValues> UserTable::RemoveUserByKey(std::string primary_key)
 {
   std::unique_lock lock(users_lock_);
   if(users_.count(primary_key)>0)
@@ -185,38 +234,35 @@ debug::Error<UserTable::ReturnValues> UserTable::RemoveUser(std::string primary_
 
 std::string UserTable::LogIn(nlohmann::json credentials)
 {
-  try
+  std::shared_ptr<IUser> shared_user = GetUserFromPrimaryKey(credentials.value(primary_key_field,""));
+  
+  if(shared_user && shared_user->CheckCredentials(credentials))
   {
-    std::shared_ptr<IUser> ptr(create_user_());
-    if(!ptr->ConstructFromJSON(credentials))
-      return "";
+    std::unique_lock lock(loggedin_lock_);
 
-    std::shared_ptr<IUser> shared_user;
-    
+    while(true)
     {
-      std::shared_lock lock(users_lock_);
-      shared_user = users_.at(ptr->GetPrimaryKey());
-
-      if(!shared_user->CheckCredentials(credentials))
-        return "";
-    }
-
-
-    {
-      std::unique_lock lock(loggedin_lock_);
-      while(true)
+      std::string cookie = CreateRandomString(32);
+      if(logged_in_.count(cookie) == 0)
       {
-        std::string cookie = CreateRandomString(32);
-        if(logged_in_.count(cookie) == 0)
-        {
-          logged_in_.insert({cookie,shared_user});
-          return cookie;
-        }
+        logged_in_.insert({cookie,shared_user});
+        return cookie;
       }
     }
   }
-  catch(...) {}
   return "";
+}
+
+std::shared_ptr<IUser> UserTable::GetUserFromPrimaryKey(std::string key)
+{
+  try
+  {
+    std::shared_lock lock(loggedin_lock_);
+    return users_.at(key);
+  }
+  catch(...)
+  {}
+  return nullptr;
 }
 
 std::shared_ptr<IUser> UserTable::GetUserFromCookie(const std::string &cookie)
@@ -260,6 +306,19 @@ nlohmann::json UserTable::GetAsJSON()
   return js;
 }
 
+debug::Error<UserTable::ReturnValues> UserTable::SaveUserTable()
+{
+  if(save_file_.string() != "")
+  {
+    std::ofstream ofs("tmp213093812303234.db",std::ios::out);
+    
+    if(std::filesystem::exists(save_file_) == false || std::filesystem::is_directory(save_file_) || !ofs.is_open())
+      return debug::Error(RET_CANT_OPEN_USER_FILE,"Cannot open user file for saving. Filename: "+save_file_.string());
 
-
+    auto js = GetAsJSON();
+    ofs<<js.dump();
+    ofs.close();
+  }
+  return debug::Error(RET_OK);
+}
 

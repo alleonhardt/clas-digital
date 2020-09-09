@@ -70,7 +70,7 @@ void CLASServer::UpdateUserList(const httplib::Request &req, httplib::Response &
         if(it["action"]=="DELETE")
 	      {
 		      //Remove the user if the action is delete if one of the necessary variables does not exist then throw an error and return an error not found
-          users_->RemoveUser(it["key"]);
+          users_->RemoveUser(it);
 	      }
 	      else if(it["action"]=="CREATE")
 	      {
