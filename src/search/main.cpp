@@ -19,7 +19,6 @@ using namespace httplib;
  * Load the login
  */
 std::string GetPage(std::string file) {
-  std::cout << "Go request for: " << file << std::endl;
   //Read loginpage and send
   std::string path = "web/"+file;
   std::ifstream read(path);
@@ -152,16 +151,7 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
     }
     std::cout << "Finished constructing json respsonse." << std::endl;
 
-    /*
-     * Potentiell new version. 
-    nlohmann::json json_response;
-    json_response["pillars"] = zotero_pillars;
-    json_response["search"] = search_response;
-    */
-    std::string app = GetPage("Search.html");
-    app += "<script>let ServerDataObj = {pillars:" + zotero_pillars.dump();
-    app += ", search:" + search_response.dump() + "};<script>";
-    resp.set_content(app.c_str(), "text/html");
+    resp.set_content(search_response.dump(), "application/json");
   }
 
   catch (std::exception &e) {
@@ -251,7 +241,6 @@ void Suggestions(const Request& req, Response& resp, CBookManager& manager,
 
   catch(std::exception &e) {
     std::cout << "Caught exception in suggestions: " << e.what() << std::endl;
-    // TODO (fux): investigate what kind of response is necessary!!
   }
 }
 
@@ -288,7 +277,6 @@ int main()
     std::cout << "Initialization successful!\n"; 
   else
     std::cout << "Initialization failed!\n";
-
   
   int start_port = std::stoi("4848");
   std::cout << "Starting on port: " << start_port << std::endl;
@@ -301,13 +289,19 @@ int main()
       { Search(req, resp, zotero_pillars, manager); });
   srv.Get("/api/v2/search/pages", [&](const Request& req, Response& resp) 
       { Pages(req, resp, manager); });
-  srv.Get("/api/v2/suggestions/corpus", [&](const Request& req, Response& resp)
+  srv.Get("/api/v2/search/suggestions/corpus", [&](const Request& req, Response& resp)
       { Suggestions(req, resp, manager, "corpus"); });
-  srv.Get("/api/v2/suggestions/author", [&](const Request& req, Response& resp)
+  srv.Get("/api/v2/search/suggestions/author", [&](const Request& req, Response& resp)
       { Suggestions(req, resp, manager, "author"); });
+
+  //TODO (fux): this should be handled from main server
+  srv.Get("/api/v2/search/pillars", [&](const Request& req, Response& resp)
+      { resp.set_content(zotero_pillars.dump(), "application/json"); });
 
   //Serve static pages ONLY FOR TESTING!
   srv.Get("/", [](const Request& req, Response& resp) 
+      { resp.set_content(GetPage("Search.html"), "text/html"); });
+  srv.Get("/search(.*)", [](const Request& req, Response& resp)
       { resp.set_content(GetPage("Search.html"), "text/html"); });
   srv.Get("/Search.js", [](const Request& req, Response& resp) 
       { resp.set_content(GetPage("Search.js"), "application/javascript"); });
