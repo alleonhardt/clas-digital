@@ -3,9 +3,9 @@
 
 int *globalx;
 int test_case = -1;
-CLASServer *srv;
+clas_digital::CLASServer *srv;
 
-extern "C" bool InitialisePlugin(CLASServer *server)
+extern "C" bool InitialisePlugin(clas_digital::CLASServer *server)
 {
   globalx = (int*)server;
   if(*globalx == 0)

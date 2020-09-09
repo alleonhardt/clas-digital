@@ -14,7 +14,7 @@ int main( int argc, char* argv[] ) {
  
 
 
-  constexpr int iterations = 10;
+  constexpr int iterations = 100;
   for(int i = 0; i < iterations; i++) {
     std::cout<<termcolor::blue<<"[CATCH 2]: -- Iteration "<<i+1<<"/"<<iterations<<std::endl;
     int result = session.run();

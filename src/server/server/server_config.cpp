@@ -1,6 +1,8 @@
 #include "server_config.hpp"
 #include <fstream>
 
+using namespace clas_digital;
+
 Error<ServerConfigReturnCodes> ServerConfig::LoadFromFile(std::filesystem::path configfile)
 {
   std::string js;

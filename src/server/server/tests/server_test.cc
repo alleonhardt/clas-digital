@@ -3,6 +3,7 @@
 #include <thread>
 #include <chrono>
 
+using namespace clas_digital;
 TEST_CASE("Constructor", "[CLASServer]") {
   // Check the singleton template works
   CLASServer &srv = CLASServer::GetInstance();
@@ -11,6 +12,14 @@ TEST_CASE("Constructor", "[CLASServer]") {
 
 TEST_CASE("Login","[CLASServer]") {
   CLASServer &srv = CLASServer::GetInstance();
+
+  srv.GetEventManager().RegisterForEvent(clas_digital::EventManager::ON_AFTER_INITIALISE, [](CLASServer *srv, void*){
+      nlohmann::json js;
+      js["email"] = "root";
+      js["password"] = "password";
+      srv->GetUserTable()->AddUser(js);
+      return debug::Error(clas_digital::EventManager::RET_OK);
+      });
 
   std::thread t1([&srv](){
       while(!srv.IsRunning())
@@ -59,6 +68,14 @@ TEST_CASE("Login","[CLASServer]") {
 TEST_CASE("Update User List","[CLASServer]") {
   CLASServer &srv = CLASServer::GetInstance();
 
+  srv.GetEventManager().RegisterForEvent(clas_digital::EventManager::ON_AFTER_INITIALISE, [](CLASServer *srv, void*){
+      nlohmann::json js;
+      js["email"] = "root";
+      js["password"] = "password";
+      srv->GetUserTable()->AddUser(js);
+      return debug::Error(clas_digital::EventManager::RET_OK);
+      });
+
   std::thread t1([&srv](){
       while(!srv.IsRunning())
       {
@@ -87,7 +104,7 @@ TEST_CASE("Update User List","[CLASServer]") {
         entry["action"] = "CREATE";
         entry["email"] = "alex";
         entry["password"] = "password";
-        entry["access"] = (int)UserAccess::ADMIN;
+        entry["access"] = (int)User::ACC_ADMIN;
         change_table.push_back(entry);
 
         resp = cl.Post("/api/v2/server/userlist",change_table.dump(),"application/json");

@@ -1,37 +1,36 @@
 #include "EventManager.hpp"
 
-using namespace cl_events;
+using namespace clas_digital;
 
-bool EventManager::RegisterForEvent(Events event, callback_t callback)
+debug::Error<EventManager::ReturnValues> EventManager::RegisterForEvent(Events event, callback_t callback)
 {
   if(static_cast<int>(event) >= NumberOfEvents)
-    return false;
+    return debug::Error(RET_ERROR_EVENT_DOES_NOT_EXIST);
   callbacks_[static_cast<int>(event)].push_back(std::move(callback));
-  return true;
+  return debug::Error(RET_OK);
 }
 
-debug::Error<EventReturn> EventManager::TriggerEvent(Events event, CLASServer* srv, void *data)
+debug::Error<EventManager::ReturnValues> EventManager::TriggerEvent(Events event, CLASServer* srv, void *data)
 {
   if(static_cast<int>(event) >= NumberOfEvents)
-    return debug::Error(EventReturn::ERROR_EVENT_DOES_NOT_EXIST);
+    return debug::Error(RET_ERROR_EVENT_DOES_NOT_EXIST);
 
+  
   for(auto &it : callbacks_[static_cast<int>(event)])
   {
     auto err = it(srv,data);
-    if(err.GetErrorCode() == EventReturn::ERR_ABORT_FOLLOWING)
-      return err;
-    else if(err.GetErrorCode() == EventReturn::OK_ABORT_FOLLOWING)
-    {
-      err.SetErrorCode(EventReturn::OK);
-      return err;
-    }
-    else if(err.GetErrorCode() == EventReturn::ERROR_EVENT_FAILED)
+    if(err.GetErrorCode() == RET_OK_DELETE_HANDLER)
+      it = nullptr;
+    else if(err.GetErrorCode() == RET_ERR_DELETE_HANDLER)
     {
       err.print();
+      it = nullptr;
     }
+    else if(err.GetErrorCode() == RET_ERR)
+      err.print();
   }
 
-  return debug::Error(EventReturn::OK);
+  return debug::Error(RET_OK);
 }
 
 

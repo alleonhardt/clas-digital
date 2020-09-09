@@ -6,36 +6,36 @@
 #include <nlohmann/json.hpp>
 #include "debug/debug.hpp"
 
-class CLASServer;
 
-namespace cl_events
+namespace clas_digital
 {
-  enum class Events
-  {
-    ON_UPDATE_REFERENCE = 0,
-    AFTER_INITIALISE,
-    ON_SERVER_START
-  };
-
-  constexpr unsigned long NumberOfEvents = 3;
-
-  enum class EventReturn
-  {
-    OK = 0,
-    OK_ABORT_FOLLOWING = 1,
-    ERR_ABORT_FOLLOWING = 2,
-    ERROR_EVENT_FAILED,
-    ERROR_EVENT_DOES_NOT_EXIST
-  };
-
-
+  class CLASServer;
   class EventManager
   {
     public:
-      using callback_t = std::function<debug::Error<EventReturn>(CLASServer *, void *)>;
+      enum ReturnValues
+      {
+        RET_OK = 0,
+        RET_ERR,
+        RET_ERROR_EVENT_DOES_NOT_EXIST,
+        RET_ERR_DELETE_HANDLER,
+        RET_OK_DELETE_HANDLER
+      };
 
-      bool RegisterForEvent(Events event, callback_t callback);
-      debug::Error<EventReturn> TriggerEvent(Events event, CLASServer* srv, void *data);
+      enum Events
+      {
+        ON_UPDATE_REFERENCE = 0,
+        ON_AFTER_INITIALISE,
+        ON_SERVER_START,
+        ON_SERVER_STOP
+      };
+      
+      constexpr static unsigned long NumberOfEvents = 4;
+
+      using callback_t = std::function<debug::Error<ReturnValues>(CLASServer *, void *)>;
+
+      debug::Error<ReturnValues> RegisterForEvent(Events event, callback_t callback);
+      debug::Error<ReturnValues> TriggerEvent(Events event, CLASServer* srv, void *data);
 
     private:
       std::vector<callback_t> callbacks_[NumberOfEvents];
