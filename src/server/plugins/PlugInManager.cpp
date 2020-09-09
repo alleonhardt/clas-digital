@@ -8,6 +8,8 @@ using plugin_handle_type = HMODULE;
 using plugin_handle_type = void*;
 #endif
 
+using namespace clas_digital;
+
 
 bool PlugInManager::LoadPlugin(std::string alias_name, std::filesystem::path library_path, CLASServer *server)
 {

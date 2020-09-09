@@ -1,5 +1,6 @@
 #include "server/server.hpp"
 #include <catch2/catch.hpp>
+using namespace clas_digital;
 
 TEST_CASE("Load from string","ServerConfig")
 {

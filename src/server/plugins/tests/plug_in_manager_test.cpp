@@ -3,6 +3,7 @@
 #include <catch2/catch.hpp>
 #include <debug/debug.hpp>
 
+using namespace clas_digital;
 
 #ifdef _WIN32
 const char libpath[] = "bin/test_plugin";

@@ -4,11 +4,12 @@
 #include <openssl/evp.h>
 #include <openssl/sha.h>
 #include <random>
+using namespace clas_digital;
 
-
-
-std::string sha3_512(const std::string& input)
+namespace clas_digital
 {
+  std::string sha3_512(const std::string& input)
+  {
     unsigned int digest_length = SHA512_DIGEST_LENGTH;
     const EVP_MD* algorithm = EVP_sha3_512();
     uint8_t* digest = static_cast<uint8_t*>(OPENSSL_malloc(digest_length));
@@ -20,200 +21,245 @@ std::string sha3_512(const std::string& input)
     EVP_DigestUpdate(context, input.c_str(), input.size());
     EVP_DigestFinal_ex(context, digest, &digest_length);
     EVP_MD_CTX_destroy(context);
-    
+
     std::stringstream stream;
 
     for(auto b : std::vector<uint8_t>(digest,digest+digest_length))
       stream << std::setw(2) << std::hex << std::setfill('0') << b;
 
     return stream.str();
+  }
+
+  std::string CreateRandomString(int len) {
+    std::string str;
+    static const char alphanum[] =
+      "0123456789"
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+      "abcdefghijklmnopqrstuvwxyz"
+      "_";
+    std::random_device dev;
+    //Create random alphanumeric cookie
+    for(int i = 0; i < len; i++)
+      str += alphanum[dev()%(sizeof(alphanum)-1)];
+    return str;
+  }
 }
 
-std::string CreateRandomString(int len) {
-  std::string str;
-	static const char alphanum[] =
-		"0123456789"
-		"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-		"abcdefghijklmnopqrstuvwxyz"
-		"_";
-  std::random_device dev;
-  //Create random alphanumeric cookie
-  for(int i = 0; i < len; i++)
-    str += alphanum[dev()%(sizeof(alphanum)-1)];
-  return str;
+bool User::ConstructFromJSON(const nlohmann::json &js)
+{
+  email_ = js.value("email","");
+  password_ = js.value("password","");
+  access_ = js.value("access",0);
+  return email_ != "";
 }
 
-
-User::User(std::string email, UserAccess acc) : email_(email),access_(acc) {}
-
-const std::string &User::Email() const {
+std::string User::GetPrimaryKey()
+{
   return email_;
 }
 
-UserAccess User::Access() const {
-  return access_;
+nlohmann::json User::ExportToJSON(ExportPurpose purpose)
+{
+
+  nlohmann::json js;
+  js["email"] = email_;
+  
+  if(purpose == User::EXPORT_FOR_SAVING_TO_FILE)
+    js["password"] = password_;
+
+  js["access"] = access_;
+  return js;
+}
+
+bool User::CheckCredentials(nlohmann::json options)
+{
+  if(options.value("email","") == email_ && options.value("password","") == password_)
+    return true;
+  else return false;
+}
+
+bool User::DoAccessCheck(std::string URI)
+{
+  //Always allow access
+  return true;
+}
+
+User::User()
+{}
+
+User::User(std::string email) : email_(email)
+{
 }
 
 
 
 
-UserTable::UserTable() : connection_(nullptr) {}
 
-debug::Error<UserTable::ReturnCodes> UserTable::Load() {
-  return Load(":memory:");
+
+UserTable::UserTable()
+{
+  create_user_ = [](){
+    return new User;
+  };
 }
 
-debug::Error<UserTable::ReturnCodes> UserTable::Load(std::filesystem::path database_path) {
-  try {
-    std::lock_guard lck(class_lock_);
-    debug::log(debug::LOG_DEBUG, "Opening database at path: ",database_path.string(),"\n");
-    connection_ = new SQLite::Database(database_path.string().c_str(),SQLite::OPEN_READWRITE|SQLite::OPEN_CREATE);
-    SQLite::Statement query(*connection_,"SELECT name FROM sqlite_master WHERE type='table' AND name='users';");
-    bool exists = false;
-    while(query.executeStep()) {
-      exists = true;
+void UserTable::SetCreateUserCallback(std::function<IUser*()> fnc)
+{
+  create_user_ = fnc;
+}
+
+
+debug::Error<UserTable::ReturnValues> UserTable::Load()
+{
+  save_file_ = "";
+  return debug::Error(RET_OK);
+}
+
+debug::Error<UserTable::ReturnValues> UserTable::Load(std::filesystem::path database_path)
+{
+  if(database_path.string() == ":memory:")
+    return Load();
+
+  std::ifstream ifs(database_path.c_str(), std::ios::in);
+  if(!ifs.is_open())
+  {
+    save_file_ = database_path;
+    return debug::Error(RET_CANT_OPEN_USER_FILE,"Cant open user file at "+database_path.string());
+  }
+
+  nlohmann::json js;
+  try
+  {
+    ifs>>js;
+  }
+  catch(...)
+  {
+    return debug::Error(RET_USER_FILE_CORRUPTED,"The user file does not contain valid json statements, the file is corrupted. File at " +database_path.string());
+  }
+  ifs.close();
+
+  for(auto &it : js)
+  {
+    std::shared_ptr<IUser> ptr(create_user_());
+    auto ret = ptr->ConstructFromJSON(it);
+    if(ret)
+      return debug::Error(RET_USER_FILE_CORRUPTED,"The user file is corrupted cant call ConstructFromJSON() on user\n");
+
+    if(users_.count(ptr->GetPrimaryKey())>0)
+      return debug::Error(RET_USER_EXISTS,"Multiple users with the same primary key in user file!");
+
+    users_.insert({ptr->GetPrimaryKey(),ptr});
+  }
+  save_file_ = database_path;
+  return RET_OK;
+}
+
+debug::Error<UserTable::ReturnValues> UserTable::AddUser(nlohmann::json create_credentials)
+{
+  std::unique_lock lock(users_lock_);
+  auto usr = create_user_();
+  auto ret = usr->ConstructFromJSON(create_credentials);
+  if(!ret)
+    return debug::Error(RET_USER_FILE_CORRUPTED,"The user credentials are corrupted cant call ConstructFromJSON() on user\n");
+
+  if(users_.count(usr->GetPrimaryKey())>0)
+    return debug::Error(RET_USER_EXISTS,"The user exists already primary constraint failed\n");
+
+  users_.insert({usr->GetPrimaryKey(),std::shared_ptr<IUser>(usr)});
+  return debug::Error(RET_OK);
+}
+
+debug::Error<UserTable::ReturnValues> UserTable::RemoveUser(std::string primary_key)
+{
+  std::unique_lock lock(users_lock_);
+  if(users_.count(primary_key)>0)
+  {
+    if(users_.size() == 1)
+      users_.clear();
+    else
+      users_.erase(primary_key);
+    return debug::Error(RET_OK);
+  }
+  return debug::Error(RET_USER_DOES_NOT_EXIST,"Could not find and delete the user "+primary_key);
+}
+
+std::string UserTable::LogIn(nlohmann::json credentials)
+{
+  try
+  {
+    std::shared_ptr<IUser> ptr(create_user_());
+    if(!ptr->ConstructFromJSON(credentials))
+      return "";
+
+    std::shared_ptr<IUser> shared_user;
+    
+    {
+      std::shared_lock lock(users_lock_);
+      shared_user = users_.at(ptr->GetPrimaryKey());
+
+      if(!shared_user->CheckCredentials(credentials))
+        return "";
     }
 
-    if(!exists) {
-      SQLite::Transaction act(*connection_);
-      connection_->exec( "CREATE TABLE users("
-                  "email TEXT PRIMARY KEY NOT NULL,"
-                  "password TEXT NOT NULL,"
-                  "name TEXT NOT NULL,"
-                  "access INT);");
 
-      std::string cmd = "INSERT INTO USERS(email,password,name,access) VALUES ('root','";
-      cmd+=sha3_512("password");
-      cmd+="','Admin',4);";
-
-      connection_->exec(cmd.c_str());
-
-      act.commit();
-      debug::log(debug::LOG_DEBUG, "Created the table users and the root user.\n");
+    {
+      std::unique_lock lock(loggedin_lock_);
+      while(true)
+      {
+        std::string cookie = CreateRandomString(32);
+        if(logged_in_.count(cookie) == 0)
+        {
+          logged_in_.insert({cookie,shared_user});
+          return cookie;
+        }
+      }
     }
-    
   }
-  catch(SQLite::Exception &e) {
-    debug::log(debug::LOG_ERROR,"Caught exception in ",__FUNCTION__," error \"",e.getErrorStr(),"\"\n");
-    return debug::Error(ReturnCodes::UNKNOWN_ERROR,e.getErrorStr());
-  }
-  return debug::Error(ReturnCodes::OK);
-}
-
-debug::Error<UserTable::ReturnCodes> UserTable::AddUser(std::string email, std::string password, std::string name, UserAccess acc) {
-  try {
-    std::lock_guard lck(class_lock_);
-    SQLite::Statement insert_cmd(*connection_, "INSERT INTO users(email,password,name,access) "
-                                  "VALUES (?,?,?,?);");
-    insert_cmd.bind(1,email.c_str());
-    insert_cmd.bind(2,sha3_512(password).c_str());
-    insert_cmd.bind(3,name.c_str());
-    insert_cmd.bind(4,(int)acc);
-    insert_cmd.exec();
-    debug::log(debug::LOG_DEBUG,"Added new user \"",email,"\" with access \"",(int)acc,"\"\n");
-  }
-  catch(SQLite::Exception &e) {
-    if(e.getExtendedErrorCode() == SQLITE_CONSTRAINT_PRIMARYKEY)
-      return debug::Error(ReturnCodes::USER_EXISTS,"The user "+email+" exists already!");
-
-    return debug::Error(ReturnCodes::UNKNOWN_ERROR, e.getErrorStr());
-  }
-  return debug::Error(ReturnCodes::OK);
-}
-
-debug::Error<UserTable::ReturnCodes> UserTable::RemoveUser(std::string email)
-{
-  try {
-    std::lock_guard lck(class_lock_);
-    SQLite::Statement insert_cmd(*connection_, "DELETE FROM users WHERE email=?;");
-
-    insert_cmd.bind(1,email.c_str());
-    insert_cmd.exec();
-    debug::log(debug::LOG_DEBUG,"Removed user \"",email,"\"\n");
-  }
-  catch(SQLite::Exception &e) {
-    return debug::Error(ReturnCodes::UNKNOWN_ERROR, e.getErrorStr());
-  }
-  return debug::Error(ReturnCodes::OK);
-}
-
-
-int UserTable::GetNumUsers() {
-  try {
-    std::lock_guard lck(class_lock_);
-    SQLite::Statement st(*connection_,"SELECT COUNT(*) FROM users;");
-    
-    st.executeStep();
-    return st.getColumn(0).getInt();
-  }
-  catch(SQLite::Exception &e) {
-    debug::log(debug::LOG_ERROR,"Could not get number of users! Error string: \"",e.getErrorStr(),"\"\n");
-  }
-
-  return -1;
-}
-
-std::string UserTable::LogIn(std::string email, std::string password)
-{
-  try {
-    std::lock_guard lck(class_lock_);
-    SQLite::Statement insert_cmd(*connection_, "SELECT email,access FROM users WHERE email=? AND password=?");
-    insert_cmd.bind(1,email.c_str());
-    insert_cmd.bind(2,sha3_512(password).c_str());
-    insert_cmd.executeStep();
-    User us(insert_cmd.getColumn(0).getText(),(UserAccess)insert_cmd.getColumn(1).getInt());
-    std::string cookie = CreateRandomString(32);
-    logged_in_.insert({cookie, us});
-    return cookie;
-  }
-  catch(SQLite::Exception &) { }
+  catch(...) {}
   return "";
 }
 
-User *UserTable::GetUserFromCookie(const std::string &cookie) {
-  try {
-    std::lock_guard lck(class_lock_);
-    return &logged_in_.at(cookie);
+std::shared_ptr<IUser> UserTable::GetUserFromCookie(const std::string &cookie)
+{
+  std::shared_lock lock(loggedin_lock_);
+  try
+  {
+    return logged_in_.at(cookie);
   }
-  catch(...) { }
+  catch(...){}
+
   return nullptr;
 }
 
-nlohmann::json UserTable::GetAsJSON() {
-  try {
-    std::lock_guard lck(class_lock_);
-    SQLite::Statement query_cmd(*connection_, "SELECT email,access FROM users;");
-    nlohmann::json js;
-    while(query_cmd.executeStep())
-    {
-      nlohmann::json entry;
-      entry["email"] = query_cmd.getColumn(0).getText();
-      entry["access"] = query_cmd.getColumn(1).getInt();
-      js.push_back(entry);
-    }
-
-    return js;
-  }
-  catch(...) {
-    return nlohmann::json::array();
-  }
-}
-
-
-void UserTable::RemoveCookie(const std::string &cookie) {
- try {
-    std::lock_guard lck(class_lock_);
+void UserTable::RemoveCookie(const std::string &cookie)
+{
+  std::unique_lock lock(users_lock_);
+  if(logged_in_.count(cookie)>0)
+  {
     if(logged_in_.size() == 1)
       logged_in_.clear();
     else
       logged_in_.erase(cookie);
   }
-  catch(...) { }
 }
 
 
-UserTable::~UserTable() {
-  std::lock_guard lck(class_lock_);
-  if(connection_)
-    delete connection_;
+int UserTable::GetNumUsers() const
+{
+  return users_.size();
 }
+
+nlohmann::json UserTable::GetAsJSON()
+{
+  std::unique_lock lock(users_lock_);
+  nlohmann::json js;
+  for(auto &it : users_)
+  {
+    js.push_back(it.second->ExportToJSON(IUser::EXPORT_FOR_SENDING_TO_ADMIN));
+  }
+  return js;
+}
+
+
+
+

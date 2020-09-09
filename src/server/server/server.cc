@@ -3,6 +3,8 @@
 #include "util/URLParser.hpp"
 #include "debug/debug.hpp"
 
+using namespace clas_digital;
+
 
 CLASServer &CLASServer::GetInstance()
 {
@@ -16,8 +18,11 @@ void CLASServer::HandleLogin(const httplib::Request &req, httplib::Response &res
   //First parse the url encoded body of the post request
   URLParser parser(req.body);
 
+  nlohmann::json cred;
+  cred["email"] = parser["email"];
+  cred["password"] = parser["password"];
   // Try to do a login with the obtained data
-  auto cookie = users_->LogIn(parser["email"], parser["password"]);
+  auto cookie = users_->LogIn(std::move(cred));
 
   //No cookie created deny access
   if(cookie == "") {
@@ -38,20 +43,20 @@ void CLASServer::SendUserList(const httplib::Request &req, httplib::Response &re
   //Send back the user list if the user is an admin user, first check if there
   //is an user associated with the cookie and if it is. Check if the user is an
   //admin user
-  const User *usr = GetUserFromCookie(req.get_header_value("Cookie"));
-  if(!usr || usr->Access() != UserAccess::ADMIN)
-    resp.status = 403;
-  else
+  auto usr = GetUserFromCookie(req.get_header_value("Cookie"));
+  if(usr && usr->DoAccessCheck(req.path))
     resp.set_content(users_->GetAsJSON().dump(),"application/json");
+  else
+    resp.status = 403;
 }
 
 void CLASServer::UpdateUserList(const httplib::Request &req, httplib::Response &resp)
 {
   //Update the user list based on the json commands received
-  const User *usr = GetUserFromCookie(req.get_header_value("Cookie"));
+  auto usr = GetUserFromCookie(req.get_header_value("Cookie"));
 
   // Check if the user has the required access
-  if(!usr || usr->Access() != UserAccess::ADMIN)
+  if(!usr || !usr->DoAccessCheck(req.path))
     resp.status = 403;
   else
   {
@@ -65,12 +70,12 @@ void CLASServer::UpdateUserList(const httplib::Request &req, httplib::Response &
         if(it["action"]=="DELETE")
 	      {
 		      //Remove the user if the action is delete if one of the necessary variables does not exist then throw an error and return an error not found
-          users_->RemoveUser(it["email"]);
+          users_->RemoveUser(it["key"]);
 	      }
 	      else if(it["action"]=="CREATE")
 	      {
 		      //Create the user with the specified email password and access
-          users_->AddUser(it["email"], it["password"], "Unknown", it["access"]);
+          users_->AddUser(it);
 	      }
       }
     }
@@ -83,7 +88,7 @@ void CLASServer::UpdateUserList(const httplib::Request &req, httplib::Response &
 }
 
 
-const User *CLASServer::GetUserFromCookie(const std::string &cookie_ptr)
+std::shared_ptr<IUser> CLASServer::GetUserFromCookie(const std::string &cookie_ptr)
 {
   //Try to extract the SESSID from the cookie field
   //If the cookie field is empty return 0 as there is no way an user is logged
@@ -125,7 +130,7 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::Start(std::string listenAddres
     server_.set_mount_point("/", it.string().c_str());
   }
 
-  event_manager_.TriggerEvent(cl_events::Events::ON_SERVER_START, this, (void*)&server_);
+  event_manager_.TriggerEvent(EventManager::ON_SERVER_START, this, (void*)&server_);
   
   // Check how many times we tried to bind the port
   int port_binding_tries = 0;
@@ -170,32 +175,25 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::InitialiseFromString(std::stri
   {
     plugin_manager_.LoadPlugin(std::to_string(i++), it, this);
   }
-
-  // Try to load the user table, if this fails notify the user and stop
-  // initialising
-  if(!users_)
-    users_.reset(new UserTable);
-
+  
   auto err = users_->Load(user_db_file);
-  if(err.GetErrorCode() != UserTable::ReturnCodes::OK)
+  if(err.GetErrorCode() != UserTable::RET_OK)
   {
     debug::log(debug::LOG_ERROR,"Could not create user table in RAM!\n");
     return debug::Error(ReturnCodes::ERR_USERTABLE_INITIALISE,"Could not initialise user table subsytem").Next(err);
   }
 
-  event_manager_.TriggerEvent(cl_events::Events::AFTER_INITIALISE, this, nullptr);
-  
   initialised_ = true;
+  event_manager_.TriggerEvent(EventManager::ON_AFTER_INITIALISE, this, nullptr);
 
   return Error(ReturnCodes::OK);
 }
-
-
 
 void CLASServer::Stop()
 {
   // Stop the server and tell the status bit about the changed status
   server_.stop();
+  event_manager_.TriggerEvent(EventManager::ON_SERVER_STOP, this, (void*)&server_);
 }
 
 ServerConfig &CLASServer::GetServerConfig()
@@ -203,9 +201,15 @@ ServerConfig &CLASServer::GetServerConfig()
   return cfg_;
 }
 
-cl_events::EventManager &CLASServer::GetEventManager()
+EventManager &CLASServer::GetEventManager()
 {
   return event_manager_;
+}
+
+
+std::shared_ptr<UserTable> CLASServer::GetUserTable()
+{
+  return users_;
 }
 
 
@@ -216,5 +220,6 @@ bool CLASServer::IsRunning()
 
 CLASServer::CLASServer()
 {
+  users_.reset(new UserTable);
   initialised_ = false;
 }
