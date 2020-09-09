@@ -238,7 +238,7 @@ function sendSugg(input, type)
         str = input.substr(n+1);
     else
         str=input;
-    let requ = "/api/v1/typeahead/"+type+"?q="+encodeURIComponent(str);
+    let requ = "/api/v2/search/suggestions/"+type+"?q="+encodeURIComponent(str);
 
     var xhttp = new XMLHttpRequest();
     var suggs = document.getElementById("suggs_"+type);
@@ -273,7 +273,7 @@ function sendToPage(name)
 	let inputObj = document.getElementById(name);
 	let input = inputObj.value;
 	//Form the request for the server
-	let requ = "/search?q="+encodeURIComponent(input).replace(/%20/g, "+");
+	let requ = "/api/v2/search?q="+encodeURIComponent(input).replace(/%20/g, "+");
 
 	//Create the json file with the advanced search options
 	if(document.getElementById("fuzzyness").value=="1")
@@ -289,7 +289,7 @@ function sendToPage(name)
 	if(document.getElementById("collections").value != "all")
         requ += "&pillars="+document.getElementById("collections").value;
 	
-    window.location = requ;
+  window.location = requ;
 }
 
 function sugg_func(x, type) 

@@ -3,7 +3,6 @@
  */
 
 #include <chrono>
-#include <filesystem>
 #include <iostream>
 #include <string>
 
@@ -12,7 +11,25 @@
 #include "book_manager/CBookManager.hpp"
 
 using namespace httplib;
-namespace fs = std::filesystem;
+
+/**
+ * Load a page (html/ css/ javascript) from disc and return as string
+ * @param[in] path to file
+ * @return complete file as string
+ * Load the login
+ */
+std::string GetPage(std::string file) {
+  std::cout << "Go request for: " << file << std::endl;
+  //Read loginpage and send
+  std::string path = "web/"+file;
+  std::ifstream read(path);
+  std::string login_page( (std::istreambuf_iterator<char>(read) ),
+                           std::istreambuf_iterator<char>()     );
+
+  //Delete file-end marker
+  login_page.pop_back();
+  return login_page;
+}
 
 /**
  * Search in all entries in corpus. And all metadata.
@@ -135,11 +152,16 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
     }
     std::cout << "Finished constructing json respsonse." << std::endl;
 
-    //TODO (fux): send response!!
+    /*
+     * Potentiell new version. 
     nlohmann::json json_response;
     json_response["pillars"] = zotero_pillars;
     json_response["search"] = search_response;
-    resp.set_content(json_response, "application/json");
+    */
+    std::string app = GetPage("Search.html");
+    app += "<script>let ServerDataObj = {pillars:" + zotero_pillars.dump();
+    app += ", search:" + search_response.dump() + "};<script>";
+    resp.set_content(app.c_str(), "text/html");
   }
 
   catch (std::exception &e) {
@@ -224,7 +246,7 @@ void Suggestions(const Request& req, Response& resp, CBookManager& manager,
     delete suggestions;
 
     //Send response.
-    resp.set_content(json_response, "application/json");
+    resp.set_content(json_response.dump(), "application/json");
   }
 
   catch(std::exception &e) {
@@ -237,9 +259,6 @@ int main()
 {
   //Create server.
   Server srv;
-
-  for (auto &p : fs::directory_iterator())
-    std::cout << p.path() << std::endl;
 
   //Load corpus metadata from disc.
   //TODO (fux): location should be specified by a config file.
@@ -278,14 +297,24 @@ int main()
   std::cout<<  "TODO (fux):  add signal-handler to stop the service.\n";
   
   //Add specific handlers via server-frame 
-  srv.Get("/api/search/", [&](const Request& req, Response& resp) 
-                  { Search(req, resp, zotero_pillars, manager); });
-  srv.Get("/api/search/pages", [&](const Request& req, Response& resp) 
-                  { Pages(req, resp, manager); });
-  srv.Get("/api/suggestions/corpus", [&](const Request& req, Response& resp)
-                  { Suggestions(req, resp, manager, "corpus"); });
-  srv.Get("/api/suggestions/author", [&](const Request& req, Response& resp)
-                  { Suggestions(req, resp, manager, "author"); });
+  srv.Get("/api/v2/search", [&](const Request& req, Response& resp) 
+      { Search(req, resp, zotero_pillars, manager); });
+  srv.Get("/api/v2/search/pages", [&](const Request& req, Response& resp) 
+      { Pages(req, resp, manager); });
+  srv.Get("/api/v2/suggestions/corpus", [&](const Request& req, Response& resp)
+      { Suggestions(req, resp, manager, "corpus"); });
+  srv.Get("/api/v2/suggestions/author", [&](const Request& req, Response& resp)
+      { Suggestions(req, resp, manager, "author"); });
+
+  //Serve static pages ONLY FOR TESTING!
+  srv.Get("/", [](const Request& req, Response& resp) 
+      { resp.set_content(GetPage("Search.html"), "text/html"); });
+  srv.Get("/Search.js", [](const Request& req, Response& resp) 
+      { resp.set_content(GetPage("Search.js"), "application/javascript"); });
+  srv.Get("/topnav.css", [](const Request& req, Response& resp) 
+      { resp.set_content(GetPage("topnav.css"), "text/css"); });
+  srv.Get("/Search.css", [](const Request& req, Response& resp) 
+      { resp.set_content(GetPage("Search.css"), "text/css"); });
   std::cout << "C++ Api server startup successfull!" << std::endl;
 
   srv.listen("0.0.0.0", start_port);
