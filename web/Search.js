@@ -84,6 +84,7 @@ function ShowSelectedValues(obj) {
 
   document.getElementById("selAll").style.display = "block";
 
+  //Set start and limit and calculate the number of books being presented.
   let start = 0;
   if(getParameterByName('start')!=null)
     start = parseInt(getParameterByName('start'));
@@ -93,112 +94,110 @@ function ShowSelectedValues(obj) {
   let to=limit;
   if(start+limit > json.max_results)
     to = json.max_results - start;
+
+  //Iterate over books and add to page.
 	for (var i=0; i<to; i++) {
-			let newList = document.createElement("li");
-			newList.id = json.books[i].scanId;
+    let newList = document.createElement("li");
+    newList.id = json.books[i].scanId;
 
-      let div1 = document.createElement("div")
-      div1.setAttribute("class", "searchResult");
+    let div1 = document.createElement("div")
+    div1.setAttribute("class", "searchResult");
 
-      let desc = document.createElement("span");
-      if(!json.books[i].hasocr || (json.books[i].hasocr == undefined))
-        desc.innerHTML = json.books[i].description;
-      else if(document.getElementById("fuzzyness").value!=0) {
-        desc.innerHTML = "<a onclick='changeColor(this);return true;' href='/books/"
-          + json.books[i].scanId
-          + "/pages/?highlight="+document.getElementById("SpecialSID").value
-          + "&fuzzyness="+document.getElementById("fuzzyness").value+"'>"
-          + json.books[i].description+"</a>";
-      }
-      else {
-        desc.innerHTML = "<a onclick='changeColor(this);return true;' href='/books/"
-          + json.books[i].scanId
-          + "/pages/?highlight="+document.getElementById("SpecialSID").value
-          + "'>"+json.books[i].description+"</a>";
-      }
-      desc.setAttribute("class", "desc");
-      div1.appendChild(desc);
+    let desc = document.createElement("span");
+    if(!json.books[i].hasocr || (json.books[i].hasocr == undefined))
+      desc.innerHTML = json.books[i].description;
 
-      let bib = document.createElement("span");
-      bib.innerHTML = "<a class='metadata' href='/books/" + json.books[i].scanId
-                      + "/'>" + json.books[i].bibliography + "</a>";
-      div1.appendChild(bib);
-
-      let prev = document.createElement("span");
-      prev.innerHTML = json.books[i].preview;
-      prev.setAttribute("class", "preview");
-      div1.appendChild(prev);
-      newList.appendChild(div1);
-
-      let div2 = document.createElement("div");
-      div2.setAttribute("class", "tickbox");
-      let aBox = document.createElement("input");
-      aBox.setAttribute("class", "booklistinp");
-      aBox.setAttribute("type", "checkbox");
-      aBox.setAttribute("data-scanid", json.books[i].scanId);
-      div2.appendChild(aBox);
-      newList.appendChild(div2);
-      hitList.appendChild(newList);
-	  }
-	
-    document.getElementById("bottomBorder").style.display="block";
-
-    let lastHit = json.max_results - ((json.max_results-start) % limit);
-    let numPages = (json.max_results - (json.max_results % limit))/limit;
-    let counter = numPages+1;
-    if(start%limit != 0) counter++;
-
-    let linkcontainer = document.getElementById("linkcontainer");
-    for(let i = lastHit; i >= 0; i-=limit) {
-      let newlst = document.createElement("li");
-      newlst.setAttribute("class", "link");
-
-      let newlnk='';
-      if(getParameterByName('start')==null)
-          newlnk = window.location.search+"&start="+i;
-      else
-          newlnk = window.location.search.replace("start="+start,"start="+i);
-      if(i==start)
-          newlst.innerHTML = counter;
-      else
-          newlst.innerHTML = "<a href='"+newlnk+"'>"+counter+"</a>";
-      linkcontainer.insertBefore(newlst, linkcontainer.childNodes[0]);
-      counter--;
-    }
-    if(start%limit != 0) {
-      let newlst = document.createElement("li");
-      newlst.setAttribute("class", "link");
-
-      let newlnk='';
-      if(getParameterByName('start')==null)
-          newlnk = window.location.search+"&start="+0;
-      else
-          newlnk = window.location.search.replace("start="+start,"start="+0);
-      if(i==start)
-          newlst.innerHTML = counter;
-      else
-          newlst.innerHTML = "<a href='"+newlnk+"'>"+counter+"</a>";
-      linkcontainer.insertBefore(newlst, linkcontainer.childNodes[0]);
-    }
-    
-
-    let inc_start= parseInt(start+limit);
-    let dec_start= parseInt(start-limit);
-    rep = 'start='+start;
-
-    if(dec_start<1) dec_start=0;
-    if(inc_start>json.max_results) inc_start=lastHit;
-
-    if(getParameterByName('start')==null) {
-        document.getElementById("prev").setAttribute("href", window.location.search + "&start="+dec_start);
-	    document.getElementById("next").setAttribute("href", window.location.search + "&start="+inc_start);
-    }
     else {
-        document.getElementById("prev").setAttribute("href", window.location.search.replace(rep,"start="+dec_start));
-        document.getElementById("next").setAttribute("href", window.location.search.replace(rep,"start="+inc_start));
+      desc.innerHTML = "<a onclick='changeColor(this);return true;' href='/books/"
+        + json.books[i].scanId
+        + "/pages/?highlight="+document.getElementById("SpecialSID").value;
+        if (document.getElementById("fuzzyness").value != 0) {
+          desc.innerHTML+="&fuzzyness="+document.getElementById("fuzzyness").value+"'>";
+        desc.innerHTML += json.books[i].description+"</a>";
     }
-    document.getElementById("prev").style.display="inline-block";
-    document.getElementById("next").style.display="inline-block";
+    desc.setAttribute("class", "desc");
+    div1.appendChild(desc);
+
+    let bib = document.createElement("span");
+    bib.innerHTML = "<a class='metadata' href='/books/" + json.books[i].scanId
+                    + "/'>" + json.books[i].bibliography + "</a>";
+    div1.appendChild(bib);
+
+    let prev = document.createElement("span");
+    prev.innerHTML = json.books[i].preview;
+    prev.setAttribute("class", "preview");
+    div1.appendChild(prev);
+    newList.appendChild(div1);
+
+    let div2 = document.createElement("div");
+    div2.setAttribute("class", "tickbox");
+    let aBox = document.createElement("input");
+    aBox.setAttribute("class", "booklistinp");
+    aBox.setAttribute("type", "checkbox");
+    aBox.setAttribute("data-scanid", json.books[i].scanId);
+    div2.appendChild(aBox);
+    newList.appendChild(div2);
+    hitList.appendChild(newList);
+  }
+
+  document.getElementById("bottomBorder").style.display="block";
+
+  let lastHit = json.max_results - ((json.max_results-start) % limit);
+  let numPages = (json.max_results - (json.max_results % limit))/limit;
+  let counter = numPages+1;
+  if(start%limit != 0) counter++;
+
+  let linkcontainer = document.getElementById("linkcontainer");
+  for(let i = lastHit; i >= 0; i-=limit) {
+    let newlst = document.createElement("li");
+    newlst.setAttribute("class", "link");
+
+    let newlnk='';
+    if(getParameterByName('start')==null)
+        newlnk = window.location.search+"&start="+i;
+    else
+        newlnk = window.location.search.replace("start="+start,"start="+i);
+    if(i==start)
+        newlst.innerHTML = counter;
+    else
+        newlst.innerHTML = "<a href='"+newlnk+"'>"+counter+"</a>";
+    linkcontainer.insertBefore(newlst, linkcontainer.childNodes[0]);
+    counter--;
+  }
+  if(start%limit != 0) {
+    let newlst = document.createElement("li");
+    newlst.setAttribute("class", "link");
+
+    let newlnk='';
+    if(getParameterByName('start')==null)
+        newlnk = window.location.search+"&start="+0;
+    else
+        newlnk = window.location.search.replace("start="+start,"start="+0);
+    if(i==start)
+        newlst.innerHTML = counter;
+    else
+        newlst.innerHTML = "<a href='"+newlnk+"'>"+counter+"</a>";
+    linkcontainer.insertBefore(newlst, linkcontainer.childNodes[0]);
+  }
+  
+
+  let inc_start= parseInt(start+limit);
+  let dec_start= parseInt(start-limit);
+  rep = 'start='+start;
+
+  if(dec_start<1) dec_start=0;
+  if(inc_start>json.max_results) inc_start=lastHit;
+
+  if(getParameterByName('start')==null) {
+      document.getElementById("prev").setAttribute("href", window.location.search + "&start="+dec_start);
+    document.getElementById("next").setAttribute("href", window.location.search + "&start="+inc_start);
+  }
+  else {
+      document.getElementById("prev").setAttribute("href", window.location.search.replace(rep,"start="+dec_start));
+      document.getElementById("next").setAttribute("href", window.location.search.replace(rep,"start="+inc_start));
+  }
+  document.getElementById("prev").style.display="inline-block";
+  document.getElementById("next").style.display="inline-block";
 }
 
 function sendSugg(input, type) {
@@ -519,7 +518,6 @@ function GetSearchResultsFromServer() {
   var pos = url.indexOf("?q=");
   if (pos == -1)
     return
-  console.log(url.substr(pos, url.length))
 
   let requ = "api/v2/search" + url.substr(pos, url.length)
   var xhttp = new XMLHttpRequest();
