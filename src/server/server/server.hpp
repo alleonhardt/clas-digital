@@ -2,6 +2,7 @@
 #define CLASDIGITAL_SRC_SERVER_SERVER_SERVER_HPP
 // Overwrite default thread pool count
 #define CPPHTTPLIB_THREAD_POOL_COUNT 8
+#define CPPHTTPLIB_OPENSSL_SUPPORT
 #include <httplib.h>
 #include <algorithm>
 #include <mutex>

@@ -2,7 +2,6 @@
 
 #include <iostream>
 #include <streambuf>
-#include <httplib.h>
 #include <chrono>
 #include <exception>
 #include <string_view>
