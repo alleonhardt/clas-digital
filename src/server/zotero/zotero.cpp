@@ -22,6 +22,16 @@ size_t clas_digital::zoteroHeaderReader(char *pReceiveData, size_t pSize, size_t
 	//The function zoteroHeaderReader will get called for each header in the http request
 	std::string ass;
 	ass.assign(pReceiveData,pSize*pNumBlocks);
+  if(ass.find("HTTP/1.1 404")!=std::string::npos)
+  {
+    zot->err_ = IReferenceManager::Error::KEY_DOES_NOT_EXIST;
+	  return pSize*pNumBlocks;
+  }
+  else if(ass.find("HTTP/1.1 403")!=std::string::npos)
+  {
+    zot->err_ = IReferenceManager::Error::API_KEY_NOT_VALID_OR_NO_ACCESS;
+	  return pSize*pNumBlocks;
+  }
 
 	//Look if there is a link to follow in order to download the whole json
 	if(ass.find("Link: ")!=std::string::npos)
@@ -63,6 +73,7 @@ void ZoteroConnection::SetNextLink(std::string str)
 
 ZoteroConnection::ZoteroConnection(std::string apiKey, std::string api_addr, std::string baseUri)
 {
+  err_ = IReferenceManager::Error::OK;
 	_nextLink="";
 	//Init the interface to libcurl
 	_curl = curl_easy_init();
@@ -105,7 +116,7 @@ ZoteroConnection::ZoteroConnection(std::string apiKey, std::string api_addr, std
 }
 
 
-ReturnCode ZoteroConnection::SendRequest(std::string requestURI, std::shared_ptr<std::unordered_map<std::string,IReference*>> &ref)
+IReferenceManager::Error ZoteroConnection::SendRequest(std::string requestURI, std::shared_ptr<std::unordered_map<std::string,IReference*>> &ref)
 {
 	//Try to build the request to zotero
 	//_baseRequest = https://api.zotero.org/groups/$(our_group_number)
@@ -132,9 +143,11 @@ ReturnCode ZoteroConnection::SendRequest(std::string requestURI, std::shared_ptr
 		if(result != CURLE_OK)
 		{
 			std::cout<<"[Could not perform request to zotero api!]\n";
-			return ReturnCode::USER_ID_AND_GROUP_ID;
+			return IReferenceManager::Error::USER_ID_AND_GROUP_ID;
 		}
 
+    if(err_)
+      return err_;
 		//We could receive a corrupted json file
 		//to handle all error catch all error and try to process them
 		try
@@ -165,7 +178,7 @@ ReturnCode ZoteroConnection::SendRequest(std::string requestURI, std::shared_ptr
 			}
 			//TODO: Some error handling at the moment the programm just exits with an
 			//error code
-			return ReturnCode::NO_GROUP_ID_OR_USER_ID;
+			return IReferenceManager::Error::NOT_A_VALID_JSON;
 		}
 
 		//If the custom header function set the link to the next chunk of the json
@@ -185,7 +198,7 @@ ReturnCode ZoteroConnection::SendRequest(std::string requestURI, std::shared_ptr
 	}
 
 	//Convert the json to an string and return it.
-	return ReturnCode::OK;
+	return IReferenceManager::Error::OK;
 }
 
 
@@ -216,11 +229,80 @@ void custom_deleter(ZoteroReferenceManager::container_t* ptr)
   delete ptr;
 }
 
-ZoteroReferenceManager::ZoteroReferenceManager() : itemReferences_(new ZoteroReferenceManager::container_t()), collectionReferences_(new ZoteroReferenceManager::container_t())
+ZoteroReferenceManager::ZoteroReferenceManager(std::filesystem::path path)
 { 
+  cache_path_ = std::move(path);  
+  std::ifstream ifs(cache_path_, std::ios::in);
+  try
+  {
+    nlohmann::json save;
+    if(ifs.is_open())
+    {
+      ifs>>save;
+      ifs.close();
+    }
+
+    if(save.count("items"))
+    {
+      itemReferences_ = IReferenceManager::ptr_cont_t(new container_t,custom_deleter);
+      for(auto &it : save["items"])
+      {
+        IReference *ref = new ZoteroReference();
+        ref->json(it);
+        itemReferences_->insert({ref->GetKey(),ref});
+      }
+      if(itemReferences_->size() == 0)
+        itemReferences_.reset();
+    }
+    
+    if(save.count("collections"))
+    {
+      collectionReferences_ = IReferenceManager::ptr_cont_t(new container_t,custom_deleter);
+      for(auto &it : save["collections"])
+      {
+        IReference *ref = new ZoteroReference();
+        ref->json(it);
+        collectionReferences_->insert({ref->GetKey(),ref});
+      }
+      if(collectionReferences_->size() == 0)
+        collectionReferences_.reset();
+    }
+  }
+  catch(...)
+  {
+  }
+}
+      
+IReferenceManager::Error ZoteroReferenceManager::SaveToFile()
+{
+  std::ofstream ofs(cache_path_, std::ios::out);
+  nlohmann::json save;
+  {
+    std::shared_lock lck(exclusive_swap_);
+    save["items"] = nlohmann::json::array();
+    save["collections"] = nlohmann::json::array();
+    if(itemReferences_)
+      for(auto &it : *itemReferences_)
+        save["items"].push_back(it.second->json());
+  
+    if(collectionReferences_)
+      for(auto &it : *collectionReferences_)
+        save["collections"].push_back(it.second->json());
+  }
+  if(ofs.is_open())
+  {
+    ofs<<save;
+    ofs.close();
+  }
+  return Error::OK;
 }
 
-ReturnCode ZoteroReferenceManager::Initialise(std::filesystem::path p)
+ZoteroReferenceManager::~ZoteroReferenceManager()
+{
+  SaveToFile();
+}
+
+IReferenceManager::Error ZoteroReferenceManager::Initialise(std::filesystem::path p)
 {
   // Try to load the file from the specified path
   nlohmann::json js;
@@ -228,7 +310,7 @@ ReturnCode ZoteroReferenceManager::Initialise(std::filesystem::path p)
 
   // If the file does not exist return the corresponding error
   if(ifs.fail())
-    return ReturnCode::JSON_FILE_DOES_NOT_EXIST;
+    return Error::JSON_FILE_DOES_NOT_EXIST;
 
   try
   {
@@ -238,7 +320,7 @@ ReturnCode ZoteroReferenceManager::Initialise(std::filesystem::path p)
   catch(...)
   {
     // Something went wrong, probably the JSON was not valid
-    return ReturnCode::NOT_A_VALID_JSON;
+    return Error::NOT_A_VALID_JSON;
   }
 
   // Close the file input and intialise with the given settings
@@ -247,11 +329,11 @@ ReturnCode ZoteroReferenceManager::Initialise(std::filesystem::path p)
 }
 
 
-ReturnCode ZoteroReferenceManager::Initialise(nlohmann::json details)
+IReferenceManager::Error ZoteroReferenceManager::Initialise(nlohmann::json details)
 {
   // Check if there is an API Key, this is REQUIRED for an connection to zotero
   if (details.count("api_key") == 0)
-    return ReturnCode::NO_API_KEY;
+    return Error::NO_API_KEY;
   else
     apiKey_ = details["api_key"];
 
@@ -261,7 +343,7 @@ ReturnCode ZoteroReferenceManager::Initialise(nlohmann::json details)
   {
     // If there is neither an group id nor an user id return an error
     if (details.count("user_id") == 0)
-      return ReturnCode::NO_GROUP_ID_OR_USER_ID;
+      return IReferenceManager::Error::NO_GROUP_OR_USER_ID;
 
     //TODO: Access the users database
     baseUri_ = "/users/";
@@ -272,7 +354,7 @@ ReturnCode ZoteroReferenceManager::Initialise(nlohmann::json details)
     // If there is an user id as well there is no way to know what to use
     // therefore return an error
     if (details.count("user_id") != 0)
-      return ReturnCode::USER_ID_AND_GROUP_ID;
+      return Error::USER_ID_AND_GROUP_ID;
     
     // Construct the basic uri from the group id and the basi format of zotero
     // for requests to an group 
@@ -291,7 +373,7 @@ ReturnCode ZoteroReferenceManager::Initialise(nlohmann::json details)
   citationStyle_ = details.value("citation_style","kritische-ausgabe");
 
   // Everything went well!
-  return ReturnCode::OK;
+  return Error::OK;
 }
 
 std::unique_ptr<ZoteroConnection> ZoteroReferenceManager::GetConnection()
@@ -304,163 +386,117 @@ std::unique_ptr<ZoteroConnection> ZoteroReferenceManager::GetConnection()
 
 
 
-IReferenceManager::Error ZoteroReferenceManager::__applyForEach(const ZoteroReferenceManager::ptr_cont_t &t, IReferenceManager::func &fnc, IReferenceManager::CacheOptions opts)
+IReferenceManager::Error ZoteroReferenceManager::__tryCacheHit(ZoteroReferenceManager::ptr_cont_t &input, ZoteroReferenceManager::ptr_cont_t &ret_val, IReferenceManager::CacheOptions opts)
 {
   std::shared_lock lck(exclusive_swap_);
-  if(!t || opts == CacheOptions::CACHE_FORCE_FETCH)
+
+  if(!input || opts == CacheOptions::CACHE_FORCE_FETCH)
     return Error::CACHE_MISS;
 
-  for(auto &it : *t)
-    fnc(it.second);
-  
+  ret_val = input; 
   return Error::OK;
 }
 
-IReferenceManager::Error ZoteroReferenceManager::__updateContainerAndApplyForEach(ZoteroReferenceManager::ptr_cont_t &destination, ZoteroReferenceManager::ptr_cont_t &source, IReferenceManager::func &fnc)
+
+IReferenceManager::Error ZoteroReferenceManager::__tryCacheHit(ZoteroReferenceManager::ptr_cont_t &input, ZoteroReferenceManager::ptr_t &ret_val, const std::string &value, CacheOptions opts)
 {
-  {
-    std::unique_lock lck(exclusive_swap_);
-    destination = std::move(source);
-  }
-
   std::shared_lock lck(exclusive_swap_);
-  for(auto &it : *destination)
-    fnc(it.second);
+  if(!input || opts == CacheOptions::CACHE_FORCE_FETCH)
+    return Error::CACHE_MISS;
 
+  auto val = input->find(value);
+  if(val == input->end())
+    return Error::CACHE_MISS;
+
+  ret_val = std::shared_ptr<IReference>(val->second->Copy());
   return Error::OK;
 }
 
-IReferenceManager::Error ZoteroReferenceManager::__updateContainerAndApply(ZoteroReferenceManager::ptr_cont_t &destination, ZoteroReferenceManager::ptr_cont_t &source, IReferenceManager::func &fnc)
+
+void ZoteroReferenceManager::__updateCache(ZoteroReferenceManager::ptr_cont_t &input, ZoteroReferenceManager::ptr_cont_t &new_val)
 {
-  
-  {
-    IReference *ref = nullptr;
-    std::unique_lock lck(exclusive_swap_);
-
-    for(auto &it : *source)
-    {
-      std::swap((*destination)[it.first], it.second);
-      if(it.second)
-        delete it.second;
-    }
-  }
-
-  std::shared_lock lck(exclusive_swap_);
-  for(auto &it : *destination)
-    fnc(it.second);
-
-  return Error::OK;
+  std::unique_lock lck(exclusive_swap_);
+  input = std::move(new_val);
 }
 
-IReferenceManager::Error ZoteroReferenceManager::__applyFuncOnSingleElement(ZoteroReferenceManager::ptr_cont_t &destination, const std::string &key, IReferenceManager::func &fnc, IReferenceManager::CacheOptions opts)
+IReferenceManager::Error ZoteroReferenceManager::__performRequestsAndUpdateCache(ZoteroReferenceManager::ptr_cont_t &input, ZoteroReferenceManager::ptr_cont_t &output, std::vector<std::string> &requestMatrix)
 {
-  std::shared_lock lck(exclusive_swap_);
-  if(!destination || opts == CacheOptions::CACHE_FORCE_FETCH)
-    return Error::CACHE_MISS;
-  
-  try
-  {
-    fnc(destination->at(key));
-    return Error::OK;
-  }
-  catch(...)
-  {
-    return Error::CACHE_MISS;
-  }
-}
-
-
-
-
-IReferenceManager::Error ZoteroReferenceManager::GetAllItems(IReferenceManager::func on_item, IReferenceManager::CacheOptions opts)
-{
-  auto err = __applyForEach(itemReferences_,on_item,opts);
-  if(err == Error::OK || opts == CacheOptions::CACHE_FAIL_ON_CACHE_MISS) return err;
- 
   ptr_cont_t request(new container_t(),custom_deleter);
   auto connection = GetConnection();
-  
+ 
+  for(const auto &it : requestMatrix)
+  {
+    auto res = connection->SendRequest(it,request);
+    if(res != Error::OK)
+      return res;
+  }
+
+  __updateCache(input,request);
+  output = input;
+
+  return Error::OK;
+}
+
+
+IReferenceManager::Error ZoteroReferenceManager::GetAllItems(ZoteroReferenceManager::ptr_cont_t &items, IReferenceManager::CacheOptions opts)
+{
+  auto err = __tryCacheHit(itemReferences_,items,opts);
+  if(err == Error::OK || opts == CacheOptions::CACHE_FAIL_ON_CACHE_MISS) return err;
+ 
   std::vector<std::string> cmdMatrix;
   if(trackedCollections_.size() == 0)
     cmdMatrix.push_back("/items?format=json&include=data,bib,citation&style="+citationStyle_+"&limit=100");
   else
     std::for_each(trackedCollections_.begin(),trackedCollections_.end(),[&cmdMatrix,this](std::string &coll){cmdMatrix.push_back("/collections/"+coll+"/items?format=json&include=data,bib,citation&style="+this->citationStyle_+"&limit=100");});
 
-  for(const auto &it : cmdMatrix)
-  {
-    auto res = connection->SendRequest(it,request);
-    if(res != ReturnCode::OK)
-      return Error::UNKNOWN;
-  }
+  return __performRequestsAndUpdateCache(itemReferences_,items,cmdMatrix);
+ }
 
-  return __updateContainerAndApplyForEach(itemReferences_,request,on_item);
-}
-
-IReferenceManager::Error ZoteroReferenceManager::GetAllCollections(IReferenceManager::func on_item, IReferenceManager::CacheOptions opts)
+IReferenceManager::Error ZoteroReferenceManager::GetAllCollections(IReferenceManager::ptr_cont_t &collections, IReferenceManager::CacheOptions opts)
 { 
-  auto err = __applyForEach(collectionReferences_,on_item,opts);
+  auto err = __tryCacheHit(collectionReferences_,collections,opts);
   if(err == Error::OK || opts == CacheOptions::CACHE_FAIL_ON_CACHE_MISS) return err;
   
-  ptr_cont_t request(new container_t(),custom_deleter);
-  auto connection = GetConnection();
-
   std::vector<std::string> cmdMatrix;
   if(trackedCollections_.size() == 0)
     cmdMatrix.push_back("/collections?format=json&include=data&limit=100");
   else
     std::for_each(trackedCollections_.begin(),trackedCollections_.end(),[&cmdMatrix](std::string &coll){cmdMatrix.push_back("/collections/"+coll+"?format=json&include=data");});
 
-  for(const auto &it : cmdMatrix)
+  return __performRequestsAndUpdateCache(collectionReferences_, collections, cmdMatrix);
+}
+
+
+IReferenceManager::Error ZoteroReferenceManager::GetItemMetadata(ZoteroReferenceManager::ptr_t &item, std::string key, IReferenceManager::CacheOptions opts)
+{
+  auto err = __tryCacheHit(itemReferences_, item, key, opts);
+  if(err == Error::OK || opts == CacheOptions::CACHE_FAIL_ON_CACHE_MISS) return err;
+
+  auto connection = GetConnection();
+  ptr_cont_t request(new container_t());
+  auto res = connection->SendRequest("/items/"+key+"?format=json&include=data,bib,citation&style="+citationStyle_,request);
+
+  if(res == Error::OK)
   {
-    auto res = connection->SendRequest(it,request);
-    if(res != ReturnCode::OK)
-      return Error::UNKNOWN;
+    item = std::shared_ptr<IReference>(request->begin()->second);
+    return Error::OK;
   }
-
-  return __updateContainerAndApplyForEach(collectionReferences_,request,on_item);
+  return res;
 }
 
 
-IReferenceManager::Error ZoteroReferenceManager::GetItemMetadata(IReferenceManager::func on_item, std::string item, IReferenceManager::CacheOptions opts)
+IReferenceManager::Error ZoteroReferenceManager::GetCollectionMetadata(IReferenceManager::ptr_t &collection, std::string collectionKey, IReferenceManager::CacheOptions opts)
 {
-  auto err = __applyFuncOnSingleElement(itemReferences_,item,on_item,opts);
+  auto err = __tryCacheHit(collectionReferences_, collection, collectionKey, opts);
   if(err == Error::OK || opts == CacheOptions::CACHE_FAIL_ON_CACHE_MISS) return err;
 
   auto connection = GetConnection();
   ptr_cont_t request(new container_t());
-  auto res = connection->SendRequest("/items/"+item+"?format=json&include=data,bib,citation&style="+citationStyle_,request);
+  auto res = connection->SendRequest("/collections/"+collectionKey+"?format=json&include=data",request);
 
-  if(res == ReturnCode::OK)
-    return __updateContainerAndApply(itemReferences_,request, on_item);
-  
-  return Error::UNKNOWN;
+  if(res == Error::OK)
+  {
+    collection = std::shared_ptr<IReference>(request->begin()->second);
+  }
+  return res;
 }
-
-
-IReferenceManager::Error ZoteroReferenceManager::GetCollectionMetadata(IReferenceManager::func on_item, std::string collection, IReferenceManager::CacheOptions opts)
-{
-  auto err = __applyFuncOnSingleElement(collectionReferences_,collection, on_item,opts);
-  if(err == Error::OK || opts == CacheOptions::CACHE_FAIL_ON_CACHE_MISS) return err;
-
-  auto connection = GetConnection();
-  ptr_cont_t request(new container_t());
-  auto res = connection->SendRequest("/collections/"+collection+"?format=json&include=data",request);
-
-  if(res == ReturnCode::OK)
-    return __updateContainerAndApply(collectionReferences_,request, on_item);
-  return Error::UNKNOWN;
-}
-
-IReferenceManager::Error ZoteroReferenceManager::GetAllItemsFromCollection(IReferenceManager::func on_item, std::string collectionKey, IReferenceManager::CacheOptions opts)
-{
-  ptr_cont_t request(new container_t());
-  auto connection = GetConnection();
-
-  auto res = connection->SendRequest("/collections/"+collectionKey+"/items?format=json&include=data,bib,citation&style="+citationStyle_+"&limit=100",request);
-  
-  if(res == ReturnCode::OK)
-    return __updateContainerAndApply(itemReferences_,request, on_item);
-
-  return Error::UNKNOWN;
-}
-

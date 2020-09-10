@@ -9,7 +9,6 @@
 
 namespace clas_digital
 {
-
   class IReference
   {
     public:
@@ -31,6 +30,7 @@ namespace clas_digital
       virtual int GetDate() = 0;
       virtual bool HasCopyright() = 0;
       virtual std::string GetKey() = 0;
+      virtual ~IReference(){};
 
     protected:
         nlohmann::json metadata_;
@@ -43,7 +43,10 @@ namespace clas_digital
   class IReferenceManager
   {
     public:
-      using func = std::function<void(IReference*)>;
+      using container_t = std::unordered_map<std::string,IReference*>;
+      using ptr_t = std::shared_ptr<IReference>;
+      using ptr_cont_t = std::shared_ptr<container_t>;
+
 
       enum CacheOptions
       {
@@ -58,18 +61,25 @@ namespace clas_digital
         CACHE_MISS,
         MULTIPLE_RESULTS,
         NO_JSON_RETURNED,
+        KEY_DOES_NOT_EXIST,
+        NO_API_KEY,
+        NO_GROUP_OR_USER_ID,
+        USER_ID_AND_GROUP_ID,
+        JSON_FILE_DOES_NOT_EXIST,
+        NOT_A_VALID_JSON,
+        API_KEY_NOT_VALID_OR_NO_ACCESS,
         UNKNOWN
       };
 
     
-      virtual Error GetAllItems(func on_item, CacheOptions opts=CacheOptions::CACHE_USE_CACHED) = 0;
-      virtual Error GetAllCollections(func on_collections, CacheOptions opts=CacheOptions::CACHE_USE_CACHED) = 0;
-      virtual Error GetAllItemsFromCollection(func on_item, std::string collectionKey, CacheOptions opts=CacheOptions::CACHE_USE_CACHED) = 0;
+      virtual Error GetAllItems(ptr_cont_t &items, CacheOptions opts=CacheOptions::CACHE_USE_CACHED) = 0;
+      virtual Error GetAllCollections(ptr_cont_t &collections, CacheOptions opts=CacheOptions::CACHE_USE_CACHED) = 0;
 
-      virtual Error GetItemMetadata(func on_item, std::string item, CacheOptions opts=CacheOptions::CACHE_USE_CACHED) = 0;
-      virtual Error GetCollectionMetadata(func on_item, std::string collection, CacheOptions opts=CacheOptions::CACHE_USE_CACHED) = 0;
+      virtual Error GetItemMetadata(ptr_t &item, std::string itemKey, CacheOptions opts=CacheOptions::CACHE_USE_CACHED) = 0;
+      virtual Error GetCollectionMetadata(ptr_t &collection, std::string collectionKey, CacheOptions opts=CacheOptions::CACHE_USE_CACHED) = 0;
+
+      virtual Error SaveToFile() = 0;
   };
-
 }
 
 

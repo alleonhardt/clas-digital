@@ -20,46 +20,6 @@
 namespace clas_digital
 {
   /**
-   * @brief The possible return codes returned by the diffrent classes in the
-   * zotero namespace
-   */
-  enum class ReturnCode
-  {
-    /**
-     * @brief No error everything went well
-     */
-    OK = 0,
-
-    /**
-     * @brief No API Key found in the json file loaded or in the details given
-     */
-    NO_API_KEY = 1,
-
-    /**
-     * @brief No user or group id found in the configuration json
-     */
-    NO_GROUP_ID_OR_USER_ID = 2,
-
-
-    /**
-     * @brief There is an user as well as an group id in the configuration json
-     * there is no way to know which one to use, therefore the error
-     */
-    USER_ID_AND_GROUP_ID = 4,
-
-    /**
-     * @brief Trying to load a json file that does not exist
-     */
-    JSON_FILE_DOES_NOT_EXIST = 8,
-
-
-    /**
-     * @brief Received a json that was not valid
-     */
-    NOT_A_VALID_JSON = 16
-  };
-
-  /**
    * @brief The basic zotero api address can be changed to make accesses to a
    * diffrent zotero api address
    */
@@ -96,7 +56,7 @@ namespace clas_digital
 
       bool HasCopyright() override
       {
-        return false;
+        return false; 
       }
 
       IReference *Copy() override
@@ -129,7 +89,7 @@ namespace clas_digital
        * invalid request.
        *
        */
-      ReturnCode SendRequest(std::string requestURI,std::shared_ptr<std::unordered_map<std::string,IReference*>> &ref);
+      IReferenceManager::Error SendRequest(std::string requestURI,std::shared_ptr<std::unordered_map<std::string,IReference*>> &ref);
 
       /**
        * Closes all open connection and cleans everything up
@@ -150,6 +110,7 @@ namespace clas_digital
 
       std::string _nextLink;		///<Contains an non empty string if the json downloaded is only a part of the full json
 			std::string body_;
+      IReferenceManager::Error err_;
 
       /**
        * Writes the buffer inside of the class variable _requestJSON
@@ -176,20 +137,23 @@ namespace clas_digital
   class ZoteroReferenceManager : public IReferenceManager
   {
     public:
-      using container_t = std::unordered_map<std::string,IReference*>;
-      using ptr_t = std::shared_ptr<IReference>;
-      using ptr_cont_t = std::shared_ptr<container_t>;
 
-      using func = IReferenceManager::func;
+      using container_t = IReferenceManager::container_t;
+      using ptr_t = IReferenceManager::ptr_t;
+      using ptr_cont_t = IReferenceManager::ptr_cont_t;
+
+
        
-      ZoteroReferenceManager();
+      ZoteroReferenceManager(std::filesystem::path filename="zoteroCacheData.json");
+      ~ZoteroReferenceManager();
 
-      Error GetAllItems(func on_item, CacheOptions opts=CacheOptions::CACHE_USE_CACHED);
-      Error GetAllCollections(func on_collections, CacheOptions opts=CacheOptions::CACHE_USE_CACHED);
-      Error GetAllItemsFromCollection(func on_item, std::string collectionKey, CacheOptions opts=CacheOptions::CACHE_USE_CACHED);
+      Error GetAllItems(ptr_cont_t &items, CacheOptions opts=CacheOptions::CACHE_USE_CACHED) override;
+      Error GetAllCollections(ptr_cont_t &collections, CacheOptions opts=CacheOptions::CACHE_USE_CACHED) override;
       
-      Error GetItemMetadata(func on_item, std::string item, CacheOptions opts=CacheOptions::CACHE_USE_CACHED);
-      Error GetCollectionMetadata(func on_item, std::string collection, CacheOptions opts=CacheOptions::CACHE_USE_CACHED);
+      Error GetItemMetadata(ptr_t &item, std::string itemKey, CacheOptions opts=CacheOptions::CACHE_USE_CACHED) override;
+      Error GetCollectionMetadata(ptr_t &collection, std::string collectionKey, CacheOptions opts=CacheOptions::CACHE_USE_CACHED) override;
+     
+      Error SaveToFile() override;
 
       /**
        * @brief Constructor for the reference manager creates the manager from
@@ -197,7 +161,7 @@ namespace clas_digital
        *
        * @param details The details to connect the api with
        */
-      ReturnCode Initialise(nlohmann::json details);
+      IReferenceManager::Error Initialise(nlohmann::json details);
 
       /**
        * @brief Constructs the ReferenceManager from the specified options from
@@ -208,7 +172,7 @@ namespace clas_digital
        * @return The error if there is any return ReturnCode::OK if everything
        * went well.
        */
-      ReturnCode Initialise(std::filesystem::path p);
+      IReferenceManager::Error Initialise(std::filesystem::path p);
 
 
       /**
@@ -232,19 +196,22 @@ namespace clas_digital
       std::vector<std::string> trackedCollections_;
       std::string citationStyle_;
 
+      std::filesystem::path cache_path_;
+
 
       ptr_cont_t itemReferences_;
       ptr_cont_t collectionReferences_;
       std::shared_mutex exclusive_swap_;
 
 
-      Error __applyForEach(const ZoteroReferenceManager::ptr_cont_t &t, IReferenceManager::func &fnc, IReferenceManager::CacheOptions opts);
+      Error __tryCacheHit(ptr_cont_t &input, ptr_cont_t &ret_val, IReferenceManager::CacheOptions opts);
+      
+      Error __tryCacheHit(ptr_cont_t &input, ptr_t &ret_val, const std::string &value, CacheOptions opts);
 
-      Error __updateContainerAndApplyForEach(ZoteroReferenceManager::ptr_cont_t &destination, ZoteroReferenceManager::ptr_cont_t &source, IReferenceManager::func &fnc);
 
-      Error __updateContainerAndApply(ZoteroReferenceManager::ptr_cont_t &destination, ZoteroReferenceManager::ptr_cont_t &source, IReferenceManager::func &fnc);
+      Error __performRequestsAndUpdateCache(ptr_cont_t &input, ptr_cont_t &output, std::vector<std::string> &requestMatrix);
 
-      Error __applyFuncOnSingleElement(ZoteroReferenceManager::ptr_cont_t &destination, const std::string &key, IReferenceManager::func &fnc, IReferenceManager::CacheOptions opts);
+      void __updateCache(ptr_cont_t &input, ptr_cont_t &new_val);
   };
 }
 
