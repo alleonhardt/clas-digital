@@ -408,7 +408,6 @@ std::list<std::string>* CBookManager::getSuggestions(std::string sWord, std::str
 */
 std::list<std::string>* CBookManager::getSuggestions(std::string sWord, sortedList& listWords)
 {
-    std::cout << sWord << std::endl;
     func::convertToLower(sWord);
     sWord = func::convertStr(sWord);
     std::map<std::string, double>* suggs = new std::map<std::string, double>;
