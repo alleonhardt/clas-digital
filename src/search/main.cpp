@@ -96,7 +96,7 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
 
     //Debug printing.
     std::cout << "Recieved search request!" << std::endl;
-    std::cout << "Query: " << query << 
+    std::cout << "Searching with query: " << query << 
       "; fuzzyness: " << fuzzyness <<
       "; scope: " << scope <<
       "; author: " << author <<
@@ -113,10 +113,8 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
 
 
     //Start search
-    std::cout << "Started search!" << std::endl;
     auto time_start = std::chrono::system_clock::now();
     auto result_list = manager.search(&options);
-    std::cout << "Finished searching!" << std::endl;
 
     //Construct response
     std::cout << "Constructing response json." << std::endl;
@@ -128,10 +126,13 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
       search_response["time"] = 0;
     }
     else {
+      //get iterator and advance to beginning of "list_start".
       auto it = result_list->begin();
       std::advance(it, list_start);
+
       size_t counter = 0;
       for (; it!=result_list->end(); it++) {
+        //Create entry for each book in result.
         auto &book = all_books[*it];
         nlohmann::json entry;
         entry["scanId"] = book->get_key();
@@ -144,22 +145,24 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
         if (++counter == resultsperpage)
           break;
       }
+
+      //Add number of results and elapsed time to response.
       search_response["max_results"] = result_list->size();
       std::chrono::duration<double> elapsed_seconds = 
         std::chrono::system_clock::now() - time_start;
-      search_response["time"] = 0;
+      search_response["time"] = elapsed_seconds.count();
     }
-    std::cout << "Finished constructing json respsonse." << std::endl;
+    std::cout << "Finished constructing json response." << std::endl;
 
     resp.set_content(search_response.dump(), "application/json");
   }
 
   catch (std::exception &e) {
     std::cout << "Caught exception in search_all_books: " << e.what() << "\n";
-    // TODO (fux): investigate what kind of response is necessary!!
     resp.status = 400;
-    resp.set_content("<html><head></head><body><h1>Corrupted search request!"
-        "</h1></body></html>", "text/html");
+    nlohmann::json error_response;
+    error_response["error"] = "Ups. Something went wrong. Please try again later.";
+    resp.set_content(error_response.dump(), "text/txt");
   }
 }
 

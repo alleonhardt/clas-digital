@@ -15,11 +15,11 @@ function OpenFilter(x) {
 	}
 
 	let val = getParameterByName(x.id);
-	if(val==null) {
+	if (val==null) {
 	  window.location = lnk + "&"+x.id+"="+retval;
   }
 	else {
-    if(x.value=="10"||x.value=="relevance")
+    if (x.value == "10" || x.value == "relevance")
       window.location = lnk.replace("&"+x.id+"="+val,"");
     else
       window.location = lnk.replace(x.id+"="+val,x.id+"="+retval);
@@ -84,6 +84,7 @@ function ShowSelectedValues(obj) {
 
   document.getElementById("selAll").style.display = "block";
 
+  //Set start and limit and calculate the number of books being presented.
   let start = 0;
   if(getParameterByName('start')!=null)
     start = parseInt(getParameterByName('start'));
@@ -93,146 +94,142 @@ function ShowSelectedValues(obj) {
   let to=limit;
   if(start+limit > json.max_results)
     to = json.max_results - start;
+
+  //Iterate over books and add to page.
 	for (var i=0; i<to; i++) {
-			let newList = document.createElement("li");
-			newList.id = json.books[i].scanId;
+    let newList = document.createElement("li");
+    newList.id = json.books[i].scanId;
 
-      let div1 = document.createElement("div")
-      div1.setAttribute("class", "searchResult");
+    let div1 = document.createElement("div")
+    div1.setAttribute("class", "searchResult");
 
-      let desc = document.createElement("span");
-      if(!json.books[i].hasocr || (json.books[i].hasocr == undefined))
-        desc.innerHTML = json.books[i].description;
-      else if(document.getElementById("fuzzyness").value!=0) {
-        desc.innerHTML = "<a onclick='changeColor(this);return true;' href='/books/"
-          + json.books[i].scanId
-          + "/pages/?highlight="+document.getElementById("SpecialSID").value
-          + "&fuzzyness="+document.getElementById("fuzzyness").value+"'>"
-          + json.books[i].description+"</a>";
-      }
-      else {
-        desc.innerHTML = "<a onclick='changeColor(this);return true;' href='/books/"
-          + json.books[i].scanId
-          + "/pages/?highlight="+document.getElementById("SpecialSID").value
-          + "'>"+json.books[i].description+"</a>";
-      }
-      desc.setAttribute("class", "desc");
-      div1.appendChild(desc);
+    let desc = document.createElement("span");
+    if(!json.books[i].hasocr || (json.books[i].hasocr == undefined))
+      desc.innerHTML = json.books[i].description;
 
-      let bib = document.createElement("span");
-      bib.innerHTML = "<a class='metadata' href='/books/" + json.books[i].scanId
-                      + "/'>" + json.books[i].bibliography + "</a>";
-      div1.appendChild(bib);
-
-      let prev = document.createElement("span");
-      prev.innerHTML = json.books[i].preview;
-      prev.setAttribute("class", "preview");
-      div1.appendChild(prev);
-      newList.appendChild(div1);
-
-      let div2 = document.createElement("div");
-      div2.setAttribute("class", "tickbox");
-      let aBox = document.createElement("input");
-      aBox.setAttribute("class", "booklistinp");
-      aBox.setAttribute("type", "checkbox");
-      aBox.setAttribute("data-scanid", json.books[i].scanId);
-      div2.appendChild(aBox);
-      newList.appendChild(div2);
-      hitList.appendChild(newList);
-	  }
-	
-    document.getElementById("bottomBorder").style.display="block";
-
-    let lastHit = json.max_results - ((json.max_results-start) % limit);
-    let numPages = (json.max_results - (json.max_results % limit))/limit;
-    let counter = numPages+1;
-    if(start%limit != 0) counter++;
-
-    let linkcontainer = document.getElementById("linkcontainer");
-    for(let i = lastHit; i >= 0; i-=limit) {
-      let newlst = document.createElement("li");
-      newlst.setAttribute("class", "link");
-
-      let newlnk='';
-      if(getParameterByName('start')==null)
-          newlnk = window.location.search+"&start="+i;
-      else
-          newlnk = window.location.search.replace("start="+start,"start="+i);
-      if(i==start)
-          newlst.innerHTML = counter;
-      else
-          newlst.innerHTML = "<a href='"+newlnk+"'>"+counter+"</a>";
-      linkcontainer.insertBefore(newlst, linkcontainer.childNodes[0]);
-      counter--;
-    }
-    if(start%limit != 0) {
-      let newlst = document.createElement("li");
-      newlst.setAttribute("class", "link");
-
-      let newlnk='';
-      if(getParameterByName('start')==null)
-          newlnk = window.location.search+"&start="+0;
-      else
-          newlnk = window.location.search.replace("start="+start,"start="+0);
-      if(i==start)
-          newlst.innerHTML = counter;
-      else
-          newlst.innerHTML = "<a href='"+newlnk+"'>"+counter+"</a>";
-      linkcontainer.insertBefore(newlst, linkcontainer.childNodes[0]);
-    }
-    
-
-    let inc_start= parseInt(start+limit);
-    let dec_start= parseInt(start-limit);
-    rep = 'start='+start;
-
-    if(dec_start<1) dec_start=0;
-    if(inc_start>json.max_results) inc_start=lastHit;
-
-    if(getParameterByName('start')==null) {
-        document.getElementById("prev").setAttribute("href", window.location.search + "&start="+dec_start);
-	    document.getElementById("next").setAttribute("href", window.location.search + "&start="+inc_start);
-    }
     else {
-        document.getElementById("prev").setAttribute("href", window.location.search.replace(rep,"start="+dec_start));
-        document.getElementById("next").setAttribute("href", window.location.search.replace(rep,"start="+inc_start));
+      desc.innerHTML = "<a onclick='changeColor(this);return true;' href='/books/"
+        + json.books[i].scanId
+        + "/pages/?highlight="+document.getElementById("SpecialSID").value;
+        if (document.getElementById("fuzzyness").value != 0) 
+          desc.innerHTML+="&fuzzyness="+document.getElementById("fuzzyness").value+"'>";
+        desc.innerHTML += json.books[i].description+"</a>";
     }
-    document.getElementById("prev").style.display="inline-block";
-    document.getElementById("next").style.display="inline-block";
+    desc.setAttribute("class", "desc");
+    div1.appendChild(desc);
+
+    let bib = document.createElement("span");
+    bib.innerHTML = "<a class='metadata' href='/books/" + json.books[i].scanId
+                    + "/'>" + json.books[i].bibliography + "</a>";
+    div1.appendChild(bib);
+
+    let prev = document.createElement("span");
+    prev.innerHTML = json.books[i].preview;
+    prev.setAttribute("class", "preview");
+    div1.appendChild(prev);
+    newList.appendChild(div1);
+
+    let div2 = document.createElement("div");
+    div2.setAttribute("class", "tickbox");
+    let aBox = document.createElement("input");
+    aBox.setAttribute("class", "booklistinp");
+    aBox.setAttribute("type", "checkbox");
+    aBox.setAttribute("data-scanid", json.books[i].scanId);
+    div2.appendChild(aBox);
+    newList.appendChild(div2);
+    hitList.appendChild(newList);
+  }
+
+  document.getElementById("bottomBorder").style.display="block";
+
+  let lastHit = json.max_results - ((json.max_results-start) % limit);
+  let numPages = (json.max_results - (json.max_results % limit))/limit;
+  let counter = numPages+1;
+  if(start%limit != 0) counter++;
+
+  let linkcontainer = document.getElementById("linkcontainer");
+  for(let i = lastHit; i >= 0; i-=limit) {
+    let newlst = document.createElement("li");
+    newlst.setAttribute("class", "link");
+
+    let newlnk='';
+    if(getParameterByName('start')==null)
+        newlnk = window.location.search+"&start="+i;
+    else
+        newlnk = window.location.search.replace("start="+start,"start="+i);
+    if(i==start)
+        newlst.innerHTML = counter;
+    else
+        newlst.innerHTML = "<a href='"+newlnk+"'>"+counter+"</a>";
+    linkcontainer.insertBefore(newlst, linkcontainer.childNodes[0]);
+    counter--;
+  }
+  if(start%limit != 0) {
+    let newlst = document.createElement("li");
+    newlst.setAttribute("class", "link");
+
+    let newlnk='';
+    if(getParameterByName('start')==null)
+        newlnk = window.location.search+"&start="+0;
+    else
+        newlnk = window.location.search.replace("start="+start,"start="+0);
+    if(i==start)
+        newlst.innerHTML = counter;
+    else
+        newlst.innerHTML = "<a href='"+newlnk+"'>"+counter+"</a>";
+    linkcontainer.insertBefore(newlst, linkcontainer.childNodes[0]);
+  }
+  
+
+  let inc_start= parseInt(start+limit);
+  let dec_start= parseInt(start-limit);
+  rep = 'start='+start;
+
+  if(dec_start<1) dec_start=0;
+  if(inc_start>json.max_results) inc_start=lastHit;
+
+  if(getParameterByName('start')==null) {
+      document.getElementById("prev").setAttribute("href", window.location.search + "&start="+dec_start);
+    document.getElementById("next").setAttribute("href", window.location.search + "&start="+inc_start);
+  }
+  else {
+      document.getElementById("prev").setAttribute("href", window.location.search.replace(rep,"start="+dec_start));
+      document.getElementById("next").setAttribute("href", window.location.search.replace(rep,"start="+inc_start));
+  }
+  document.getElementById("prev").style.display="inline-block";
+  document.getElementById("next").style.display="inline-block";
 }
 
 function sendSugg(input, type) {
-    console.log(input, type);
-    var n = input.indexOf(" ");
-    var str;
-    if(n!=-1)
-      str = input.substr(n+1);
-    else
-      str=input;
-    let requ = "/api/v2/search/suggestions/"+type+"?q="+encodeURIComponent(str);
+  var n = input.indexOf(" ");
+  var str;
+  if(n!=-1)
+    str = input.substr(n+1);
+  else
+    str=input;
+  let requ = "/api/v2/search/suggestions/"+type+"?q="+encodeURIComponent(str);
 
-    var xhttp = new XMLHttpRequest();
-    var suggs = document.getElementById("suggs_"+type);
-    xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-           //Action to be performed when the document is ready:
-           suggs.innerHTML="";
-           suggs.style.display="inline-block";
+  var xhttp = new XMLHttpRequest();
+  var suggs = document.getElementById("suggs_"+type);
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      //Action to be performed when the document is ready:
+      suggs.innerHTML="";
+      suggs.style.display="inline-block";
 
-           console.log(this.responseText);
-           var obj = JSON.parse(this.responseText);
-           for(let i=0;i<obj.length;i++) {
-               var node = document.createElement("a");
-               node.onclick=function(){sugg_func(this, type);};
-               node.onmousedown=function(){sugg_func(this, type);};
-               var textNode = document.createTextNode(obj[i]);
-               node.appendChild(textNode);
-               suggs.appendChild(node);
-           }
-        }
-    };
-    xhttp.open("GET", requ, true);
-    xhttp.send();
+      var obj = JSON.parse(this.responseText);
+      for(let i=0;i<obj.length;i++) {
+        var node = document.createElement("a");
+        node.onclick=function(){sugg_func(this, type);};
+        node.onmousedown=function(){sugg_func(this, type);};
+        var textNode = document.createTextNode(obj[i]);
+        node.appendChild(textNode);
+        suggs.appendChild(node);
+      }
+    }
+  };
+  xhttp.open("GET", requ, true);
+  xhttp.send();
 }
 
 //Searches in the server with the given search options and displays a list of matches
@@ -331,12 +328,12 @@ function AddListeners() {
 
   // *** ADD LISTENERS *** // 
 
-  //Suggestions for author names
-  let ath = document.getElementById("author");
-  ath.addEventListener("input", function(event){
+  //Listeners on author's input field (suggestion for author names)
+  let input_authors = document.getElementById("author");
+  input_authors.addEventListener("input", function(event){
       sendSugg(document.getElementById("author").value, "author");
   });
-  ath.addEventListener("keydown", function(event){
+  input_authors.addEventListener("keydown", function(event){
       let k = document.getElementById("suggs_author").selec;
       if(k==undefined)
           k=-1;
@@ -347,7 +344,6 @@ function AddListeners() {
           }
       }
       if(event.key=="ArrowUp" || event.key=="ArrowDown") {
-          
           let lst = document.getElementById("suggs_author").children;
           if(k!=-1)
               lst[k].style.background="";
@@ -366,14 +362,18 @@ function AddListeners() {
   });
 
   //Listeners on main input field
-  let inp = document.getElementById("SpecialSID");
-  inp.focus();
-  inp.addEventListener("input",function(event){
-          sendSugg(document.getElementById("SpecialSID").value, "corpus");
-  });
-  inp.addEventListener("keydown",function(event){
+  let input_search= document.getElementById("SpecialSID");
+  input_search.focus();
 
-    //Suggestions
+  //Handler to send suggestions after every input.
+  input_search.addEventListener("input",function(event){
+      sendSugg(document.getElementById("SpecialSID").value, "corpus");
+  });
+
+  //Handler to manager 1. Enter to search, 2. select suggestion, 3. next page
+  input_search.addEventListener("keydown",function(event){
+    
+    //1. Press >>Enter<< to search.
     let k = document.getElementById("suggs_corpus").selec;
     if(k==undefined)
       k=-1;
@@ -385,7 +385,7 @@ function AddListeners() {
       document.getElementById("srchButton").click();
     }
 
-    //next or previous page
+    //2. Select suggestion.
     else if(event.key=="ArrowUp" || event.key=="ArrowDown") {
       let lst = document.getElementById("suggs_corpus").children;
       if(k!=-1)
@@ -403,6 +403,7 @@ function AddListeners() {
       document.getElementById("suggs_corpus").selec=k;
     }
 
+    //3. Next or previos page with keyboard shortcut.
     let start = 0;
     if(getParameterByName("start") != null)
       start= parseInt(getParameterByName('start'));  
@@ -474,8 +475,10 @@ function ReflectUrlValues() {
 	  document.title = "CLAS digital book search";
 	else
 	  document.title = q + " ‒ CLAS digital book search";
-	let description = "Search results for \"" + q + "\" from the CLAS digital book search collection of over 100,000 pages.";
-	document.querySelector('meta[name="description"]').setAttribute("content", description);
+	let description = "Search results for \"" + q + "\" from the CLAS digital "
+    + "book search collection of over 100,000 pages.";
+	document.querySelector('meta[name="description"]').setAttribute("content", 
+    description);
 }
 
 function GetPillarsFromServer() {
@@ -487,8 +490,13 @@ function GetPillarsFromServer() {
   xhttp.onreadystatechange = function() {
     //Add pillars
     if(this.status == 200) {
-      console.log("Response: ", this.responseText);
+
+      //Parse search results from respond
+      if (this.responseText == "")
+        return;
       var pillars = JSON.parse(this.responseText);
+
+      //Add pillars
       for(let i=0; i<pillars.length; i++) {
         var opt = document.createElement("option");
         opt.value=pillars[i].key;
@@ -508,19 +516,32 @@ function GetSearchResultsFromServer() {
   var pos = url.indexOf("?q=");
   if (pos == -1)
     return
-  console.log(url.substr(pos, url.length))
 
   let requ = "api/v2/search" + url.substr(pos, url.length)
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
 
-    //parse search results from respond
-    var search_results= JSON.parse(this.responseText);
+    if (this.status == 400) {
+      if (this.responseText != "") {
+        console.log(this.responseText);
+        var json_obj = JSON.parse(this.responseText);
+        var error_msg = "<h3>" + json_obj["error"] + "</h3>";
+        console.log(error_msg);
+        document.getElementById("server_crash_warning").style="display=block;";
+        document.getElementById("server_crash_warning").innerHTML = error_msg;
+      }
+    }
+    else {
+      //parse search results from respond
+      if (this.responseText == "")
+        return;
+      var search_results= JSON.parse(this.responseText);
 
-    //Add search results to document
-    let obj = document.getElementById("SearchHitList");
-    obj.drawablejson = search_results; 
-    ShowSelectedValues(obj);
+      //Add search results to document
+      let obj = document.getElementById("SearchHitList");
+      obj.drawablejson = search_results; 
+      ShowSelectedValues(obj);
+    }
   }
   xhttp.open("GET", requ, true)
   xhttp.send();
