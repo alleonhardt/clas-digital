@@ -15,11 +15,11 @@ function OpenFilter(x) {
 	}
 
 	let val = getParameterByName(x.id);
-	if(val==null) {
+	if (val==null) {
 	  window.location = lnk + "&"+x.id+"="+retval;
   }
 	else {
-    if(x.value=="10"||x.value=="relevance")
+    if (x.value == "10" || x.value == "relevance")
       window.location = lnk.replace("&"+x.id+"="+val,"");
     else
       window.location = lnk.replace(x.id+"="+val,x.id+"="+retval);
@@ -331,12 +331,12 @@ function AddListeners() {
 
   // *** ADD LISTENERS *** // 
 
-  //Suggestions for author names
-  let ath = document.getElementById("author");
-  ath.addEventListener("input", function(event){
+  //Listeners on author's input field (suggestion for author names)
+  let input_authors = document.getElementById("author");
+  input_authors.addEventListener("input", function(event){
       sendSugg(document.getElementById("author").value, "author");
   });
-  ath.addEventListener("keydown", function(event){
+  input_authors.addEventListener("keydown", function(event){
       let k = document.getElementById("suggs_author").selec;
       if(k==undefined)
           k=-1;
@@ -347,7 +347,6 @@ function AddListeners() {
           }
       }
       if(event.key=="ArrowUp" || event.key=="ArrowDown") {
-          
           let lst = document.getElementById("suggs_author").children;
           if(k!=-1)
               lst[k].style.background="";
@@ -366,14 +365,18 @@ function AddListeners() {
   });
 
   //Listeners on main input field
-  let inp = document.getElementById("SpecialSID");
-  inp.focus();
-  inp.addEventListener("input",function(event){
-          sendSugg(document.getElementById("SpecialSID").value, "corpus");
-  });
-  inp.addEventListener("keydown",function(event){
+  let input_search= document.getElementById("SpecialSID");
+  input_search.focus();
 
-    //Suggestions
+  //Handler to send suggestions after every input.
+  input_search.addEventListener("input",function(event){
+      sendSugg(document.getElementById("SpecialSID").value, "corpus");
+  });
+
+  //Handler to manager 1. Enter to search, 2. select suggestion, 3. next page
+  input_search.addEventListener("keydown",function(event){
+    
+    //1. Press >>Enter<< to search.
     let k = document.getElementById("suggs_corpus").selec;
     if(k==undefined)
       k=-1;
@@ -385,7 +388,7 @@ function AddListeners() {
       document.getElementById("srchButton").click();
     }
 
-    //next or previous page
+    //2. Select suggestion.
     else if(event.key=="ArrowUp" || event.key=="ArrowDown") {
       let lst = document.getElementById("suggs_corpus").children;
       if(k!=-1)
@@ -403,6 +406,7 @@ function AddListeners() {
       document.getElementById("suggs_corpus").selec=k;
     }
 
+    //3. Next or previos page with keyboard shortcut.
     let start = 0;
     if(getParameterByName("start") != null)
       start= parseInt(getParameterByName('start'));  
@@ -474,8 +478,10 @@ function ReflectUrlValues() {
 	  document.title = "CLAS digital book search";
 	else
 	  document.title = q + " ‒ CLAS digital book search";
-	let description = "Search results for \"" + q + "\" from the CLAS digital book search collection of over 100,000 pages.";
-	document.querySelector('meta[name="description"]').setAttribute("content", description);
+	let description = "Search results for \"" + q + "\" from the CLAS digital "
+    + "book search collection of over 100,000 pages.";
+	document.querySelector('meta[name="description"]').setAttribute("content", 
+    description);
 }
 
 function GetPillarsFromServer() {
@@ -487,8 +493,13 @@ function GetPillarsFromServer() {
   xhttp.onreadystatechange = function() {
     //Add pillars
     if(this.status == 200) {
-      console.log("Response: ", this.responseText);
+
+      //Parse search results from respond
+      if (this.responseText == "")
+        return;
       var pillars = JSON.parse(this.responseText);
+
+      //Add pillars
       for(let i=0; i<pillars.length; i++) {
         var opt = document.createElement("option");
         opt.value=pillars[i].key;
@@ -515,6 +526,8 @@ function GetSearchResultsFromServer() {
   xhttp.onreadystatechange = function() {
 
     //parse search results from respond
+    if (this.responseText == "")
+      return;
     var search_results= JSON.parse(this.responseText);
 
     //Add search results to document
