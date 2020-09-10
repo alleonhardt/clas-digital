@@ -111,7 +111,7 @@ function ShowSelectedValues(obj) {
       desc.innerHTML = "<a onclick='changeColor(this);return true;' href='/books/"
         + json.books[i].scanId
         + "/pages/?highlight="+document.getElementById("SpecialSID").value;
-        if (document.getElementById("fuzzyness").value != 0) {
+        if (document.getElementById("fuzzyness").value != 0) 
           desc.innerHTML+="&fuzzyness="+document.getElementById("fuzzyness").value+"'>";
         desc.innerHTML += json.books[i].description+"</a>";
     }
@@ -201,37 +201,35 @@ function ShowSelectedValues(obj) {
 }
 
 function sendSugg(input, type) {
-    console.log(input, type);
-    var n = input.indexOf(" ");
-    var str;
-    if(n!=-1)
-      str = input.substr(n+1);
-    else
-      str=input;
-    let requ = "/api/v2/search/suggestions/"+type+"?q="+encodeURIComponent(str);
+  var n = input.indexOf(" ");
+  var str;
+  if(n!=-1)
+    str = input.substr(n+1);
+  else
+    str=input;
+  let requ = "/api/v2/search/suggestions/"+type+"?q="+encodeURIComponent(str);
 
-    var xhttp = new XMLHttpRequest();
-    var suggs = document.getElementById("suggs_"+type);
-    xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-           //Action to be performed when the document is ready:
-           suggs.innerHTML="";
-           suggs.style.display="inline-block";
+  var xhttp = new XMLHttpRequest();
+  var suggs = document.getElementById("suggs_"+type);
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      //Action to be performed when the document is ready:
+      suggs.innerHTML="";
+      suggs.style.display="inline-block";
 
-           console.log(this.responseText);
-           var obj = JSON.parse(this.responseText);
-           for(let i=0;i<obj.length;i++) {
-               var node = document.createElement("a");
-               node.onclick=function(){sugg_func(this, type);};
-               node.onmousedown=function(){sugg_func(this, type);};
-               var textNode = document.createTextNode(obj[i]);
-               node.appendChild(textNode);
-               suggs.appendChild(node);
-           }
-        }
-    };
-    xhttp.open("GET", requ, true);
-    xhttp.send();
+      var obj = JSON.parse(this.responseText);
+      for(let i=0;i<obj.length;i++) {
+        var node = document.createElement("a");
+        node.onclick=function(){sugg_func(this, type);};
+        node.onmousedown=function(){sugg_func(this, type);};
+        var textNode = document.createTextNode(obj[i]);
+        node.appendChild(textNode);
+        suggs.appendChild(node);
+      }
+    }
+  };
+  xhttp.open("GET", requ, true);
+  xhttp.send();
 }
 
 //Searches in the server with the given search options and displays a list of matches
@@ -523,15 +521,27 @@ function GetSearchResultsFromServer() {
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
 
-    //parse search results from respond
-    if (this.responseText == "")
-      return;
-    var search_results= JSON.parse(this.responseText);
+    if (this.status == 400) {
+      if (this.responseText != "") {
+        console.log(this.responseText);
+        var json_obj = JSON.parse(this.responseText);
+        var error_msg = "<h3>" + json_obj["error"] + "</h3>";
+        console.log(error_msg);
+        document.getElementById("server_crash_warning").style="display=block;";
+        document.getElementById("server_crash_warning").innerHTML = error_msg;
+      }
+    }
+    else {
+      //parse search results from respond
+      if (this.responseText == "")
+        return;
+      var search_results= JSON.parse(this.responseText);
 
-    //Add search results to document
-    let obj = document.getElementById("SearchHitList");
-    obj.drawablejson = search_results; 
-    ShowSelectedValues(obj);
+      //Add search results to document
+      let obj = document.getElementById("SearchHitList");
+      obj.drawablejson = search_results; 
+      ShowSelectedValues(obj);
+    }
   }
   xhttp.open("GET", requ, true)
   xhttp.send();

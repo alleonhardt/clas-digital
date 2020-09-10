@@ -159,10 +159,10 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
 
   catch (std::exception &e) {
     std::cout << "Caught exception in search_all_books: " << e.what() << "\n";
-    // TODO (fux): investigate what kind of response is necessary!!
     resp.status = 400;
-    resp.set_content("<html><head></head><body><h1>Corrupted search request!"
-        "</h1></body></html>", "text/html");
+    nlohmann::json error_response;
+    error_response["error"] = "Ups. Something went wrong. Please try again later.";
+    resp.set_content(error_response.dump(), "text/txt");
   }
 }
 
