@@ -11,6 +11,9 @@
 #include "server/server_config.hpp"
 #include "plugins/EventManager.hpp"
 #include "plugins/PlugInManager.hpp"
+#include "reference_management/IReferenceManager.h"
+#include "zotero/zotero.hpp"
+#include "filehandler/filehandler.hpp"
 
 
 namespace clas_digital
@@ -109,10 +112,12 @@ namespace clas_digital
       ///< The User table load the users from disk and handles
       //login/create/delete/change user requests
       std::shared_ptr<UserTable> users_;
+      std::shared_ptr<IReferenceManager> ref_manager_;
 
       ServerConfig cfg_;
       clas_digital::EventManager event_manager_;
       PlugInManager plugin_manager_;
+      FileHandler file_handler_;
 
 
       /**

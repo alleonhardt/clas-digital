@@ -1,5 +1,6 @@
 #include "server.hpp"
 #include <mutex>
+#include <sstream>
 #include "util/URLParser.hpp"
 #include "debug/debug.hpp"
 
@@ -127,8 +128,14 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::Start(std::string listenAddres
 
   for(auto &it : cfg_.mount_points_)
   {
-    server_.set_mount_point("/", it.string().c_str());
+    file_handler_.AddMountPoint(it);
   }
+
+  server_.set_error_handler([this](const auto& req, auto& res) {
+        this->file_handler_.ServeFile(req,res);
+      });
+
+
 
   event_manager_.TriggerEvent(EventManager::ON_SERVER_START, this, (void*)&server_);
   
@@ -149,14 +156,14 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::Start(std::string listenAddres
 
 debug::Error<CLASServer::ReturnCodes> CLASServer::InitialiseFromFile(std::filesystem::path config_file, std::filesystem::path user_db_file)
 {
-  std::string config;
   std::ifstream ifs(config_file.string(), std::ios::in);
-  if(ifs.is_open())
+  if(!ifs.is_open())
     return Error(ReturnCodes::ERR_CONFIG_FILE_INITIALISE,"Could not load config file at " + config_file.string());
-  ifs>>config;
+  std::stringstream buffer;
+  buffer << ifs.rdbuf();
   ifs.close();
 
-  return InitialiseFromString(config,user_db_file);
+  return InitialiseFromString(buffer.str(),user_db_file);
 }
 
 debug::Error<CLASServer::ReturnCodes> CLASServer::InitialiseFromString(std::string config_file, std::filesystem::path user_db_file)
@@ -181,6 +188,24 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::InitialiseFromString(std::stri
   {
     debug::log(debug::LOG_ERROR,"Could not create user table in RAM!\n");
     return debug::Error(ReturnCodes::ERR_USERTABLE_INITIALISE,"Could not initialise user table subsytem").Next(err);
+  }
+
+
+  if(!ref_manager_)
+  {
+    if(cfg_.reference_manager_ != "zotero")
+      return debug::Error(ReturnCodes::ERR_CONFIG_FILE_INITIALISE,"Unknown reference manager, was also not loaded by plugin");
+    else
+    {
+      auto ptr = new ZoteroReferenceManager;
+      ref_manager_ = std::shared_ptr<IReferenceManager>(ptr);
+      auto err2 = ptr->Initialise(cfg_.reference_config_);
+      if(err2)
+      {
+        std::cout<<"Running without reference manager! Due to errors or missing config!"<<std::endl;
+        ref_manager_.reset();
+      }
+    }
   }
 
   initialised_ = true;

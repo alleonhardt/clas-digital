@@ -1,5 +1,3 @@
-#define CPPHTTPLIB_THREAD_POOL_COUNT 8
-
 #include <iostream>
 #include <streambuf>
 #include <chrono>
@@ -9,20 +7,24 @@
 #include <sstream>
 
 #include <signal.h>
-
-#include "URLParser.hpp"
-#include "zotero/zotero.hpp"
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h" //Needed for image dimensions
+#include "server/server.hpp"
 
 
-using namespace httplib;
+
+using namespace clas_digital;
 
 int main(int argc, char **argv)
 {
-  if (argc < 2)
-    return 0;
-  int startPort = std::stoi(argv[1]);
-  std::cout << "Starting on port: " << startPort << std::endl;
+  CLASServer &server = CLASServer::GetInstance();
+  auto err = server.InitialiseFromFile("server.config",":memory:");
+  if(err.GetErrorCode() != CLASServer::ReturnCodes::OK)
+  {
+    std::cout<<termcolor::red<<"Something went wrong..."<<std::endl;
+    err.print();
+    return  0;
+  }
+
+  server.Start("0.0.0.0");
+
   return 0;
 }

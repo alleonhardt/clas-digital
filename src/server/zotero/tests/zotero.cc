@@ -54,7 +54,7 @@ TEST_CASE("GetItemMetadata from ReferenceManager","[ZoteroReferenceManager]")
 {
   ZoteroReferenceManager ref;
   auto ret = ref.Initialise(std::filesystem::path("zoteroConfig.json"));
-  if(ret == IReferenceManager::Error::OK && false)
+  if(ret == IReferenceManager::Error::OK )
   {
     IReferenceManager::ptr_t item;
     auto ptr = ref.GetItemMetadata(item,"2UB6NTBHsad",IReferenceManager::CacheOptions::CACHE_USE_CACHED);

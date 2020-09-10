@@ -35,8 +35,9 @@ namespace clas_digital
     std::filesystem::path key_;
 
     std::string reference_manager_;
-    nlohmann::json zotero_config_;
+    nlohmann::json reference_config_;
 
+    nlohmann::json config_;
     void *additional_data_;
   };
 };

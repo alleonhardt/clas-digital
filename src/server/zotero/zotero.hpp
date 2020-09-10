@@ -212,6 +212,7 @@ namespace clas_digital
       Error __performRequestsAndUpdateCache(ptr_cont_t &input, ptr_cont_t &output, std::vector<std::string> &requestMatrix);
 
       void __updateCache(ptr_cont_t &input, ptr_cont_t &new_val);
+      void __loadCacheFromFile();
   };
 }
 

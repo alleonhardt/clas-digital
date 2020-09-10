@@ -315,11 +315,65 @@ namespace debug
       std::shared_ptr<PrintableError> next_;
   };
 
-
 }
+
+namespace clas_digital
+{
+  class clas_error
+  {
+    public:
+      template<typename T>
+      clas_error(T error, std::string msg, std::string trace)
+      {
+        error_ = static_cast<int>(error);
+        message_ = std::move(trace);
+        message_ += msg;
+      }
+
+      clas_error &append(std::shared_ptr<clas_error> err)
+      {
+        next_ = err;
+        return *this;
+      }
+
+      template<typename T>
+      operator T()
+      {
+        return static_cast<T>(error_);
+      }
+
+      void print(int index=0,std::ostream &os=std::cout)
+      {
+        for(int i = 0; i < index; i++)
+          os<<"-";
+        os<<"Code "<<error_<<" message: \""<<message_<<"\"\n";
+        if(next_)
+          next_->print(index+1,os);
+      }
+
+    private:
+      int error_;
+      std::shared_ptr<clas_error> next_;
+      std::string message_;
+  };
+}
+
+#ifdef _WIN32
+#define CL_TRACE __FUNCSIG__ " in " __FILE__ " l."+std::string(__LINE__)
+#else
+#define CL_TRACE __PRETTY_FUNCTION__ " in " __FILE__ " l."+std::string(__LINE__)
+#endif
+
+#define cl_create_err2(x,y) new clas_digital::clas_error(x,y,CL_TRACE)
+#define cl_create_err1(x) new clas_digital::clas_error(x,"",CL_TRACE)
+
+#define GET_MACRO(_1,_2,NAME,...) NAME
+#define cl_create_err(...) GET_MACRO(__VA_ARGS__, cl_create_err2, cl_create_err1)(__VA_ARGS__)
+
 
 #define DBG_FULL_LOG "[",__FILE__,":",__LINE__,"] "
 #define DBG_EXT_LOG "(",std::filesystem::path(__FILE__).filename().string().c_str(),":",__LINE__,") "
+
 
 
 #endif

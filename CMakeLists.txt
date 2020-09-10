@@ -49,7 +49,8 @@ add_library(clas_server_lib OBJECT src/shared/metadata_handler.cc
   src/server/zotero/zotero.cpp src/server/server/server.cc
   src/server/server/server_config.cpp
   src/server/plugins/EventManager.cpp
-  src/server/plugins/PlugInManager.cpp)
+  src/server/plugins/PlugInManager.cpp
+  src/server/filehandler/filehandler.cpp)
 
 
 set(SRC_FILES_SERVER_TEST src/server/test/main.cc

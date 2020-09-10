@@ -13,6 +13,7 @@ size_t clas_digital::zoteroReadBuffer(void *pReceiveData, size_t pSize, size_t p
 	return pSize*pNumBlocks;
 }
 
+
 size_t clas_digital::zoteroHeaderReader(char *pReceiveData, size_t pSize, size_t pNumBlocks, void *userData)
 {
 	//We put the Zotero pointer inside user data so cast it back to the original class
@@ -22,6 +23,7 @@ size_t clas_digital::zoteroHeaderReader(char *pReceiveData, size_t pSize, size_t
 	//The function zoteroHeaderReader will get called for each header in the http request
 	std::string ass;
 	ass.assign(pReceiveData,pSize*pNumBlocks);
+
   if(ass.find("HTTP/1.1 404")!=std::string::npos)
   {
     zot->err_ = IReferenceManager::Error::KEY_DOES_NOT_EXIST;
@@ -125,7 +127,8 @@ IReferenceManager::Error ZoteroConnection::SendRequest(std::string requestURI, s
   body_ = "";
 
 
-	//Create the json class to start filling
+
+  //Create the json class to start filling
 	while(true)
 	{
 		std::cout<<"Zotero request to url: "<<st<<std::endl;
@@ -145,7 +148,7 @@ IReferenceManager::Error ZoteroConnection::SendRequest(std::string requestURI, s
 			std::cout<<"[Could not perform request to zotero api!]\n";
 			return IReferenceManager::Error::USER_ID_AND_GROUP_ID;
 		}
-
+    
     if(err_)
       return err_;
 		//We could receive a corrupted json file
@@ -229,9 +232,8 @@ void custom_deleter(ZoteroReferenceManager::container_t* ptr)
   delete ptr;
 }
 
-ZoteroReferenceManager::ZoteroReferenceManager(std::filesystem::path path)
-{ 
-  cache_path_ = std::move(path);  
+void ZoteroReferenceManager::__loadCacheFromFile()
+{
   std::ifstream ifs(cache_path_, std::ios::in);
   try
   {
@@ -271,6 +273,11 @@ ZoteroReferenceManager::ZoteroReferenceManager(std::filesystem::path path)
   catch(...)
   {
   }
+}
+
+ZoteroReferenceManager::ZoteroReferenceManager(std::filesystem::path path)
+{ 
+  cache_path_ = std::move(path);  
 }
       
 IReferenceManager::Error ZoteroReferenceManager::SaveToFile()
@@ -371,6 +378,8 @@ IReferenceManager::Error ZoteroReferenceManager::Initialise(nlohmann::json detai
   }
 
   citationStyle_ = details.value("citation_style","kritische-ausgabe");
+  cache_path_ = details.value("cache_file",cache_path_.string());
+  __loadCacheFromFile();
 
   // Everything went well!
   return Error::OK;
