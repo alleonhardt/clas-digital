@@ -7,13 +7,17 @@
 #define CLASDIGITAL_SRC_SERVER_ZOTERO_ZOTERO_H
 
 #include <nlohmann/json.hpp>
+#define CPPHTTPLIB_OPENSSL_SUPPORT
 #include <httplib.h>
+#include <curl/curl.h>
+#include <vector>
 #include <filesystem>
+#include <shared_mutex>
 
 #include "debug/debug.hpp"
 #include "reference_management/IReferenceManager.h"
 
-namespace Zotero
+namespace clas_digital
 {
   /**
    * @brief The possible return codes returned by the diffrent classes in the
@@ -61,74 +65,131 @@ namespace Zotero
    */
   constexpr const char ZOTERO_API_ADDR[] = "https://api.zotero.org";
 
+
+  class ZoteroReference : public IReference
+  {
+    public:
+      std::string GetKey() override
+      {
+        return metadata_.value("key","");
+      }
+
+      std::string GetAuthor() override
+      {
+        return "none";
+      }
+
+      std::string GetShortTitle() override
+      {
+        return "none";
+      }
+
+      std::string GetTitle() override
+      {
+        return "none";
+      }
+
+      int GetDate() override
+      {
+        return 10;
+      }
+
+      bool HasCopyright() override
+      {
+        return false;
+      }
+
+      IReference *Copy() override
+      {
+        auto ref = new ZoteroReference();
+        ref->json(metadata_);
+        return ref;
+      }
+  };
+
+
+  size_t zoteroReadBuffer(void *pReceiveData, size_t pSize, size_t pNumBlocks, void *userData);
+
+
+  size_t zoteroHeaderReader(char *pReceiveData, size_t pSize, size_t pNumBlocks, void *userData);
+
   /**
-   * @brief This class represents a connection to the zotero api server and has
-   * the authorization keys set already. The object is reusable therefore one
-   * can make as many requests as one wants with one object. The object is not
-   * thread safe DO not attempt to use the same object in diffrent threads
-   * without synchronization measures.
+   * @brief The zotero class connects the server to the zotero api and requests metadata from the server to keep the metadata up to date
+   *
    */
-  class Connection
+  class ZoteroConnection
   {
     public:
       /**
-       * @brief Constructs a connection to the given zotero server, at the given
-       * api address with the given base uri and sets the api key to validate
-       * requests.
+       * Receives the json for a specific request.
+       * Example: _sendRequest("/collections/top?format=json") returns all the
+       * top level collection form zotero in the json format in a string
+       * @param requestURI Returns the zotero json for the specific request URI.
+       * @return Returns the json for the request, returns an empty string for an
+       * invalid request.
        *
-       * @param apiKey The api key to validate requests with
-       * @param api_addr The base api address in almost all cases api.zotero.org
-       * @param baseUri The base uri this is constructed by the reference
-       * manager for example /groups/8123123
        */
-      Connection(std::string apiKey, std::string api_addr, std::string baseUri);
-
+      ReturnCode SendRequest(std::string requestURI,std::shared_ptr<std::unordered_map<std::string,IReference*>> &ref);
 
       /**
-       * @brief Sends a request to the given uri for example /items/all
-       *
-       * @param uri The ressource to request please refer to the zotero api to
-       * find the fitting uri for the request
-       *
-       * @return The returned ressource as string
+       * Closes all open connection and cleans everything up
        */
-      std::string SendRequest(std::string uri);
+      ~ZoteroConnection();
+
+      friend size_t zoteroHeaderReader(char *, size_t, size_t, void *); ///< Needed as curl callback on header receiving
+      friend size_t zoteroReadBuffer(void *, size_t, size_t, void *);  ///< Needed as curl callback on data receiving
+   
+      /**
+       * Creates a new ssl connection to the zotero server
+       */
+      ZoteroConnection(std::string apiKey, std::string api_addr, std::string baseUri);
 
     private:
-      /**
-       * @brief The base uri to use for all requests for example for group abc
-       * it would be /groups/abc
-       */
-      std::string baseURI_;
+      CURL *_curl;				///<Interface to the ssl/https api
+      std::string _baseRequest;	///<Contains the basic url and group number for the zotero request
+
+      std::string _nextLink;		///<Contains an non empty string if the json downloaded is only a part of the full json
+			std::string body_;
 
       /**
-       * @brief The connection to the zotero server in order to do some
-       * requests.
+       * Writes the buffer inside of the class variable _requestJSON
+       * @param pBytes The buffer which contains the last received json
+       * @param pNumBytes The number of bytes inside the buffer
        */
-      httplib::Client connection_;
+
+      void ReceiveBytes(char *pBytes, size_t pNumBytes);
+
+      /**
+       * Sets the class variable _nextLink to the next url which is needed to download
+       * all json chunks from zotero
+       * @param str The next url to receive the json from
+       */
+      void SetNextLink(std::string str);
   };
+
 
 
   /**
    * @brief Implements the interface of the reference manager to become a fully
    * fledged reference manager for the zotero subsystem
    */
-  class ReferenceManager : public IReferenceManager
+  class ZoteroReferenceManager : public IReferenceManager
   {
     public:
-      /**
-       * @brief Updates the corpus from the given details.
-       *
-       * @param details Always required for the function to work {"name":"individual name id" or "group_name": "individual group id", "api_key": "api key"}
-       */
-      bool UpdateCorpus() override;
+      using container_t = std::unordered_map<std::string,IReference*>;
+      using ptr_t = std::shared_ptr<IReference>;
+      using ptr_cont_t = std::shared_ptr<container_t>;
 
-      /**
-       * @brief Returns a list of references to all managed items
-       *
-       * @return The references to all managed items
-       */
-      nlohmann::json &references() override;
+      using func = IReferenceManager::func;
+       
+      ZoteroReferenceManager();
+
+      Error GetAllItems(func on_item, CacheOptions opts=CacheOptions::CACHE_USE_CACHED);
+      Error GetAllCollections(func on_collections, CacheOptions opts=CacheOptions::CACHE_USE_CACHED);
+      Error GetAllItemsFromCollection(func on_item, std::string collectionKey, CacheOptions opts=CacheOptions::CACHE_USE_CACHED);
+      
+      Error GetItemMetadata(func on_item, std::string item, CacheOptions opts=CacheOptions::CACHE_USE_CACHED);
+      Error GetCollectionMetadata(func on_item, std::string collection, CacheOptions opts=CacheOptions::CACHE_USE_CACHED);
 
       /**
        * @brief Constructor for the reference manager creates the manager from
@@ -155,7 +216,7 @@ namespace Zotero
        *
        * @return The unique pointer to an open connection
        */
-      std::unique_ptr<Connection> GetConnection();
+      std::unique_ptr<ZoteroConnection> GetConnection();
 
     private:     
       /**
@@ -168,17 +229,22 @@ namespace Zotero
        * @brief The api key used to validate all requests
        */
       std::string apiKey_;
-
-      /**
-       * @brief The references to all books managed by the server
-       */
-      nlohmann::json references_;
+      std::vector<std::string> trackedCollections_;
+      std::string citationStyle_;
 
 
-      /**
-       * @brief The pillars that are used by the zotero programm
-       */
-      nlohmann::json pillars_;
+      ptr_cont_t itemReferences_;
+      ptr_cont_t collectionReferences_;
+      std::shared_mutex exclusive_swap_;
+
+
+      Error __applyForEach(const ZoteroReferenceManager::ptr_cont_t &t, IReferenceManager::func &fnc, IReferenceManager::CacheOptions opts);
+
+      Error __updateContainerAndApplyForEach(ZoteroReferenceManager::ptr_cont_t &destination, ZoteroReferenceManager::ptr_cont_t &source, IReferenceManager::func &fnc);
+
+      Error __updateContainerAndApply(ZoteroReferenceManager::ptr_cont_t &destination, ZoteroReferenceManager::ptr_cont_t &source, IReferenceManager::func &fnc);
+
+      Error __applyFuncOnSingleElement(ZoteroReferenceManager::ptr_cont_t &destination, const std::string &key, IReferenceManager::func &fnc, IReferenceManager::CacheOptions opts);
   };
 }
 
