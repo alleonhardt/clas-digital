@@ -15,30 +15,12 @@
 
 namespace clas_digital
 {
-  template<typename T>
-  bool atomic_write_file(std::filesystem::path p, const T &t1)
-  {
-    static std::atomic<int> x(0);
-    auto tmpname = ".tmpfile"+std::to_string(x++);
-    std::ofstream ofs(tmpname,std::ios::out);
-    if(!ofs.is_open())
-      return false;
-    ofs<<t1;
-    ofs.close();
-
-    std::error_code ec;
-    std::filesystem::rename(tmpname, p,ec);
-    if(ec.value() != 0)
-    {
-      std::filesystem::remove(tmpname,ec);
-      return false;
-    }
-    return true;
-  }
-
+  
   class FileHandler
   {
     public:
+      using cache_t = std::shared_ptr<std::vector<char>>;
+
       FileHandler();
       void AddMountPoint(std::filesystem::path pt);
       void ServeFile(const httplib::Request &req, httplib::Response &resp);
@@ -46,8 +28,18 @@ namespace clas_digital
     private:
       std::vector<std::filesystem::path> mount_points_;
       std::map<std::string,std::string> file_types_;
-      std::unordered_map<std::string,std::vector<char>> cached_files_;
+
+      std::function<bool(const std::filesystem::path&)> cache_file_callback_;
+
+      std::unordered_map<std::string,cache_t> cached_files_;
+      unsigned long long cached_size_;
       std::shared_mutex mut_;
+
+      bool __loadFile(const std::filesystem::path &p, cache_t &ptr);
+      std::string __getFileMimetype(const std::filesystem::path &mime);
+      void __cacheFile(const std::filesystem::path &cachePath);
+      void __cacheFile(const std::filesystem::path &cachePath, cache_t &t);
+      void __iterateDirAndCacheFiles(const std::filesystem::path &p);
   };
 }
 

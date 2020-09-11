@@ -3,7 +3,7 @@
 #include <fstream>
 #include <chrono>
 #include <thread>
-#include "filehandler/filehandler.hpp"
+#include "filehandler/util.h"
 
 using namespace clas_digital;
 
@@ -288,13 +288,22 @@ IReferenceManager::Error ZoteroReferenceManager::SaveToFile()
     std::shared_lock lck(exclusive_swap_);
     save["items"] = nlohmann::json::array();
     save["collections"] = nlohmann::json::array();
+    bool save_file = false;
     if(itemReferences_ && itemReferences_->size() > 0)
+    {
+      save_file = true;
       for(auto &it : *itemReferences_)
         save["items"].push_back(it.second->json());
+    }
   
     if(collectionReferences_ && collectionReferences_->size() > 0)
+    {
+      save_file = true;
       for(auto &it : *collectionReferences_)
         save["collections"].push_back(it.second->json());
+    }
+    if(!save_file)
+      return Error::OK;
   }
   if(!clas_digital::atomic_write_file(cache_path_,save))
     return Error::CACHE_FILE_PATH_NOT_VALID;

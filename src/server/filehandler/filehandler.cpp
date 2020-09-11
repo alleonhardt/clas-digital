@@ -1,5 +1,5 @@
 #include "filehandler.hpp"
-
+#include "filehandler/util.h"
 using namespace clas_digital;
 
 FileHandler::FileHandler()
@@ -14,53 +14,99 @@ FileHandler::FileHandler()
   file_types_[".png"] = "application/png";
   file_types_[".json"] = "application/json";
   file_types_[".ico"] = "image/x-icon";
+
+  cache_file_callback_ = [](const std::filesystem::path &p){
+    auto ext = p.extension();
+    if(ext == ".txt" && p.filename() == "ocr.txt")
+      return true;
+    if(ext == ".html" || ext == ".css" || ext == ".js" || ext == ".json" || ext == ".ico")
+      return true;
+    return false;
+  };
 }
 
-void IndexFiles(std::filesystem::path pt)
+void FileHandler::__iterateDirAndCacheFiles(const std::filesystem::path &p)
 {
   int indexed_files = 0;
   unsigned long long size = 0;
 
-  for(auto &it : std::filesystem::recursive_directory_iterator(pt))
+  for(auto &it : std::filesystem::recursive_directory_iterator(p))
   {
-    if(!it.is_directory() && (it.path().extension() == ".html" || it.path().extension() == ".css" || it.path().extension() == ".js" || it.path().extension() == ".json" || it.path().extension() == ".txt"))
+    if(cache_file_callback_(it.path()))
     {
-      indexed_files++;
-      if((indexed_files%1000) == 0)
-        std::cout<<"Indexed "<<indexed_files<<std::endl;
-      size+=it.file_size();
+      __cacheFile(it.path());
     }
   }
-  std::cout<<"Found "<<indexed_files<<" files with a total size of "<<(float)size/(1024*1024)<<" MB"<<std::endl;
+}
+
+void FileHandler::__cacheFile(const std::filesystem::path &cachePath)
+{
+  cache_t vec;
+  if(!__loadFile(cachePath,vec))
+    return;
+  __cacheFile(cachePath,vec);
+}
+
+void FileHandler::__cacheFile(const std::filesystem::path &cachePath, FileHandler::cache_t &t)
+{
+  std::unique_lock lck(mut_);
+  cached_size_ += t->size();
+  cached_files_.insert({cachePath.string(),t});
+  if(cachePath.filename() == "index.html" || cachePath.filename() == "index.htm")
+  {
+    cached_files_.insert({cachePath.parent_path().string(),t});
+  }
+}
+
+std::string FileHandler::__getFileMimetype(const std::filesystem::path &p)
+{
+  std::string file_type = "text/html";
+  auto it = file_types_.find(p.extension());
+  if(it!=file_types_.end())
+    file_type = it->second;
+  return file_type;
 }
 
 
 void FileHandler::AddMountPoint(std::filesystem::path pt)
 {
   mount_points_.push_back(pt);
-  std::cout<<"Add mount point: "<<pt<<std::endl;
-  IndexFiles(pt);
+  std::thread t1([pt,this](){this->__iterateDirAndCacheFiles(pt);std::cout<<"Processed mount point "<<pt<<" total files indexed: "<<cached_files_.size()<<" total memory in use: "<<cached_size_<<" Bytes."<<std::endl;});
+  t1.detach();
+}
+      
+bool FileHandler::__loadFile(const std::filesystem::path &p, cache_t &ptr)
+{
+  std::ifstream ifs(p, std::ios::in);
+  if(!ifs.is_open())
+    return false;
+
+  std::error_code ec;
+  auto size = std::filesystem::file_size(p,ec);
+  if(ec)
+    return false;
+  
+  if(!ptr)
+    ptr = std::shared_ptr<std::vector<char>>(new std::vector<char>());
+  ptr->resize(size);
+
+  ifs.read(ptr->data(),size);
+  ifs.close();
+  return true;
 }
 
 void FileHandler::ServeFile(const httplib::Request &req, httplib::Response &resp)
 {
   
-  decltype(cached_files_.find(req.path)) find_val;
   {
     std::shared_lock lck(mut_);
-    find_val = cached_files_.find(req.path);
-  }
-  if(find_val!=cached_files_.end())
-  {
+    auto find_val = cached_files_.find(req.path);
+    if(find_val!=cached_files_.end())
+    {
       resp.status = 200;
-      std::string file_type = "text/html";
-      auto it = file_types_.find(std::filesystem::path(req.path).extension());
-      if(it!=file_types_.end())
-        file_type = it->second;
-
-
-      resp.set_content(find_val->second.data(),find_val->second.size(),file_type.c_str());
+      resp.set_content(const_cast<const char*>(find_val->second->data()),find_val->second->size(),__getFileMimetype(req.path).c_str());
       return;
+    }
   }
   
   
@@ -72,31 +118,15 @@ void FileHandler::ServeFile(const httplib::Request &req, httplib::Response &resp
 
     if(std::filesystem::exists(pt))
     {
-      std::ifstream ifs(pt, std::ios::in);
-      if(!ifs.is_open())
+      cache_t fl;
+      if(!__loadFile(pt,fl))
         return;
-
-      std::error_code ec;
-      
-      std::vector<char> vec;
-      auto size = std::filesystem::file_size(pt,ec);
-      vec.resize(size);
-      if(ec)
-        return;
-
-      ifs.read(vec.data(),size);
-      ifs.close();
-      std::string file_type = "text/html";
-      auto it = file_types_.find(pt.extension());
-      if(it!=file_types_.end())
-        file_type = it->second;
-
       
       resp.status = 200;
-      resp.set_content(vec.data(),vec.size(),file_type.c_str());
+      resp.set_content(const_cast<const char*>(fl->data()),fl->size(),__getFileMimetype(pt).c_str());
 
-      std::unique_lock lck(mut_);
-      cached_files_.insert({req.path,std::move(vec)});
+      if(cache_file_callback_(pt))
+        __cacheFile(pt,fl);
     }
   }
 }
