@@ -3,7 +3,13 @@
 #include <filesystem>
 #include <atomic>
 #include <unordered_map>
+
+#ifndef CPPHTTPLIB_OPENSSL_SUPPORT
+#define CPPHTTPLIB_THREAD_POOL_COUNT 8
+#define CPPHTTPLIB_OPENSSL_SUPPORT
 #include <httplib.h>
+#endif
+
 #include <shared_mutex>
 #include <fstream>
 
@@ -15,22 +21,31 @@ namespace clas_digital
     static std::atomic<int> x(0);
     auto tmpname = ".tmpfile"+std::to_string(x++);
     std::ofstream ofs(tmpname,std::ios::out);
+    if(!ofs.is_open())
+      return false;
     ofs<<t1;
     ofs.close();
 
     std::error_code ec;
     std::filesystem::rename(tmpname, p,ec);
-    return ec.value() == 0;
+    if(ec.value() != 0)
+    {
+      std::filesystem::remove(tmpname,ec);
+      return false;
+    }
+    return true;
   }
 
   class FileHandler
   {
     public:
+      FileHandler();
       void AddMountPoint(std::filesystem::path pt);
       void ServeFile(const httplib::Request &req, httplib::Response &resp);
 
     private:
       std::vector<std::filesystem::path> mount_points_;
+      std::map<std::string,std::string> file_types_;
       std::unordered_map<std::string,std::vector<char>> cached_files_;
       std::shared_mutex mut_;
   };

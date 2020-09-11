@@ -3,6 +3,7 @@
 #include <fstream>
 #include <chrono>
 #include <thread>
+#include "filehandler/filehandler.hpp"
 
 using namespace clas_digital;
 
@@ -282,25 +283,22 @@ ZoteroReferenceManager::ZoteroReferenceManager(std::filesystem::path path)
       
 IReferenceManager::Error ZoteroReferenceManager::SaveToFile()
 {
-  std::ofstream ofs(cache_path_, std::ios::out);
   nlohmann::json save;
   {
     std::shared_lock lck(exclusive_swap_);
     save["items"] = nlohmann::json::array();
     save["collections"] = nlohmann::json::array();
-    if(itemReferences_)
+    if(itemReferences_ && itemReferences_->size() > 0)
       for(auto &it : *itemReferences_)
         save["items"].push_back(it.second->json());
   
-    if(collectionReferences_)
+    if(collectionReferences_ && collectionReferences_->size() > 0)
       for(auto &it : *collectionReferences_)
         save["collections"].push_back(it.second->json());
   }
-  if(ofs.is_open())
-  {
-    ofs<<save;
-    ofs.close();
-  }
+  if(!clas_digital::atomic_write_file(cache_path_,save))
+    return Error::CACHE_FILE_PATH_NOT_VALID;
+
   return Error::OK;
 }
 

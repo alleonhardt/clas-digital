@@ -4,6 +4,8 @@
 #include <openssl/evp.h>
 #include <openssl/sha.h>
 #include <random>
+#include "filehandler/filehandler.hpp"
+
 using namespace clas_digital;
 
 namespace clas_digital
@@ -310,14 +312,8 @@ debug::Error<UserTable::ReturnValues> UserTable::SaveUserTable()
 {
   if(save_file_.string() != "")
   {
-    std::ofstream ofs("tmp213093812303234.db",std::ios::out);
-    
-    if(std::filesystem::exists(save_file_) == false || std::filesystem::is_directory(save_file_) || !ofs.is_open())
+    if(!clas_digital::atomic_write_file(save_file_,GetAsJSON()))
       return debug::Error(RET_CANT_OPEN_USER_FILE,"Cannot open user file for saving. Filename: "+save_file_.string());
-
-    auto js = GetAsJSON();
-    ofs<<js.dump();
-    ofs.close();
   }
   return debug::Error(RET_OK);
 }

@@ -2,9 +2,41 @@
 
 using namespace clas_digital;
 
+FileHandler::FileHandler()
+{
+  file_types_[".css"] = "text/css";
+  file_types_[".js"] = "application/javascript";
+  file_types_[".html"] = "text/html";
+  file_types_[".htm"] = "text/html";
+  file_types_[".jpg"] = "image/jpg";
+  file_types_[".jpeg"] = "image/jpg";
+  file_types_[".pdf"] = "application/pdf";
+  file_types_[".png"] = "application/png";
+  file_types_[".json"] = "application/json";
+  file_types_[".ico"] = "image/x-icon";
+}
+
+void IndexFiles(std::filesystem::path pt)
+{
+  int indexed_files = 0;
+  unsigned long long size = 0;
+  for(auto &it : std::filesystem::recursive_directory_iterator(pt))
+  {
+    if(!it.is_directory() && (it.path().extension() == ".html" || it.path().extension() == ".css" || it.path().extension() == ".js"))
+    {
+      indexed_files++;
+      size+=it.file_size();
+    }
+  }
+  std::cout<<"Found "<<indexed_files<<" files with a total size of "<<(float)size/(1024*1024)<<" MB"<<std::endl;
+}
+
+
 void FileHandler::AddMountPoint(std::filesystem::path pt)
 {
   mount_points_.push_back(pt);
+  std::cout<<"Add mount point: "<<pt<<std::endl;
+  IndexFiles(pt);
 }
 
 void FileHandler::ServeFile(const httplib::Request &req, httplib::Response &resp)
@@ -18,7 +50,13 @@ void FileHandler::ServeFile(const httplib::Request &req, httplib::Response &resp
   if(find_val!=cached_files_.end())
   {
       resp.status = 200;
-      resp.set_content(find_val->second.data(),find_val->second.size(),"text/html");
+      std::string file_type = "text/html";
+      auto it = file_types_.find(std::filesystem::path(req.path).extension());
+      if(it!=file_types_.end())
+        file_type = it->second;
+
+
+      resp.set_content(find_val->second.data(),find_val->second.size(),file_type.c_str());
       return;
   }
   
@@ -45,9 +83,14 @@ void FileHandler::ServeFile(const httplib::Request &req, httplib::Response &resp
 
       ifs.read(vec.data(),size);
       ifs.close();
+      std::string file_type = "text/html";
+      auto it = file_types_.find(pt.extension());
+      if(it!=file_types_.end())
+        file_type = it->second;
+
       
       resp.status = 200;
-      resp.set_content(vec.data(),vec.size(),"text/html");
+      resp.set_content(vec.data(),vec.size(),file_type.c_str());
 
       std::unique_lock lck(mut_);
       cached_files_.insert({req.path,std::move(vec)});

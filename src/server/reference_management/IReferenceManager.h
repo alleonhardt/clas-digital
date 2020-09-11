@@ -68,6 +68,7 @@ namespace clas_digital
         JSON_FILE_DOES_NOT_EXIST,
         NOT_A_VALID_JSON,
         API_KEY_NOT_VALID_OR_NO_ACCESS,
+        CACHE_FILE_PATH_NOT_VALID,
         UNKNOWN
       };
 
