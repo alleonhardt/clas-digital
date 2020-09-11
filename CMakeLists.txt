@@ -41,7 +41,7 @@ configure_file("${CMAKE_SOURCE_DIR}/src/shared/version.hpp.in"
 
 
 
-set(SRC_FILES_SEARCH src/search/book_manager/book.cc src/search/book_manager/book_manager.cc src/search/search/search.cc src/search/search/search_options.cc src/search/main.cpp src/shared/metadata_handler.cc src/shared/util/func.cpp src/shared/util/fuzzy.cpp)
+set(SRC_FILES_SEARCH src/search/book_manager/book.cc src/search/book_manager/book_manager.cc src/search/book_manager/word_info.cc src/search/search/search.cc src/search/search/search_options.cc src/search/main.cpp src/shared/metadata_handler.cc src/shared/util/func.cpp src/shared/util/fuzzy.cpp)
 
 add_library(clas_server_lib OBJECT src/shared/metadata_handler.cc
   src/shared/util/URLParser.cpp src/shared/util/ubuntu20matherror.cpp

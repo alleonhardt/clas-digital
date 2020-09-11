@@ -12,16 +12,31 @@
 
 class WordInfo {
   public:
-    WordInfo();
+    /**
+     * Constructor.
+     * @param[in] pages (vector of all pages word occures on)
+     * @param[in] pos (first position the word occures in book)
+     * @param[in] rel (relevance of this word)
+     */
+    WordInfo(std::vector<size_t> pages, int pos, size_t rel);
 
+    //Getter 
     std::vector<size_t> pages();
     int position();
     size_t relevance();
 
-  private: 
-    std::vector<size_t> pages_;
-    std::map<std::stirng, std::vector<size_t>> neighbors_;
-    int position_;
-    size_t relevance_;
-}
+    //Setter
+    void set_pages(std::vector<size_t> pages);
+    void set_position(int pos);
+    void set_relevance(size_t rel);
 
+  private: 
+
+    //Membervariable
+    std::vector<size_t> pages_; ///< vector of all pages word occures on.
+    //std::map<std::strirng, std::vector<size_t>> neighbors_;
+    int position_;  ///< First position this word is found on
+    size_t relevance_;  ///< Relevance (how often word occures on pages)
+};
+
+#endif
