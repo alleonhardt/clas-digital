@@ -23,7 +23,7 @@ void IndexFiles(std::filesystem::path pt)
 
   for(auto &it : std::filesystem::recursive_directory_iterator(pt))
   {
-    if(!it.is_directory() && (it.path().extension() == ".html" || it.path().extension() == ".css" || it.path().extension() == ".js" || it.path().extension() == ".json"))
+    if(!it.is_directory() && (it.path().extension() == ".html" || it.path().extension() == ".css" || it.path().extension() == ".js" || it.path().extension() == ".json" || it.path().extension() == ".txt"))
     {
       indexed_files++;
       if((indexed_files%1000) == 0)
