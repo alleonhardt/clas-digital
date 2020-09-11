@@ -61,7 +61,7 @@ void FileHandler::__cacheFile(const std::filesystem::path &cachePath, FileHandle
 std::string FileHandler::__getFileMimetype(const std::filesystem::path &p)
 {
   std::string file_type = "text/html";
-  auto it = file_types_.find(p.extension());
+  auto it = file_types_.find(p.extension().string());
   if(it!=file_types_.end())
     file_type = it->second;
   return file_type;
