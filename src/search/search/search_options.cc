@@ -1,9 +1,9 @@
-#include "CSearchOptions.hpp"
+#include "search_options.h"
 
 /**
 * @breif default constructor.
 */
-CSearchOptions::CSearchOptions()
+SearchOptions::SearchOptions()
 {
     m_chSearchedWord="";
     m_fuzzyness = false;
@@ -25,7 +25,7 @@ CSearchOptions::CSearchOptions()
 * @param[in] from date from which books shall be searched
 * @param[in] to date to which books shall be searched
 **/
-CSearchOptions::CSearchOptions(std::string chSearchedWord, bool fuzzyness, std::vector<std::string> sCollections, std::string sScope, std::string slastName, int from, int to, bool full, std::string filterResults)
+SearchOptions::SearchOptions(std::string chSearchedWord, bool fuzzyness, std::vector<std::string> sCollections, std::string sScope, std::string slastName, int from, int to, bool full, std::string filterResults)
 {
     func::convertToLower(chSearchedWord);
     std::replace(chSearchedWord.begin(), chSearchedWord.end(), ' ', '+');
@@ -55,76 +55,76 @@ CSearchOptions::CSearchOptions(std::string chSearchedWord, bool fuzzyness, std::
 /**
 * @return searched word
 **/
-std::string CSearchOptions::getSearchedWord() const {
+std::string SearchOptions::getSearchedWord() const {
     return m_chSearchedWord;
 }
 
 /**
 * @return selected fuzzyness
 **/
-bool CSearchOptions::getFuzzyness() const {
+bool SearchOptions::getFuzzyness() const {
     return m_fuzzyness;
 }
 
 /**
 * @return selected pillars
 **/
-std::vector<std::string> CSearchOptions::getCollections() const {
+std::vector<std::string> SearchOptions::getCollections() const {
     return m_sCollections;
 }
 
 /**
 * @return whether search only in title 
 **/
-bool CSearchOptions::getOnlyTitle() const {
+bool SearchOptions::getOnlyTitle() const {
     return m_onlyTitle;
 }
 
 /**
 * @return whether search only in ocr (if exists)
 **/
-bool CSearchOptions::getOnlyOcr() const {
+bool SearchOptions::getOnlyOcr() const {
     return m_onlyOCR;
 }
 /**
 * @return last name of selected author
 */
-std::string CSearchOptions::getLastName() const {
+std::string SearchOptions::getLastName() const {
     return m_slastName;
 }
 
 /**
 * @return year from which books shall be searched in
 **/
-int CSearchOptions::getFrom() const {
+int SearchOptions::getFrom() const {
     return m_From;
 }
 
 /**
 * @return year to which books shall be searched
 **/
-int CSearchOptions::getTo() const {
+int SearchOptions::getTo() const {
     return m_To;
 }
 
 /**
 * @return get user access
 */
-bool CSearchOptions::getAccess() const {
+bool SearchOptions::getAccess() const {
     return m_fullAccess;
 }
 
 /**
 * @return return whether results shall be filtered or not
 */
-size_t CSearchOptions::getFilterResults() const {
+size_t SearchOptions::getFilterResults() const {
     return m_filterResults;
 }
 
 /**
 * @param[in] searchedWord new searched word 
 */
-void CSearchOptions::setSearchedWord(std::string searchedWord) {
+void SearchOptions::setSearchedWord(std::string searchedWord) {
     m_chSearchedWord = searchedWord;
 }
 

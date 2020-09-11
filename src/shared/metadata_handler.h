@@ -31,7 +31,7 @@ public:
 
   // *** GETTER *** //
 
-  nlohmann::json get_json();
+  nlohmann::json GetJson();
 
 
   // *** SETTER *** //

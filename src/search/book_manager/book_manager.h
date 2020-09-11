@@ -16,18 +16,18 @@
 #include <shared_mutex>
 #include <string>
 
-#include "book_manager/CBook.hpp"
+#include "book_manager/book.h"
 #include "func.hpp"
-#include "search/CSearch.hpp"
-#include "search/CSearchOptions.hpp"
+#include "search/search.h"
+#include "search/search_options.h"
 
 
-class CBookManager
+class BookManager
 {
 private:
 
     //Map of all books
-    std::unordered_map<std::string, CBook*> m_mapBooks;
+    std::unordered_map<std::string, Book*> m_mapBooks;
 
 
     //Map of words / map of words in titles
@@ -49,14 +49,14 @@ private:
 public:
 
     //Constructor
-    CBookManager();
+    BookManager();
 
     // **** getter **** //
 
     /**
     * @return map of all book
     */
-    std::unordered_map<std::string, CBook*>& getMapOfBooks();
+    std::unordered_map<std::string, Book*>& getMapOfBooks();
     
     /**
     * @return unordered dicionary of authors
@@ -92,7 +92,7 @@ public:
     * @brief search function calling fitting function from search class
     * @return list of all found books
     */
-    std::list<std::string>* search(CSearchOptions* searchOptions);
+    std::list<std::string>* search(SearchOptions* searchOptions);
 
     /**
     * @brief convert to list

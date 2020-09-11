@@ -13,7 +13,7 @@ MetadataHandler::MetadataHandler(nlohmann::json metadata) {
 
 // *** GETTER *** //
 
-nlohmann::json MetadataHandler::get_json() {
+nlohmann::json MetadataHandler::GetJson() {
   return metadata_;
 }
 
