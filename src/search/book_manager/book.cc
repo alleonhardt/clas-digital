@@ -75,8 +75,7 @@ std::string Book::author_date() {
 
 
 ///Get map of words with list of pages, preview-position and relevance.
-std::unordered_map<std::string, std::tuple<std::vector<size_t>,int,size_t>>& 
-Book::map_words_pages() { 
+std::unordered_map<std::string, WordInfo>& Book::map_words_pages() { 
   return map_words_pages_;
 }
 
@@ -246,9 +245,10 @@ void Book::CreatePage(std::string sBuffer, std::string& sConvert,
     size_t page, bool mark) {
   //Add entry, or update entry in map of words/ pages (new page + relevance)
   for (auto it : func::extractWordsFromString(sBuffer)) {
-    std::get<0>(map_words_pages_[it.first]).push_back(page);
-    std::get<1>(map_words_pages_[it.first]) += it.second*(it.second+1) / 2;
+    map_words_pages_.at(it.first).AddPage(page);
+    map_words_pages_.at(it.first).AddRelevance(it.second);
   } 
+
 
   //Create new page
   std::ofstream write(path_ + "/intern/page" + std::to_string(page) + ".txt");
@@ -265,7 +265,8 @@ void Book::CreatePage(std::string sBuffer, std::string& sConvert,
 void Book::CreateMapPreview() {
   std::cout << "Create map Prev." << std::endl;
   for(auto it : map_words_pages_) 
-    std::get<2>(map_words_pages_[it.first]) = GetPreviewPosition(it.first);
+    map_words_pages_[it.first].set_position(GetPreviewPosition(it.first));
+    //std::get<2>(map_words_pages_[it.first]) = GetPreviewPosition(it.first);
   
 }
     
@@ -286,12 +287,14 @@ void Book::SafePages() {
     std::string sBuffer = func::convertStr(word) + ";";
 
     //Add all pages word occurs on
-    for (size_t page : std::get<0>(it.second))
+    for (size_t page : it.second.pages())
       sBuffer += std::to_string(page) + ",";
 
     //Add preview-position and relevance.
-    sBuffer += ";" + std::to_string(std::get<1>(map_words_pages_[it.first]));
-    sBuffer += ";" + std::to_string(std::get<2>(map_words_pages_[it.first])) 
+    sBuffer += ";" + std::to_string(map_words_pages_[it.first].relevance());
+    sBuffer += ";" + std::to_string(map_words_pages_[it.first].position());
+    //sBuffer += ";" + std::to_string(std::get<1>(map_words_pages_[it.first]));
+    //sBuffer += ";" + std::to_string(std::get<2>(map_words_pages_[it.first])) 
       + "\n";
 
     write << sBuffer;
@@ -338,7 +341,7 @@ void Book::LoadPages() {
     }
 
     //Add word and pages to map
-    map_words_pages_[vec[0]] = make_tuple(pages, std::stoi(vec[2]), std::stoi(vec[3]));
+    map_words_pages_[vec[0]] = WordInfo(pages, std::stoi(vec[2]), std::stoi(vec[3]));
   }
 
   read.close();
@@ -401,13 +404,13 @@ std::map<int, std::vector<std::string>>* Book::FindPages(std::string sWord,
     if (found_grammatical_matches_.count(sWord) > 0) {
       //Obtain pages from each word.
       for (auto elem : found_grammatical_matches_[sWord]) {
-        for (auto page : std::get<0>(map_words_pages_.at(elem)))
+        for (auto page : map_words_pages_.at(elem).pages())
             (*mapPages)[page].push_back(elem);
       }
     }
     //Obtains pages.
     else if (map_words_pages_.count(sWord) > 0) {
-      for (auto page : std::get<0>(map_words_pages_.at(sWord)))
+      for (auto page : map_words_pages_.at(sWord).pages())
         (*mapPages)[page].push_back(sWord);
     }
   }
@@ -418,7 +421,7 @@ std::map<int, std::vector<std::string>>* Book::FindPages(std::string sWord,
     if (found_fuzzy_matches_.count(sWord) > 0) {
       //Obtain pages from each word found by fuzzy-search.
       for (auto elem : found_fuzzy_matches_[sWord]) {
-        for (auto page : std::get<0>(map_words_pages_.at(elem.first)))
+        for (auto page : map_words_pages_.at(elem.first).pages())
           (*mapPages)[page].push_back(elem.first);
       }
     }
@@ -551,14 +554,14 @@ std::vector<size_t> Book::PagesFromWord(std::string sWord, bool fuzzyness)
 
   //Obtain pages with exact match
   if (map_words_pages_.count(sWord) > 0) {
-    std::vector<size_t> foo = std::get<0>(map_words_pages_.at(sWord));
+    std::vector<size_t> foo = map_words_pages_.at(sWord).pages();
     pages.insert(foo.begin(), foo.end());
   }
 
   //Obtain pages from grammatical matches
   if (found_grammatical_matches_.count(sWord) > 0) {
     for (auto elem : found_grammatical_matches_[sWord]) {
-      std::vector<size_t> foo = std::get<0>(map_words_pages_.at(elem));
+      std::vector<size_t> foo = map_words_pages_.at(elem).pages();
       pages.insert(foo.begin(), foo.end());
     }
   }
@@ -566,7 +569,7 @@ std::vector<size_t> Book::PagesFromWord(std::string sWord, bool fuzzyness)
   //Obtain pages from fuzzy match.
   if (found_fuzzy_matches_.count(sWord) > 0 && fuzzyness == true)  {
     for (auto elem : found_fuzzy_matches_[sWord]) {
-      std::vector<size_t> foo = std::get<0>(map_words_pages_.at(elem.first));
+      std::vector<size_t> foo = map_words_pages_.at(elem.first).pages();
       pages.insert(foo.begin(), foo.end());
     }
   }
@@ -680,7 +683,7 @@ std::string Book::GetPreviewText(std::string& word, size_t& pos, size_t& page) {
     return "";
 
   //Get page number from map of words and pages.
-  page = std::get<0>(map_words_pages_[word])[0];
+  page = map_words_pages_[word].pages()[0];
   if (page == 1000000)
     return "";
 
@@ -691,7 +694,7 @@ std::string Book::GetPreviewText(std::string& word, size_t& pos, size_t& page) {
       std::istreambuf_iterator<char>());
 
   //Find position, where word occures.
-  pos = std::get<2>(map_words_pages_[word]);
+  pos = map_words_pages_[word].position();
 
   return source;
 }
@@ -733,7 +736,7 @@ std::string Book::GetPreviewTitle(std::string& word, size_t& pos) {
 * @return preview for this book
 */
 size_t Book::GetPreviewPosition(std::string word) {
-  std::vector<size_t> pages = std::get<0>(map_words_pages_[word]);
+  std::vector<size_t> pages = map_words_pages_[word].pages();
   for (size_t i=0; i<pages.size(); i++) {
     //Read ocr and kontent and find match
     std::ifstream read(path_ + "/intern/page" + std::to_string(pages[i]) 

@@ -309,22 +309,23 @@ std::list<std::string>* BookManager::convertToList(std::map<std::string, double>
 /**
 * @brief create map of all words (key) and books in which the word occurs (value)
 */
-void BookManager::createMapWords()
-{
-    //Iterate over all books. Add words to list (if the word does not already exist in map of all words)
-    //or add book to list of books (if word already exists).
-    for(auto it=m_mapBooks.begin(); it!=m_mapBooks.end(); it++)
-    {
-        //Check whether book has ocr
-        if(it->second->has_ocr() == false)
-            continue;
+void BookManager::createMapWords() {
+  //Iterate over all books. Add words to list (if the word does not already exist in map of all words)
+  //or add book to list of books (if word already exists).
+  for (auto it=m_mapBooks.begin(); it!=m_mapBooks.end(); it++) {
+    //Check whether book has ocr
+    if(it->second->has_ocr() == false)
+      continue;
 
-        //Iterate over all words in this book. Check whether word already exists in list off all words.
-        for(auto yt : it->second->map_words_pages())
-            m_mapWords[yt.first][it->first] = static_cast<double>(std::get<1>(it->second->map_words_pages()[yt.first]))/it->second->num_pages();
+    //Iterate over all words in this book. Check whether word already 
+    //exists in list off all words.
+    for(auto yt : it->second->map_words_pages()) {
+      m_mapWords[yt.first][it->first] = static_cast<double>(it->second
+          ->map_words_pages()[yt.first].relevance())/it->second->num_pages();
     }
+  }
 
-    createListWords(m_mapWords, m_listWords);
+  createListWords(m_mapWords, m_listWords);
 } 
 
 /**

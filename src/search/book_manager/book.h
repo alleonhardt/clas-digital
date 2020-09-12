@@ -17,6 +17,7 @@
 #include "func.hpp"
 #include "fuzzy.hpp"
 #include "metadata_handler.h"
+#include "book_manager/word_info.h"
 
 class Book {
 public:
@@ -43,8 +44,7 @@ public:
   int date();
   std::vector<std::string> collections();
   std::string author_date();
-  std::unordered_map<std::string, std::tuple<std::vector<size_t>, int, size_t>>&   
-  map_words_pages();
+  std::unordered_map<std::string, WordInfo>& map_words_pages();
   std::unordered_map<std::string, std::list<std::pair<std::string, double>>>& 
   found_fuzzy_matches();
   std::unordered_map<std::string, std::list<std::string>>& 
@@ -141,8 +141,7 @@ private:
   found_grammatical_matches_; 
 
   ///Map of words_pages_pos_relevance
-  std::unordered_map<std::string, std::tuple<std::vector<size_t>, int, size_t>>
-  map_words_pages_;
+  std::unordered_map<std::string, WordInfo> map_words_pages_;
 
   int num_pages_;  ///< Number of pages in book
 
