@@ -588,28 +588,23 @@ std::vector<size_t> Book::PagesFromWord(std::string sWord, bool fuzzyness)
  * @param input (user input, possibly containing several words)
  * @return one ore more previews ready formatted for output.
  */
-std::string Book::GetPreview(std::string sInput) {
+std::string Book::GetPreview(std::string input) {
   //Get vector of search words.
-  std::vector<std::string> searchedWords = func::split2(sInput, "+");
+  std::vector<std::string> words = func::split2(input, "+");
   //Get First preview
-  std::string prev = GetOnePreview(searchedWords[0]);
+  std::string prev = GetOnePreview(words[0]);
 
   //Get previous for extra words, that have been searched for.
-  for (size_t i=1; i<searchedWords.size(); i++) {
+  for (size_t i=1; i<words.size(); i++) {
     //Try finding second word in current preview
-    size_t pos = prev.find(searchedWords[i]);
+    size_t pos = prev.find(words[i]);
     if (pos!=std::string::npos) {
-      size_t end = prev.find(" ", pos);
-      if (end != std::string::npos) 
-        prev.insert(end, "</mark>");
-      else
-        prev.insert(pos+searchedWords[i].length(), "</mark>");
-      prev.insert(pos, "<mark>");
+      prev.replace(pos, prev.find(" ", pos+1)-pos, "<mark>"+words[i]+"</mark>");
     } 
     else {
-      std::string newPrev = GetOnePreview(searchedWords[i]);
-      if(newPrev != "No Preview.")
-        prev += "\n" + newPrev;
+      std::string new_prev = GetOnePreview(words[i]);
+      if(new_prev != "No Preview.")
+        prev += "\n" + new_prev;
     }
   }
   return prev;
@@ -621,41 +616,28 @@ std::string Book::GetPreview(std::string sInput) {
  * @return Preview.
  */
 std::string Book::GetOnePreview(std::string word) {
-  std::string source;
-  size_t pos;
-  size_t page=1000000;
+  size_t pos = 0, page = 1000000;
 
   //Get Source string and position, if no source, then return "no preview".
+  std::string preview = "";
   if (has_ocr_ == true) 
-    source = GetPreviewText(word, pos, page);
+    preview = GetPreviewText(word, pos, page);
   else
-    source = GetPreviewTitle(word, pos);
-  if (source=="") return "No Preview.";
-
-  //Generate substring of 150 characters, with search word in the center.
-  size_t front = 0;
-  size_t len = 150;
-  if (pos > 75) front = pos - 75;
-  if(front+len >= source.length()) len = source.length()-front;
-  std::string final_result = source.substr(front, len);
+    preview = GetPreviewTitle(word, pos);
+  if (preview=="") return "No Preview.";
 
   //Highlight searched word.
   if (pos > 75) pos = 75;
-  size_t end = final_result.find(" ", pos+1);
-  if (end!=std::string::npos)
-    final_result.insert(end, "</mark>");
-  else
-    final_result.insert(pos + word.length(), "</mark>");
-  final_result.insert(pos, "<mark>");
+  preview.replace(pos, preview.find(" ", pos+1)-pos, "<mark>"+word+"</mark>");
 
   //Delete or escape invalid characters if needed.
-  EscapeDeleteInvalidChars(final_result);
+  EscapeDeleteInvalidChars(preview);
 
   //Append [...] front and back
-  final_result.insert(0, " \u2026"); 
+  preview.insert(0, " \u2026"); 
   if (page!=1000000)
-    return final_result += " \u2026 (S. " + std::to_string(page) +")";
-  return final_result += " \u2026";
+    return preview += " \u2026 (S. " + std::to_string(page) +")";
+  return preview += " \u2026";
 }
 
 /**
@@ -682,19 +664,30 @@ std::string Book::GetPreviewText(std::string& word, size_t& pos, size_t& page) {
 
   //Get page number from map of words and pages.
   page = map_words_pages_[word].pages()[0];
-  if (page == 1000000)
+  if (page == 1000000) 
     return "";
 
-  //Get source string of complete page. 
-  std::ifstream read(path_ + "/intern/page" + std::to_string(page) + ".txt", 
-      std::ios::in);
-  std::string source((std::istreambuf_iterator<char>(read)), 
-      std::istreambuf_iterator<char>());
-
-  //Find position, where word occures.
+  //Find position, where word occurs.
   pos = map_words_pages_[word].position();
 
-  return source;
+  //Calculate beginning and ende of 150 character preview surounding word.
+  size_t front = 0, len = 150;
+  if (pos > 75) front = pos - 75;
+
+  //Generate substring of 150 characters, with search word in the center.
+  std::ifstream file(path_ + "/intern/page" + std::to_string(page) + ".txt",
+      std::ifstream::ate | std::ifstream::binary);
+  std::string preview = "";
+  if (file.is_open()) {
+    size_t file_length = file.tellg();
+    if(front+len >= file_length) len = file_length-front;
+    file.seekg(front);
+    preview.resize(len);
+    file.read(&preview[0], len); 
+    file.close();
+  }
+
+  return preview;
 }
 
 /**
@@ -842,11 +835,10 @@ void Book::AddPage(std::string page_text, std::string pagenumber,
  * @param[in] word
  * @return vector of the 10 most relevant neighboors.
  */
-std::string Book::GetMostRelevantNeighbors(std::string word) {
-  std::set<std::string> ignored = {"der", "die", "das", "dem", 
-    "und", "oder", "ein", "eine", "einen", "eines", "mit", word,
-    "the", "this", "and", "or"};
+std::string Book::GetMostRelevantNeighbors(std::string word, Dict& dict) {
   std::map<std::string, int> neighbors;
+  if (map_words_pages_.count(word) == 0)
+    return "";
   for (auto page : map_words_pages_[word].pages()) {
     //Get source string of complete page. 
     std::ifstream read(path_ + "/intern/page" + std::to_string(page) + ".txt", 
@@ -857,18 +849,18 @@ std::string Book::GetMostRelevantNeighbors(std::string word) {
     if (pos == std::string::npos) continue;
 
     std::string part = "";
-    while(true) {
-      size_t front = 0;
-      size_t len = 150;
-      if (pos > 75) front = pos - 75;
-      if(front+len >= source.length()) len = source.length()-front;
-      part = source.substr(front, len);
+    while (true) {
+      size_t front = source.find(".");
+      if (front == std::string::npos || front > pos) front = 0;
+      size_t end = source.find(".", pos);
+      if (end == std::string::npos) end = pos+30; 
+      if (end >= source.length()) end = source.length();
+      part = source.substr(front, end-front);
       size_t pos = source.find(word, pos);
       if (pos == std::string::npos) break;
     }
-    std::cout << part << std::endl;
     for (auto it : func::extractWordsFromString(part)) {
-      if (ignored.count(it.first) == 0)
+      if (dict.IsWordX(it.first, "f", {"ADJ", "SUB", "VER"}) == true)
         neighbors[it.first] += it.second*(it.second+1)/2;
     }
   }

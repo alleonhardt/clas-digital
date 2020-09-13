@@ -14,10 +14,11 @@
 #include <set>
 #include <vector>
 
+#include "book_manager/word_info.h"
 #include "func.hpp"
 #include "fuzzy.hpp"
+#include "gramma.h"
 #include "metadata_handler.h"
-#include "book_manager/word_info.h"
 
 class Book {
 public:
@@ -121,7 +122,7 @@ public:
    * @param[in] word
    * @return vector of the 10 most relevant neighboors.
    */
-  std::string GetMostRelevantNeighbors(std::string word);
+  std::string GetMostRelevantNeighbors(std::string word, Dict& dict);
    
 private:
 

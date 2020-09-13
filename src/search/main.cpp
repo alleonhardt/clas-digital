@@ -9,6 +9,7 @@
 #include <httplib.h>
 
 #include "book_manager/book_manager.h"
+#include "gramma.h"
 #include "search/search_options.h"
 
 using namespace httplib;
@@ -38,7 +39,7 @@ std::string GetPage(std::string file) {
  * @param[in] manager (book manager, to do search and get map of all books.)
  */
 void Search(const Request& req, Response& resp, const nlohmann::json& 
-    zotero_pillars, BookManager& manager) {
+    zotero_pillars, BookManager& manager, Dict& dict) {
   
   try {
     //Get query (necessary value!)
@@ -49,6 +50,7 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
       query.erase(0, 1);
       relevant_neighbors = true;
     }
+    std::replace(query.begin(), query.end(), ' ', '+');
       
 
     //get fuzzyness
@@ -148,13 +150,12 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
         entry["description"] = book->GetAuthorDateScanned();
         entry["bibliography"] = book->metadata().GetMetadata("bib");
 
-        std::cout << "Go here - 1" << std::endl;
         std::string preview = book->GetPreview(query);
-        std::cout << "Go here - 1" << std::endl;
-        if (relevant_neighbors == true)
-          preview += "<br>" + book->GetMostRelevantNeighbors(query);
+        if (relevant_neighbors == true) {
+          std::string str = book->GetMostRelevantNeighbors(query, dict);
+          if (str != "") preview += "<br>" + str;
+        }
         entry["preview"] = preview;
-        std::cout << "Go here - 3" << std::endl;
         search_response["books"].push_back(std::move(entry)); 
         if (++counter == resultsperpage)
           break;
@@ -266,6 +267,11 @@ int main()
   //Create server.
   Server srv;
 
+  //Load dictionary
+  std::cout << "Loading dictionary.\n";
+  Dict dict("web/dict.json");
+  std::cout << "done.\n";
+
   //Load corpus metadata from disc.
   //TODO (fux): location should be specified by a config file.
   std::ifstream read("bin/zotero.json", std::ios::in);
@@ -303,7 +309,7 @@ int main()
   
   //Add specific handlers via server-frame 
   srv.Get("/api/v2/search", [&](const Request& req, Response& resp) 
-      { Search(req, resp, zotero_pillars, manager); });
+      { Search(req, resp, zotero_pillars, manager, dict); });
   srv.Get("/api/v2/search/pages", [&](const Request& req, Response& resp) 
       { Pages(req, resp, manager); });
   srv.Get("/api/v2/search/suggestions/corpus", [&](const Request& req, Response& resp)
