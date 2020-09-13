@@ -42,8 +42,14 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
   
   try {
     //Get query (necessary value!)
+    bool relevant_neighbors = false;
     if (!req.has_param("q")) return;
     std::string query = req.get_param_value("q", 0);
+    if(query.front() == '$') {
+      query.erase(0, 1);
+      relevant_neighbors = true;
+    }
+      
 
     //get fuzzyness
     bool fuzzyness = false;
@@ -141,7 +147,14 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
         entry["hasocr"] = book->HasContent();
         entry["description"] = book->GetAuthorDateScanned();
         entry["bibliography"] = book->metadata().GetMetadata("bib");
-        entry["preview"] = book->GetPreview(query);
+
+        std::cout << "Go here - 1" << std::endl;
+        std::string preview = book->GetPreview(query);
+        std::cout << "Go here - 1" << std::endl;
+        if (relevant_neighbors == true)
+          preview += "<br>" + book->GetMostRelevantNeighbors(query);
+        entry["preview"] = preview;
+        std::cout << "Go here - 3" << std::endl;
         search_response["books"].push_back(std::move(entry)); 
         if (++counter == resultsperpage)
           break;

@@ -245,8 +245,8 @@ void Book::CreatePage(std::string sBuffer, std::string& sConvert,
     size_t page, bool mark) {
   //Add entry, or update entry in map of words/ pages (new page + relevance)
   for (auto it : func::extractWordsFromString(sBuffer)) {
-    map_words_pages_.at(it.first).AddPage(page);
-    map_words_pages_.at(it.first).AddRelevance(it.second);
+    map_words_pages_[it.first].AddPage(page);
+    map_words_pages_[it.first].AddRelevance(it.second);
   } 
 
 
@@ -266,8 +266,6 @@ void Book::CreateMapPreview() {
   std::cout << "Create map Prev." << std::endl;
   for(auto it : map_words_pages_) 
     map_words_pages_[it.first].set_position(GetPreviewPosition(it.first));
-    //std::get<2>(map_words_pages_[it.first]) = GetPreviewPosition(it.first);
-  
 }
     
 
@@ -341,7 +339,7 @@ void Book::LoadPages() {
     }
 
     //Add word and pages to map
-    map_words_pages_[vec[0]] = WordInfo(pages, std::stoi(vec[2]), std::stoi(vec[3]));
+    map_words_pages_[vec[0]] = WordInfo(pages, std::stoi(vec[3]), std::stoi(vec[2]));
   }
 
   read.close();
@@ -838,3 +836,64 @@ void Book::AddPage(std::string page_text, std::string pagenumber,
   write_ocr << new_ocr;
   write_ocr.close();
 }
+
+/**
+ * Returns the 10 most relevant neighboors of a given word.
+ * @param[in] word
+ * @return vector of the 10 most relevant neighboors.
+ */
+std::string Book::GetMostRelevantNeighbors(std::string word) {
+  std::set<std::string> ignored = {"der", "die", "das", "dem", 
+    "und", "oder", "ein", "eine", "einen", "eines", "mit", word,
+    "the", "this", "and", "or"};
+  std::map<std::string, int> neighbors;
+  for (auto page : map_words_pages_[word].pages()) {
+    //Get source string of complete page. 
+    std::ifstream read(path_ + "/intern/page" + std::to_string(page) + ".txt", 
+        std::ios::in);
+    std::string source((std::istreambuf_iterator<char>(read)), 
+        std::istreambuf_iterator<char>());
+    size_t pos = source.find(word);
+    if (pos == std::string::npos) continue;
+
+    std::string part = "";
+    while(true) {
+      size_t front = 0;
+      size_t len = 150;
+      if (pos > 75) front = pos - 75;
+      if(front+len >= source.length()) len = source.length()-front;
+      part = source.substr(front, len);
+      size_t pos = source.find(word, pos);
+      if (pos == std::string::npos) break;
+    }
+    std::cout << part << std::endl;
+    for (auto it : func::extractWordsFromString(part)) {
+      if (ignored.count(it.first) == 0)
+        neighbors[it.first] += it.second*(it.second+1)/2;
+    }
+  }
+  
+  //Create compare function
+	typedef std::function<bool(std::pair<std::string, int>, 
+      std::pair<std::string, int>)> Comp;
+  Comp comp_function = [](const auto& a, const auto& b) {
+    if (a.second == b.second)
+      return a.first > b.first;
+    return a.second > b.second;
+  };
+
+  //Convert map to sorted set
+	std::set<std::pair<std::string, int>, Comp> sorted(neighbors.begin(), 
+      neighbors.end(), comp_function);
+
+  //Convert set to vector
+  size_t counter = 0;
+  std::string result="";
+  for (auto it : sorted) {
+    result += it.first + "(" + std::to_string(it.second) + ")" + ", ";
+    if(++counter == 10) break;
+  }
+
+  return result;
+}
+  

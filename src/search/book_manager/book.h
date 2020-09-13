@@ -116,7 +116,13 @@ public:
   */
   std::string GetPreview(std::string sWord);
 
-    
+   /**
+   * Returns the 10 most relevant neighboors of a given word.
+   * @param[in] word
+   * @return vector of the 10 most relevant neighboors.
+   */
+  std::string GetMostRelevantNeighbors(std::string word);
+   
 private:
 
   // *** member variables *** //
