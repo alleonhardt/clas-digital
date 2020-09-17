@@ -11,7 +11,7 @@
 
 #include "func.hpp"
 
-class CSearchOptions
+class SearchOptions
 {
 private:
     std::string m_chSearchedWord;              //Searched word
@@ -30,7 +30,7 @@ public:
     /**
     * @breif default constructor.
     */
-	CSearchOptions();
+	  SearchOptions();
 
     /**
     * @brief Constructor
@@ -45,7 +45,7 @@ public:
     * @param[in] full does user have full access to ocr file?
     * @param[in] filterResults results will be filtered by number of matches in book
     **/
-    CSearchOptions(std::string chSearchedWord, bool fuzzyness, std::vector<std::string> sCollections, std::string sScope, std::string slastName, int from, int to, bool full, std::string filterResults);
+    SearchOptions(std::string chSearchedWord, bool fuzzyness, std::vector<std::string> sCollections, std::string sScope, std::string slastName, int from, int to, bool full, std::string filterResults);
     
 	//Getter
 

@@ -108,12 +108,14 @@ function ShowSelectedValues(obj) {
       desc.innerHTML = json.books[i].description;
 
     else {
-      desc.innerHTML = "<a onclick='changeColor(this);return true;' href='/books/"
+      var description = "<a onclick='changeColor(this);return true;' href='/books/"
         + json.books[i].scanId
         + "/pages/?highlight="+document.getElementById("SpecialSID").value;
+      console.log(description);
         if (document.getElementById("fuzzyness").value != 0) 
-          desc.innerHTML+="&fuzzyness="+document.getElementById("fuzzyness").value+"'>";
-        desc.innerHTML += json.books[i].description+"</a>";
+          description+="&fuzzyness="+document.getElementById("fuzzyness").value;
+      description += "'>" + json.books[i].description+"</a>";
+      desc.innerHTML = description;
     }
     desc.setAttribute("class", "desc");
     div1.appendChild(desc);

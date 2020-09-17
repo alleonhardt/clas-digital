@@ -8,7 +8,9 @@
 
 #include <httplib.h>
 
-#include "book_manager/CBookManager.hpp"
+#include "book_manager/book_manager.h"
+#include "gramma.h"
+#include "search/search_options.h"
 
 using namespace httplib;
 
@@ -37,12 +39,19 @@ std::string GetPage(std::string file) {
  * @param[in] manager (book manager, to do search and get map of all books.)
  */
 void Search(const Request& req, Response& resp, const nlohmann::json& 
-    zotero_pillars, CBookManager& manager) {
+    zotero_pillars, BookManager& manager, Dict& dict) {
   
   try {
     //Get query (necessary value!)
+    bool relevant_neighbors = false;
     if (!req.has_param("q")) return;
     std::string query = req.get_param_value("q", 0);
+    if(query.front() == '$') {
+      query.erase(0, 1);
+      relevant_neighbors = true;
+    }
+    std::replace(query.begin(), query.end(), ' ', '+');
+      
 
     //get fuzzyness
     bool fuzzyness = false;
@@ -108,7 +117,7 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
       << resultsperpage << std::endl;
 
     //Construct search-options
-    CSearchOptions options(query, fuzzyness, pillars, scope, author, pubafter,
+    SearchOptions options(query, fuzzyness, pillars, scope, author, pubafter,
       pubbefore, true, sort);
 
 
@@ -135,12 +144,18 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
         //Create entry for each book in result.
         auto &book = all_books[*it];
         nlohmann::json entry;
-        entry["scanId"] = book->get_key();
-        entry["copyright"] = !book->get_metadata().GetPublic();
-        entry["hasocr"] = book->hasContent();
-        entry["description"] = book->getAuthorDateScanned();
-        entry["bibliography"] = book->get_metadata().GetMetadata("bib");
-        entry["preview"] = book->getPreview(query);
+        entry["scanId"] = book->key();
+        entry["copyright"] = !book->metadata().GetPublic();
+        entry["hasocr"] = book->HasContent();
+        entry["description"] = book->GetAuthorDateScanned();
+        entry["bibliography"] = book->metadata().GetMetadata("bib");
+
+        std::string preview = book->GetPreview(query);
+        if (relevant_neighbors == true) {
+          std::string str = book->GetMostRelevantNeighbors(query, dict);
+          if (str != "") preview += "<br>" + str;
+        }
+        entry["preview"] = preview;
         search_response["books"].push_back(std::move(entry)); 
         if (++counter == resultsperpage)
           break;
@@ -172,7 +187,7 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
  * @param[in, out] resp (respsonse)
  * @param[in] manager (book manager, to do get book which to search in.)
  */
-void Pages(const Request& req, Response& resp, CBookManager& manager) {
+void Pages(const Request& req, Response& resp, BookManager& manager) {
   try {
     //Retrieve necessary date from url
     std::string scanId = req.get_param_value("scanId"); 
@@ -188,7 +203,7 @@ void Pages(const Request& req, Response& resp, CBookManager& manager) {
       << " and fuzzyness: " << fuzzyness << std::endl;
 
     auto book = manager.getMapOfBooks()[scanId];
-    auto pages = book->getPages(query, fuzzyness!=0);
+    auto pages = book->GetPages(query, fuzzyness!=0);
     std::cout << "Got " << pages->size() << " pages for this book." << std::endl;
 
     //Construct response
@@ -225,7 +240,7 @@ void Pages(const Request& req, Response& resp, CBookManager& manager) {
  * @param[in] manager (book manager, to do search for suggestions)
  * @param[in] type (indication what kind of suggestions (author/ corpus))
  */
-void Suggestions(const Request& req, Response& resp, CBookManager& manager, 
+void Suggestions(const Request& req, Response& resp, BookManager& manager, 
     std::string type) {
   try {
     //Retrieve suggestions from book manager.
@@ -252,6 +267,11 @@ int main()
   //Create server.
   Server srv;
 
+  //Load dictionary
+  std::cout << "Loading dictionary.\n";
+  Dict dict("web/dict.json");
+  std::cout << "done.\n";
+
   //Load corpus metadata from disc.
   //TODO (fux): location should be specified by a config file.
   std::ifstream read("bin/zotero.json", std::ios::in);
@@ -274,7 +294,7 @@ int main()
 
   //Create book manager
   std::cout << "initializing bookmanager\n";
-  CBookManager manager;
+  BookManager manager;
   manager.updateZotero(metadata);
   if (manager.initialize())
     std::cout << "Initialization successful!\n"; 
@@ -289,7 +309,7 @@ int main()
   
   //Add specific handlers via server-frame 
   srv.Get("/api/v2/search", [&](const Request& req, Response& resp) 
-      { Search(req, resp, zotero_pillars, manager); });
+      { Search(req, resp, zotero_pillars, manager, dict); });
   srv.Get("/api/v2/search/pages", [&](const Request& req, Response& resp) 
       { Pages(req, resp, manager); });
   srv.Get("/api/v2/search/suggestions/corpus", [&](const Request& req, Response& resp)

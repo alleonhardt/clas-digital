@@ -11,20 +11,20 @@
 #include <set>
 #include <string>
 
-#include "book_manager/CBook.hpp"
+#include "book_manager/book.h"
 #include "func.hpp"
 #include "fuzzy.hpp"
-#include "search/CSearchOptions.hpp"
+#include "search/search_options.h"
 
-class CSearch
+class Search
 {
 private:
     std::string m_sWord;
-    CSearchOptions* m_sOpts;
+    SearchOptions* m_sOpts;
     std::map<std::string, double>* m_mapSR;
 
     typedef std::unordered_map<std::string, std::map<std::string, double>> MAPWORDS;
-    typedef std::unordered_map<std::string, CBook*> map_books;
+    typedef std::unordered_map<std::string, Book*> map_books;
     typedef std::unordered_map<std::string, std::set<std::string>> dict;
 
 public:
@@ -32,8 +32,8 @@ public:
     /**
     * @brief constructor
     */
-    CSearch(CSearchOptions* searchOpts, std::string sWord);
-    ~CSearch();
+    Search(SearchOptions* searchOpts, std::string sWord);
+    ~Search();
 
     // *** GETTER *** //
 
@@ -41,7 +41,7 @@ public:
     /**
     * @return searchOptions
     */
-    CSearchOptions* getSearchOptions();
+    SearchOptions* getSearchOptions();
 
     /**
     * @return searched word
@@ -79,7 +79,7 @@ public:
     * books that do not match with search options.
     */
     std::map<std::string, double>* search(MAPWORDS& mWs, MAPWORDS& mWsTitle, MAPWORDS& mWsAuthor,
-                std::unordered_map<std::string, CBook*>& mapBooks, dict& d_dict);
+                std::unordered_map<std::string, Book*>& mapBooks, dict& d_dict);
 
     /**
     * @brief search full-match
@@ -125,7 +125,7 @@ public:
     * @param[in] book to be checked
     * return Boolean
     */
-    bool checkSearchOptions(CBook* book);
+    bool checkSearchOptions(Book* book);
 };
 
 #endif
