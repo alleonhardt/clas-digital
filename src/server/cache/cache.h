@@ -33,9 +33,12 @@ namespace clas_digital
       using map_t = std::unordered_map<Key,std::shared_ptr<CacheableObject>>;
       using iterator_map_t = typename map_t::iterator;
 
-      FixedSizeCache(long long maxSize) : size_(maxSize), free_space_(maxSize), lru_order_index_(0) {}
+      FixedSizeCache(long long maxSize) : size_(maxSize), free_space_(maxSize) 
+      {
+        lru_order_index_.store(0);
+      }
 
-      bool Register(Key key, std::shared_ptr<CacheableObject> obj)
+      bool insert(Key key, std::shared_ptr<CacheableObject> obj)
       {
         std::unique_lock lck(access_);
         auto ret = cache_objs_.insert({key,obj});
@@ -48,7 +51,7 @@ namespace clas_digital
       }
 
       
-      void Unregister(Key key)
+      void erase(Key key)
       {
         std::unique_lock lck(access_);
         auto it = cache_objs_.find(key);
@@ -59,7 +62,7 @@ namespace clas_digital
         }
       }
 
-      void DebugPrint()
+      void debug_print()
       {
         std::unique_lock lck(access_);
         for(const auto &it : cache_objs_)
@@ -72,7 +75,7 @@ namespace clas_digital
         std::cout<<"Vector pointer: "<<lru_order_index_<<std::endl;
       }
 
-      void Load(Key key, CacheableObject::success_func_t onsuccess, CacheableObject::error_func_t onerror)
+      void load(Key key, CacheableObject::success_func_t onsuccess, CacheableObject::error_func_t onerror)
       {
         std::shared_ptr<CacheableObject> obj;
         try

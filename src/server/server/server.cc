@@ -128,11 +128,13 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::Start(std::string listenAddres
 
   for(auto &it : cfg_.mount_points_)
   {
-    file_handler_.AddMountPoint(it);
+    file_handler_->AddMountPoint(it);
   }
 
+  file_handler_->AddAlias({"/search","/"},"../web/index.html");
+
   server_.set_error_handler([this](const auto& req, auto& res) {
-        this->file_handler_.ServeFile(req,res);
+        this->file_handler_->ServeFile(req,res);
       });
 
 
@@ -181,13 +183,25 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::InitialiseFromString(std::stri
   for(auto &it : cfg_.plugins_)
   {
     plugin_manager_.LoadPlugin(std::to_string(i++), it, this);
+    debug::log(debug::LOG_DEBUG,"Loaded plugin ",it,"with id ",i-1,"\n");
+  }
+
+  if(!file_handler_)
+  {
+    debug::log(debug::LOG_DEBUG,"Detected file cache size of ",cfg_.file_cache_size_," Bytes. Creating the file handler now as none was supplied by the plugins.\n");
+    file_handler_ = std::make_shared<FileHandler>(cfg_.file_cache_size_);
   }
   
-  auto err = users_->Load(user_db_file);
-  if(err.GetErrorCode() != UserTable::RET_OK)
+  if(!users_)
   {
-    debug::log(debug::LOG_ERROR,"Could not create user table in RAM!\n");
-    return debug::Error(ReturnCodes::ERR_USERTABLE_INITIALISE,"Could not initialise user table subsytem").Next(err);
+    users_.reset(new UserTable);
+    auto err = users_->Load(user_db_file);
+    if(err.GetErrorCode() != UserTable::RET_OK)
+    {
+      debug::log(debug::LOG_ERROR,"Could not create user table in RAM!\n");
+      return debug::Error(ReturnCodes::ERR_USERTABLE_INITIALISE,"Could not initialise user table subsytem").Next(err);
+    }
+    debug::log(debug::LOG_DEBUG,"Created and loaded user table from path ",user_db_file,"\n");
   }
 
 
@@ -202,7 +216,7 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::InitialiseFromString(std::stri
       auto err2 = ptr->Initialise(cfg_.reference_config_);
       if(err2)
       {
-        std::cout<<"Running without reference manager! Due to errors or missing config!"<<std::endl;
+        debug::log(debug::LOG_WARNING,"Could not load reference manager config and no reference manager was supplied by plugins! Proceeding without reference manager.\n");
         ref_manager_.reset();
       }
     }
@@ -245,6 +259,5 @@ bool CLASServer::IsRunning()
 
 CLASServer::CLASServer()
 {
-  users_.reset(new UserTable);
   initialised_ = false;
 }

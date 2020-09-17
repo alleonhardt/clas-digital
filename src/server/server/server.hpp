@@ -113,11 +113,11 @@ namespace clas_digital
       //login/create/delete/change user requests
       std::shared_ptr<UserTable> users_;
       std::shared_ptr<IReferenceManager> ref_manager_;
+      std::shared_ptr<IFileHandler> file_handler_;
 
       ServerConfig cfg_;
       clas_digital::EventManager event_manager_;
       PlugInManager plugin_manager_;
-      FileHandler file_handler_;
 
 
       /**

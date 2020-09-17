@@ -73,7 +73,30 @@ Error<ServerConfigReturnCodes> ServerConfig::LoadFromString(std::string config)
     }
 
     reference_manager_ = config_.value("refmgr","zotero");
-    debug::log(debug::LOG_WARNING,"No valid reference manager found, using own id system!");
+
+    std::string val = config_.value("file_cache_size","1GB");
+    if(val.back() == 'B')
+    {
+      val.pop_back();
+      auto last = val.back();
+      long long factor = 1;
+      if(last == 'K')
+        factor = 1024;
+      else if(last == 'M')
+        factor = 1024*1024;
+      else if(last == 'G')
+        factor = 1024*1024*1024;
+      else
+      {
+        debug::log(debug::LOG_ERROR,"The size of the file cache does not follow format limitations!\n");
+      }
+      val.pop_back();
+      file_cache_size_ = std::stoi(val)*factor;
+    }
+    else
+    {
+      file_cache_size_ = std::stoi(val);
+    }
   }
   catch(nlohmann::json::exception &e)
   {

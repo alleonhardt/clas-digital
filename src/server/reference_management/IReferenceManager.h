@@ -80,6 +80,7 @@ namespace clas_digital
       virtual Error GetCollectionMetadata(ptr_t &collection, std::string collectionKey, CacheOptions opts=CacheOptions::CACHE_USE_CACHED) = 0;
 
       virtual Error SaveToFile() = 0;
+      virtual ~IReferenceManager(){}
   };
 }
 
