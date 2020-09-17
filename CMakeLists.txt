@@ -58,7 +58,8 @@ set(SRC_FILES_SERVER_TEST src/server/test/main.cc
   src/server/login/tests/users_test.cc
   src/server/server/tests/server_config_test.cc
   src/server/plugins/tests/event_manager_test.cpp
-  src/server/plugins/tests/plug_in_manager_test.cpp)
+  src/server/plugins/tests/plug_in_manager_test.cpp
+  src/server/cache/tests/cache_tests.cpp)
 
 if(MSVC)
   add_library(test_plugin SHARED src/server/plugins/tests/test_plugin.cpp $<TARGET_OBJECTS:clas_server_lib>)

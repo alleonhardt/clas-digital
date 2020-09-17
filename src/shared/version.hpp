@@ -5,9 +5,9 @@
 
 namespace clas_digital
 {
-  inline const char gGitSha[] = "439f5d78aa3a4bb1e951e5bfeaea965a59fc0dec-dirty";
-  inline const char gDate[] = "Fri Sep 11 09:18:24 2020";
-  inline const char gCommitSubject[] = "Added .txt files for caching";
+  inline const char gGitSha[] = "14db06a60717f86557fcf087ba2b245824972964-dirty";
+  inline const char gDate[] = "Fri Sep 11 13:47:56 2020";
+  inline const char gCommitSubject[] = "Possible fix for windows again";
 
   inline void print_version()
   {

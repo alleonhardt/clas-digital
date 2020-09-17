@@ -1,5 +1,7 @@
 #include "filehandler.hpp"
 #include "filehandler/util.h"
+#include "debug/debug.hpp"
+debug::LogLevel debug::LogClass::gLogLevel;
 using namespace clas_digital;
 
 FileHandler::FileHandler()
