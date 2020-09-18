@@ -445,14 +445,44 @@ IReferenceManager::Error ZoteroReferenceManager::__tryCacheHit(ZoteroReferenceMa
 
 void ZoteroReferenceManager::__updateCache(ZoteroReferenceManager::ptr_cont_t &input, ZoteroReferenceManager::ptr_cont_t &new_val)
 {
+  
+  if(event_manager_)
   {
-    std::unique_lock lck(exclusive_swap_);
-    input = std::move(new_val);
+    auto func = [this,new_val]()
+    {
+      for(auto &it : *new_val)
+      {
+        event_manager_->TriggerEvent(EventManager::Events::ON_UPDATE_REFERENCE, &CLASServer::GetInstance(), it.second);
+      }
+    };
+    
+    //Start a thread to do the event dispatching when encoutering a lot of new
+    //items
+    if(new_val->size() > 100)
+      std::thread(func).detach();
+    else
+      func();
   }
 
-  for(auto &it : *new_val)
   {
-    event_manager_->TriggerEvent(EventManager::Events::ON_UPDATE_REFERENCE, &CLASServer::GetInstance(), it.second);
+    std::unique_lock lck(exclusive_swap_);
+    if(input)
+    {
+      for(auto &it : *new_val)
+      {
+        auto fnd = input->find(it.first);
+        if(fnd!=input->end())
+        {
+          std::cout<<"Ptr second: "<<fnd->second<<std::endl;
+          delete fnd->second;
+          fnd->second = it.second;
+        }
+        else
+          (*input)[it.first] = it.second;
+      }
+    }
+    else
+      input = std::move(new_val);
   }
 }
 

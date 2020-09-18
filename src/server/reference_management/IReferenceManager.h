@@ -78,6 +78,8 @@ namespace clas_digital
         event_manager_ = manager;
       }
 
+      IReferenceManager() : event_manager_(nullptr) {}
+
       virtual Error GetAllItems(ptr_cont_t &items, CacheOptions opts=CacheOptions::CACHE_USE_CACHED) = 0;
       virtual Error GetAllCollections(ptr_cont_t &collections, CacheOptions opts=CacheOptions::CACHE_USE_CACHED) = 0;
 
