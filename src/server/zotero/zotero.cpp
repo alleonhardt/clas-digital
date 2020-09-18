@@ -4,6 +4,8 @@
 #include <chrono>
 #include <thread>
 #include "filehandler/util.h"
+#include "reference_management/IReferenceManager.h"
+#include "server/server.hpp"
 
 using namespace clas_digital;
 
@@ -64,8 +66,23 @@ size_t clas_digital::zoteroHeaderReader(char *pReceiveData, size_t pSize, size_t
 	else if(ass.find("Retry-After: ")!=std::string::npos)
 	{
 	}
+
+  const std::string last_modified_header = "Last-Modified-Version: ";
+  auto position = ass.find(last_modified_header);
+  if(position != std::string::npos)
+  {
+    auto start = position+last_modified_header.length(); 
+    std::string subs = ass.substr(start, ass.find("\r\n",start)-start);
+    std::cout<<"Extracted version substr: "<<subs<<std::endl;
+    zot->libraryVersion_ = std::move(subs);
+  }
 	//Tell libcurl how many bytes we processed.
 	return pSize*pNumBlocks;
+}
+
+std::string &ZoteroConnection::GetLibraryVersion()
+{
+  return libraryVersion_;
 }
 
 void ZoteroConnection::SetNextLink(std::string str)
@@ -245,31 +262,26 @@ void ZoteroReferenceManager::__loadCacheFromFile()
       ifs.close();
     }
 
-    if(save.count("items"))
+    auto loadFieldContainer = [&save](const char *field, IReferenceManager::ptr_cont_t &cont, std::string &libVersion)
     {
-      itemReferences_ = IReferenceManager::ptr_cont_t(new container_t,custom_deleter);
-      for(auto &it : save["items"])
+      if(save.count(field))
       {
-        IReference *ref = new ZoteroReference();
-        ref->json(it);
-        itemReferences_->insert({ref->GetKey(),ref});
+        cont = IReferenceManager::ptr_cont_t(new container_t,custom_deleter);
+        for(auto &it : save[field]["data"])
+        {
+          IReference *ref = new ZoteroReference();
+          ref->json(it);
+          cont->insert({ref->GetKey(),ref});
+        }
+        libVersion = save["items"]["version"];
+        if(cont->size() == 0)
+          cont.reset();
       }
-      if(itemReferences_->size() == 0)
-        itemReferences_.reset();
-    }
-    
-    if(save.count("collections"))
-    {
-      collectionReferences_ = IReferenceManager::ptr_cont_t(new container_t,custom_deleter);
-      for(auto &it : save["collections"])
-      {
-        IReference *ref = new ZoteroReference();
-        ref->json(it);
-        collectionReferences_->insert({ref->GetKey(),ref});
-      }
-      if(collectionReferences_->size() == 0)
-        collectionReferences_.reset();
-    }
+    };
+
+    loadFieldContainer("items",itemReferences_,libraryVersionItems_);
+    loadFieldContainer("collections",collectionReferences_,libraryVersionReferences_);
+
   }
   catch(...)
   {
@@ -286,24 +298,26 @@ IReferenceManager::Error ZoteroReferenceManager::SaveToFile()
   nlohmann::json save;
   {
     std::shared_lock lck(exclusive_swap_);
-    save["items"] = nlohmann::json::array();
-    save["collections"] = nlohmann::json::array();
+
     bool save_file = false;
-    if(itemReferences_ && itemReferences_->size() > 0)
+    auto save_to_json = [&save,&save_file](const char *signature,IReferenceManager::ptr_cont_t &cont,std::string &libVersion)
     {
-      save_file = true;
-      for(auto &it : *itemReferences_)
-        save["items"].push_back(it.second->json());
-    }
-  
-    if(collectionReferences_ && collectionReferences_->size() > 0)
-    {
-      save_file = true;
-      for(auto &it : *collectionReferences_)
-        save["collections"].push_back(it.second->json());
-    }
+      save[signature] = nlohmann::json();
+      save[signature]["data"] = nlohmann::json::array();
+      save[signature]["version"] = libVersion;
+      if(cont && cont->size() > 0)
+      {
+        save_file = true;
+        for(auto &it : *cont)
+          save[signature]["data"].push_back(it.second->json());
+      }
+    };
+    
+    save_to_json("items",itemReferences_,libraryVersionItems_);
+    save_to_json("collections", collectionReferences_, libraryVersionReferences_);
+
     if(!save_file)
-      return Error::OK;
+      return Error::UNKNOWN;
   }
   if(!clas_digital::atomic_write_file(cache_path_,save))
     return Error::CACHE_FILE_PATH_NOT_VALID;
@@ -431,11 +445,18 @@ IReferenceManager::Error ZoteroReferenceManager::__tryCacheHit(ZoteroReferenceMa
 
 void ZoteroReferenceManager::__updateCache(ZoteroReferenceManager::ptr_cont_t &input, ZoteroReferenceManager::ptr_cont_t &new_val)
 {
-  std::unique_lock lck(exclusive_swap_);
-  input = std::move(new_val);
+  {
+    std::unique_lock lck(exclusive_swap_);
+    input = std::move(new_val);
+  }
+
+  for(auto &it : *new_val)
+  {
+    event_manager_->TriggerEvent(EventManager::Events::ON_UPDATE_REFERENCE, &CLASServer::GetInstance(), it.second);
+  }
 }
 
-IReferenceManager::Error ZoteroReferenceManager::__performRequestsAndUpdateCache(ZoteroReferenceManager::ptr_cont_t &input, ZoteroReferenceManager::ptr_cont_t &output, std::vector<std::string> &requestMatrix)
+IReferenceManager::Error ZoteroReferenceManager::__performRequestsAndUpdateCache(ZoteroReferenceManager::ptr_cont_t &input, ZoteroReferenceManager::ptr_cont_t &output, std::vector<std::string> &requestMatrix,std::string &libraryVersion)
 {
   ptr_cont_t request(new container_t(),custom_deleter);
   auto connection = GetConnection();
@@ -447,6 +468,8 @@ IReferenceManager::Error ZoteroReferenceManager::__performRequestsAndUpdateCache
       return res;
   }
 
+
+  libraryVersion = std::move(connection->GetLibraryVersion());
   __updateCache(input,request);
   output = input;
 
@@ -465,7 +488,7 @@ IReferenceManager::Error ZoteroReferenceManager::GetAllItems(ZoteroReferenceMana
   else
     std::for_each(trackedCollections_.begin(),trackedCollections_.end(),[&cmdMatrix,this](std::string &coll){cmdMatrix.push_back("/collections/"+coll+"/items?format=json&include=data,bib,citation&style="+this->citationStyle_+"&limit=100");});
 
-  return __performRequestsAndUpdateCache(itemReferences_,items,cmdMatrix);
+  return __performRequestsAndUpdateCache(itemReferences_,items,cmdMatrix,libraryVersionItems_);
  }
 
 IReferenceManager::Error ZoteroReferenceManager::GetAllCollections(IReferenceManager::ptr_cont_t &collections, IReferenceManager::CacheOptions opts)
@@ -479,7 +502,7 @@ IReferenceManager::Error ZoteroReferenceManager::GetAllCollections(IReferenceMan
   else
     std::for_each(trackedCollections_.begin(),trackedCollections_.end(),[&cmdMatrix](std::string &coll){cmdMatrix.push_back("/collections/"+coll+"?format=json&include=data");});
 
-  return __performRequestsAndUpdateCache(collectionReferences_, collections, cmdMatrix);
+  return __performRequestsAndUpdateCache(collectionReferences_, collections, cmdMatrix,libraryVersionReferences_);
 }
 
 
