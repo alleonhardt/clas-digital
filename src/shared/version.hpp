@@ -5,9 +5,9 @@
 
 namespace clas_digital
 {
-  inline const char gGitSha[] = "2148bf3ace28cd095f2f475444a28c585176e72a-dirty";
-  inline const char gDate[] = "Fri Sep 11 17:28:21 2020";
-  inline const char gCommitSubject[] = "Fixed bug when presenting search results";
+  inline const char gGitSha[] = "3228acd504249abcabc7a081af8ec86a20b15f2a";
+  inline const char gDate[] = "Sun Sep 13 20:57:19 2020";
+  inline const char gCommitSubject[] = "Added gramma-class to generate better results concerning relevant neighbours";
 
   inline void print_version()
   {
