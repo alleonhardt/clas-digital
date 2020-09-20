@@ -104,6 +104,8 @@ namespace clas_digital
        */
       ZoteroConnection(std::string apiKey, std::string api_addr, std::string baseUri);
 
+      std::string &GetLibraryVersion();
+
     private:
       CURL *_curl;				///<Interface to the ssl/https api
       std::string _baseRequest;	///<Contains the basic url and group number for the zotero request
@@ -111,6 +113,7 @@ namespace clas_digital
       std::string _nextLink;		///<Contains an non empty string if the json downloaded is only a part of the full json
 			std::string body_;
       IReferenceManager::Error err_;
+      std::string libraryVersion_;
 
       /**
        * Writes the buffer inside of the class variable _requestJSON
@@ -200,7 +203,11 @@ namespace clas_digital
 
 
       ptr_cont_t itemReferences_;
+      std::string libraryVersionItems_;
+
       ptr_cont_t collectionReferences_;
+      std::string libraryVersionReferences_;
+
       std::shared_mutex exclusive_swap_;
 
 
@@ -209,7 +216,7 @@ namespace clas_digital
       Error __tryCacheHit(ptr_cont_t &input, ptr_t &ret_val, const std::string &value, CacheOptions opts);
 
 
-      Error __performRequestsAndUpdateCache(ptr_cont_t &input, ptr_cont_t &output, std::vector<std::string> &requestMatrix);
+      Error __performRequestsAndUpdateCache(ptr_cont_t &input, ptr_cont_t &output, std::vector<std::string> &requestMatrix, std::string &libraryVersion);
 
       void __updateCache(ptr_cont_t &input, ptr_cont_t &new_val);
       void __loadCacheFromFile();

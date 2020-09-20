@@ -25,6 +25,5 @@ int main(int argc, char **argv)
   }
 
   server.Start("0.0.0.0");
-
   return 0;
 }

@@ -6,6 +6,7 @@
 #include <memory>
 #include <unordered_map>
 #include <functional>
+#include "plugins/EventManager.hpp"
 
 namespace clas_digital
 {
@@ -72,7 +73,13 @@ namespace clas_digital
         UNKNOWN
       };
 
-    
+      void SetEventManager(EventManager *manager)
+      {
+        event_manager_ = manager;
+      }
+
+      IReferenceManager() : event_manager_(nullptr) {}
+
       virtual Error GetAllItems(ptr_cont_t &items, CacheOptions opts=CacheOptions::CACHE_USE_CACHED) = 0;
       virtual Error GetAllCollections(ptr_cont_t &collections, CacheOptions opts=CacheOptions::CACHE_USE_CACHED) = 0;
 
@@ -80,6 +87,9 @@ namespace clas_digital
       virtual Error GetCollectionMetadata(ptr_t &collection, std::string collectionKey, CacheOptions opts=CacheOptions::CACHE_USE_CACHED) = 0;
 
       virtual Error SaveToFile() = 0;
+      virtual ~IReferenceManager(){}
+    protected:
+      EventManager *event_manager_;
   };
 }
 

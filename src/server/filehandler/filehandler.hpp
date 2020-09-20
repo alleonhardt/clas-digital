@@ -12,34 +12,37 @@
 
 #include <shared_mutex>
 #include <fstream>
+#include <cache/cache.h>
 
 namespace clas_digital
 {
-  
-  class FileHandler
+ 
+  class IFileHandler
+  {
+    public:
+      virtual void AddMountPoint(std::filesystem::path pt) = 0;
+      virtual void ServeFile(const httplib::Request &req, httplib::Response &resp, bool abortoncachemiss=false) = 0;
+      virtual void AddAlias(std::vector<std::string> from, std::filesystem::path to) = 0;
+  };
+
+  class FileHandler : public IFileHandler
   {
     public:
       using cache_t = std::shared_ptr<std::vector<char>>;
 
-      FileHandler();
-      void AddMountPoint(std::filesystem::path pt);
-      void ServeFile(const httplib::Request &req, httplib::Response &resp);
+      FileHandler(long long cache_size);
+      virtual void AddMountPoint(std::filesystem::path pt) override;
+      virtual void ServeFile(const httplib::Request &req, httplib::Response &resp, bool abortoncachemiss=false) override;
+      virtual void AddAlias(std::vector<std::string> from, std::filesystem::path to) override;
 
     private:
+      FixedSizeCache<std::string> cache_;
       std::vector<std::filesystem::path> mount_points_;
       std::map<std::string,std::string> file_types_;
 
       std::function<bool(const std::filesystem::path&)> cache_file_callback_;
 
-      std::unordered_map<std::string,cache_t> cached_files_;
-      unsigned long long cached_size_;
-      std::shared_mutex mut_;
-
-      bool __loadFile(const std::filesystem::path &p, cache_t &ptr);
       std::string __getFileMimetype(const std::filesystem::path &mime);
-      void __cacheFile(const std::filesystem::path &cachePath);
-      void __cacheFile(const std::filesystem::path &cachePath, cache_t &t);
-      void __iterateDirAndCacheFiles(const std::filesystem::path &p);
   };
 }
 

@@ -1,9 +1,14 @@
 #ifndef CLASDIGITAL_SRC_SERVER_SERVER_SERVER_HPP
 #define CLASDIGITAL_SRC_SERVER_SERVER_SERVER_HPP
 // Overwrite default thread pool count
+
+#ifndef CPPHTTPLIB_OPENSSL_SUPPORT
 #define CPPHTTPLIB_THREAD_POOL_COUNT 8
 #define CPPHTTPLIB_OPENSSL_SUPPORT
 #include <httplib.h>
+#endif
+
+
 #include <algorithm>
 #include <mutex>
 #include <bitset>
@@ -113,11 +118,11 @@ namespace clas_digital
       //login/create/delete/change user requests
       std::shared_ptr<UserTable> users_;
       std::shared_ptr<IReferenceManager> ref_manager_;
+      std::shared_ptr<IFileHandler> file_handler_;
 
       ServerConfig cfg_;
       clas_digital::EventManager event_manager_;
       PlugInManager plugin_manager_;
-      FileHandler file_handler_;
 
 
       /**

@@ -10,3 +10,4 @@ doc/*
 web/books/*
 bin/*
 compile_commands.json
+.clangd/*

@@ -6,6 +6,7 @@ using namespace clas_digital;
 
 TEST_CASE("Creating Usertable and inserting values","[UserTable]") {
     UserTable tbl;
+    debug::LogClass::gLogLevel = debug::LogLevel::DBG_TODO;
     REQUIRE(tbl.Load().GetErrorCode() == UserTable::RET_OK);
     //Let the destructor run to write changes on disk!
     //
@@ -27,6 +28,7 @@ TEST_CASE("Creating Usertable and inserting values","[UserTable]") {
 
 
 TEST_CASE("Threading user table test","[UserTable]") {
+    debug::LogClass::gLogLevel = debug::LogLevel::DBG_ALWAYS;
     UserTable tbl;
     REQUIRE(tbl.Load().GetErrorCode() == UserTable::RET_OK);
     //Let the destructor run to write changes on disk!

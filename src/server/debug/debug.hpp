@@ -39,7 +39,6 @@ namespace debug
   
   ///< The global log level when printing always log messages that have a higher
   //level than the global log level
-  static inline LogLevel gLogLevel = LogLevel::DBG_ERROR;
  
   /**
    * @brief This log class should ease the user of colors and specific tags for
@@ -49,6 +48,7 @@ namespace debug
   class LogClass
   {
     public:
+      static LogLevel gLogLevel;
 
       /**
        * @brief Creates the LogClass from the log level it should react to, a
