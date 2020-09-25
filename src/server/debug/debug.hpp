@@ -1,11 +1,10 @@
 #ifndef CLASIDIGITAL_SRC_SERVER_DEBUG_DEBUG_H
 #define CLASIDIGITAL_SRC_SERVER_DEBUG_DEBUG_H
 
-
-
 #include <iostream>
 #include <filesystem>
 #include <functional>
+#include <type_traits>
 #define WIN32_LEAN_AND_MEAN
 
 #include <termcolor/termcolor.hpp>
@@ -319,53 +318,114 @@ namespace debug
 
 namespace clas_digital
 {
+  struct trace_info
+  {
+    const char *file;
+    const char *function;
+    int line;
+  };
+
+
+
+  template<typename ReturnType,typename ErrorType, bool SaveTraceInfo=true>
   class clas_error
   {
     public:
-      template<typename T>
-      clas_error(T error, std::string msg, std::string trace)
+      clas_error(ReturnType ret)
       {
-        error_ = static_cast<int>(error);
-        message_ = std::move(trace);
-        message_ += msg;
+        has_error_ = false;
+        ret_ = ret;
       }
 
-      clas_error &append(std::shared_ptr<clas_error> err)
+      clas_error(ErrorType t)
       {
-        next_ = err;
+        static_assert(SaveTraceInfo,"Specified save trace information, but did not provide tracing information!");
+      }
+
+      clas_error(ErrorType t, trace_info inf)
+      {
+        has_error_ = true;
+        error_ = t;
+        if constexpr(SaveTraceInfo)
+          trace_info_ = inf;
+      }
+
+      template<typename NewReturnType>
+      clas_error<ErrorType,NewReturnType> &map(std::function<clas_error<ErrorType,NewReturnType>&(ReturnType)> fnc)
+      {
+        if(has_error_)
+        {
+          has_error_ = false;
+          return clas_error<ErrorType,NewReturnType>(error_);
+        }
+        return fnc(ret_);
+      }
+
+      template<typename NewReturnType>
+      clas_error<ErrorType,NewReturnType> &map(std::function<clas_error<ErrorType,NewReturnType>&()> fnc)
+      {
+        if(has_error_)
+        {
+          has_error_ = false;
+          return clas_error<ErrorType,NewReturnType>(error_);
+        }
+        return fnc();
+      }
+
+      void error(std::function<void(ErrorType)> fnc)
+      {
+        if(has_error_)
+        {
+          has_error_ = false;
+          fnc(error_);
+        }
+      }
+
+      clas_error<ErrorType,ReturnType> &print()
+      {
+        if(has_error_)
+        {
+          std::cout<<" -> Contains error\n";
+          std::cout<<" -> -> Error: "<<error_<<std::endl;
+          if constexpr(SaveTraceInfo)
+          {
+            std::cout<<" -> -> Function: "<<trace_info_.function<<std::endl;
+            std::cout<<" -> -> File: "<<trace_info_.file<<std::endl;
+            std::cout<<" -> -> Line: "<<trace_info_.line<<std::endl;
+          }
+        }
+        else
+        {
+          std::cout<<" -> Contains value"<<std::endl;
+          std::cout<<" -> -> Value: "<<ret_<<std::endl;
+        }
         return *this;
       }
 
-      template<typename T>
-      operator T()
+      ~clas_error()
       {
-        return static_cast<T>(error_);
+        if(has_error_)
+        {
+          std::cout<<termcolor::red<<"Unchecked error, terminating programm. Error details: \n"<<std::endl;
+          this->print();
+          std::cout<<termcolor::reset;
+          throw *this;
+        }
       }
 
-      void print(int index=0,std::ostream &os=std::cout)
-      {
-        for(int i = 0; i < index; i++)
-          os<<"-";
-        os<<"Code "<<error_<<" message: \""<<message_<<"\"\n";
-        if(next_)
-          next_->print(index+1,os);
-      }
-
-    private:
-      int error_;
-      std::shared_ptr<clas_error> next_;
-      std::string message_;
+    protected:
+      ErrorType error_;
+      ReturnType ret_;
+      trace_info trace_info_;
+      bool has_error_;
   };
 }
 
 #ifdef _WIN32
-#define CL_TRACE __FUNCSIG__ " in " __FILE__ " l."+std::string(__LINE__)
+#define CL_TRACE clas_digital::trace_info{.file=__FILE__,.function=__FUNC_SIG__,.line=__LINE__}
 #else
-#define CL_TRACE __PRETTY_FUNCTION__ " in " __FILE__ " l."+std::string(__LINE__)
+#define CL_TRACE clas_digital::trace_info{.file=__FILE__,.function=__PRETTY_FUNCTION__,.line=__LINE__}
 #endif
-
-#define cl_create_err2(x,y) new clas_digital::clas_error(x,y,CL_TRACE)
-#define cl_create_err1(x) new clas_digital::clas_error(x,"",CL_TRACE)
 
 #define GET_MACRO(_1,_2,NAME,...) NAME
 #define cl_create_err(...) GET_MACRO(__VA_ARGS__, cl_create_err2, cl_create_err1)(__VA_ARGS__)

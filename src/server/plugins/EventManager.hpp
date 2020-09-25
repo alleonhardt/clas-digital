@@ -4,6 +4,7 @@
 #include <string>
 #include <map>
 #include <nlohmann/json.hpp>
+#include <shared_mutex>
 #include "debug/debug.hpp"
 
 
@@ -34,11 +35,18 @@ namespace clas_digital
 
       using callback_t = std::function<debug::Error<ReturnValues>(CLASServer *, void *)>;
 
-      debug::Error<ReturnValues> RegisterForEvent(Events event, callback_t callback);
-      debug::Error<ReturnValues> TriggerEvent(Events event, CLASServer* srv, void *data);
+      debug::Error<ReturnValues> RegisterForEvent(Events event,unsigned long long *handle,callback_t callback);
+      void EraseEventHandler(Events event, unsigned long long *handler);
+
+      debug::Error<ReturnValues> TriggerEvent(Events event, void *data);
+
+      EventManager(CLASServer *server);
 
     private:
-      std::vector<callback_t> callbacks_[NumberOfEvents];
+      std::map<unsigned long long,callback_t> callbacks_[NumberOfEvents];
+      std::shared_mutex shared_mutex_;
+      unsigned long long id_;
+      CLASServer *server_;
   };
 }
 

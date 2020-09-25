@@ -19,6 +19,7 @@
 #include "reference_management/IReferenceManager.h"
 #include "zotero/zotero.hpp"
 #include "filehandler/filehandler.hpp"
+#include "corpus_manager/corpus_manager.h"
 
 
 namespace clas_digital
@@ -51,14 +52,6 @@ namespace clas_digital
       };
 
 
-      /**
-       * @brief Returns the Singleton instance of the CLASServer
-       *
-       * @return A reference to the singleton instance of CLASServer
-       */
-      static CLASServer &GetInstance();
-
-
       debug::Error<ReturnCodes> InitialiseFromFile(std::filesystem::path config_file, std::filesystem::path user_db_file);
 
       debug::Error<ReturnCodes> InitialiseFromString(std::string config_file, std::filesystem::path user_db_file);
@@ -84,6 +77,8 @@ namespace clas_digital
       void HandleLogin(const httplib::Request& req, httplib::Response &resp);
       void SendUserList(const httplib::Request& req, httplib::Response &resp);
       void UpdateUserList(const httplib::Request& req, httplib::Response &resp);
+      void GetMetadata(const httplib::Request& req, httplib::Response &resp);
+      void CreateBibliography(const httplib::Request& req, httplib::Response &resp);
 
       bool IsRunning();
 
@@ -98,11 +93,26 @@ namespace clas_digital
        */
       std::shared_ptr<IUser> GetUserFromCookie(const std::string &cookie);
 
-      ServerConfig &GetServerConfig();
-      clas_digital::EventManager &GetEventManager();
-      std::shared_ptr<UserTable> GetUserTable();
+      std::shared_ptr<ServerConfig> &GetServerConfig();
+
+      std::shared_ptr<EventManager> &GetEventManager();
+      std::shared_ptr<UserTable> &GetUserTable();
+      std::shared_ptr<IFileHandler> &GetFileHandler();
+      
+      httplib::Server &GetHTTPServer();
+      
+      std::shared_ptr<IReferenceManager> &GetReferenceManager();
+
+      std::shared_ptr<CorpusManager> &GetCorpusManager();
+
+      void SetAccessFunction(std::function<bool(const httplib::Request&,IUser*)> &&func);
+
+      bool GetShutdownScheduled();
 
 
+      ~CLASServer();
+      CLASServer();
+  
 
     private:
       ///< The http server forwards all requests to handlers
@@ -110,6 +120,8 @@ namespace clas_digital
 
 
       bool initialised_;
+      std::atomic<bool> shutdown_scheduled_;
+      std::thread check_shutdown_;
 
       ///< The mutex synchronises atomic actions on the status
       std::mutex exclusive_section_;
@@ -119,19 +131,14 @@ namespace clas_digital
       std::shared_ptr<UserTable> users_;
       std::shared_ptr<IReferenceManager> ref_manager_;
       std::shared_ptr<IFileHandler> file_handler_;
+      std::shared_ptr<PlugInManager> plugin_manager_;
+      std::shared_ptr<EventManager> event_manager_;
+      std::shared_ptr<CorpusManager> corpus_manager_;
+      std::shared_ptr<ServerConfig> cfg_;
 
-      ServerConfig cfg_;
-      clas_digital::EventManager event_manager_;
-      PlugInManager plugin_manager_;
-
-
-      /**
-       * @brief Make the constructor private to prevent the user from
-       * creating additional instances of CLASServer. The CLASServer is a
-       * singleton class.
-       */
-      CLASServer();
+      std::function<bool(const httplib::Request&,IUser*)> access_func_;
   };
+
 }
 
 #endif

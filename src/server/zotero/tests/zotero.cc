@@ -60,7 +60,7 @@ TEST_CASE("GetItemMetadata from ReferenceManager","[ZoteroReferenceManager]")
     auto ptr = ref.GetItemMetadata(item,"2UB6NTBHsad",IReferenceManager::CacheOptions::CACHE_USE_CACHED);
     REQUIRE(ptr == IReferenceManager::Error::KEY_DOES_NOT_EXIST);
 
-    ptr = ref.GetItemMetadata(item,"2UB6NTBH",IReferenceManager::CacheOptions::CACHE_USE_CACHED);
+    ptr = ref.GetItemMetadata(item,"2UB6NTBH",IReferenceManager::CacheOptions::CACHE_FORCE_FETCH);
     REQUIRE(ptr == IReferenceManager::Error::OK);
     REQUIRE(item->GetKey() == "2UB6NTBH");
 

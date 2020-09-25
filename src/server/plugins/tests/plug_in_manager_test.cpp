@@ -44,12 +44,12 @@ TEST_CASE("Load Plugin give real server and change config","[PlugInManager]")
 {
   PlugInManager manager;
   int x  = 2;
-  CLASServer &srv = CLASServer::GetInstance();
+  CLASServer srv;
   REQUIRE(srv.InitialiseFromString("{}", ":memory:") == false);
 
-  REQUIRE( srv.GetServerConfig().server_port_ == 80 );
+  REQUIRE(srv.GetServerConfig()->server_port_ == 80 );
   REQUIRE(manager.LoadPlugin("Test plugin", libpath, &srv) == true);
-  REQUIRE( srv.GetServerConfig().server_port_ == 10000 );
+  REQUIRE(srv.GetServerConfig()->server_port_ == 10000 );
 
   // Cant unload as it does not exist
   REQUIRE(manager.UnloadPlugin("Test plugin") == true);

@@ -95,10 +95,10 @@ bool User::CheckCredentials(nlohmann::json options)
   else return false;
 }
 
-bool User::DoAccessCheck(std::string URI)
+int User::GetAccess()
 {
   //Always allow access
-  return true;
+  return access_;
 }
 
 User::User()

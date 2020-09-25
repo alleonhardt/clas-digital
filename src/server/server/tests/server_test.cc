@@ -4,16 +4,11 @@
 #include <chrono>
 
 using namespace clas_digital;
-TEST_CASE("Constructor", "[CLASServer]") {
-  // Check the singleton template works
-  CLASServer &srv = CLASServer::GetInstance();
-  REQUIRE(&srv == &CLASServer::GetInstance());
-}
 
 TEST_CASE("Login","[CLASServer]") {
-  CLASServer &srv = CLASServer::GetInstance();
+  CLASServer srv;
 
-  srv.GetEventManager().RegisterForEvent(clas_digital::EventManager::ON_AFTER_INITIALISE, [](CLASServer *srv, void*){
+  srv.GetEventManager()->RegisterForEvent(clas_digital::EventManager::ON_AFTER_INITIALISE,nullptr, [](CLASServer *srv, void*){
       nlohmann::json js;
       js["email"] = "root";
       js["password"] = "password";
@@ -66,9 +61,9 @@ TEST_CASE("Login","[CLASServer]") {
 
 
 TEST_CASE("Update User List","[CLASServer]") {
-  CLASServer &srv = CLASServer::GetInstance();
+  CLASServer srv;
 
-  srv.GetEventManager().RegisterForEvent(clas_digital::EventManager::ON_AFTER_INITIALISE, [](CLASServer *srv, void*){
+  srv.GetEventManager()->RegisterForEvent(clas_digital::EventManager::ON_AFTER_INITIALISE, nullptr,[](CLASServer *srv, void*){
       nlohmann::json js;
       js["email"] = "root";
       js["password"] = "password";

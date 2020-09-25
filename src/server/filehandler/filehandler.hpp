@@ -13,6 +13,7 @@
 #include <shared_mutex>
 #include <fstream>
 #include <cache/cache.h>
+#include <login/user.hpp>
 
 namespace clas_digital
 {
@@ -35,12 +36,13 @@ namespace clas_digital
       virtual void ServeFile(const httplib::Request &req, httplib::Response &resp, bool abortoncachemiss=false) override;
       virtual void AddAlias(std::vector<std::string> from, std::filesystem::path to) override;
 
+      std::function<bool(const std::filesystem::path&)> cache_file_callback_;
     private:
       FixedSizeCache<std::string> cache_;
       std::vector<std::filesystem::path> mount_points_;
       std::map<std::string,std::string> file_types_;
 
-      std::function<bool(const std::filesystem::path&)> cache_file_callback_;
+
 
       std::string __getFileMimetype(const std::filesystem::path &mime);
   };

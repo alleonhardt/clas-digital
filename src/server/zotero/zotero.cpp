@@ -3,7 +3,9 @@
 #include <fstream>
 #include <chrono>
 #include <thread>
+#include <string_view>
 #include "filehandler/util.h"
+#include "plugins/EventManager.hpp"
 #include "reference_management/IReferenceManager.h"
 #include "server/server.hpp"
 
@@ -17,6 +19,14 @@ size_t clas_digital::zoteroReadBuffer(void *pReceiveData, size_t pSize, size_t p
 }
 
 
+int progress_callback(void *clientp,   curl_off_t dltotal,   curl_off_t dlnow,   curl_off_t ultotal,   curl_off_t ulnow)
+{
+	ZoteroConnection *zot = (ZoteroConnection*)clientp;
+  if(zot->GetState().load())
+    return -1;
+  return 0;
+}
+
 size_t clas_digital::zoteroHeaderReader(char *pReceiveData, size_t pSize, size_t pNumBlocks, void *userData)
 {
 	//We put the Zotero pointer inside user data so cast it back to the original class
@@ -29,12 +39,17 @@ size_t clas_digital::zoteroHeaderReader(char *pReceiveData, size_t pSize, size_t
 
   if(ass.find("HTTP/1.1 404")!=std::string::npos)
   {
-    zot->err_ = IReferenceManager::Error::KEY_DOES_NOT_EXIST;
+    zot->err_.store(IReferenceManager::Error::KEY_DOES_NOT_EXIST);
 	  return pSize*pNumBlocks;
   }
   else if(ass.find("HTTP/1.1 403")!=std::string::npos)
   {
-    zot->err_ = IReferenceManager::Error::API_KEY_NOT_VALID_OR_NO_ACCESS;
+    zot->err_.store(IReferenceManager::Error::API_KEY_NOT_VALID_OR_NO_ACCESS);
+	  return pSize*pNumBlocks;
+  }
+  else if(ass.find("HTTP/1.1 304")!=std::string::npos)
+  {
+    zot->err_.store(IReferenceManager::Error::NOT_MODIFIED);
 	  return pSize*pNumBlocks;
   }
 
@@ -74,7 +89,7 @@ size_t clas_digital::zoteroHeaderReader(char *pReceiveData, size_t pSize, size_t
     auto start = position+last_modified_header.length(); 
     std::string subs = ass.substr(start, ass.find("\r\n",start)-start);
     std::cout<<"Extracted version substr: "<<subs<<std::endl;
-    zot->libraryVersion_ = std::move(subs);
+    if(zot->libraryVersion_ == "") zot->libraryVersion_ = std::move(subs);
   }
 	//Tell libcurl how many bytes we processed.
 	return pSize*pNumBlocks;
@@ -93,7 +108,7 @@ void ZoteroConnection::SetNextLink(std::string str)
 
 ZoteroConnection::ZoteroConnection(std::string apiKey, std::string api_addr, std::string baseUri)
 {
-  err_ = IReferenceManager::Error::OK;
+  err_.store(IReferenceManager::Error::OK);
 	_nextLink="";
 	//Init the interface to libcurl
 	_curl = curl_easy_init();
@@ -133,6 +148,9 @@ ZoteroConnection::ZoteroConnection(std::string apiKey, std::string api_addr, std
 
 	//Set a the custom data pointer given to the header function to this class
 	curl_easy_setopt(_curl,CURLOPT_HEADERDATA,this);
+
+  curl_easy_setopt(_curl, CURLOPT_XFERINFODATA, this); 
+  curl_easy_setopt(_curl, CURLOPT_XFERINFOFUNCTION, progress_callback);
 }
 
 
@@ -150,8 +168,8 @@ IReferenceManager::Error ZoteroConnection::SendRequest(std::string requestURI, s
 	while(true)
 	{
 		std::cout<<"Zotero request to url: "<<st<<std::endl;
-
-		//Set the request url
+		
+    //Set the request url
 		curl_easy_setopt(_curl, CURLOPT_URL, st.c_str());
 		curl_easy_setopt(_curl, CURLOPT_TIMEOUT, 30L);
 
@@ -167,8 +185,10 @@ IReferenceManager::Error ZoteroConnection::SendRequest(std::string requestURI, s
 			return IReferenceManager::Error::USER_ID_AND_GROUP_ID;
 		}
     
-    if(err_)
-      return err_;
+    auto error_state = err_.load();
+    if(error_state)
+      return error_state;
+
 		//We could receive a corrupted json file
 		//to handle all error catch all error and try to process them
 		try
@@ -262,7 +282,7 @@ void ZoteroReferenceManager::__loadCacheFromFile()
       ifs.close();
     }
 
-    auto loadFieldContainer = [&save](const char *field, IReferenceManager::ptr_cont_t &cont, std::string &libVersion)
+    auto loadFieldContainer = [&save](const char *field, IReferenceManager::ptr_cont_t &cont)
     {
       if(save.count(field))
       {
@@ -273,14 +293,21 @@ void ZoteroReferenceManager::__loadCacheFromFile()
           ref->json(it);
           cont->insert({ref->GetKey(),ref});
         }
-        libVersion = save["items"]["version"];
         if(cont->size() == 0)
           cont.reset();
       }
     };
 
-    loadFieldContainer("items",itemReferences_,libraryVersionItems_);
-    loadFieldContainer("collections",collectionReferences_,libraryVersionReferences_);
+    loadFieldContainer("items",itemReferences_);
+    loadFieldContainer("collections",collectionReferences_);
+
+    if(save.count("cache_age"))
+    {
+      for(auto &it : save["cache_age"])
+      {
+        cache_age_.insert({it["n"].get<std::string>(),it["v"].get<int>()});
+      }
+    }
 
   }
   catch(...)
@@ -300,11 +327,10 @@ IReferenceManager::Error ZoteroReferenceManager::SaveToFile()
     std::shared_lock lck(exclusive_swap_);
 
     bool save_file = false;
-    auto save_to_json = [&save,&save_file](const char *signature,IReferenceManager::ptr_cont_t &cont,std::string &libVersion)
+    auto save_to_json = [&save,&save_file](const char *signature,IReferenceManager::ptr_cont_t &cont)
     {
       save[signature] = nlohmann::json();
       save[signature]["data"] = nlohmann::json::array();
-      save[signature]["version"] = libVersion;
       if(cont && cont->size() > 0)
       {
         save_file = true;
@@ -313,8 +339,17 @@ IReferenceManager::Error ZoteroReferenceManager::SaveToFile()
       }
     };
     
-    save_to_json("items",itemReferences_,libraryVersionItems_);
-    save_to_json("collections", collectionReferences_, libraryVersionReferences_);
+    save_to_json("items",itemReferences_);
+    save_to_json("collections", collectionReferences_);
+
+    save["cache_age"] = nlohmann::json::array();
+    for(auto &it : cache_age_)
+    {
+      nlohmann::json entry;
+      entry["n"] = it.first;
+      entry["v"] = it.second;
+      save["cache_age"].push_back(std::move(entry));
+    }
 
     if(!save_file)
       return Error::UNKNOWN;
@@ -414,8 +449,6 @@ std::unique_ptr<ZoteroConnection> ZoteroReferenceManager::GetConnection()
 }
 
 
-
-
 IReferenceManager::Error ZoteroReferenceManager::__tryCacheHit(ZoteroReferenceManager::ptr_cont_t &input, ZoteroReferenceManager::ptr_cont_t &ret_val, IReferenceManager::CacheOptions opts)
 {
   std::shared_lock lck(exclusive_swap_);
@@ -423,7 +456,12 @@ IReferenceManager::Error ZoteroReferenceManager::__tryCacheHit(ZoteroReferenceMa
   if(!input || opts == CacheOptions::CACHE_FORCE_FETCH)
     return Error::CACHE_MISS;
 
-  ret_val = input; 
+  if(!ret_val)
+    ret_val = ptr_cont_t(new container_t(),custom_deleter);
+  for(auto &it : *input)
+  {
+    ret_val->insert({it.first,it.second->Copy()});
+  }
   return Error::OK;
 }
 
@@ -445,63 +483,99 @@ IReferenceManager::Error ZoteroReferenceManager::__tryCacheHit(ZoteroReferenceMa
 
 void ZoteroReferenceManager::__updateCache(ZoteroReferenceManager::ptr_cont_t &input, ZoteroReferenceManager::ptr_cont_t &new_val)
 {
+  if(input)
+  {
+    for(auto &it : *new_val)
+    {
+      auto fnd = input->find(it.first);
+      if(fnd!=input->end())
+      {
+        delete fnd->second;
+        fnd->second = it.second;
+      }
+      else
+        (*input)[it.first] = it.second;
+    }
+  }
+  else
+    input = new_val;
+}
+
+IReferenceManager::Error ZoteroReferenceManager::__performRequestsAndUpdateCache(ZoteroReferenceManager::ptr_cont_t &input, std::vector<std::string> &requestMatrix)
+{
+  ptr_cont_t request(new container_t());
+  auto connection = GetConnection();
+ 
+  std::vector<int*> libVersions;
+  libVersions.reserve(requestMatrix.size());
   
+  {
+    std::shared_lock lck(exclusive_swap_);
+    for(const auto &it : requestMatrix)
+    {
+      auto find = cache_age_.find(it);
+      if(find!=cache_age_.end())
+        libVersions.push_back(&find->second);
+      else
+        libVersions.push_back(nullptr);
+    }
+  }
+
+  std::map<std::string,int> to_be_inserted_into_cache;
+  unsigned long long handle;
+  if(event_manager_)
+    event_manager_->RegisterForEvent(EventManager::ON_SERVER_STOP, &handle,[&connection](CLASServer*,void*){connection->abort();return debug::Error(EventManager::ReturnValues::RET_OK);});
+
+  for(int i = 0; i < requestMatrix.size(); i++)
+  {
+    std::string_view original_request(requestMatrix[i]);
+    bool exists_in_cache = libVersions[i] != nullptr;
+
+    if(exists_in_cache)
+      requestMatrix[i]+=("&since="+std::to_string(*libVersions[i]));
+
+    auto res = connection->SendRequest(requestMatrix[i],request);
+
+    if(res != Error::OK)
+    {
+      if(res == Error::NOT_MODIFIED)
+        continue;
+      return res;
+    }
+
+    if(exists_in_cache)
+      *libVersions[i] = std::stoi(connection->GetLibraryVersion());
+    else
+      to_be_inserted_into_cache.insert({std::string(original_request),std::stoi(connection->GetLibraryVersion())});
+  }
+
+  if(event_manager_)
+    event_manager_->EraseEventHandler(EventManager::ON_SERVER_STOP, &handle);
+      
+
+  {
+    std::unique_lock lck(exclusive_swap_);
+    cache_age_.insert(to_be_inserted_into_cache.begin(),to_be_inserted_into_cache.end());  
+    __updateCache(input,request);
+  }
+
   if(event_manager_)
   {
-    auto func = [this,new_val]()
+    auto func = [this,request]()
     {
-      for(auto &it : *new_val)
+      for(auto &it : *request)
       {
-        event_manager_->TriggerEvent(EventManager::Events::ON_UPDATE_REFERENCE, &CLASServer::GetInstance(), it.second);
+        event_manager_->TriggerEvent(EventManager::Events::ON_UPDATE_REFERENCE, it.second);
       }
     };
     
     //Start a thread to do the event dispatching when encoutering a lot of new
     //items
-    if(new_val->size() > 100)
+    if(request->size() > 50)
       std::thread(func).detach();
     else
       func();
   }
-
-  {
-    std::unique_lock lck(exclusive_swap_);
-    if(input)
-    {
-      for(auto &it : *new_val)
-      {
-        auto fnd = input->find(it.first);
-        if(fnd!=input->end())
-        {
-          std::cout<<"Ptr second: "<<fnd->second<<std::endl;
-          delete fnd->second;
-          fnd->second = it.second;
-        }
-        else
-          (*input)[it.first] = it.second;
-      }
-    }
-    else
-      input = std::move(new_val);
-  }
-}
-
-IReferenceManager::Error ZoteroReferenceManager::__performRequestsAndUpdateCache(ZoteroReferenceManager::ptr_cont_t &input, ZoteroReferenceManager::ptr_cont_t &output, std::vector<std::string> &requestMatrix,std::string &libraryVersion)
-{
-  ptr_cont_t request(new container_t(),custom_deleter);
-  auto connection = GetConnection();
- 
-  for(const auto &it : requestMatrix)
-  {
-    auto res = connection->SendRequest(it,request);
-    if(res != Error::OK)
-      return res;
-  }
-
-
-  libraryVersion = std::move(connection->GetLibraryVersion());
-  __updateCache(input,request);
-  output = input;
 
   return Error::OK;
 }
@@ -516,9 +590,13 @@ IReferenceManager::Error ZoteroReferenceManager::GetAllItems(ZoteroReferenceMana
   if(trackedCollections_.size() == 0)
     cmdMatrix.push_back("/items?format=json&include=data,bib,citation&style="+citationStyle_+"&limit=100");
   else
-    std::for_each(trackedCollections_.begin(),trackedCollections_.end(),[&cmdMatrix,this](std::string &coll){cmdMatrix.push_back("/collections/"+coll+"/items?format=json&include=data,bib,citation&style="+this->citationStyle_+"&limit=100");});
+    std::for_each(trackedCollections_.begin(),trackedCollections_.end(),[&cmdMatrix,this](std::string &coll)
+        {cmdMatrix.push_back("/collections/"+coll+"/items?format=json&include=data,bib,citation&style="+this->citationStyle_+"&limit=100");});
 
-  return __performRequestsAndUpdateCache(itemReferences_,items,cmdMatrix,libraryVersionItems_);
+  auto ret = __performRequestsAndUpdateCache(itemReferences_,cmdMatrix);
+
+  if(ret==Error::OK) return __tryCacheHit(itemReferences_, items, CacheOptions::CACHE_USE_CACHED);
+  else return ret;
  }
 
 IReferenceManager::Error ZoteroReferenceManager::GetAllCollections(IReferenceManager::ptr_cont_t &collections, IReferenceManager::CacheOptions opts)
@@ -532,7 +610,9 @@ IReferenceManager::Error ZoteroReferenceManager::GetAllCollections(IReferenceMan
   else
     std::for_each(trackedCollections_.begin(),trackedCollections_.end(),[&cmdMatrix](std::string &coll){cmdMatrix.push_back("/collections/"+coll+"?format=json&include=data");});
 
-  return __performRequestsAndUpdateCache(collectionReferences_, collections, cmdMatrix,libraryVersionReferences_);
+  auto ret = __performRequestsAndUpdateCache(collectionReferences_, cmdMatrix);
+  if(ret==Error::OK) return __tryCacheHit(collectionReferences_, collections, CacheOptions::CACHE_USE_CACHED);
+  else return ret;
 }
 
 
@@ -541,16 +621,13 @@ IReferenceManager::Error ZoteroReferenceManager::GetItemMetadata(ZoteroReference
   auto err = __tryCacheHit(itemReferences_, item, key, opts);
   if(err == Error::OK || opts == CacheOptions::CACHE_FAIL_ON_CACHE_MISS) return err;
 
-  auto connection = GetConnection();
-  ptr_cont_t request(new container_t());
-  auto res = connection->SendRequest("/items/"+key+"?format=json&include=data,bib,citation&style="+citationStyle_,request);
-
-  if(res == Error::OK)
-  {
-    item = std::shared_ptr<IReference>(request->begin()->second);
-    return Error::OK;
-  }
-  return res;
+  ptr_cont_t request;
+  std::vector<std::string> requestMat{"/items/"+key+"?format=json&include=data,bib,citation&style="+citationStyle_};
+  
+  auto ret = __performRequestsAndUpdateCache(itemReferences_, requestMat);
+  
+  if(ret==Error::OK) return __tryCacheHit(itemReferences_, item, key, CacheOptions::CACHE_USE_CACHED);
+  else return ret;
 }
 
 
@@ -559,13 +636,11 @@ IReferenceManager::Error ZoteroReferenceManager::GetCollectionMetadata(IReferenc
   auto err = __tryCacheHit(collectionReferences_, collection, collectionKey, opts);
   if(err == Error::OK || opts == CacheOptions::CACHE_FAIL_ON_CACHE_MISS) return err;
 
-  auto connection = GetConnection();
-  ptr_cont_t request(new container_t());
-  auto res = connection->SendRequest("/collections/"+collectionKey+"?format=json&include=data",request);
+  ptr_cont_t request;
+  std::vector<std::string> requestMat{"/collections/"+collectionKey+"?format=json&include=data"};
 
-  if(res == Error::OK)
-  {
-    collection = std::shared_ptr<IReference>(request->begin()->second);
-  }
-  return res;
+  auto ret = __performRequestsAndUpdateCache(collectionReferences_, requestMat);
+  
+  if(ret==Error::OK) return __tryCacheHit(collectionReferences_,collection,collectionKey,CacheOptions::CACHE_USE_CACHED);
+  else return ret;
 }

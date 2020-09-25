@@ -33,6 +33,11 @@ namespace clas_digital
       {
         return metadata_.value("key","");
       }
+      
+      std::string GetCitation() override
+      {
+        return metadata_.value("citation","");
+      }
 
       std::string GetAuthor() override
       {
@@ -106,13 +111,22 @@ namespace clas_digital
 
       std::string &GetLibraryVersion();
 
+      void abort()
+      {
+        err_.exchange(IReferenceManager::SERVER_SHUTDOWN_INTERRUPT);
+      }
+
+      std::atomic<IReferenceManager::Error> &GetState()
+      {
+        return err_;
+      }
     private:
       CURL *_curl;				///<Interface to the ssl/https api
       std::string _baseRequest;	///<Contains the basic url and group number for the zotero request
 
       std::string _nextLink;		///<Contains an non empty string if the json downloaded is only a part of the full json
 			std::string body_;
-      IReferenceManager::Error err_;
+      std::atomic<IReferenceManager::Error> err_;
       std::string libraryVersion_;
 
       /**
@@ -120,6 +134,7 @@ namespace clas_digital
        * @param pBytes The buffer which contains the last received json
        * @param pNumBytes The number of bytes inside the buffer
        */
+
 
       void ReceiveBytes(char *pBytes, size_t pNumBytes);
 
@@ -203,10 +218,8 @@ namespace clas_digital
 
 
       ptr_cont_t itemReferences_;
-      std::string libraryVersionItems_;
-
       ptr_cont_t collectionReferences_;
-      std::string libraryVersionReferences_;
+      std::map<std::string,int> cache_age_;
 
       std::shared_mutex exclusive_swap_;
 
@@ -216,7 +229,7 @@ namespace clas_digital
       Error __tryCacheHit(ptr_cont_t &input, ptr_t &ret_val, const std::string &value, CacheOptions opts);
 
 
-      Error __performRequestsAndUpdateCache(ptr_cont_t &input, ptr_cont_t &output, std::vector<std::string> &requestMatrix, std::string &libraryVersion);
+      Error __performRequestsAndUpdateCache(ptr_cont_t &input, std::vector<std::string> &requestMatrix);
 
       void __updateCache(ptr_cont_t &input, ptr_cont_t &new_val);
       void __loadCacheFromFile();

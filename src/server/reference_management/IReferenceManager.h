@@ -28,6 +28,7 @@ namespace clas_digital
       virtual std::string GetAuthor() = 0; 
       virtual std::string GetShortTitle() = 0;
       virtual std::string GetTitle() = 0;
+      virtual std::string GetCitation() = 0;
       virtual int GetDate() = 0;
       virtual bool HasCopyright() = 0;
       virtual std::string GetKey() = 0;
@@ -36,6 +37,9 @@ namespace clas_digital
     protected:
         nlohmann::json metadata_;
   };
+
+
+
 
   /**
    * @brief Manages the reference information, for the moment only manages the
@@ -48,6 +52,7 @@ namespace clas_digital
       using ptr_t = std::shared_ptr<IReference>;
       using ptr_cont_t = std::shared_ptr<container_t>;
 
+      
 
       enum CacheOptions
       {
@@ -70,6 +75,8 @@ namespace clas_digital
         NOT_A_VALID_JSON,
         API_KEY_NOT_VALID_OR_NO_ACCESS,
         CACHE_FILE_PATH_NOT_VALID,
+        NOT_MODIFIED,
+        SERVER_SHUTDOWN_INTERRUPT,
         UNKNOWN
       };
 
@@ -92,7 +99,5 @@ namespace clas_digital
       EventManager *event_manager_;
   };
 }
-
-
 
 #endif

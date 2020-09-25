@@ -45,7 +45,7 @@ namespace clas_digital
       virtual std::string GetPrimaryKey() = 0;
       virtual bool CheckCredentials(nlohmann::json options) = 0;
       virtual nlohmann::json ExportToJSON(ExportPurpose purpose) = 0;
-      virtual bool DoAccessCheck(std::string URI) = 0;
+      virtual int GetAccess() = 0;
   };
 
 
@@ -57,9 +57,9 @@ namespace clas_digital
       bool ConstructFromJSON(const nlohmann::json &js,ConstructFlags flags) override;
       std::string GetPrimaryKey() override;
       nlohmann::json ExportToJSON(ExportPurpose purpose) override;
-      bool DoAccessCheck(std::string URI) override;
       bool CheckCredentials(nlohmann::json options) override;
       void UpdateFromJSON(const nlohmann::json &js) override;
+      int GetAccess() override;
 
       enum Access
       {

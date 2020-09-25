@@ -46,6 +46,12 @@ void FileHandler::AddAlias(std::vector<std::string> from, std::filesystem::path 
       
 void FileHandler::ServeFile(const httplib::Request &req, httplib::Response &resp, bool abortoncachemiss)
 {
+  if(req.path.find("..") || req.path.find("~"))
+  {
+    resp.status = 403;
+    return;
+  }
+
   cache_.load(req.path,
       [&resp,&req,this](void* data,long long size)
       {

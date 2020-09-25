@@ -23,7 +23,7 @@ extern "C" bool InitialisePlugin(clas_digital::CLASServer *server)
   {
     test_case = 2;
     srv = server;
-    srv->GetServerConfig().server_port_ = 10000;
+    srv->GetServerConfig()->server_port_ = 10000;
   }
   return true;
 }

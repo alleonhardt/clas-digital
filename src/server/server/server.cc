@@ -1,18 +1,19 @@
 #include "server.hpp"
 #include <mutex>
 #include <sstream>
+#include <csignal>
+#include <thread>
+#include "filehandler/filehandler.hpp"
+#include "plugins/EventManager.hpp"
+#include "plugins/PlugInManager.hpp"
+#include "server/server_config.hpp"
 #include "util/URLParser.hpp"
 #include "debug/debug.hpp"
+#include "zotero/zotero.hpp"
 
 using namespace clas_digital;
 
-
-CLASServer &CLASServer::GetInstance()
-{
-  //Returns the only valid instance of the server
-  static CLASServer server;
-  return server;
-}
+std::atomic<bool> gCaughtUserAbort = false;
 
 void CLASServer::HandleLogin(const httplib::Request &req, httplib::Response &resp)
 {
@@ -45,7 +46,7 @@ void CLASServer::SendUserList(const httplib::Request &req, httplib::Response &re
   //is an user associated with the cookie and if it is. Check if the user is an
   //admin user
   auto usr = GetUserFromCookie(req.get_header_value("Cookie"));
-  if(usr && usr->DoAccessCheck(req.path))
+  if(access_func_(req,GetUserFromCookie(req.get_header_value("cookie")).get()))
     resp.set_content(users_->GetAsJSON().dump(),"application/json");
   else
     resp.status = 403;
@@ -57,7 +58,7 @@ void CLASServer::UpdateUserList(const httplib::Request &req, httplib::Response &
   auto usr = GetUserFromCookie(req.get_header_value("Cookie"));
 
   // Check if the user has the required access
-  if(!usr || !usr->DoAccessCheck(req.path))
+  if(!access_func_(req,GetUserFromCookie(req.get_header_value("cookie")).get()))
     resp.status = 403;
   else
   {
@@ -113,11 +114,37 @@ std::shared_ptr<IUser> CLASServer::GetUserFromCookie(const std::string &cookie_p
   return users_->GetUserFromCookie(cookie);
 }
 
+void CLASServer::GetMetadata(const httplib::Request& req, httplib::Response &resp)
+{
+  if(!access_func_(req,GetUserFromCookie(req.get_header_value("cookie")).get()))
+  {
+    resp.status = 403;
+    return;
+  }
+
+  auto &items = corpus_manager_->item_references();
+  auto find = items->find(req.get_header_value("key"));
+  if(find!=items->end())
+  {
+    resp.set_content(find->second->json().dump(),"application/json");
+  }
+  else
+    resp.status = 404;
+}
+
+void CLASServer::CreateBibliography(const httplib::Request& req, httplib::Response &resp)
+{
+  resp.status = 404;
+}
+
+
 
 debug::Error<CLASServer::ReturnCodes> CLASServer::Start(std::string listenAddress)
 {
   if(!initialised_)
     return debug::Error(ReturnCodes::ERR_SERVER_NOT_INITIALISED,"The server was not initialised yet");
+
+  corpus_manager_->UpdateZotero(ref_manager_.get());
 
   //Register all the URI Handler.
   server_.Post("/api/v2/server/login",[this](const httplib::Request &req, httplib::Response &resp){this->HandleLogin(req, resp);});
@@ -126,12 +153,11 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::Start(std::string listenAddres
 
   server_.Post("/api/v2/server/userlist",[this](const httplib::Request &req, httplib::Response &resp){this->UpdateUserList(req,resp);});
 
-  for(auto &it : cfg_.mount_points_)
+  for(auto &it : cfg_->mount_points_)
   {
     file_handler_->AddMountPoint(it);
   }
 
-  file_handler_->AddAlias({"/search","/"},"../web/index.html");
 
   server_.set_error_handler([this](const auto& req, auto& res) {
         this->file_handler_->ServeFile(req,res);
@@ -139,19 +165,20 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::Start(std::string listenAddres
 
 
 
-  event_manager_.TriggerEvent(EventManager::ON_SERVER_START, this, (void*)&server_);
+  event_manager_->TriggerEvent(EventManager::ON_SERVER_START, (void*)&server_);
   
   // Check how many times we tried to bind the port
   int port_binding_tries = 0;
   
   //Try to bind the port 3 times always waiting 50 milliseconds in between. If
   //this fails return ERR_PORT_BINDING
-  while(!server_.listen(listenAddress.c_str(),cfg_.server_port_))
+  while(!server_.listen(listenAddress.c_str(),cfg_->server_port_) && !shutdown_scheduled_.load())
   {
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
     if(port_binding_tries++ > 3)
       return debug::Error(ReturnCodes::ERR_PORT_BINDING);
   }
+  
   return debug::Error(ReturnCodes::OK);
 }
 
@@ -160,7 +187,7 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::InitialiseFromFile(std::filesy
 {
   std::ifstream ifs(config_file.string(), std::ios::in);
   if(!ifs.is_open())
-    return Error(ReturnCodes::ERR_CONFIG_FILE_INITIALISE,"Could not load config file at " + config_file.string());
+    return Error(ReturnCodes::ERR_CONFIG_FILE_INITIALISE,"Could not load config file at " +  config_file.string());
   std::stringstream buffer;
   buffer << ifs.rdbuf();
   ifs.close();
@@ -170,26 +197,24 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::InitialiseFromFile(std::filesy
 
 debug::Error<CLASServer::ReturnCodes> CLASServer::InitialiseFromString(std::string config_file, std::filesystem::path user_db_file)
 {
+  auto err = cfg_->LoadFromString(config_file);
+  if(err)
   {
-    auto err = cfg_.LoadFromString(config_file);
-    if(err)
-    {
-      return Error(ReturnCodes::ERR_CONFIG_FILE_INITIALISE,"Could not load config file.").Next(err);
-    }
+    return Error(ReturnCodes::ERR_CONFIG_FILE_INITIALISE,"Could not load config file.").Next(err);
   }
 
   debug::log(debug::LOG_DEBUG,"Config loaded, loading plugins now...\n");
   int i = 0;
-  for(auto &it : cfg_.plugins_)
+  for(auto &it : cfg_->plugins_)
   {
-    plugin_manager_.LoadPlugin(std::to_string(i++), it, this);
+    plugin_manager_->LoadPlugin(std::to_string(i++), it, this);
     debug::log(debug::LOG_DEBUG,"Loaded plugin ",it,"with id ",i-1,"\n");
   }
 
   if(!file_handler_)
   {
-    debug::log(debug::LOG_DEBUG,"Detected file cache size of ",cfg_.file_cache_size_," Bytes. Creating the file handler now as none was supplied by the plugins.\n");
-    file_handler_ = std::make_shared<FileHandler>(cfg_.file_cache_size_);
+    debug::log(debug::LOG_DEBUG,"Detected file cache size of ",cfg_->file_cache_size_," Bytes. Creating the file handler now as none was supplied by the plugins.\n");
+    file_handler_ = std::make_shared<FileHandler>(cfg_->file_cache_size_);
   }
   
   if(!users_)
@@ -207,13 +232,13 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::InitialiseFromString(std::stri
 
   if(!ref_manager_)
   {
-    if(cfg_.reference_manager_ != "zotero")
+    if(cfg_->reference_manager_ != "zotero")
       return debug::Error(ReturnCodes::ERR_CONFIG_FILE_INITIALISE,"Unknown reference manager, was also not loaded by plugin");
     else
     {
       auto ptr = new ZoteroReferenceManager;
       ref_manager_ = std::shared_ptr<IReferenceManager>(ptr);
-      auto err2 = ptr->Initialise(cfg_.reference_config_);
+      auto err2 = ptr->Initialise(cfg_->reference_config_);
       if(err2)
       {
         debug::log(debug::LOG_WARNING,"Could not load reference manager config and no reference manager was supplied by plugins! Proceeding without reference manager.\n");
@@ -222,33 +247,76 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::InitialiseFromString(std::stri
     }
   }
 
+  if(!corpus_manager_)
+  {
+    corpus_manager_ = std::make_shared<CorpusManager>();
+    corpus_manager_->UpdateZotero(ref_manager_.get());
+  }
+
   initialised_ = true;
-  event_manager_.TriggerEvent(EventManager::ON_AFTER_INITIALISE, this, nullptr);
+  debug::log(debug::LOG_DEBUG,"Initialise done, triggering ON_AFTER_INITIALISE now!\n");
+  event_manager_->TriggerEvent(EventManager::ON_AFTER_INITIALISE, nullptr);
 
   return Error(ReturnCodes::OK);
 }
 
 void CLASServer::Stop()
 {
-  // Stop the server and tell the status bit about the changed status
-  server_.stop();
-  event_manager_.TriggerEvent(EventManager::ON_SERVER_STOP, this, (void*)&server_);
+  shutdown_scheduled_.store(true);
+  if(!shutdown_scheduled_.exchange(true))
+  {
+    // Stop the server and tell the status bit about the changed status
+    server_.stop();
+    debug::log(debug::LOG_DEBUG,"Received shutdown signal. Shutting down server, triggering ON_SERVER_STOP!\n");
+    event_manager_->TriggerEvent(EventManager::ON_SERVER_STOP, (void*)&server_);
+  }
 }
 
-ServerConfig &CLASServer::GetServerConfig()
+std::shared_ptr<ServerConfig> &CLASServer::GetServerConfig()
 {
   return cfg_;
 }
 
-EventManager &CLASServer::GetEventManager()
+std::shared_ptr<EventManager> &CLASServer::GetEventManager()
 {
   return event_manager_;
 }
 
 
-std::shared_ptr<UserTable> CLASServer::GetUserTable()
+std::shared_ptr<UserTable> &CLASServer::GetUserTable()
 {
   return users_;
+}
+
+
+std::shared_ptr<IFileHandler> &CLASServer::GetFileHandler()
+{
+  return file_handler_;
+}
+      
+httplib::Server &CLASServer::GetHTTPServer()
+{
+  return server_;
+}
+
+std::shared_ptr<IReferenceManager> &CLASServer::GetReferenceManager()
+{
+  return ref_manager_;
+}
+
+std::shared_ptr<CorpusManager> &CLASServer::GetCorpusManager()
+{
+  return corpus_manager_;
+}
+
+void CLASServer::SetAccessFunction(std::function<bool(const httplib::Request&,IUser*)> &&func)
+{
+  access_func_ = func;
+}
+
+bool CLASServer::GetShutdownScheduled()
+{
+  return shutdown_scheduled_.load();
 }
 
 
@@ -257,7 +325,41 @@ bool CLASServer::IsRunning()
   return server_.is_running();
 }
 
-CLASServer::CLASServer()
+void signal_handler(int sig)
 {
+  gCaughtUserAbort.store(true);
+}
+
+CLASServer::CLASServer() : shutdown_scheduled_(false)
+{
+  std::signal(SIGINT,signal_handler);
   initialised_ = false;
+
+  access_func_ = [](const httplib::Request&,IUser*) {
+    return true;
+  };
+  
+  cfg_ = std::make_shared<ServerConfig>();
+  plugin_manager_ = std::make_shared<PlugInManager>();
+  event_manager_ = std::make_shared<EventManager>(this);
+  
+  check_shutdown_ = std::move(std::thread([this](){
+        while(!this->GetShutdownScheduled())
+        {
+          if(gCaughtUserAbort.load())
+          {
+            this->Stop();
+            break;
+          }
+          std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        }
+        }));
+}
+
+CLASServer::~CLASServer()
+{
+  //Ensure order of those two! This is very important!
+  event_manager_.reset();
+  plugin_manager_.reset();
+  check_shutdown_.join();
 }
