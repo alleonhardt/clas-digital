@@ -262,7 +262,6 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::InitialiseFromString(std::stri
 
 void CLASServer::Stop()
 {
-  shutdown_scheduled_.store(true);
   if(!shutdown_scheduled_.exchange(true))
   {
     // Stop the server and tell the status bit about the changed status
@@ -358,6 +357,7 @@ CLASServer::CLASServer() : shutdown_scheduled_(false)
 
 CLASServer::~CLASServer()
 {
+  Stop();
   //Ensure order of those two! This is very important!
   event_manager_.reset();
   plugin_manager_.reset();
