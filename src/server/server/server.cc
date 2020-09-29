@@ -172,12 +172,13 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::Start(std::string listenAddres
   
   //Try to bind the port 3 times always waiting 50 milliseconds in between. If
   //this fails return ERR_PORT_BINDING
-  while(!server_.listen(listenAddress.c_str(),cfg_->server_port_) && !shutdown_scheduled_.load())
+  while(!shutdown_scheduled_.load() && !server_.listen(listenAddress.c_str(),cfg_->server_port_))
   {
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
     if(port_binding_tries++ > 3)
       return debug::Error(ReturnCodes::ERR_PORT_BINDING);
   }
+  debug::log(debug::LOG_DEBUG,"Exiting server loop now!\n");
   
   return debug::Error(ReturnCodes::OK);
 }
@@ -236,7 +237,7 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::InitialiseFromString(std::stri
       return debug::Error(ReturnCodes::ERR_CONFIG_FILE_INITIALISE,"Unknown reference manager, was also not loaded by plugin");
     else
     {
-      auto ptr = new ZoteroReferenceManager;
+      auto ptr = new ZoteroReferenceManager(event_manager_.get());
       ref_manager_ = std::shared_ptr<IReferenceManager>(ptr);
       auto err2 = ptr->Initialise(cfg_->reference_config_);
       if(err2)
@@ -248,10 +249,7 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::InitialiseFromString(std::stri
   }
 
   if(!corpus_manager_)
-  {
     corpus_manager_ = std::make_shared<CorpusManager>();
-    corpus_manager_->UpdateZotero(ref_manager_.get());
-  }
 
   initialised_ = true;
   debug::log(debug::LOG_DEBUG,"Initialise done, triggering ON_AFTER_INITIALISE now!\n");
@@ -264,7 +262,6 @@ void CLASServer::Stop()
 {
   if(!shutdown_scheduled_.exchange(true))
   {
-    // Stop the server and tell the status bit about the changed status
     server_.stop();
     debug::log(debug::LOG_DEBUG,"Received shutdown signal. Shutting down server, triggering ON_SERVER_STOP!\n");
     event_manager_->TriggerEvent(EventManager::ON_SERVER_STOP, (void*)&server_);
@@ -358,8 +355,8 @@ CLASServer::CLASServer() : shutdown_scheduled_(false)
 CLASServer::~CLASServer()
 {
   Stop();
+  check_shutdown_.join();
   //Ensure order of those two! This is very important!
   event_manager_.reset();
   plugin_manager_.reset();
-  check_shutdown_.join();
 }

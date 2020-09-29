@@ -62,7 +62,6 @@ namespace clas_digital
        *
        * @param listenAddress The address to listen for "0.0.0.0" for Internet and
        * local "localhost" for only local connections
-       * @param startPort The port to start the server on
        */
       debug::Error<ReturnCodes> Start(std::string listenAddress);
 

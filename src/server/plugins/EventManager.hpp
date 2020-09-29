@@ -5,6 +5,8 @@
 #include <map>
 #include <nlohmann/json.hpp>
 #include <shared_mutex>
+#include "tbb/concurrent_hash_map.h"
+#include <atomic>
 #include "debug/debug.hpp"
 
 
@@ -36,16 +38,16 @@ namespace clas_digital
       using callback_t = std::function<debug::Error<ReturnValues>(CLASServer *, void *)>;
 
       debug::Error<ReturnValues> RegisterForEvent(Events event,unsigned long long *handle,callback_t callback);
-      void EraseEventHandler(Events event, unsigned long long *handler);
+      debug::Error<ReturnValues> RegisterForEvent(Events event, debug::CleanupDtor &livetime, callback_t callback);
 
+      void EraseEventHandler(Events event, const unsigned long long *handler);
       debug::Error<ReturnValues> TriggerEvent(Events event, void *data);
-
       EventManager(CLASServer *server);
+      CLASServer *GetServerMainFrame();
 
     private:
-      std::map<unsigned long long,callback_t> callbacks_[NumberOfEvents];
-      std::shared_mutex shared_mutex_;
-      unsigned long long id_;
+      tbb::concurrent_hash_map<unsigned long long,callback_t> callbacks_[NumberOfEvents];
+      std::atomic<long long> id_;
       CLASServer *server_;
   };
 }

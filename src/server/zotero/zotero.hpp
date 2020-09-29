@@ -162,7 +162,7 @@ namespace clas_digital
 
 
        
-      ZoteroReferenceManager(std::filesystem::path filename="zoteroCacheData.json");
+      ZoteroReferenceManager(EventManager *event_manager, std::filesystem::path filename="zoteroCacheData.json");
       ~ZoteroReferenceManager();
 
       Error GetAllItems(ptr_cont_t &items, CacheOptions opts=CacheOptions::CACHE_USE_CACHED) override;
@@ -198,7 +198,7 @@ namespace clas_digital
        *
        * @return The unique pointer to an open connection
        */
-      std::unique_ptr<ZoteroConnection> GetConnection();
+      std::shared_ptr<ZoteroConnection> GetConnection();
 
     private:     
       /**

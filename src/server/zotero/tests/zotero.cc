@@ -1,11 +1,13 @@
 #include <catch2/catch.hpp>
+#include "plugins/EventManager.hpp"
+#include "server/server.hpp"
 #include "zotero/zotero.hpp"
 #include <openssl/x509.h>
 
 using namespace clas_digital;
 
 TEST_CASE("InitialiseFromJSON", "[ZoteroReferenceManager]") { 
-  ZoteroReferenceManager ref;
+  ZoteroReferenceManager ref(nullptr);
   
   // Check that the error codes are all on sport when giving flawed jsons to the
   // Reference Manager
@@ -22,7 +24,7 @@ TEST_CASE("InitialiseFromJSON", "[ZoteroReferenceManager]") {
 }
 
 TEST_CASE("InitialiseFromJSONFile", "[ZoteroReferenceManager]") {
-  ZoteroReferenceManager ref;
+  ZoteroReferenceManager ref(nullptr);
 
   // Check the error code when the file does not exist
   REQUIRE(ref.Initialise(std::filesystem::path("whatever.json")) == IReferenceManager::Error::JSON_FILE_DOES_NOT_EXIST);
@@ -52,7 +54,9 @@ TEST_CASE("InitialiseFromJSONFile", "[ZoteroReferenceManager]") {
 
 TEST_CASE("GetItemMetadata from ReferenceManager","[ZoteroReferenceManager]")
 {
-  ZoteroReferenceManager ref;
+  CLASServer srv;
+  EventManager ev(&srv);
+  ZoteroReferenceManager ref(&ev);
   auto ret = ref.Initialise(std::filesystem::path("zoteroConfig.json"));
   if(ret == IReferenceManager::Error::OK )
   {

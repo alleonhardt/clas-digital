@@ -5,6 +5,7 @@
 #include <openssl/sha.h>
 #include <random>
 #include "filehandler/util.h"
+#include "tbb/concurrent_hash_map.h"
 
 using namespace clas_digital;
 
@@ -199,7 +200,6 @@ debug::Error<UserTable::ReturnValues> UserTable::AddUser(nlohmann::json create_c
 
 debug::Error<UserTable::ReturnValues> UserTable::__AddUser(nlohmann::json create_credentials, User::ConstructFlags flags)
 {
-  std::unique_lock lock(users_lock_);
   auto usr = create_user_();
   auto ret = usr->ConstructFromJSON(create_credentials,flags);
   if(!ret)
@@ -222,7 +222,6 @@ debug::Error<UserTable::ReturnValues> UserTable::RemoveUser(nlohmann::json remov
 
 debug::Error<UserTable::ReturnValues> UserTable::RemoveUserByKey(std::string primary_key)
 {
-  std::unique_lock lock(users_lock_);
   if(users_.count(primary_key)>0)
   {
     if(users_.size() == 1)
@@ -240,8 +239,6 @@ std::string UserTable::LogIn(nlohmann::json credentials)
   
   if(shared_user && shared_user->CheckCredentials(credentials))
   {
-    std::unique_lock lock(loggedin_lock_);
-
     while(true)
     {
       std::string cookie = CreateRandomString(32);
@@ -257,38 +254,25 @@ std::string UserTable::LogIn(nlohmann::json credentials)
 
 std::shared_ptr<IUser> UserTable::GetUserFromPrimaryKey(std::string key)
 {
-  try
-  {
-    std::shared_lock lock(loggedin_lock_);
-    return users_.at(key);
-  }
-  catch(...)
-  {}
-  return nullptr;
+  typename decltype(users_)::accessor acc;
+  if(users_.find(acc,key))
+    return acc->second;
+  else
+    return nullptr;
 }
 
 std::shared_ptr<IUser> UserTable::GetUserFromCookie(const std::string &cookie)
 {
-  std::shared_lock lock(loggedin_lock_);
-  try
-  {
-    return logged_in_.at(cookie);
-  }
-  catch(...){}
-
-  return nullptr;
+  typename decltype(logged_in_)::accessor acc;
+  if(logged_in_.find(acc,cookie))
+    return acc->second;
+  else
+    return nullptr;
 }
 
 void UserTable::RemoveCookie(const std::string &cookie)
 {
-  std::unique_lock lock(users_lock_);
-  if(logged_in_.count(cookie)>0)
-  {
-    if(logged_in_.size() == 1)
-      logged_in_.clear();
-    else
-      logged_in_.erase(cookie);
-  }
+  logged_in_.erase(cookie);
 }
 
 
@@ -299,7 +283,6 @@ int UserTable::GetNumUsers() const
 
 nlohmann::json UserTable::GetAsJSON()
 {
-  std::unique_lock lock(users_lock_);
   nlohmann::json js;
   for(auto &it : users_)
   {

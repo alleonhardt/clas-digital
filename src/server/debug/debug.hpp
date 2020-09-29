@@ -219,7 +219,21 @@ namespace debug
        */
       CleanupDtor(std::function<void()> &&fnc)
       {
+        dtor_active_ = true;
         func_ = fnc;
+      }
+
+      CleanupDtor()
+      {
+        dtor_active_ = false;
+      }
+
+      void SetFunction(std::function<void()> &&fnc)
+      {
+        if(dtor_active_)
+          func_();
+        dtor_active_ = true;
+        func_ = std::move(fnc);
       }
 
 
@@ -229,11 +243,13 @@ namespace debug
        */
       ~CleanupDtor()
       {
-        func_();
+        if(dtor_active_)
+          func_();
       }
     private:
       ///< The function to execute as soon as the class gets destroyed
       std::function<void()> func_;
+      bool dtor_active_;
   };
 
 

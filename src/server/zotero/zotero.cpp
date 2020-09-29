@@ -23,7 +23,7 @@ int progress_callback(void *clientp,   curl_off_t dltotal,   curl_off_t dlnow,  
 {
 	ZoteroConnection *zot = (ZoteroConnection*)clientp;
   if(zot->GetState().load())
-    return -1;
+    return 5;
   return 0;
 }
 
@@ -159,9 +159,10 @@ IReferenceManager::Error ZoteroConnection::SendRequest(std::string requestURI, s
 	//Try to build the request to zotero
 	//_baseRequest = https://api.zotero.org/groups/$(our_group_number)
 	std::string st = _baseRequest+requestURI;
-  body_.reserve(512*1024);
+  body_.reserve(1024*1024);
   body_ = "";
-
+  _nextLink = "";
+  err_.store(IReferenceManager::Error::OK);
 
 
   //Create the json class to start filling
@@ -239,7 +240,7 @@ IReferenceManager::Error ZoteroConnection::SendRequest(std::string requestURI, s
 	}
 
 	//Convert the json to an string and return it.
-	return IReferenceManager::Error::OK;
+	return err_.load();
 }
 
 
@@ -315,9 +316,8 @@ void ZoteroReferenceManager::__loadCacheFromFile()
   }
 }
 
-ZoteroReferenceManager::ZoteroReferenceManager(std::filesystem::path path)
+ZoteroReferenceManager::ZoteroReferenceManager(EventManager *event_manager, std::filesystem::path path) : IReferenceManager(event_manager), cache_path_(std::move(path))
 { 
-  cache_path_ = std::move(path);  
 }
       
 IReferenceManager::Error ZoteroReferenceManager::SaveToFile()
@@ -441,11 +441,11 @@ IReferenceManager::Error ZoteroReferenceManager::Initialise(nlohmann::json detai
   return Error::OK;
 }
 
-std::unique_ptr<ZoteroConnection> ZoteroReferenceManager::GetConnection()
+std::shared_ptr<ZoteroConnection> ZoteroReferenceManager::GetConnection()
 {
   // Create a new connection to the zotero api server with the required
   // parameters
-  return std::unique_ptr<ZoteroConnection>(new ZoteroConnection(apiKey_,ZOTERO_API_ADDR,baseUri_));
+  return std::shared_ptr<ZoteroConnection>(new ZoteroConnection(apiKey_,ZOTERO_API_ADDR,baseUri_));
 }
 
 
@@ -522,9 +522,11 @@ IReferenceManager::Error ZoteroReferenceManager::__performRequestsAndUpdateCache
   }
 
   std::map<std::string,int> to_be_inserted_into_cache;
-  unsigned long long handle;
-  if(event_manager_)
-    event_manager_->RegisterForEvent(EventManager::ON_SERVER_STOP, &handle,[&connection](CLASServer*,void*){connection->abort();return debug::Error(EventManager::ReturnValues::RET_OK);});
+  debug::CleanupDtor livetime;
+  event_manager_->RegisterForEvent(EventManager::ON_SERVER_STOP,livetime,[conn=connection](CLASServer*,void*){conn->abort();return debug::Error(EventManager::RET_OK);});
+
+  if(event_manager_->GetServerMainFrame()->GetShutdownScheduled())
+    return IReferenceManager::SERVER_SHUTDOWN_INTERRUPT;
 
   for(int i = 0; i < requestMatrix.size(); i++)
   {
@@ -549,9 +551,6 @@ IReferenceManager::Error ZoteroReferenceManager::__performRequestsAndUpdateCache
       to_be_inserted_into_cache.insert({std::string(original_request),std::stoi(connection->GetLibraryVersion())});
   }
 
-  if(event_manager_)
-    event_manager_->EraseEventHandler(EventManager::ON_SERVER_STOP, &handle);
-      
 
   {
     std::unique_lock lck(exclusive_swap_);
@@ -559,23 +558,20 @@ IReferenceManager::Error ZoteroReferenceManager::__performRequestsAndUpdateCache
     __updateCache(input,request);
   }
 
-  if(event_manager_)
+  auto func = [this,request]()
   {
-    auto func = [this,request]()
+    for(auto &it : *request)
     {
-      for(auto &it : *request)
-      {
-        event_manager_->TriggerEvent(EventManager::Events::ON_UPDATE_REFERENCE, it.second);
-      }
-    };
-    
-    //Start a thread to do the event dispatching when encoutering a lot of new
-    //items
-    if(request->size() > 50)
-      std::thread(func).detach();
-    else
-      func();
-  }
+      event_manager_->TriggerEvent(EventManager::Events::ON_UPDATE_REFERENCE, it.second);
+    }
+  };
+
+  //Start a thread to do the event dispatching when encoutering a lot of new
+  //items
+  if(request->size() > 50)
+    std::thread(func).detach();
+  else
+    func();
 
   return Error::OK;
 }

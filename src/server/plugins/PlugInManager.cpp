@@ -135,8 +135,9 @@ bool PlugInManager::UnloadPlugin(std::string alias_name)
 
 PlugInManager::~PlugInManager()
 {
-  for(auto &it : loaded_plugins_)
-  {
-    UnloadPlugin(it.first);
-  }
+  std::vector<std::string> unload_vec;
+  std::for_each(loaded_plugins_.begin(),loaded_plugins_.end(),[&unload_vec](const std::pair<std::string,void*> &pair){unload_vec.push_back(pair.first);});
+  std::for_each(unload_vec.begin(),unload_vec.end(),[this](const std::string &pluginName){
+      this->UnloadPlugin(pluginName);
+      });
 }

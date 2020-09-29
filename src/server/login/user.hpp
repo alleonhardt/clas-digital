@@ -2,13 +2,13 @@
 #define CLASDIGITAL_SRC_SERVER_LOGIN_USER_H
 #include <queue>
 #include <thread>
-#include <shared_mutex>
 #include <map>
 #include <condition_variable>
 #include <filesystem>
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include <debug/debug.hpp>
+#include "tbb/concurrent_hash_map.h"
 
 
 namespace clas_digital
@@ -148,16 +148,13 @@ namespace clas_digital
       ~UserTable();
 
     private:
-      std::shared_mutex users_lock_;
-      std::shared_mutex loggedin_lock_;
-
       std::filesystem::path save_file_;
       
       std::function<IUser*()> create_user_;
       std::string primary_key_field;
 
-      std::map<std::string, std::shared_ptr<IUser>> users_;
-      std::map<std::string, std::shared_ptr<IUser>> logged_in_;
+      tbb::concurrent_hash_map<std::string, std::shared_ptr<IUser>> users_;
+      tbb::concurrent_hash_map<std::string, std::shared_ptr<IUser>> logged_in_;
 
       debug::Error<UserTable::ReturnValues> __AddUser(nlohmann::json create_credentials, User::ConstructFlags flags);
   };
