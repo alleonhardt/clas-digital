@@ -44,7 +44,7 @@ TEST_CASE("Load Plugin give real server and change config","[PlugInManager]")
 {
   PlugInManager manager;
   int x  = 2;
-  CLASServer srv;
+  CLASServer &srv = CLASServer::GetInstance();
   REQUIRE(srv.InitialiseFromString("{}", ":memory:") == false);
 
   REQUIRE(srv.GetServerConfig()->server_port_ == 80 );

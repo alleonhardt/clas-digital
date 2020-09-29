@@ -106,21 +106,17 @@ namespace clas_digital
 
       void SetAccessFunction(std::function<bool(const httplib::Request&,IUser*)> &&func);
 
-      bool GetShutdownScheduled();
-
 
       ~CLASServer();
-      CLASServer();
+      static CLASServer &GetInstance();
   
-
     private:
       ///< The http server forwards all requests to handlers
       httplib::Server server_;
 
+      CLASServer();
 
       bool initialised_;
-      std::atomic<bool> shutdown_scheduled_;
-      std::thread check_shutdown_;
 
       ///< The mutex synchronises atomic actions on the status
       std::mutex exclusive_section_;

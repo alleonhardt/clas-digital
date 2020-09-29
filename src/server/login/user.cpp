@@ -5,6 +5,7 @@
 #include <openssl/sha.h>
 #include <random>
 #include "filehandler/util.h"
+#include "plugins/EventManager.hpp"
 #include "tbb/concurrent_hash_map.h"
 
 using namespace clas_digital;
@@ -114,18 +115,23 @@ User::User(std::string email) : email_(email)
 
 
 
-UserTable::UserTable()
+UserTable::UserTable(EventManager *event_manager) : event_manager_(event_manager)
 {
   create_user_ = [](){
     return new User;
   };
 
   primary_key_field = "email";
+
+  event_manager->RegisterForEvent(EventManager::Events::ON_SERVER_STOP,shutdownCallbackHandle_,[this](CLASServer*,void*){
+      debug::log(debug::LOG_DEBUG,"Received shutdown signal, saving Usertable to disk!\n");
+      this->SaveUserTable();
+      return debug::Error(EventManager::RET_OK);
+      });
 }
 
 UserTable::~UserTable()
 {
-  SaveUserTable();
 }
 
 void UserTable::SetCreateUserCallback(std::function<IUser*()> fnc)

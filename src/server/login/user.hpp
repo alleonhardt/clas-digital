@@ -8,6 +8,7 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include <debug/debug.hpp>
+#include "plugins/EventManager.hpp"
 #include "tbb/concurrent_hash_map.h"
 
 
@@ -144,7 +145,7 @@ namespace clas_digital
       
       virtual debug::Error<ReturnValues> SaveUserTable();
 
-      UserTable();
+      UserTable(clas_digital::EventManager *event_manager);
       ~UserTable();
 
     private:
@@ -152,6 +153,8 @@ namespace clas_digital
       
       std::function<IUser*()> create_user_;
       std::string primary_key_field;
+      clas_digital::EventManager *event_manager_;
+      debug::CleanupDtor shutdownCallbackHandle_;
 
       tbb::concurrent_hash_map<std::string, std::shared_ptr<IUser>> users_;
       tbb::concurrent_hash_map<std::string, std::shared_ptr<IUser>> logged_in_;

@@ -1,11 +1,15 @@
 #include "login/user.hpp"
+#include "plugins/EventManager.hpp"
+#include "server/server.hpp"
 #include <catch2/catch.hpp>
 #include <debug/debug.hpp>
 
 using namespace clas_digital;
 
+EventManager mng(&CLASServer::GetInstance());
+
 TEST_CASE("Creating Usertable and inserting values","[UserTable]") {
-    UserTable tbl;
+    UserTable tbl(&mng);
     debug::LogClass::gLogLevel = debug::LogLevel::DBG_TODO;
     REQUIRE(tbl.Load().GetErrorCode() == UserTable::RET_OK);
     //Let the destructor run to write changes on disk!
@@ -29,7 +33,7 @@ TEST_CASE("Creating Usertable and inserting values","[UserTable]") {
 
 TEST_CASE("Threading user table test","[UserTable]") {
     debug::LogClass::gLogLevel = debug::LogLevel::DBG_ALWAYS;
-    UserTable tbl;
+    UserTable tbl(&mng);
     REQUIRE(tbl.Load().GetErrorCode() == UserTable::RET_OK);
     //Let the destructor run to write changes on disk!
     
@@ -77,7 +81,7 @@ TEST_CASE("Threading user table test","[UserTable]") {
 }
 
 TEST_CASE("Check root user","[UserTable]") {
-    UserTable tbl;
+    UserTable tbl(&mng);
     REQUIRE(tbl.Load().GetErrorCode() == UserTable::RET_OK);
     //Let the destructor run to write changes on disk!
     
@@ -103,7 +107,7 @@ TEST_CASE("Check root user","[UserTable]") {
 }
 
 TEST_CASE("Check UserTable to json","[UserTable]") {
-    UserTable tbl;
+    UserTable tbl(&mng);
     REQUIRE(tbl.Load().GetErrorCode() == UserTable::RET_OK);
     //Let the destructor run to write changes on disk!
     

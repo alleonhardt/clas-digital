@@ -6,7 +6,7 @@
 using namespace clas_digital;
 
 TEST_CASE("Login","[CLASServer]") {
-  CLASServer srv;
+  CLASServer &srv = CLASServer::GetInstance();
 
   srv.GetEventManager()->RegisterForEvent(clas_digital::EventManager::ON_AFTER_INITIALISE,nullptr, [](CLASServer *srv, void*){
       nlohmann::json js;
@@ -61,7 +61,7 @@ TEST_CASE("Login","[CLASServer]") {
 
 
 TEST_CASE("Update User List","[CLASServer]") {
-  CLASServer srv;
+  CLASServer &srv = CLASServer::GetInstance();
 
   srv.GetEventManager()->RegisterForEvent(clas_digital::EventManager::ON_AFTER_INITIALISE, nullptr,[](CLASServer *srv, void*){
       nlohmann::json js;

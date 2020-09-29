@@ -163,7 +163,6 @@ namespace clas_digital
 
        
       ZoteroReferenceManager(EventManager *event_manager, std::filesystem::path filename="zoteroCacheData.json");
-      ~ZoteroReferenceManager();
 
       Error GetAllItems(ptr_cont_t &items, CacheOptions opts=CacheOptions::CACHE_USE_CACHED) override;
       Error GetAllCollections(ptr_cont_t &collections, CacheOptions opts=CacheOptions::CACHE_USE_CACHED) override;
@@ -213,6 +212,7 @@ namespace clas_digital
       std::string apiKey_;
       std::vector<std::string> trackedCollections_;
       std::string citationStyle_;
+      debug::CleanupDtor shutdownCallbackHandle_;
 
       std::filesystem::path cache_path_;
 

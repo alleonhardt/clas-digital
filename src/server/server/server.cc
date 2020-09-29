@@ -172,7 +172,7 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::Start(std::string listenAddres
   
   //Try to bind the port 3 times always waiting 50 milliseconds in between. If
   //this fails return ERR_PORT_BINDING
-  while(!shutdown_scheduled_.load() && !server_.listen(listenAddress.c_str(),cfg_->server_port_))
+  while(!server_.listen(listenAddress.c_str(),cfg_->server_port_))
   {
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
     if(port_binding_tries++ > 3)
@@ -220,7 +220,7 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::InitialiseFromString(std::stri
   
   if(!users_)
   {
-    users_.reset(new UserTable);
+    users_.reset(new UserTable(event_manager_.get()));
     auto err = users_->Load(user_db_file);
     if(err.GetErrorCode() != UserTable::RET_OK)
     {
@@ -234,7 +234,7 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::InitialiseFromString(std::stri
   if(!ref_manager_)
   {
     if(cfg_->reference_manager_ != "zotero")
-      return debug::Error(ReturnCodes::ERR_CONFIG_FILE_INITIALISE,"Unknown reference manager, was also not loaded by plugin");
+      return debug::Error(ReturnCodes::ERR_CONFIG_FILE_INITIALISE,"Unknown reference manager, was also not loaded by plugin\n.");
     else
     {
       auto ptr = new ZoteroReferenceManager(event_manager_.get());
@@ -260,12 +260,9 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::InitialiseFromString(std::stri
 
 void CLASServer::Stop()
 {
-  if(!shutdown_scheduled_.exchange(true))
-  {
-    server_.stop();
-    debug::log(debug::LOG_DEBUG,"Received shutdown signal. Shutting down server, triggering ON_SERVER_STOP!\n");
-    event_manager_->TriggerEvent(EventManager::ON_SERVER_STOP, (void*)&server_);
-  }
+  server_.stop();
+  debug::log(debug::LOG_WARNING,"Received shutdown signal. Shutting down server, triggering ON_SERVER_STOP!\n");
+  event_manager_->TriggerEvent(EventManager::ON_SERVER_STOP, (void*)&server_);
 }
 
 std::shared_ptr<ServerConfig> &CLASServer::GetServerConfig()
@@ -310,10 +307,6 @@ void CLASServer::SetAccessFunction(std::function<bool(const httplib::Request&,IU
   access_func_ = func;
 }
 
-bool CLASServer::GetShutdownScheduled()
-{
-  return shutdown_scheduled_.load();
-}
 
 
 bool CLASServer::IsRunning()
@@ -323,12 +316,15 @@ bool CLASServer::IsRunning()
 
 void signal_handler(int sig)
 {
-  gCaughtUserAbort.store(true);
+  std::thread([](){
+  std::exit(0);
+  }).detach();
 }
 
-CLASServer::CLASServer() : shutdown_scheduled_(false)
+CLASServer::CLASServer()
 {
   std::signal(SIGINT,signal_handler);
+  std::signal(SIGTERM, signal_handler);
   initialised_ = false;
 
   access_func_ = [](const httplib::Request&,IUser*) {
@@ -338,25 +334,15 @@ CLASServer::CLASServer() : shutdown_scheduled_(false)
   cfg_ = std::make_shared<ServerConfig>();
   plugin_manager_ = std::make_shared<PlugInManager>();
   event_manager_ = std::make_shared<EventManager>(this);
-  
-  check_shutdown_ = std::move(std::thread([this](){
-        while(!this->GetShutdownScheduled())
-        {
-          if(gCaughtUserAbort.load())
-          {
-            this->Stop();
-            break;
-          }
-          std::this_thread::sleep_for(std::chrono::milliseconds(200));
-        }
-        }));
 }
 
 CLASServer::~CLASServer()
 {
   Stop();
-  check_shutdown_.join();
-  //Ensure order of those two! This is very important!
-  event_manager_.reset();
-  plugin_manager_.reset();
+}
+
+CLASServer &CLASServer::GetInstance()
+{
+  static CLASServer clas;
+  return clas;
 }

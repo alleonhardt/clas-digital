@@ -318,6 +318,11 @@ void ZoteroReferenceManager::__loadCacheFromFile()
 
 ZoteroReferenceManager::ZoteroReferenceManager(EventManager *event_manager, std::filesystem::path path) : IReferenceManager(event_manager), cache_path_(std::move(path))
 { 
+  event_manager->RegisterForEvent(EventManager::Events::ON_SERVER_STOP,shutdownCallbackHandle_,[this](CLASServer*,void*){
+      debug::log(debug::LOG_DEBUG,"Received shutdown signal, saving Zotero reference items to disk!\n");
+      this->SaveToFile();
+      return debug::Error(EventManager::RET_OK);
+      });
 }
       
 IReferenceManager::Error ZoteroReferenceManager::SaveToFile()
@@ -358,11 +363,6 @@ IReferenceManager::Error ZoteroReferenceManager::SaveToFile()
     return Error::CACHE_FILE_PATH_NOT_VALID;
 
   return Error::OK;
-}
-
-ZoteroReferenceManager::~ZoteroReferenceManager()
-{
-  SaveToFile();
 }
 
 IReferenceManager::Error ZoteroReferenceManager::Initialise(std::filesystem::path p)
@@ -522,12 +522,6 @@ IReferenceManager::Error ZoteroReferenceManager::__performRequestsAndUpdateCache
   }
 
   std::map<std::string,int> to_be_inserted_into_cache;
-  debug::CleanupDtor livetime;
-  event_manager_->RegisterForEvent(EventManager::ON_SERVER_STOP,livetime,[conn=connection](CLASServer*,void*){conn->abort();return debug::Error(EventManager::RET_OK);});
-
-  if(event_manager_->GetServerMainFrame()->GetShutdownScheduled())
-    return IReferenceManager::SERVER_SHUTDOWN_INTERRUPT;
-
   for(int i = 0; i < requestMatrix.size(); i++)
   {
     std::string_view original_request(requestMatrix[i]);
