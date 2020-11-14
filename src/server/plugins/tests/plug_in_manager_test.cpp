@@ -11,6 +11,7 @@ const char libpath[] = "bin/test_plugin";
 const char libpath[] = "lib/test_plugin";
 #endif
 
+/*
 TEST_CASE("Load Plugin InitialisePlugin changes int unload changes it again","[PlugInManager]")
 {
   PlugInManager manager;
@@ -57,3 +58,4 @@ TEST_CASE("Load Plugin give real server and change config","[PlugInManager]")
   // No unload plugin called
   REQUIRE( x == 2 );
 }
+*/

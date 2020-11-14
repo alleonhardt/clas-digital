@@ -64,12 +64,12 @@ set(SRC_FILES_SERVER_TEST src/server/test/main.cc
 
 if(MSVC)
   add_library(test_plugin SHARED src/server/plugins/tests/test_plugin.cpp $<TARGET_OBJECTS:clas_server_lib>)
-  add_library(clas_digital_plugin SHARED plugins/clas-digital/main.cpp
+  #add_library(clas_digital_plugin SHARED plugins/clas-digital/main.cpp
     plugins/clas-digital/server.cc
     $<TARGET_OBJECTS:clas_server_lib>)
 else()
   add_library(test_plugin SHARED src/server/plugins/tests/test_plugin.cpp)
-  add_library(clas_digital_plugin SHARED plugins/clas-digital/main.cpp
+  #add_library(clas_digital_plugin SHARED plugins/clas-digital/main.cpp
     plugins/clas-digital/server.cc)
 endif()
 
@@ -85,7 +85,7 @@ add_executable(clas_digital_search.o  ${SRC_FILES_SEARCH})
 if(MSVC)
   add_compile_options(/W4 /WX)
   target_link_libraries(test_plugin ${CONAN_LIBS} ${CXX_STDLIB})
-  target_link_libraries(clas_digital_plugin ${CONAN_LIBS} ${CXX_STDLIB})
+  #  target_link_libraries(clas_digital_plugin ${CONAN_LIBS} ${CXX_STDLIB})
 else()
   add_compile_options(-Wall -Wextra -pedantic -Werror)
 
@@ -114,11 +114,11 @@ target_include_directories(test_plugin PUBLIC
   "src/server"
 )
 
-target_include_directories(clas_digital_plugin PUBLIC
-  "src/shared"
-  "src/shared/util"
-  "src/server"
-)
+#target_include_directories(clas_digital_plugin PUBLIC
+#  "src/shared"
+#  "src/shared/util"
+#  "src/server"
+#)
 
 target_include_directories(clas_digital_server_test.o PUBLIC
   "src/shared"
