@@ -65,12 +65,12 @@ set(SRC_FILES_SERVER_TEST src/server/test/main.cc
 if(MSVC)
   add_library(test_plugin SHARED src/server/plugins/tests/test_plugin.cpp $<TARGET_OBJECTS:clas_server_lib>)
   #add_library(clas_digital_plugin SHARED plugins/clas-digital/main.cpp
-    plugins/clas-digital/server.cc
-    $<TARGET_OBJECTS:clas_server_lib>)
+  #  plugins/clas-digital/server.cc
+  #  $<TARGET_OBJECTS:clas_server_lib>)
 else()
   add_library(test_plugin SHARED src/server/plugins/tests/test_plugin.cpp)
   #add_library(clas_digital_plugin SHARED plugins/clas-digital/main.cpp
-    plugins/clas-digital/server.cc)
+  #    plugins/clas-digital/server.cc)
 endif()
 
 add_executable(clas_digital_server.o $<TARGET_OBJECTS:clas_server_lib> src/server/main.cpp)
