@@ -181,4 +181,4 @@ jobs:
     - name: Do tests on ${{ matrix.os }}
       run:  |
             cd build
-            bin/clas_digital_server_test.o
+            bin\clas_digital_server_test.o
