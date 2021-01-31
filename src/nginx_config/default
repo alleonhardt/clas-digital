@@ -135,9 +135,18 @@ server {
 	}
 
 
-    	location /api {
+  location /api/v2/server {
         	proxy_pass         http://localhost:9992;
 	} 
+
+  location /api/v2/search {
+        	proxy_pass         http://localhost:4848;
+	} 
+
+  location /search {
+        	proxy_pass         http://localhost:4848;
+  }
+
 
 	location /userlist {
         	proxy_pass         http://localhost:9992;
@@ -170,15 +179,6 @@ server {
 	}
 
 
-	location /search {
-        	proxy_pass         http://localhost:9992;
-#       	proxy_cache_key $uri$is_args$args;
-#		proxy_buffering        on;
-#            	proxy_cache            STATIC;
-#            	proxy_cache_valid      200  1d;
-#            	proxy_cache_use_stale  error timeout invalid_header updating
-#                                   http_500 http_502 http_503 http_504;
-	}
 
 location /getsugg {
         	proxy_pass         http://localhost:9992;

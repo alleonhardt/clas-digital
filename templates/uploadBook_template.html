@@ -17,45 +17,7 @@
 </head>
 <body>
     <!-- The navigation bar config -->
-    <nav id='tpnav' class="topnav">
-	<a  id='homelink' href='/information/'>Information</a>
-	<a  id='searchlink' href='/search'>Search</a>
-	<div class='dropdown'>
-		<a id='statisticslink'  href='/catalogue'>Catalogue</a>
-		<div class='dropdown-content'>
-			<a href="/catalogue/books">Books</a>
-			<a href="/catalogue/authors">Authors</a>
-			<a href="/catalogue/collections">Collections</a>
-			<a href="/catalogue/years">Years</a>
-		</div>
-	</div>
-	<a id='administrationlink' class='classifiedContent ' href='/private/admin/Administration.html' data-acc=4>Administration</a>
-	<a id='uploadbooklink' class='classifiedContent classifiedContent active' href='/private/write/UploadBook.html' data-acc=2>Upload Books</a>
-
-	<div class='topnav-right-in' id='loggedintopnav'>
-		<span id='LoggedInAs'>Logged in</span>
-		<input id="logoutBut" type='submit' value="Logout" class='loginbutton' onclick="DoLogout();return true;"/>
-	</div>
-	<div class='topnav-right-out' id='loggedouttopnav'>
-		<form id ="LoginForm" class='loginform'>
-			<input id="EmailType" class="emailinput" type="email" name="email" placeholder="Email" aria-label="Email" required>
-			<input id="PasswordType" class="passwordinput" type="password" name="password" placeholder="Password" aria-label="Password" required>
-			<input id="LoginButton" type='submit' value="Log In" class='loginbutton' onclick="ExecuteLogin();return true;"/>
-			<div id="LoaderButton" class='loader'></div>
-		</form>
-	</div>
-
-</nav>
-<footer style="position: fixed; bottom: 20px; right: 40px; color: grey; font-size:11px">
-    <dl>
-        <dt>Generated:</dt>
-        <dd itemprop="dataModified" content="2021-01-31T20:48:47Z">
-            <time datetime="2021-01-31T20:48:47Z">2021-01-31 20:48:47</time>
-        </dd>
-    </dl>
-</footer>
-
- 
+    {% include "template_navbar.html" %} 
 	
     <div class='biggerPageClass'>
 	<h3 id='status_banner'></h3>

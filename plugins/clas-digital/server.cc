@@ -39,6 +39,7 @@ void PluginServer::Initialise()
       });
 
   //Initialise Zotero and force fetch all zotero data!
+    reference_manager_->GetAllCollections(all_collections_,IReferenceManager::CacheOptions::CACHE_FORCE_FETCH);
     reference_manager_->GetAllItems(book_metadata_,IReferenceManager::CacheOptions::CACHE_FORCE_FETCH);
     reference_manager_->GetAllCollections(all_collections_,IReferenceManager::CacheOptions::CACHE_FORCE_FETCH);
 
