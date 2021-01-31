@@ -5,26 +5,26 @@ namespace fs = std::filesystem;
 
 Book::Book () {}
 
-/**
-* @Brief Constructor
-* @param[in] sPath Path to book
-* @param[in] map map of words in book
-*/
-Book::Book(nlohmann::json jMetadata) : metadata_(jMetadata)
+Book::Book(nlohmann::json metadata) : metadata_(metadata)
 {
-  key_ = jMetadata["key"];
-  path_ = "web/books/"+key_;
+  // Set key
+  key_ = metadata["key"];
+
+  // These are only pre-initialized and finally set by InitializeBook().
+  path_ = ""; 
   has_ocr_ = false;
   has_images_ = false;
 
-  //Metadata
+  // Set Metadata
   author_ = metadata_.GetAuthor();                 
-  if(author_.size() == 0) author_ = "No Author";
+  if(author_.size() == 0) 
+    author_ = "No Author";
   author_date_ = author_;
   func::convertToLower(author_);
-  date_    = metadata_.GetDate();
+  date_ = metadata_.GetDate();
   collections_ = metadata_.GetCollections();
-  if(date_ != -1) author_date_ += ", " + std::to_string(date_);
+  if(date_ != -1) 
+    author_date_ += ", " + std::to_string(date_);
   author_date_ += ".";
 }
 
@@ -74,32 +74,28 @@ std::string Book::author_date() {
 }
 
 
-///Get map of words with list of pages, preview-position and relevance.
 std::unordered_map<std::string, WordInfo>& Book::map_words_pages() { 
   return map_words_pages_;
 }
 
-///Return matches found with fuzzy-search
 std::unordered_map<std::string, std::list<std::pair<std::string, double>>>& 
 Book::found_fuzzy_matches() {
   return found_fuzzy_matches_;
 }
 
-///Return matches found with contains-search
 std::unordered_map<std::string, std::list<std::string>>& Book::found_grammatical_matches() {
   return found_grammatical_matches_;
 }
 
-///Return whether book has images or ocr
 bool Book::HasContent() const { 
   return has_images_ || has_ocr_; 
 }
 
-///Return "[author], [date]" and add "book not yet scanned", when has_ocr == false
 std::string Book::GetAuthorDateScanned() {
   if(has_ocr_ == true)
     return author_date_;
-  return author_date_ + "<span style='color:orange;font-size:80%'> Book is not yet scanned, sorry for that.</span>";
+  return author_date_ + "<span style='color:orange;font-size:80%'>"
+    "Book is not yet scanned, sorry for that.</span>";
 }    
 
 // **** SETTER **** //
@@ -111,22 +107,22 @@ void Book::SetPath(std::string sPath) {
 
 // **** CREATE BOOK AND MAPS (PAGES, RELEVANCE, PREVIEW) **** // 
 
-/**
-* @brief sets has_ocr_/Images, 
-* if has_ocr==true, safes json to disc creates/ loads map of words/pages.
-* @param[in] sPath (path to book)
-*/
-void Book::CreateBook(std::string sPath) {
+void Book::InitializeBook(std::string path) {
+  // Set absolute path.
+  path_ = path;
+
   //Check if book has images
-  for (auto& p: std::filesystem::directory_iterator(sPath)) {
-    (void)p;
+  for (auto& p: std::filesystem::directory_iterator(path)) {
     if(p.path().extension() == ".jpg" || p.path().extension() == ".bmp")
       has_images_ = true; 
   }
 
-  //Open ocr, if it doesn't exist, end function -> book does not need to be "created".
-  if (!std::filesystem::exists(ocr_path())) 
-    return;
+  // if books has ocr, pre-process ocr and create map of worlds/ pages.
+  if (std::filesystem::exists(ocr_path()))
+    InitializePreProcessing();
+}
+
+void Book::InitializePreProcessing() {
   has_ocr_ = true;
 
   //Write json to disc.
@@ -149,7 +145,6 @@ void Book::CreateBook(std::string sPath) {
     LoadPages();
 }
 
-///Create map of all pages and safe.
 void Book::CreatePages() {
   std::cout << "Creating map of words... \n";
   //Load ocr and create ne directory "intern" for this book.
@@ -248,7 +243,6 @@ void Book::CreatePage(std::string sBuffer, std::string& sConvert,
     map_words_pages_[it.first].AddPage(page);
     map_words_pages_[it.first].AddRelevance(it.second);
   } 
-
 
   //Create new page
   std::ofstream write(path_ + "/intern/page" + std::to_string(page) + ".txt");

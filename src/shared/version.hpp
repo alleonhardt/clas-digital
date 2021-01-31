@@ -5,9 +5,9 @@
 
 namespace clas_digital
 {
-  inline const char gGitSha[] = "30fcaeacf36c0975a015c7a3de9aaa6af8627e74-dirty";
-  inline const char gDate[] = "Sat Sep 19 00:32:02 2020";
-  inline const char gCommitSubject[] = "Fixed a few bugs in the new zotero update cache function and added a thread to dispatch events when updating 100+ new references.";
+  inline const char gGitSha[] = "317f07466e173a399953a4e5daaadd493568dafd";
+  inline const char gDate[] = "Sat Nov 14 18:53:54 2020";
+  inline const char gCommitSubject[] = "Fixed small compile mistake on apple and fixed the pathing in windows";
 
   inline void print_version()
   {

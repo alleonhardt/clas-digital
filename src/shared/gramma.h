@@ -32,6 +32,7 @@ struct Word {
 class Dict {
   public:
     Dict(std::string path) {
+      std::cout << "Dict: loading json..." << std::endl;
       //Read Json
       std::ifstream read(path);
       if (!read) {
@@ -42,8 +43,7 @@ class Dict {
       read >> words;
       read.close();
 
-      std::cout << "loaded into json." << std::endl;
-
+      std::cout << "Dict: parse list of words and attributes..." << std::endl;
       //Parse list of words and attributes
       for (auto it=words.begin(); it!=words.end(); it++) {
         Word word({it.value()["bf"], {}});
@@ -55,6 +55,7 @@ class Dict {
         word_attributes_[it.key()] = word;
       }
 
+      std::cout << "Dict: create base-forms and conjungations..." << std::endl;
       //Create list of basic forms and conjungations
       for (auto it : word_attributes_)
         base_conjugations_[it.second.basic_form].insert(it.first);
