@@ -24,6 +24,17 @@ int main(int argc, char **argv)
     return  0;
   }
 
-  server.Start("0.0.0.0");
+  nlohmann::json root_user;
+  root_user["email"] = "root";
+  root_user["password"] = "123";
+  root_user["access"] = 7;
+
+  server.GetUserTable()->AddUser(root_user);
+  auto err2 = server.Start("127.0.0.1");
+  if(err2.GetErrorCode() != CLASServer::ReturnCodes::OK) {
+    std::cout<<termcolor::red<<"Something went wrong..."<<std::endl;
+    err2.print();
+    return  0;
+  }
   return 0;
 }

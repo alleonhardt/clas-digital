@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <functional>
 #include "plugins/EventManager.hpp"
+#include "filehandler/filehandler.hpp"
 
 namespace clas_digital
 {
@@ -32,7 +33,34 @@ namespace clas_digital
       virtual int GetDate() = 0;
       virtual bool HasCopyright() = 0;
       virtual std::string GetKey() = 0;
+      virtual std::string GetPath(IFileHandler* handler) = 0;
       virtual ~IReference(){};
+      virtual std::string GetBibliography() {
+        return "no bib yet";
+      }
+
+      virtual std::vector<std::string> GetCollections() {
+        return {};
+      }
+      virtual std::string GetShow2() {
+        return "no_show";
+      }
+
+      virtual std::string GetName() {
+        return "no name";
+      }
+
+      virtual bool HasContent() {
+        return false;
+      }
+
+      virtual std::vector<std::map<std::string,std::string>> GetAuthorKeys() {
+        return {};
+      }
+
+      virtual bool IsAuthorEditor(nlohmann::json js) {
+        return true;
+      }
 
     protected:
         nlohmann::json metadata_;

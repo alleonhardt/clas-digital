@@ -8,6 +8,8 @@ zotero.json
 build/*
 doc/*
 web/books/*
+web/catalogue/*
 bin/*
 compile_commands.json
+server.config
 .clangd/*

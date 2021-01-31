@@ -144,7 +144,7 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::Start(std::string listenAddres
   if(!initialised_)
     return debug::Error(ReturnCodes::ERR_SERVER_NOT_INITIALISED,"The server was not initialised yet");
 
-  corpus_manager_->UpdateZotero(ref_manager_.get());
+  corpus_manager_->UpdateZotero(ref_manager_.get(),file_handler_.get());
 
   //Register all the URI Handler.
   server_.Post("/api/v2/server/login",[this](const httplib::Request &req, httplib::Response &resp){this->HandleLogin(req, resp);});

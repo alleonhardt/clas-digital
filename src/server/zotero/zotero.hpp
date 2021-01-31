@@ -16,6 +16,7 @@
 
 #include "debug/debug.hpp"
 #include "reference_management/IReferenceManager.h"
+#include "filehandler/filehandler.hpp"
 
 namespace clas_digital
 {
@@ -24,11 +25,45 @@ namespace clas_digital
    * diffrent zotero api address
    */
   constexpr const char ZOTERO_API_ADDR[] = "https://api.zotero.org";
+  static std::vector<std::string> split2(std::string str, std::string delimiter)
+  {
+    std::vector<std::string> vStr;
+
+    size_t pos=0;
+    while ((pos = str.find(delimiter)) != std::string::npos) {
+      if(pos!=0)
+        vStr.push_back(str.substr(0, pos));
+      str.erase(0, pos + delimiter.length());
+    }
+    vStr.push_back(str);
+
+    return vStr;
+  }
+
+/**
+* @param[in, out] str string to be modified
+*/
+static std::string returnToLower(std::string &str)
+{
+    std::locale loc1("de_DE.UTF8");
+    std::string str2;
+    for(unsigned int i=0; i<str.length(); i++)
+        str2 += tolower(str[i], loc1);
+
+    return str2;
+}
 
 
   class ZoteroReference : public IReference
   {
     public:
+
+      std::vector<std::string> GetCollections() override
+      {
+        if (metadata_.count("data") == 0) 
+          return {};
+        return metadata_["data"].value("collections", std::vector<std::string>());
+      }
       std::string GetKey() override
       {
         return metadata_.value("key","");
@@ -39,29 +74,199 @@ namespace clas_digital
         return metadata_.value("citation","");
       }
 
-      std::string GetAuthor() override
-      {
-        return "none";
+      /**
+       * @brief return data from json.
+       * @param[in] search (which metadata (f.e. title, date...)
+       * @return string 
+       */
+      std::string GetMetadata(std::string search) {
+        std::string returnSearch = metadata_.value(search, "");
+        return returnSearch;
+      } 
+
+      /**
+       * @brief return data from metadata.
+       * @param[in] search (which metadata (f.e. title, date...)
+       * @param[in] from (from which json (f.e. title -> data -> title) 
+       * @return string 
+       */
+      std::string GetMetadata(std::string search, std::string from) {
+        if (metadata_.count(from) == 0)
+          return "";
+        return metadata_[from].value(search, ""); 
       }
 
-      std::string GetShortTitle() override
+      /**
+       * @brief return data from metadata
+       * @param[in] search (which metadata (f.e. title, date...)
+       * @param[in] from1 (from which json (f.e. title -> data -> title) 
+       * @param[in] from2 (from which json (f.e. author -> data -> creators -> author)
+       * @return string 
+       */
+      std::string GetMetadata(std::string search, std::string from1, 
+          std::string from2) {
+        if (metadata_.count(from1) == 0)
+          return "";
+        if (metadata_[from1].count(from2) == 0)
+          return "";
+        return metadata_[from1][from2].value(search, "");
+      } 
+
+      /**
+       * @brief return data from metadata
+       * @param[in] search (which metadata (f.e. title, date...)
+       * @param[in] from1 (from which json (f.e. title -> data -> title) 
+       * @param[in] from2 (from which json (f.e. author -> data -> creators -> author)
+       * @param[in] in (in case of list: which element from list)
+       * @return string 
+       */
+      std::string GetMetadata(std::string search, std::string from1,
+          std::string from2, int in) {
+        if (metadata_.count(from1) == 0)
+          return "";
+        if (metadata_[from1].count(from2) == 0)
+          return "";
+        if (metadata_[from1][from2].size() == 0)
+          return "";
+        return metadata_[from1][from2][in].value(search, "");
+      }
+
+      std::string GetBibliography() override {
+        return metadata_.value("bib","Could not find bilbiography");
+      }
+
+      std::string GetShow2() override {
+        bool html = true;
+        // *** Add Author *** //
+        std::string result = GetAuthor();
+        if (result == "") 
+          result = "Unknown author";
+
+        // *** Add title *** //
+        if (GetTitle() != "" && html == true)
+          result += ", <i>";
+        else if (GetTitle() != "")
+          result += ", ";
+
+        //Add first [num] words of title
+        std::vector<std::string> words_in_title = split2(GetTitle(), " "); 
+        for (unsigned int i=0; i<10 && i<words_in_title.size(); i++)
+          result += words_in_title[i] + " ";
+
+        //Do some formatting
+        result.pop_back();
+        if (html == true)
+          result+="</i>";
+        if (words_in_title.size() > 10)
+          result += "...";
+
+        // *** Add date *** //
+        if (GetDate() != -1)
+          result += ", " + std::to_string(GetDate());
+        return result + ".";
+      }
+
+      std::string GetAuthor() override
       {
-        return "none";
+        //Get author. Try to find "lastName"
+        std::string author = GetMetadata("lastName", "data", "creators", 0);
+
+        //If string is empty, try to find "name"
+        if (author.size() == 0)
+          author = GetMetadata("name", "data", "creators", 0);
+
+        //Return result: either Name of author or empty string
+        return author;
+      }
+
+      std::vector<std::map<std::string,std::string>> GetAuthorKeys() override {
+  if (metadata_.count("data") == 0 || metadata_["data"].count("creators") == 0)
+    return std::vector<std::map<std::string, std::string>>();
+
+  std::vector<std::map<std::string, std::string>> v_authors;
+  //Iterate and push map including "lastname", "fullname" and "key"
+  for (const auto &it : metadata_["data"]["creators"]) {
+    std::map<std::string, std::string> author;
+    
+    //Generate last name [0]
+    std::string lastName = it.value("lastName", it.value("name", ""));
+    author["lastname"] = lastName;
+
+    //Generate  lastName, firstname [1]
+    author["fullname"] = lastName;
+    std::string firstname = it.value("firstName", "");
+    if (firstname != "")
+      author["fullname"] += ", " + firstname;
+
+    //Generate key firstname-lastName
+    std::string key = returnToLower(firstname) 
+                      + "-"
+                      + returnToLower(lastName);
+    std::replace(key.begin(), key.end(), ' ', '-');
+    std::replace(key.begin(), key.end(), '/', ',');
+    author["key"] = key;
+
+    author["creator_type"] = it.value("creatorType", "undefined");
+
+    //Add to results
+    v_authors.push_back(author);
+  }
+
+  return v_authors;
+}
+      
+std::string GetShortTitle() override
+      {
+        std::string short_title = GetMetadata("shortTitle", "data");
+        if (short_title == "")
+          return GetTitle();
+        return short_title;
       }
 
       std::string GetTitle() override
       {
-        return "none";
+        //Get title
+        std::string title = GetMetadata("title", "data");
+
+        //Escape html and return 
+        return title;
       }
 
       int GetDate() override
       {
-        return 10;
+        //Create regex
+        std::regex date3(".*(\\d{3}).*");
+        std::regex date4(".*(\\d{4}).*");
+        std::smatch m;
+
+        //Get date from json
+        std::string date = GetMetadata("date", "data");
+
+        //Check whether regex find match with a 4-digit. 
+        if (std::regex_search(date, m, date4))
+          return std::stoi(m[1]);
+        //Check whether regex find match with a 3-digit. 
+        if (std::regex_search(date, m, date3))
+          return std::stoi(m[1]);
+
+        //Return -1 if regex nether matched
+        return -1;
       }
 
       bool HasCopyright() override
       {
-        return false; 
+        return GetDate()<1922; 
+      }
+
+      std::string GetPath(IFileHandler *handler) override
+      {
+        for(auto &vec: handler->GetMountPoints()) {
+          auto path = vec / "books" / GetKey();
+          if(std::filesystem::exists(path)) 
+            return path.string();
+        }
+        return std::string("web/books/")+GetKey();
+        return (handler->GetMountPoints()[0]/"books"/GetKey()).string();
       }
 
       IReference *Copy() override
