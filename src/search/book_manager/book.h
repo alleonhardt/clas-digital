@@ -107,7 +107,6 @@ public:
   std::map<int, std::vector<std::string>>* GetPages(std::string sInput, bool fuzzyness);
 
 
-
   // ***** GET PREVIEW - functions ***** //
 
   /**
@@ -163,16 +162,12 @@ private:
   void CreatePages();
 
   /**
-  * Function adding all words from one page to map of words. Writes the
-  * page to disc as single file. Add the page break line to a string used to 
-  * convert new format to old/ normal format. 
-  * @param[in] sBuffer (string holding current page)
-  * @param[in, out] sConvert (copy of complete ocr in page-mark-format)
+  * Function adding all words from one page to map of words. 
+  * Writes the page to disc as single file. 
+  * @param[in] buffer (string holding current page)
   * @param[in] page (number indexing current page)
-  * @param[in] mark (page-mark-format yes/no)
   */
-  void CreatePage(std::string sBuffer, std::string& sConvert, size_t page, 
-                  bool mark);
+  void CreatePage(std::string buffer, size_t page);
 
   /**
   * Find preview position for each word in map of words/pages.

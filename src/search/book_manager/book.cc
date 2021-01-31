@@ -151,111 +151,44 @@ void Book::CreatePages() {
   std::ifstream read(ocr_path());
   fs::create_directories(path_ + "/intern");
 
-  std::string sBuffer = "", sLine = "";
-
-  //Check if book has a mark for end/ beginning of page.
-  bool pageMark = false;
-  for (size_t i=0; i<10; i++) {
-    std::getline(read, sLine);
-    //check page, checks whether current line is of page-break-form
-    if (func::checkPage(sLine) == true) {
-        pageMark = true;
-        break;
-    }
-  }
-  //Reset file
-  read.clear();
-  read.seekg(0, std::ios::beg); 
-
   //Variable storing complete ocr, to convert to page-break-format if necessary 
-  std::string sConvertToNormalLayout = "----- 0 / 999 -----\n\n";
-  size_t page=1, pageCounter = 0, blanclines = 3;
+  std::string buffer = "", cur_line = "";
+  size_t page=1, num_pages_=0;
   while (!read.eof()) {
     //Read line
-    getline(read, sLine);
-
-    //Increase, or reset blanc lines
-    if (sLine == "") 
-      blanclines++;
-    else 
-      blanclines = 0;
-
+    getline(read, cur_line);
     //Add a page when new page is reached.
-    if ((func::checkPage(sLine) == true && pageMark == true) 
-        || ((blanclines == 4 || (blanclines >= 4 && blanclines % 2 == 1)) 
-          && pageMark == false)) {
+    if (func::checkPage(cur_line)) {
       //Add new page to map of pages and update values. Safe page to disc
-      CreatePage(sBuffer, sConvertToNormalLayout, page, pageMark);
-
-      //Different handling for page-break- and non-page-break-(new)-format
-      if (pageMark == true)   
-        page = stoi(sLine.substr(6, sLine.find("/")-7));
-      else
-        page++; 
-      sBuffer = "";
-      pageCounter++;
+      CreatePage(buffer, page);
+      // Update current page, reset buffer and increate page_counter.
+      page = stoi(cur_line.substr(6, cur_line.find("/")-7));
+      buffer = "";
+      num_pages_++;
     }
-    
     //Append line to buffer if page end is not reached.
     else
-      sBuffer += " " + sLine + "\n";
+      buffer += " " + cur_line + "\n";
   }
-
   //If there is "something left", safe as new page.
-  if (sBuffer.length() !=0)
-    CreatePage(sBuffer, sConvertToNormalLayout, page, pageMark);
+  if (buffer.length() !=0)
+    CreatePage(buffer, page);
 
   read.close();
-
-  //Write page-mark-format to disc, if ocr was in new format.
-  if (pageMark == false) {
-    //Move new format, so it is not overwritten.
-    try {
-      std::filesystem::rename(path_ + "/ocr.txt", path_ + "/old_ocr.txt");
-    } catch (std::filesystem::filesystem_error& e) {
-      std::cout << e.what() << "\n";
-    }
-
-    //Safe as page-break-format
-    std::ofstream write (path_ + "/ocr.txt");
-    write << sConvertToNormalLayout;
-    write.close();
-  }
-
-  //Set number of pages for this book.
-  num_pages_ = pageCounter;
 }
 
-
-/**
-* @brief function adding all words from one page to map of words. Writes the
-* page to disc as single file. Add the page break line to a string used to convert 
-* new format to old/ normal format. 
-* @param[in] sBuffer (string holding current page)
-* @param[in, out] sConvert (string holding copy of complete ocr in page-mark-format)
-* @param[in] page (number indexing current page)
-* @param[in] mark (page-mark-format yes/no)
-*/
-void Book::CreatePage(std::string sBuffer, std::string& sConvert, 
-    size_t page, bool mark) {
-  //Add entry, or update entry in map of words/ pages (new page + relevance)
+void Book::CreatePage(std::string sBuffer, size_t page) {
+  // Add entry, or update entry in map of words/ pages (new page + relevance)
   for (auto it : func::extractWordsFromString(sBuffer)) {
     map_words_pages_[it.first].AddPage(page);
     map_words_pages_[it.first].AddRelevance(it.second);
   } 
-
-  //Create new page
+  // Create new page
   std::ofstream write(path_ + "/intern/page" + std::to_string(page) + ".txt");
   write << func::returnToLower(sBuffer);
   write.close();
-
-  if (mark == false)
-    sConvert += "\n\n----- "+std::to_string(page)+" / 999 -----\n\n" + sBuffer;
 }
 
-/**
-* @brief Find preview position for each word in map of words/pages.
-*/
 void Book::CreateMapPreview() {
   std::cout << "Create map Prev." << std::endl;
   for(auto it : map_words_pages_) 
