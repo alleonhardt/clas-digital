@@ -23,12 +23,12 @@ class CorpusManager {
      */
     bool UpdateZotero(clas_digital::IReferenceManager *manager, clas_digital::IFileHandler *handler);
 
+    /**
+     * Returns all item references to all items found in the current zotero setup.
+     */
     clas_digital::IReferenceManager::ptr_cont_t& item_references();
-    std::string m_path;
-		std::string m_bookID;
-		nlohmann::json m_info;
-    nlohmann::json m_topnav;
-    
+
+
   private:
     clas_digital::IReferenceManager::ptr_cont_t item_references_;
     clas_digital::IReferenceManager::ptr_cont_t collection_references_;
