@@ -269,51 +269,49 @@ int main() {
   Server srv;
 
   // Load and parse config file.
+  std::cout << "Loading config..." << std::endl;
   nlohmann::json config;
   std::ifstream read_config("server.config");
   read_config >> config;
   read_config.close();
+  std::cout << "done.\n\n";
 
-  // Load dictionary
+  // Load dictionary.
   std::cout << "Loading dictionary at " << config["dictionary"] << std::endl;
   Dict dict(config["dictionary"]);
-  std::cout << "done.\n";
+  std::cout << "done.\n\n";
 
   // Load corpus metadata from disc.
-  // TODO (fux): location should be specified by a config file.
   std::cout << "Loading metadata at " << config["zotero_metadata"] << std::endl;
   std::ifstream read(config["zotero_metadata"], std::ios::in);
-  //Check if metadata was found.
+  // Check if metadata was found.
   if(!read) {
     std::cout << "No metadata found! Server fails to load\n";
     return 1;
   }
   nlohmann::json metadata;
   read >> metadata;
-  std::cout << "done." << std::endl;
+  std::cout << "done.\n\n";
 
-  // Load active pillars 
-  // TODO (fux): these should be specified by a config file.
-  std::cout << "TODO (fux): these should be specified by a config file.\n";
-  nlohmann::json zotero_pillars = {
-      {{"key","XCFFDRQC"}, {"name", "Forschung CLAS"}},
-      {{"key", "RFWJC42V"}, {"name", "Geschichte des Tierwissens"}} }; 
+  // Load active pillars:
+  std::cout << "Loading active collections...";
+  nlohmann::json zotero_pillars = nlohmann::json::array();
+  for (auto it : metadata["collections"]["data"])
+    zotero_pillars.push_back(nlohmann::json({{"key", it["key"]}, {"name", it["data"]["name"]}}));
+  std::cout << "done.\n\n";
 
-  // Create book manager
-  std::cout << "initializing bookmanager\n";
+  // Create book manager:
+  std::cout << "initializing bookmanager..." << std::endl;
   BookManager manager(config["upload_points"], config["dictionary_old"]);
-  manager.UpdateZotero(metadata);
+  manager.UpdateZotero(metadata["items"]["data"]);
   if (manager.Initialize())
-    std::cout << "Initialization successful!\n"; 
+    std::cout << "Initialization successful!\n\n"; 
   else
-    std::cout << "Initialization failed!\n";
+    std::cout << "Initialization failed!\n\n";
   
   int start_port = std::stoi("4848");
   std::cout << "Starting on port: " << start_port << std::endl;
 
-  // TODO (fux):  add signal-handler to stop the service.
-  std::cout << "TODO (fux):  add signal-handler to stop the service.\n";
-  
   // Add specific handlers via server-frame 
   srv.Get("/api/v2/search", [&](const Request& req, Response& resp) 
       { Search(req, resp, zotero_pillars, manager, dict); });

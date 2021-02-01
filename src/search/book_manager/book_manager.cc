@@ -162,7 +162,7 @@ bool BookManager::Initialize() {
 
 void BookManager::UpdateZotero(nlohmann::json j_items) {
   //Iterate over all items in json
-  for (auto &it:j_items) {
+  for (auto &it : j_items) {
     // already exists: update metadata.
     if (map_books_.count(it["key"]) > 0)
       map_books_[it["key"]]->metadata().set_json(it);

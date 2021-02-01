@@ -54,9 +54,7 @@ public:
   ///< Return "[author], [date]" and add "book not yet scanned", when hasOcr == false
   std::string GetAuthorDateScanned();
 
-
   // **** setter **** //
-  
   void SetPath(std::string sPath);
   
 
@@ -93,7 +91,7 @@ public:
   * @param[in] fuzzyness (fuzzy-search yes/ no)
   * @return boolean indicating whether words or on the same page or not
   */
-  bool OnSamePage(std::vector<std::string> sWords, bool fuzzyness);
+  bool OnSamePage(std::vector<std::string> words, bool fuzzyness);
 
   /**
   * GetPages calls findPages (extracting all pages from given word) for each 
@@ -104,7 +102,7 @@ public:
   * @return map of pages, with vector of words on this page 
   * (all the same if fuzziness==false)
   */
-  std::map<int, std::vector<std::string>>* GetPages(std::string sInput, bool fuzzyness);
+  std::map<int, std::vector<std::string>>* GetPages(std::string input, bool fuzzyness);
 
 
   // ***** GET PREVIEW - functions ***** //
@@ -116,7 +114,7 @@ public:
   * @param input (user input, possibly containing several words)
   * @return one ore more previews ready formatted for output.
   */
-  std::string GetPreview(std::string sWord);
+  std::string GetPreview(std::string word);
 
    /**
    * Returns the 10 most relevant neighboors of a given word.
@@ -128,7 +126,6 @@ public:
 private:
 
   // *** member variables *** //
-
   std::string key_;  ///< Key of the book
   std::string path_;  ///< Path to book (if exists)
   bool has_ocr_;  ///< Book has ocr path
@@ -195,8 +192,7 @@ private:
   * @param[in] fuzzyness (boolean indicating whether fuzziness is set or not)
   * @return map of all pages on which word was found.
   */
-  std::map<int, std::vector<std::string>>* FindPages(std::string sWord, 
-                                                     bool fuzzyness);
+  std::map<int, std::vector<std::string>>* FindPages(std::string word, bool fuzzyness);
 
   /**
   * Remove all elements from results-1, which do not exist in results-2. 
@@ -212,7 +208,7 @@ private:
   * @param[in] fuzzyness (fuzzy-search yes/ no)
   * @return boolean whether all words are in metadata or not.
   */
-  bool MetadataCmp(std::vector<std::string> vWords, bool fuzzyness);
+  bool MetadataCmp(std::vector<std::string> words, bool fuzzyness);
 
   /**
   * Generates list of all pages the searched word occurs on.
@@ -221,7 +217,7 @@ private:
   * @param[in] word to generate list of pages for.
   * @return list of pages
   */
-  std::vector<size_t> PagesFromWord(std::string sWord, bool fuzzyness);
+  std::vector<size_t> PagesFromWord(std::string word, bool fuzzyness);
 
 
   // *** Previews *** //
@@ -231,7 +227,7 @@ private:
    * @param sWord (searched word)
    * @return Preview.
    */
-  std::string GetOnePreview(std::string sWord);
+  std::string GetOnePreview(std::string word);
 
   /**
    * @brief Return page on which word occures, the position on the page and the
@@ -241,7 +237,7 @@ private:
    * @param[in, out] page (page number the word was found on)
    * @return complete text of the page the word was found on.
    */
-  std::string GetPreviewText(std::string& sWord, size_t& pos, size_t& page);
+  std::string GetPreviewText(std::string& word, size_t& pos, size_t& page);
 
   /**
    * Get the complete title and the position where the word was found.
@@ -250,7 +246,7 @@ private:
    * @param[in, out] pos (position, where in title word was found)
    * @return title.
    */
-  std::string GetPreviewTitle(std::string& sWord, size_t& pos);
+  std::string GetPreviewTitle(std::string& word, size_t& pos);
 
   /**
    * Find preview with matched word + pages.
@@ -258,7 +254,7 @@ private:
    * @param[in] page (page on which match was found)
    * @return preview for this book
    */
-  size_t GetPreviewPosition(std::string sWord);
+  size_t GetPreviewPosition(std::string word);
 
   /**
    * Delete brocken characters and escape invalid literals.
