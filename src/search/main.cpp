@@ -269,12 +269,10 @@ int main() {
   Server srv;
 
   // Load and parse config file.
-  std::cout << "Loading config..." << std::endl;
   nlohmann::json config;
   std::ifstream read_config("server.config");
   read_config >> config;
   read_config.close();
-  std::cout << "done.\n\n";
 
   // Load dictionary.
   std::cout << "Loading dictionary at " << config["dictionary"] << std::endl;
@@ -298,6 +296,7 @@ int main() {
   nlohmann::json zotero_pillars = nlohmann::json::array();
   for (auto it : metadata["collections"]["data"])
     zotero_pillars.push_back(nlohmann::json({{"key", it["key"]}, {"name", it["data"]["name"]}}));
+  std::cout << zotero_pillars << std::endl;
   std::cout << "done.\n\n";
 
   // Create book manager:

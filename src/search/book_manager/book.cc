@@ -217,7 +217,7 @@ void Book::LoadPages() {
   std::ifstream read(path_ + "/intern/pages.txt");
   std::string buffer = "";
 
-  // Read number of pages, if first lind does not indicate pages, recreate book.
+  // Read number of pages, if first line does not indicate pages, recreate book.
   getline(read, buffer);
   if (std::isdigit(buffer[0]) == false) {
     CreatePages();
@@ -229,10 +229,8 @@ void Book::LoadPages() {
 
   // Read words, pages, and relevance, preview-position.
   while (!read.eof()) {
-    // Read new line.
     getline(read, buffer);
-    if(buffer.length() < 2)
-      continue;
+    if(buffer.length() < 2) continue;
 
     // Extract word (vec[0] = word, vec[1] = sBuffer.
     std::vector<std::string> vec = func::split2(buffer, ";");
@@ -265,7 +263,7 @@ std::map<int, std::vector<std::string>>* Book::GetPages(std::string sInput,
   std::replace(sInput.begin(), sInput.end(), ' ', '+');
   std::vector<std::string> vWords = func::split2(func::returnToLower(sInput), "+");
 
-  // Create map of pages and found words for first word
+  // Create map of pages and found words for first word.
   mapPages = FindPages(vWords[0], fuzzyness);
 
   // Iterate over all 1..n words create list of pages, and remove words not on same page.
@@ -337,14 +335,14 @@ bool Book::OnSamePage(std::vector<std::string> vWords, bool fuzzyness) {
   if (MetadataCmp(vWords, fuzzyness) == true)
     return true;
 
-  // Get all pages, the first word is on
+  // Get all pages, the first word is on.
   std::vector<size_t> pages1 = PagesFromWord(vWords[0], fuzzyness);
 
-  // If no pages or found, return false
+  // If no pages or found, return false.
   if (pages1.size() == 0) 
     return false;
 
-  // Iterate over words 1..n
+  // Iterate over words 1..n.
   for (size_t i=1; i<vWords.size(); i++) {
     // Get all pages of word i.
     std::vector<size_t> pages2 = PagesFromWord(vWords[i], fuzzyness);
@@ -361,40 +359,40 @@ bool Book::OnSamePage(std::vector<std::string> vWords, bool fuzzyness) {
         break;
       }
     }
-    if (found==false) 
+    if (!found) 
       return false;
   }
   
   return true;
 }
 
-bool Book::MetadataCmp(std::vector<std::string> vWords, bool fuzzyness) {
+bool Book::MetadataCmp(std::vector<std::string> words, bool fuzzyness) {
   bool in_metadata = true;
           
   // Iterate over all words and check for occurrence in metadata.
-  for (const auto& word : vWords) {
-    std::string sTitle = metadata_.GetTitle(); func::convertToLower(sTitle);
-    std::string sAuthor = metadata_.GetAuthor(); func::convertToLower(sAuthor);
+  for (const auto& word : words) {
+    std::string title = metadata_.GetTitle(); func::convertToLower(title);
+    std::string author = metadata_.GetAuthor(); func::convertToLower(author);
 
     // If word occurs neither in author, title, or date, set inMetadata to false.
-    if (sAuthor.find(word) == std::string::npos  
-        && sTitle.find(word) == std::string::npos 
+    if (author.find(word) == std::string::npos  
+        && title.find(word) == std::string::npos 
         && std::to_string(date_) != word) 
       in_metadata = false;
 
     // Check title and author again with fuzzy search.
     if (fuzzyness == true) {
-      // Check title
+      // Check title:
       bool found = false;
-      sTitle = func::convertStr(sTitle);
-      for (auto it : func::extractWordsFromString(sTitle)) {
+      title = func::convertStr(title);
+      for (auto it : func::extractWordsFromString(title)) {
         if(fuzzy::fuzzy_cmp(word, it.first) <= 0.2)
           found = true;
       }
 
-      // Check author
-      sAuthor = func::convertStr(sAuthor);
-      for (auto it : func::extractWordsFromString(sAuthor)) {
+      // Check author:
+      author = func::convertStr(author);
+      for (auto it : func::extractWordsFromString(author)) {
         if(fuzzy::fuzzy_cmp(word, it.first) <= 0.2)
           found = true;
       }
@@ -410,35 +408,34 @@ bool Book::MetadataCmp(std::vector<std::string> vWords, bool fuzzyness) {
   return in_metadata;
 }
 
-std::vector<size_t> Book::PagesFromWord(std::string sWord, bool fuzzyness) {
+std::vector<size_t> Book::PagesFromWord(std::string word, bool fuzzyness) {
   // Use set to automatically erase duplicates.
   std::set<size_t> pages;
 
   // Obtain pages with exact match.
-  if (map_words_pages_.count(sWord) > 0) {
-    std::vector<size_t> foo = map_words_pages_.at(sWord).pages();
+  if (map_words_pages_.count(word) > 0) {
+    std::vector<size_t> foo = map_words_pages_.at(word).pages();
     pages.insert(foo.begin(), foo.end());
   }
 
   // Obtain pages from grammatical matches.
-  if (found_grammatical_matches_.count(sWord) > 0) {
-    for (auto elem : found_grammatical_matches_[sWord]) {
+  if (found_grammatical_matches_.count(word) > 0) {
+    for (auto elem : found_grammatical_matches_[word]) {
       std::vector<size_t> foo = map_words_pages_.at(elem).pages();
       pages.insert(foo.begin(), foo.end());
     }
   }
 
   // Obtain pages from fuzzy match.
-  if (found_fuzzy_matches_.count(sWord) > 0 && fuzzyness == true)  {
-    for (auto elem : found_fuzzy_matches_[sWord]) {
+  if (found_fuzzy_matches_.count(word) > 0 && fuzzyness == true)  {
+    for (auto elem : found_fuzzy_matches_[word]) {
       std::vector<size_t> foo = map_words_pages_.at(elem.first).pages();
       pages.insert(foo.begin(), foo.end());
     }
   }
   
   // Convert set to vector.
-  std::vector<size_t> vec;
-  vec.assign(pages.begin(), pages.end());
+  std::vector<size_t> vec(pages.begin(), pages.end());
   return vec;
 }
 
@@ -446,9 +443,8 @@ std::vector<size_t> Book::PagesFromWord(std::string sWord, bool fuzzyness) {
 // **** GET PREVIEW FUNCTIONS **** //
 
 std::string Book::GetPreview(std::string input) {
-  // Get vector of search words.
+  // Get vector of search words and first preview.
   std::vector<std::string> words = func::split2(input, "+");
-  // Get First preview.
   std::string prev = GetOnePreview(words[0]);
 
   // Get previous for extra words, that have been searched for.
@@ -596,7 +592,6 @@ void Book::EscapeDeleteInvalidChars(std::string& str) {
 
 void Book::AddPage(std::string page_text, std::string pagenumber, 
     std::string max_pagenumber) {
-
   // Write the single given page to disc.
   std::ofstream write_page(path_ + "/intern/add" + pagenumber + ".txt");
   write_page << page_text;
