@@ -25,6 +25,7 @@ namespace clas_digital
         return this;
       }
 
+      virtual bool MetadataHandler::IsAuthorEditor(std::string creator_type);
       virtual IReference *Copy() = 0;
       virtual std::string GetAuthor() = 0; 
       virtual std::string GetShortTitle() = 0;

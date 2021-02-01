@@ -30,12 +30,29 @@ class CorpusManager {
 
 
   private:
+    ///<The item references meaning books in this context.
     clas_digital::IReferenceManager::ptr_cont_t item_references_;
+    ///<The collection references of zotero.
     clas_digital::IReferenceManager::ptr_cont_t collection_references_;
+
+    ///<Map of unique authors of all books to create the id for every author
     std::map<std::string,std::vector<std::string>> m_mapUniqueAuthors;
   
+    /**
+     * Write the metadata page for one book
+     * @param ref The reference to get the book from
+     */
     void WriteMetadataPage(clas_digital::IReference *ref);
+  
+
+    /**
+     * Update the book index.
+     */
     void BookIndex(clas_digital::IReference *ref);
+
+    /**
+     * Write the collection page for a reference, the reference should have the type of a collection
+     */
     void WriteCollectionPage(clas_digital::IReference *ref);
 };
 

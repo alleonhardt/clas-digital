@@ -73,6 +73,16 @@ static std::string returnToLower(std::string &str)
       {
         return metadata_.value("citation","");
       }
+      /**
+       * Get whether author needs to be shown according to book creator Type.
+       * @param[in] creator_type
+       * @return whether to show author in catalogue
+       */
+      bool MetadataHandler::IsAuthorEditor(std::string creator_type) {
+        if (GetMetadata("itemType", "data") == "bookSection")
+          return creator_type == "author";
+        return creator_type == "author" || creator_type == "editor";
+      }
 
       /**
        * @brief return data from json.
