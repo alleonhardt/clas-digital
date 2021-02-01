@@ -138,9 +138,7 @@ bool BookManager::Initialize() {
   std::cout << "BookManager: Extracting books." << std::endl;
   //Go though all books and create book
   for (auto upload_point : upload_points_) {
-    std::cout << upload_point << std::endl;
     for (const auto& p : std::filesystem::directory_iterator(upload_point)) {
-      std::cout << p.path() << std::endl;
       std::string filename = p.path().stem().string();
       if (map_books_.count(filename) > 0)
         AddBook(p.path(), filename);
@@ -162,7 +160,7 @@ bool BookManager::Initialize() {
 
 void BookManager::UpdateZotero(nlohmann::json j_items) {
   //Iterate over all items in json
-  for (auto &it:j_items) {
+  for (auto &it : j_items) {
     // already exists: update metadata.
     if (map_books_.count(it["key"]) > 0)
       map_books_[it["key"]]->metadata().set_json(it);
