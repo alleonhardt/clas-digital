@@ -15,6 +15,7 @@
 #include <set>
 #include <shared_mutex>
 #include <string>
+#include <vector>
 
 #include "book_manager/book.h"
 #include "func.hpp"
@@ -22,106 +23,111 @@
 #include "search/search_options.h"
 
 
-class BookManager
-{
-private:
+class BookManager {
+  private:
+    const std::vector<std::string> upload_points_; ///< mount_points for book-locations.
 
-    //Map of all books
-    std::unordered_map<std::string, Book*> m_mapBooks;
+    std::unordered_map<std::string, Book*> map_books_; ///< map of all books.
 
 
-    //Map of words / map of words in titles
+    // Map of words / map of words in titles
     typedef std::unordered_map<std::string, std::map<std::string, double>> MAPWORDS;
-    MAPWORDS m_mapWords;
-    MAPWORDS m_mapWordsTitle;
-    MAPWORDS m_mapWordsAuthors;
-    std::map<std::string, std::vector<std::string>> m_mapUniqueAuthors;
+    MAPWORDS map_words_; ///< Map of all words (in text bodies): word -> ocuring books:score.
+    MAPWORDS map_words_title_; /// Map of all words in titles: word -> ocuring books:score.
+    MAPWORDS map_words_authors_; ///< Map of all authors: name -> ocuring books:score.
+    std::map<std::string, std::vector<std::string>> map_unique_authors_;
 
     typedef std::unordered_map<std::string, std::set<std::string>> dict;
-    dict m_dict;
+    dict dict_; ///< Dictionary from grammatic puroses. F.e. finding base form.
 
     typedef std::list<std::pair<std::string, size_t>> sortedList;
-    sortedList m_listWords;
-    sortedList m_listAuthors;
+    sortedList list_words_; ///< Sorted list of all words by score (for typeahead).
+    sortedList list_authors_; ///< Sorted list of all authors by score (for typeahead). 
 
-    std::shared_mutex m_searchLock;
+    std::shared_mutex search_lock_;
 
-public:
-
-    //Constructor
-    BookManager();
+  public:
+    ///< Constructor
+    BookManager(std::vector<std::string> paths_to_books, std::string mount_points);
 
     // **** getter **** //
 
-    /**
-    * @return map of all book
-    */
-    std::unordered_map<std::string, Book*>& getMapOfBooks();
+    std::unordered_map<std::string, Book*>& map_of_books();
     
-    /**
-    * @return unordered dicionary of authors
-    */
-    MAPWORDS& getMapofAuthors(); 
+    MAPWORDS& map_of_authors(); 
+
+    std::map<std::string, std::vector<std::string>>& map_unique_authors();
 
     /**
-    * @return map of unique authors ([lastName]-[firstNam])
-    */
-    std::map<std::string, std::vector<std::string>>& getMapofUniqueAuthors();
-
-    void writeListofBooksWithBSB();
-
-    /**
-    * @brief load all books.
-    * @return boolean for successful of not
-    */
-    bool initialize(); 
+     * @brief Generate lists on information about stored books.
+     * - currenttly untracked books.
+     * - books with bsb-link but without ocr.
+     * - books with Tag "gibtEsBeiBSB" but without ocr.
+     * - books with tag "gibtEsBeiBSB" but with ocr.
+     * - books with tag "BSBDownLoadFertig" but without ocr.
+     * - books in collection "Geschichte des Tierwissens" but without ocr.
+     */
+    void WriteListofBooksWithBSB();
 
     /**
-    * @brief parse json of all items. If item exists, change metadata of item, create new book.
-    * @param[in] j_items json with all items
-    */
-    void updateZotero(nlohmann::json j_Items);
+     * @brief load all books.
+     * @return boolean for successful of not
+     */
+    bool Initialize(); 
 
     /**
-    * @brief add a book, or rather: add ocr to book
-    * @param[in] sKey key to book
-    */
-    void addBook(std::string sKey);
+     * @brief parse json of all items. If item exists, change metadata of item, create new book.
+     * @param[in] j_items json with all items
+     */
+    void UpdateZotero(nlohmann::json j_Items);
 
     /**
-    * @brief search function calling fitting function from search class
-    * @return list of all found books
-    */
-    std::list<std::string>* search(SearchOptions* searchOptions);
+     * @brief add a book, or rather: add ocr to book
+     * @param[in] path path to book.
+     * @param[in] key key to book
+     */
+    void AddBook(std::string path, std::string key);
 
     /**
-    * @brief convert to list
-    * @return list of searchresulst
-    */
-    std::list<std::string>* convertToList(std::map<std::string, double>* mapResults, int sorting);
+     * @brief search function calling fitting function from search class
+     * @param[in] searchOPts 
+     * @return list of all found books
+     */
+    std::list<std::string>* DoSearch(SearchOptions* searchOptions);
 
     /**
-    * @brief create map of all words (key) and books in which the word occurs (value)
-    */
-    void createMapWords();
+     * @brief convert to list and sort list
+     * @param[in] mapBooks map of books that have been found to contains the searched word
+     * @param[in, out] matches Map of books and there match with the searched word
+     * @return list of searchresulst
+     */
+    std::list<std::string>* ConvertToList(std::map<std::string, double>* mapResults, int sorting);
 
     /**
-    * @brief create map of all words (key) and book-titles in which the word occurs (value)
-    */
-    void createMapWordsTitle();
+     * @brief create map of all words (key) and books in which the word occurs (value)
+     */
+    void CreateMapWords();
 
     /**
-    * @brief create map of all words (key) and author names in which the word occurs (value)
-    */
-    void createMapWordsAuthor();
-
-    void createListWords(MAPWORDS& mapWords, sortedList& listWords);
+     * @brief create map of all words (key) and book-titles in which the word occurs (value)
+     */
+    void CreateMapWordsTitle();
 
     /**
-    * @brief return a list of 10 words, fitting search Word, sorted by in how many books they apear
-    */
-    std::list<std::string>* getSuggestions(std::string sWord, std::string sWhere);
-    std::list<std::string>* getSuggestions(std::string sWord, sortedList& listWords);
+     * @brief create map of all words (key) and author names in which the word occurs (value)
+     */
+    void CreateMapWordsAuthor();
+
+    /**
+     * @brief create list of all words and relevance, ordered by relevance
+     */
+    void CreateListWords(MAPWORDS& mapWords, sortedList& listWords);
+
+    /**
+     * @brief return a list of 10 words, fitting search Word, sorted by in how many books they apear
+     */
+    std::list<std::string>* GetSuggestions(std::string sWord, std::string sWhere);
+    std::list<std::string>* GetSuggestions(std::string sWord, sortedList& listWords);
 }; 
 
 #endif

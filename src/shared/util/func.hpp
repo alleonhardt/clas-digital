@@ -12,7 +12,6 @@
 
 namespace func 
 {
-
     /*
     * @brief: checks whether a string is in a vector of strings
     * @parameter string

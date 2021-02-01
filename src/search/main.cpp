@@ -4,12 +4,14 @@
 
 #include <chrono>
 #include <iostream>
+#include <ostream>
 #include <string>
 
 #include <httplib.h>
 
 #include "book_manager/book_manager.h"
 #include "gramma.h"
+#include "nlohmann/json.hpp"
 #include "search/search_options.h"
 
 using namespace httplib;
@@ -123,11 +125,11 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
 
     //Start search
     auto time_start = std::chrono::system_clock::now();
-    auto result_list = manager.search(&options);
+    auto result_list = manager.DoSearch(&options);
 
     //Construct response
     std::cout << "Constructing response json." << std::endl;
-    auto all_books = manager.getMapOfBooks();
+    auto all_books = manager.map_of_books();
     nlohmann::json search_response;
 
     if (result_list->size() == 0) {
@@ -202,7 +204,7 @@ void Pages(const Request& req, Response& resp, BookManager& manager) {
     std::cout << "Search in book with query : " << query
       << " and fuzzyness: " << fuzzyness << std::endl;
 
-    auto book = manager.getMapOfBooks()[scanId];
+    auto book = manager.map_of_books()[scanId];
     auto pages = book->GetPages(query, fuzzyness!=0);
     std::cout << "Got " << pages->size() << " pages for this book." << std::endl;
 
@@ -245,7 +247,7 @@ void Suggestions(const Request& req, Response& resp, BookManager& manager,
   try {
     //Retrieve suggestions from book manager.
     std::string query = req.get_param_value("q");
-    std::list<std::string>* suggestions = manager.getSuggestions(query, type);
+    std::list<std::string>* suggestions = manager.GetSuggestions(query, type);
 
     //Convert list to json.
     nlohmann::json json_response;
@@ -262,20 +264,25 @@ void Suggestions(const Request& req, Response& resp, BookManager& manager,
   }
 }
 
-int main()
-{
-  //Create server.
+int main() {
+  // Create server.
   Server srv;
 
-  //Load dictionary
-  std::cout << "Loading dictionary.\n";
-  Dict dict("web/dict.json");
+  // Load and parse config file.
+  nlohmann::json config;
+  std::ifstream read_config("server.config");
+  read_config >> config;
+  read_config.close();
+
+  // Load dictionary
+  std::cout << "Loading dictionary at " << config["dictionary"] << std::endl;
+  Dict dict(config["dictionary"]);
   std::cout << "done.\n";
 
-  //Load corpus metadata from disc.
-  //TODO (fux): location should be specified by a config file.
-  std::ifstream read("bin/zotero.json", std::ios::in);
-
+  // Load corpus metadata from disc.
+  // TODO (fux): location should be specified by a config file.
+  std::cout << "Loading metadata at " << config["zotero_metadata"] << std::endl;
+  std::ifstream read(config["zotero_metadata"], std::ios::in);
   //Check if metadata was found.
   if(!read) {
     std::cout << "No metadata found! Server fails to load\n";
@@ -283,20 +290,20 @@ int main()
   }
   nlohmann::json metadata;
   read >> metadata;
+  std::cout << "done." << std::endl;
 
-  //Load active pillars 
-  //TODO (fux): these should be specified by a config file.
+  // Load active pillars 
+  // TODO (fux): these should be specified by a config file.
   std::cout << "TODO (fux): these should be specified by a config file.\n";
-
   nlohmann::json zotero_pillars = {
       {{"key","XCFFDRQC"}, {"name", "Forschung CLAS"}},
       {{"key", "RFWJC42V"}, {"name", "Geschichte des Tierwissens"}} }; 
 
-  //Create book manager
+  // Create book manager
   std::cout << "initializing bookmanager\n";
-  BookManager manager;
-  manager.updateZotero(metadata);
-  if (manager.initialize())
+  BookManager manager(config["upload_points"], config["dictionary_old"]);
+  manager.UpdateZotero(metadata);
+  if (manager.Initialize())
     std::cout << "Initialization successful!\n"; 
   else
     std::cout << "Initialization failed!\n";
@@ -305,9 +312,9 @@ int main()
   std::cout << "Starting on port: " << start_port << std::endl;
 
   // TODO (fux):  add signal-handler to stop the service.
-  std::cout<<  "TODO (fux):  add signal-handler to stop the service.\n";
+  std::cout << "TODO (fux):  add signal-handler to stop the service.\n";
   
-  //Add specific handlers via server-frame 
+  // Add specific handlers via server-frame 
   srv.Get("/api/v2/search", [&](const Request& req, Response& resp) 
       { Search(req, resp, zotero_pillars, manager, dict); });
   srv.Get("/api/v2/search/pages", [&](const Request& req, Response& resp) 
@@ -317,11 +324,11 @@ int main()
   srv.Get("/api/v2/search/suggestions/author", [&](const Request& req, Response& resp)
       { Suggestions(req, resp, manager, "author"); });
 
-  //TODO (fux): this should be handled from main server
+  // TODO (fux): this should be handled from main server
   srv.Get("/api/v2/search/pillars", [&](const Request& req, Response& resp)
       { resp.set_content(zotero_pillars.dump(), "application/json"); });
 
-  //Serve static pages ONLY FOR TESTING!
+  // Serve static pages ONLY FOR TESTING!
   srv.Get("/", [](const Request& req, Response& resp) 
       { resp.set_content(GetPage("Search.html"), "text/html"); });
   srv.Get("/search(.*)", [](const Request& req, Response& resp)

@@ -26,12 +26,10 @@ public:
   Book();
 
   /**
-  * Brief Constructor
-  * @param[in] sPath Path to book
-  * @param[in] map map of words in book
+  * Constructor initializing metadata.
+  * @param[in] metadata for this book.
   */
-  Book(nlohmann::json jMetadata);
-
+  Book(nlohmann::json metadata);
 
   // **** Getter **** //
   const std::string& key();
@@ -46,15 +44,14 @@ public:
   std::vector<std::string> collections();
   std::string author_date();
   std::unordered_map<std::string, WordInfo>& map_words_pages();
-  std::unordered_map<std::string, std::list<std::pair<std::string, double>>>& 
-  found_fuzzy_matches();
+  std::unordered_map<std::string, std::list<std::pair<std::string, double>>>& found_fuzzy_matches();
   std::unordered_map<std::string, std::list<std::string>>& 
   found_grammatical_matches();
   
-  ///Return whether book has images or ocr
+  ///< Return whether book has images or ocr
   bool HasContent() const;
 
-  ///Return "[author], [date]" and add "book not yet scanned", when hasOcr == false
+  ///< Return "[author], [date]" and add "book not yet scanned", when hasOcr == false
   std::string GetAuthorDateScanned();
 
 
@@ -66,12 +63,17 @@ public:
   // **** create book and maps (pages, relevance, preview) **** // 
 
   /**
-  * Sets m_hasOcr/Images,
-  * if hasOcr==true, safes json to disc creates/ loads map of words/pages.
-  * Creates/loads map of pages, sets hasOCR and hasImages and safes json
+   * Sets path, has_ocr and has_images.
+   * @param path to book.
+   */
+  void InitializeBook(std::string path);
+
+  /**
+  * Pre-processes ocr-file.
+  * Creates/loads map of pages, safes to json.
   * @param[in] sPath (path to book)
   */
-  void CreateBook(std::string sPath);
+  void InitializePreProcessing();
 
   /**
    * Add a single new pages, generate by Teseract. 
@@ -103,7 +105,6 @@ public:
   * (all the same if fuzziness==false)
   */
   std::map<int, std::vector<std::string>>* GetPages(std::string sInput, bool fuzzyness);
-
 
 
   // ***** GET PREVIEW - functions ***** //
@@ -161,16 +162,12 @@ private:
   void CreatePages();
 
   /**
-  * Function adding all words from one page to map of words. Writes the
-  * page to disc as single file. Add the page break line to a string used to 
-  * convert new format to old/ normal format. 
-  * @param[in] sBuffer (string holding current page)
-  * @param[in, out] sConvert (copy of complete ocr in page-mark-format)
+  * Function adding all words from one page to map of words. 
+  * Writes the page to disc as single file. 
+  * @param[in] buffer (string holding current page)
   * @param[in] page (number indexing current page)
-  * @param[in] mark (page-mark-format yes/no)
   */
-  void CreatePage(std::string sBuffer, std::string& sConvert, size_t page, 
-                  bool mark);
+  void CreatePage(std::string buffer, size_t page);
 
   /**
   * Find preview position for each word in map of words/pages.
@@ -230,14 +227,14 @@ private:
   // *** Previews *** //
 
   /**
-   * @brief get a preview of a single word. (~150 characters + highlighting)
+   * @brief Get a preview of a single word. (~150 characters + highlighting)
    * @param sWord (searched word)
    * @return Preview.
    */
   std::string GetOnePreview(std::string sWord);
 
   /**
-   * @brief return page on which word occures, the position on the page and the
+   * @brief Return page on which word occures, the position on the page and the
    * page number.
    * @param[in] word (searched word)
    * @param[in, out] pos (position on the page)
@@ -255,12 +252,12 @@ private:
    */
   std::string GetPreviewTitle(std::string& sWord, size_t& pos);
 
-  /*
-  * Find preview with matched word + pages.
-  * @param[in] sWord (best Match)
-  * @param[in] page (page on which match was found)
-  * @return preview for this book
-  */
+  /**
+   * Find preview with matched word + pages.
+   * @param[in] sWord (best Match)
+   * @param[in] page (page on which match was found)
+   * @return preview for this book
+   */
   size_t GetPreviewPosition(std::string sWord);
 
   /**
