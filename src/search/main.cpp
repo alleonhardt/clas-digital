@@ -326,7 +326,7 @@ int main() {
       { resp.set_content(zotero_pillars.dump(), "application/json"); });
 
   // Serve static pages ONLY FOR TESTING!
-  srv.Get("/", [](const Request& req, Response& resp) 
+  srv.Get("/search", [](const Request& req, Response& resp) 
       { resp.set_content(GetPage("Search.html"), "text/html"); });
   srv.Get("/search(.*)", [](const Request& req, Response& resp)
       { resp.set_content(GetPage("Search.html"), "text/html"); });
