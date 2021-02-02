@@ -197,7 +197,7 @@ std::vector<std::string> split2(std::string str, std::string delimiter)
 
 std::string convertStr(std::string& str)
 {
-    std::map<wchar_t, wchar_t> rep = {{L'ä','a'},{L'ö','o'},{L'ü','u'},{L'ö','o'},{L'ß','s'},{L'é','e'},{L'è','e'},{L'á','a'},{L'ê','e'},{L'â','a'},{L'ſ','s'}};
+    std::map<wchar_t, wchar_t> rep = {{L'ä','a'},{L'ö','o'},{L'ü','u'},{L'ö','o'},{L'ß','s'},{L'é','e'},{L'è','e'},{L'á','a'},{L'ê','e'},{L'â','a'}, {L'ſ','s'}};
     
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
     std::wstring wide = converter.from_bytes(str); 

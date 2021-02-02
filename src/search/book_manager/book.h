@@ -42,7 +42,6 @@ public:
   std::string author();
   int date();
   std::vector<std::string> collections();
-  std::string author_date();
   std::unordered_map<std::string, WordInfo>& map_words_pages();
   std::unordered_map<std::string, std::list<std::pair<std::string, double>>>& found_fuzzy_matches();
   std::unordered_map<std::string, std::list<std::string>>& 
