@@ -27,6 +27,7 @@ class CorpusManager {
      * Returns all item references to all items found in the current zotero setup.
      */
     clas_digital::IReferenceManager::ptr_cont_t& item_references();
+    clas_digital::IReference* book(std::string ref);
 
 
   private:

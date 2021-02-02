@@ -70,8 +70,9 @@ static std::string returnToLower(std::string &str)
         }
 
         if(_path == "") {
-          std::filesystem::create_directory(handler->GetMountPoints()[0]/GetKey());
-          _path = handler->GetMountPoints()[0]/GetKey();
+          std::error_code ec;
+          std::filesystem::create_directory(handler->GetUploadPoints()[0]/GetKey(),ec);
+          _path = handler->GetUploadPoints()[0]/GetKey();
         }
       }
 

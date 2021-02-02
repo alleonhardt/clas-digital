@@ -47,6 +47,7 @@ namespace clas_digital
       virtual bool CheckCredentials(nlohmann::json options) = 0;
       virtual nlohmann::json ExportToJSON(ExportPurpose purpose) = 0;
       virtual int GetAccess() = 0;
+      virtual void SetAccess(int) = 0;
   };
 
 
@@ -61,6 +62,7 @@ namespace clas_digital
       bool CheckCredentials(nlohmann::json options) override;
       void UpdateFromJSON(const nlohmann::json &js) override;
       int GetAccess() override;
+      void SetAccess(int);
 
       enum Access
       {
