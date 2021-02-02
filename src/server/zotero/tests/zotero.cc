@@ -8,7 +8,7 @@ using namespace clas_digital;
 EventManager evt(&CLASServer::GetInstance());
 
 TEST_CASE("InitialiseFromJSON", "[ZoteroReferenceManager]") { 
-  ZoteroReferenceManager ref(&evt);
+  ZoteroReferenceManager ref(&evt,nullptr);
   
   // Check that the error codes are all on sport when giving flawed jsons to the
   // Reference Manager
@@ -25,7 +25,7 @@ TEST_CASE("InitialiseFromJSON", "[ZoteroReferenceManager]") {
 }
 
 TEST_CASE("InitialiseFromJSONFile", "[ZoteroReferenceManager]") {
-  ZoteroReferenceManager ref(&evt);
+  ZoteroReferenceManager ref(&evt,nullptr);
 
   // Check the error code when the file does not exist
   REQUIRE(ref.Initialise(std::filesystem::path("whatever.json")) == IReferenceManager::Error::JSON_FILE_DOES_NOT_EXIST);
@@ -56,7 +56,7 @@ TEST_CASE("InitialiseFromJSONFile", "[ZoteroReferenceManager]") {
 TEST_CASE("GetItemMetadata from ReferenceManager","[ZoteroReferenceManager]")
 {
   EventManager ev(&CLASServer::GetInstance());
-  ZoteroReferenceManager ref(&ev);
+  ZoteroReferenceManager ref(&ev,nullptr);
   auto ret = ref.Initialise(std::filesystem::path("zoteroConfig.json"));
   if(ret == IReferenceManager::Error::OK )
   {

@@ -470,7 +470,7 @@ bool createWebpage(IReference *item,IReferenceManager::ptr_cont_t &collections,c
   std::filesystem::create_directory("web/books/"+item->GetKey(), ec);
   std::filesystem::create_directory("web/books/"+item->GetKey()+"/pages", ec);
 
-  if(std::filesystem::exists(item->GetPath(handler)+"/ocr.txt"))
+  if(std::filesystem::exists(item->GetPath()+"/ocr.txt"))
   {
     createPagesPage(item);
   }
