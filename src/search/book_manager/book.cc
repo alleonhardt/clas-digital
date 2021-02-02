@@ -203,8 +203,8 @@ void Book::SafePages() {
       buffer += std::to_string(page) + ",";
 
     // Add preview-position and relevance.
-    buffer += ";" + std::to_string(map_words_pages_[it.first].relevance());
-    buffer += ";" + std::to_string(map_words_pages_[it.first].position());
+    buffer += ";" + std::to_string(map_words_pages_[it.first].relevance())
+            + ";" + std::to_string(map_words_pages_[it.first].position()) + "\n";
 
     write << buffer;
   }
@@ -212,7 +212,7 @@ void Book::SafePages() {
 }
 
 void Book::LoadPages() {
-  std::cout << key_ << "Loading pages." << std::endl;
+  std::cout << key_ << " Loading pages." << std::endl;
   // Load map.
   std::ifstream read(path_ + "/intern/pages.txt");
   std::string buffer = "";

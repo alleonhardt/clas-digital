@@ -154,7 +154,7 @@ bool BookManager::Initialize() {
   std::cout << "Map title:   " << map_words_title_.size() << "\n";
   std::cout << "Map authors: " << map_words_authors_.size() << "\n";
 
-  WriteListofBooksWithBSB();
+  // WriteListofBooksWithBSB();
   return true;
 }
 
