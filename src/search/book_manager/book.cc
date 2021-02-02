@@ -14,14 +14,10 @@ Book::Book(nlohmann::json metadata) : metadata_(metadata) {
 
   // Set Metadata.
   key_ = metadata["key"];
-  author_ = metadata_.GetAuthor();                 
-  if(author_.size() == 0) 
-    author_ = "No Author";
-  author_date_ = func::returnToLower(author_);
+  author_ = (metadata_.GetAuthor().size() == 0) ? "No Author" : metadata_.GetAuthor();
+  author_date_ = author_;
   date_ = metadata_.GetDate();
-  if(date_ != -1) 
-    author_date_ += ", " + std::to_string(date_);
-  author_date_ += ".";
+  author_date_ += (date_ != -1) ? ", " + std::to_string(date_) : author_date_ += ".";
   collections_ = metadata_.GetCollections();
 }
 
@@ -65,11 +61,6 @@ int Book::date() {
 std::vector<std::string> Book::collections() { 
   return collections_; 
 }
-
-std::string Book::author_date() { 
-  return author_date_; 
-}
-
 
 std::unordered_map<std::string, WordInfo>& Book::map_words_pages() { 
   return map_words_pages_;
@@ -203,8 +194,8 @@ void Book::SafePages() {
       buffer += std::to_string(page) + ",";
 
     // Add preview-position and relevance.
-    buffer += ";" + std::to_string(map_words_pages_[it.first].relevance());
-    buffer += ";" + std::to_string(map_words_pages_[it.first].position());
+    buffer += ";" + std::to_string(map_words_pages_[it.first].relevance())
+            + ";" + std::to_string(map_words_pages_[it.first].position()) + "\n";
 
     write << buffer;
   }
@@ -212,7 +203,7 @@ void Book::SafePages() {
 }
 
 void Book::LoadPages() {
-  std::cout << key_ << "Loading pages." << std::endl;
+  std::cout << key_ << " Loading pages." << std::endl;
   // Load map.
   std::ifstream read(path_ + "/intern/pages.txt");
   std::string buffer = "";
