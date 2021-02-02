@@ -93,7 +93,7 @@ class BookManager {
      * @param[in] searchOPts 
      * @return list of all found books
      */
-    std::list<std::string>* DoSearch(SearchOptions* searchOptions);
+    std::list<Book*> DoSearch(SearchOptions* searchOptions);
 
     /**
      * @brief convert to list and sort list
@@ -101,7 +101,7 @@ class BookManager {
      * @param[in, out] matches Map of books and there match with the searched word
      * @return list of searchresulst
      */
-    std::list<std::string>* ConvertToList(std::map<std::string, double>* mapResults, int sorting);
+    std::list<Book*> ConvertToList(std::map<std::string, double>* mapResults, int sorting);
 
     /**
      * @brief create map of all words (key) and books in which the word occurs (value)
@@ -126,8 +126,8 @@ class BookManager {
     /**
      * @brief return a list of 10 words, fitting search Word, sorted by in how many books they apear
      */
-    std::list<std::string>* GetSuggestions(std::string sWord, std::string sWhere);
-    std::list<std::string>* GetSuggestions(std::string sWord, sortedList& listWords);
+    std::list<Book*> GetSuggestions(std::string sWord, std::string sWhere);
+    std::list<Book*> GetSuggestions(std::string sWord, sortedList& listWords);
 }; 
 
 #endif

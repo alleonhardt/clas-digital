@@ -1,4 +1,5 @@
 #include "book_manager.h"
+#include "book_manager/book.h"
 #include "search/search.h"
 #include <ostream>
 #include <vector>
@@ -184,7 +185,7 @@ void BookManager::AddBook(std::string path, std::string sKey) {
 }
     
 
-std::list<std::string>* BookManager::DoSearch(SearchOptions* searchOpts) {
+std::list<Book*> BookManager::DoSearch(SearchOptions* searchOpts) {
     std::vector<std::string> sWords = func::split2(searchOpts->getSearchedWord(), "+");
   //Start first search
   Search search(searchOpts, sWords[0]);
@@ -212,15 +213,12 @@ std::list<std::string>* BookManager::DoSearch(SearchOptions* searchOpts) {
   return ConvertToList(results, searchOpts->getFilterResults());
 }
 
-std::list<std::string>* BookManager::ConvertToList(std::map<std::string, double>* search_results, 
+std::list<Book*> BookManager::ConvertToList(std::map<std::string, double>* search_results, 
     int sorting) {
-  std::list<std::string>* listBooks = new std::list<std::string>;
   if (search_results->size() == 0) 
-    return listBooks;
-  else if (search_results->size() == 1) {
-    listBooks->push_back(search_results->begin()->first);
-    return listBooks;
-  }
+    return std::list<Book*>();
+  else if (search_results->size() == 1)
+    return {map_books_[search_results->begin()->first]};
 
 	// Declaring the type of Predicate that accepts 2 pairs and return a bool
 	typedef std::function<bool(std::pair<std::string, double>, std::pair<std::string, double>)> Comp;
@@ -257,9 +255,10 @@ std::list<std::string>* BookManager::ConvertToList(std::map<std::string, double>
       search_results->end(), compFunctor);
 
   //Convert to list
+  std::list<Book*> sorted_search_results;
   for (std::pair<std::string, double> element : sorted)
-    listBooks->push_back(element.first); 
-  return listBooks;
+    sorted_search_results.push_back(map_books_[element.first]); 
+  return sorted_search_results;
 }
 
 
@@ -329,13 +328,13 @@ void BookManager::CreateListWords(MAPWORDS& mapWords, sortedList& listWords) {
 }
 
 
-std::list<std::string>* BookManager::GetSuggestions(std::string sWord, std::string sWhere) {
+std::list<Book*> BookManager::GetSuggestions(std::string sWord, std::string sWhere) {
   if(sWhere=="corpus") return GetSuggestions(sWord, list_words_);
   if(sWhere=="author") return GetSuggestions(sWord, list_authors_);
-  return NULL;
+  return std::list<Book*>();
 }
 
-std::list<std::string>* BookManager::GetSuggestions(std::string sWord, sortedList& listWords) {
+std::list<Book*> BookManager::GetSuggestions(std::string sWord, sortedList& listWords) {
   func::convertToLower(sWord);
   sWord = func::convertStr(sWord);
   std::map<std::string, double>* suggs = new std::map<std::string, double>;
@@ -347,7 +346,7 @@ std::list<std::string>* BookManager::GetSuggestions(std::string sWord, sortedLis
       counter++;
     }
   }
-  std::list<std::string>* listSuggestions = ConvertToList(suggs, 0);
+  std::list<Book*> listSuggestions = ConvertToList(suggs, 0);
   delete suggs;
   return listSuggestions;
 }
