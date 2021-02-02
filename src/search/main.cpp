@@ -3,6 +3,7 @@
  */
 
 #include <chrono>
+#include <exception>
 #include <iostream>
 #include <ostream>
 #include <string>
@@ -181,29 +182,54 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
  * @param[in] manager (book manager, to do get book which to search in.)
  */
 void Pages(const Request& req, Response& resp, BookManager& manager) {
+  if (!req.has_param("scanId") || !req.has_param("query") || !req.has_param("fuzzyness")) {
+    std::cout << "Invalid or missing query-parameter in search_in_book: " << std::endl; 
+    resp.status = 400;
+    return;
+  }
+
+  // Retrieve necessary query and scan-/ book-id.
+  std::string scan_id = req.get_param_value("scanId"); 
+  std::string query = req.get_param_value("query"); 
+  func::convertToLower(query);
+  query = func::convertStr(query);
+  
+  int fuzzyness=0;
   try {
-    // Retrieve necessary date from url
-    std::string scanId = req.get_param_value("scanId"); 
+    fuzzyness = stoi(req.get_param_value("fuzzyness"));
+  }
+  catch (std::exception& e) {
+    std::cout << "Recieved fuzzyness with invalid value, using 0 instead.";
+  }
+  
+  // Construct response.
+  nlohmann::json json_response;
+  json_response["is_fuzzy"] = fuzzyness == 1;
+  std::cout << "Fuzzyness set to " << json_response["is_fuzzy"] << std::endl;
 
-    std::string query = req.get_param_value("query"); 
-    func::convertToLower(query);
-    query = func::convertStr(query);
+  std::cout << "Search in book with query: " << query 
+    << " and fuzzyness: " << fuzzyness << std::endl;
+
     
-    int fuzzyness = stoi(req.get_param_value("fuzzyness"));
+  // Check if book exists.
+  if (manager.map_of_books().count(scan_id) == 0) {
+    std::cout << "Search in book: given book not found!" << std::endl;
+    resp.status = 404;
+  }
 
-    // Get pages
-    std::cout << "Search in book with query : " << query
-      << " and fuzzyness: " << fuzzyness << std::endl;
+  // Get pages.
+  auto book = manager.map_of_books()[scan_id];
+  auto pages = book->GetPages(query, fuzzyness!=0);
+  std::cout << "Got " << pages->size() << " pages for this book." << std::endl;
+  if (pages->size() == 0) {
+    resp.status = 200;
+    resp.set_content(json_response.dump(), "application/json");
+    return;
+  }
 
-    auto book = manager.map_of_books()[scanId];
-    auto pages = book->GetPages(query, fuzzyness!=0);
-    std::cout << "Got " << pages->size() << " pages for this book." << std::endl;
-
-    // Construct response
-    nlohmann::json json_response;
-    if (fuzzyness == 0)
-      json_response["is_fuzzy"] = false;
-
+  // Create hitlist of books.
+  try {
+    json_response["books"] = nlohmann::json::array();
     for (auto const &it : *pages) {
       nlohmann::json entry;
       entry["page"] = it.first;
@@ -214,16 +240,17 @@ void Pages(const Request& req, Response& resp, BookManager& manager) {
         matches_on_page += std::regex_replace(match, std::regex("\""), "\\\"");
       }
       entry["words"] = matches_on_page;
-      json_response.push_back(std::move(entry));
+      json_response["books"].push_back(entry);
     }
-
-    resp.set_content(json_response, "application/json");
+  }
+  catch (std::exception& e) {
+    std::cout << "Search in book: internal server error: " << e.what() << std::endl;
+    resp.status = 500;
+    return;
   }
 
-  catch (std::exception &e) {
-    std::cout << "Caught exception in search_in_book: " << e.what() << "\n"; 
-    // TODO (fux): investigate what kind of response is necessary!!
-  }
+  resp.status = 200;
+  resp.set_content(json_response.dump(), "application/json");
 }
 
 /**
