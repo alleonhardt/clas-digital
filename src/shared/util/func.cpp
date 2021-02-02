@@ -203,8 +203,7 @@ std::string convertStr(std::string& str)
     std::wstring wide = converter.from_bytes(str); 
     for(size_t i=0; i<wide.length(); i++)
         if(rep.count(wide[i]) > 0) wide[i] = rep[wide[i]];
-
-    std::string newStr= converter.to_bytes(wide);
+    std::string newStr = converter.to_bytes(wide);
     return newStr;
 }
 
@@ -212,22 +211,20 @@ std::string convertStr(std::string& str)
 * @brief cuts all non-letter-characters from end and beginning of str
 * @param[in, out] string to modify
 */
-void transform(std::string& str)
-{
-    if(str.length() == 0)
-        return;
+void transform(std::string& str) {
+  if(str.length() == 0)
+    return;
 
-    if(isalpha(str.front()) == false)
-        transform(str.erase(0,1));
+  if(isalpha(str.front()) == false)
+    transform(str.erase(0,1));
 
-    if(str.length() == 0)
-        return;
+  if(str.length() == 0)
+    return;
 
-    if(isalpha(str.back()) == false)
-    {
-        str.pop_back();
-        transform(str);
-    }
+  if(isalpha(str.back()) == false) {
+      str.pop_back();
+      transform(str);
+  }
 }
 
 /**
