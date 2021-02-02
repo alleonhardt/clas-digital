@@ -153,10 +153,6 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::Start(std::string listenAddres
 
   server_.Post("/api/v2/server/userlist",[this](const httplib::Request &req, httplib::Response &resp){this->UpdateUserList(req,resp);});
 
-  for(auto &it : cfg_->mount_points_)
-  {
-    file_handler_->AddMountPoint(it);
-  }
 
 
   server_.set_error_handler([this](const auto& req, auto& res) {
@@ -216,6 +212,15 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::InitialiseFromString(std::stri
   {
     debug::log(debug::LOG_DEBUG,"Detected file cache size of ",cfg_->file_cache_size_," Bytes. Creating the file handler now as none was supplied by the plugins.\n");
     file_handler_ = std::make_shared<FileHandler>(cfg_->file_cache_size_);
+
+    for(auto &it : cfg_->mount_points_)
+    {
+      file_handler_->AddMountPoint(it);
+    }
+
+    for(auto &it : cfg_->upload_points_) {
+      file_handler_->AddUploadPoint(it);
+    }
   }
   
   if(!users_)
@@ -237,7 +242,7 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::InitialiseFromString(std::stri
       return debug::Error(ReturnCodes::ERR_CONFIG_FILE_INITIALISE,"Unknown reference manager, was also not loaded by plugin\n.");
     else
     {
-      auto ptr = new ZoteroReferenceManager(event_manager_.get());
+      auto ptr = new ZoteroReferenceManager(event_manager_.get(),file_handler_.get());
       ref_manager_ = std::shared_ptr<IReferenceManager>(ptr);
       auto err2 = ptr->Initialise(cfg_->reference_config_);
       if(err2)

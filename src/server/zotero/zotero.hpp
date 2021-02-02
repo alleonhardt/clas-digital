@@ -56,14 +56,41 @@ static std::string returnToLower(std::string &str)
 
   class ZoteroReference : public IReference
   {
-    public:
+    private: 
+      std::string _path;
+      nlohmann::json metadata_;
 
+    public:
+      ZoteroReference(IFileHandler *handler, nlohmann::json js) {
+        metadata_ = js; 
+        for(auto &vec: handler->GetUploadPoints()) {
+          auto path = vec / "books" / GetKey();
+          if(std::filesystem::exists(path)) 
+            _path = path.string();
+        }
+
+        if(_path == "") {
+          std::filesystem::create_directory(handler->GetMountPoints()[0]/GetKey());
+          _path = handler->GetMountPoints()[0]/GetKey();
+        }
+      }
+
+      ZoteroReference(std::string path, nlohmann::json js) {
+        metadata_ = js;
+        _path = path;
+        if(!std::filesystem::exists(_path)) {
+          std::cout<<"Zotero path does not exist "<<_path<<std::endl;
+          std::exit(-1);
+        }
+      }
+      
       std::vector<std::string> GetCollections() override
       {
         if (metadata_.count("data") == 0) 
           return {};
         return metadata_["data"].value("collections", std::vector<std::string>());
       }
+
       std::string GetKey() override
       {
         return metadata_.value("key","");
@@ -78,7 +105,7 @@ static std::string returnToLower(std::string &str)
        * @param[in] creator_type
        * @return whether to show author in catalogue
        */
-      bool MetadataHandler::IsAuthorEditor(std::string creator_type) {
+      bool IsAuthorEditor(std::string creator_type) {
         if (GetMetadata("itemType", "data") == "bookSection")
           return creator_type == "author";
         return creator_type == "author" || creator_type == "editor";
@@ -145,6 +172,14 @@ static std::string returnToLower(std::string &str)
         return metadata_.value("bib","Could not find bilbiography");
       }
 
+      virtual bool HasContent() override {
+        int count = 0;
+        for(auto &it : std::filesystem::directory_iterator(GetPath())) {
+          count++;
+        }
+        return count > 1;
+      }
+
       std::string GetShow2() override {
         bool html = true;
         // *** Add Author *** //
@@ -190,42 +225,41 @@ static std::string returnToLower(std::string &str)
       }
 
       std::vector<std::map<std::string,std::string>> GetAuthorKeys() override {
-  if (metadata_.count("data") == 0 || metadata_["data"].count("creators") == 0)
-    return std::vector<std::map<std::string, std::string>>();
+        if (metadata_.count("data") == 0 || metadata_["data"].count("creators") == 0)
+          return std::vector<std::map<std::string, std::string>>();
 
-  std::vector<std::map<std::string, std::string>> v_authors;
-  //Iterate and push map including "lastname", "fullname" and "key"
-  for (const auto &it : metadata_["data"]["creators"]) {
-    std::map<std::string, std::string> author;
-    
-    //Generate last name [0]
-    std::string lastName = it.value("lastName", it.value("name", ""));
-    author["lastname"] = lastName;
+        std::vector<std::map<std::string, std::string>> v_authors;
+        //Iterate and push map including "lastname", "fullname" and "key"
+        for (const auto &it : metadata_["data"]["creators"]) {
+          std::map<std::string, std::string> author;
 
-    //Generate  lastName, firstname [1]
-    author["fullname"] = lastName;
-    std::string firstname = it.value("firstName", "");
-    if (firstname != "")
-      author["fullname"] += ", " + firstname;
+          //Generate last name [0]
+          std::string lastName = it.value("lastName", it.value("name", ""));
+          author["lastname"] = lastName;
 
-    //Generate key firstname-lastName
-    std::string key = returnToLower(firstname) 
-                      + "-"
-                      + returnToLower(lastName);
-    std::replace(key.begin(), key.end(), ' ', '-');
-    std::replace(key.begin(), key.end(), '/', ',');
-    author["key"] = key;
+          //Generate  lastName, firstname [1]
+          author["fullname"] = lastName;
+          std::string firstname = it.value("firstName", "");
+          if (firstname != "")
+            author["fullname"] += ", " + firstname;
 
-    author["creator_type"] = it.value("creatorType", "undefined");
+          //Generate key firstname-lastName
+          std::string key = returnToLower(firstname) 
+            + "-"
+            + returnToLower(lastName);
+          std::replace(key.begin(), key.end(), ' ', '-');
+          std::replace(key.begin(), key.end(), '/', ',');
+          author["key"] = key;
 
-    //Add to results
-    v_authors.push_back(author);
-  }
+          author["creator_type"] = it.value("creatorType", "undefined");
 
-  return v_authors;
-}
+          //Add to results
+          v_authors.push_back(author);
+        }
+        return v_authors;
+      }
       
-std::string GetShortTitle() override
+      std::string GetShortTitle() override
       {
         std::string short_title = GetMetadata("shortTitle", "data");
         if (short_title == "")
@@ -240,6 +274,21 @@ std::string GetShortTitle() override
 
         //Escape html and return 
         return title;
+      }
+
+      std::string GetName() override {
+        return "no name";
+      }
+
+      const nlohmann::json &json()
+      {
+        return metadata_;
+      }
+
+      IReference *json(nlohmann::json js)
+      {
+        metadata_ = std::move(js);
+        return this;
       }
 
       int GetDate() override
@@ -268,22 +317,18 @@ std::string GetShortTitle() override
         return GetDate()<1922; 
       }
 
-      std::string GetPath(IFileHandler *handler) override
+      std::string GetPath() override
       {
-        for(auto &vec: handler->GetMountPoints()) {
-          auto path = vec / "books" / GetKey();
-          if(std::filesystem::exists(path)) 
-            return path.string();
-        }
-        return std::string("web/books/")+GetKey();
-        return (handler->GetMountPoints()[0]/"books"/GetKey()).string();
+        return _path;  
       }
 
       IReference *Copy() override
       {
-        auto ref = new ZoteroReference();
-        ref->json(metadata_);
+        auto ref = new ZoteroReference(_path, json());
         return ref;
+      }
+
+      virtual ~ZoteroReference() {
       }
   };
 
@@ -309,7 +354,7 @@ std::string GetShortTitle() override
        * invalid request.
        *
        */
-      IReferenceManager::Error SendRequest(std::string requestURI,std::shared_ptr<std::unordered_map<std::string,IReference*>> &ref);
+      IReferenceManager::Error SendRequest(std::string requestURI,std::shared_ptr<std::unordered_map<std::string,IReference*>> &ref, IFileHandler *_handler);
 
       /**
        * Closes all open connection and cleans everything up
@@ -377,7 +422,7 @@ std::string GetShortTitle() override
 
 
        
-      ZoteroReferenceManager(EventManager *event_manager, std::filesystem::path filename="zoteroCacheData.json");
+      ZoteroReferenceManager(EventManager *event_manager, IFileHandler *handler, std::filesystem::path filename="zoteroCacheData.json");
 
       Error GetAllItems(ptr_cont_t &items, CacheOptions opts=CacheOptions::CACHE_USE_CACHED) override;
       Error GetAllCollections(ptr_cont_t &collections, CacheOptions opts=CacheOptions::CACHE_USE_CACHED) override;
@@ -386,6 +431,7 @@ std::string GetShortTitle() override
       Error GetCollectionMetadata(ptr_t &collection, std::string collectionKey, CacheOptions opts=CacheOptions::CACHE_USE_CACHED) override;
      
       Error SaveToFile() override;
+      virtual ~ZoteroReferenceManager() {}
 
       /**
        * @brief Constructor for the reference manager creates the manager from
@@ -437,6 +483,7 @@ std::string GetShortTitle() override
       std::map<std::string,int> cache_age_;
 
       std::shared_mutex exclusive_swap_;
+      IFileHandler *_handler;
 
 
       Error __tryCacheHit(ptr_cont_t &input, ptr_cont_t &ret_val, IReferenceManager::CacheOptions opts);

@@ -22,9 +22,11 @@ namespace clas_digital
   {
     public:
       virtual void AddMountPoint(std::filesystem::path pt) = 0;
+      virtual void AddUploadPoint(std::filesystem::path pt) = 0;
       virtual void ServeFile(const httplib::Request &req, httplib::Response &resp, bool abortoncachemiss=false) = 0;
       virtual void AddAlias(std::vector<std::string> from, std::filesystem::path to) = 0;
       virtual std::vector<std::filesystem::path> &GetMountPoints() = 0;
+      virtual std::vector<std::filesystem::path> &GetUploadPoints() = 0;
   };
 
   class FileHandler : public IFileHandler
@@ -38,12 +40,21 @@ namespace clas_digital
       virtual void AddAlias(std::vector<std::string> from, std::filesystem::path to) override;
 
       std::function<bool(const std::filesystem::path&)> cache_file_callback_;
+      void AddUploadPoint(std::filesystem::path pt) {
+        upload_points_.push_back(pt);
+      }
+
       std::vector<std::filesystem::path> &GetMountPoints() {
         return mount_points_;
+      }
+
+      std::vector<std::filesystem::path> &GetUploadPoints() {
+        return upload_points_;
       }
     private:
       FixedSizeCache<std::string> cache_;
       std::vector<std::filesystem::path> mount_points_;
+      std::vector<std::filesystem::path> upload_points_;
       std::map<std::string,std::string> file_types_;
 
 

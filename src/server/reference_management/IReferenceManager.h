@@ -14,18 +14,9 @@ namespace clas_digital
   class IReference
   {
     public:
-      const nlohmann::json &json()
-      {
-        return metadata_;
-      }
-
-      IReference *json(nlohmann::json js)
-      {
-        metadata_ = std::move(js);
-        return this;
-      }
-
-      virtual bool MetadataHandler::IsAuthorEditor(std::string creator_type);
+      virtual const nlohmann::json &json() = 0;
+      virtual IReference *json(nlohmann::json js) = 0;
+      virtual bool IsAuthorEditor(std::string creator_type) = 0;
       virtual IReference *Copy() = 0;
       virtual std::string GetAuthor() = 0; 
       virtual std::string GetShortTitle() = 0;
@@ -34,37 +25,18 @@ namespace clas_digital
       virtual int GetDate() = 0;
       virtual bool HasCopyright() = 0;
       virtual std::string GetKey() = 0;
-      virtual std::string GetPath(IFileHandler* handler) = 0;
-      virtual ~IReference(){};
-      virtual std::string GetBibliography() {
-        return "no bib yet";
-      }
+      virtual std::string GetPath() = 0;
+      virtual ~IReference(){}
+      virtual std::string GetBibliography() = 0;
+      virtual std::vector<std::string> GetCollections() = 0;
+      virtual std::string GetShow2() = 0;
+      virtual std::string GetName()  = 0;
+      virtual bool HasContent() = 0;
+      virtual std::vector<std::map<std::string,std::string>> GetAuthorKeys() = 0;
 
-      virtual std::vector<std::string> GetCollections() {
-        return {};
-      }
-      virtual std::string GetShow2() {
-        return "no_show";
-      }
 
-      virtual std::string GetName() {
-        return "no name";
-      }
-
-      virtual bool HasContent() {
-        return false;
-      }
-
-      virtual std::vector<std::map<std::string,std::string>> GetAuthorKeys() {
-        return {};
-      }
-
-      virtual bool IsAuthorEditor(nlohmann::json js) {
-        return true;
-      }
 
     protected:
-        nlohmann::json metadata_;
   };
 
 

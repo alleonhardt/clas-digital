@@ -154,7 +154,7 @@ ZoteroConnection::ZoteroConnection(std::string apiKey, std::string api_addr, std
 }
 
 
-IReferenceManager::Error ZoteroConnection::SendRequest(std::string requestURI, std::shared_ptr<std::unordered_map<std::string,IReference*>> &ref)
+IReferenceManager::Error ZoteroConnection::SendRequest(std::string requestURI, std::shared_ptr<std::unordered_map<std::string,IReference*>> &ref, IFileHandler *_handler)
 {
 	//Try to build the request to zotero
 	//_baseRequest = https://api.zotero.org/groups/$(our_group_number)
@@ -201,13 +201,13 @@ IReferenceManager::Error ZoteroConnection::SendRequest(std::string requestURI, s
       {
         for(auto &it : js)
         {
-          IReference* ptr((new ZoteroReference)->json(it));
+          IReference* ptr = new ZoteroReference(_handler,it);
           ref->insert({ptr->GetKey(),ptr});
         }
       }
 			else
       {
-          IReference* ptr((new ZoteroReference)->json(js));
+          IReference* ptr = new ZoteroReference(_handler,js);
           ref->insert({ptr->GetKey(),ptr});
       }
 		}
@@ -283,15 +283,14 @@ void ZoteroReferenceManager::__loadCacheFromFile()
       ifs.close();
     }
 
-    auto loadFieldContainer = [&save](const char *field, IReferenceManager::ptr_cont_t &cont)
+    auto loadFieldContainer = [&save,this](const char *field, IReferenceManager::ptr_cont_t &cont)
     {
       if(save.count(field))
       {
         cont = IReferenceManager::ptr_cont_t(new container_t,custom_deleter);
         for(auto &it : save[field]["data"])
         {
-          IReference *ref = new ZoteroReference();
-          ref->json(it);
+          IReference *ref = new ZoteroReference(_handler,it);
           cont->insert({ref->GetKey(),ref});
         }
         if(cont->size() == 0)
@@ -316,11 +315,10 @@ void ZoteroReferenceManager::__loadCacheFromFile()
   }
 }
 
-ZoteroReferenceManager::ZoteroReferenceManager(EventManager *event_manager, std::filesystem::path path) : IReferenceManager(event_manager), cache_path_(std::move(path))
+ZoteroReferenceManager::ZoteroReferenceManager(EventManager *event_manager, IFileHandler *handler, std::filesystem::path path) : IReferenceManager(event_manager), cache_path_(std::move(path)), _handler(handler)
 { 
   event_manager->RegisterForEvent(EventManager::Events::ON_SERVER_STOP,shutdownCallbackHandle_,[this](CLASServer*,void*){
       debug::log(debug::LOG_DEBUG,"Received shutdown signal, saving Zotero reference items to disk!\n");
-      this->SaveToFile();
       return debug::Error(EventManager::RET_OK);
       });
 }
@@ -503,7 +501,8 @@ void ZoteroReferenceManager::__updateCache(ZoteroReferenceManager::ptr_cont_t &i
 
 IReferenceManager::Error ZoteroReferenceManager::__performRequestsAndUpdateCache(ZoteroReferenceManager::ptr_cont_t &input, std::vector<std::string> &requestMatrix)
 {
-  ptr_cont_t request(new container_t());
+  if(!input)
+    input.reset(new container_t());
   auto connection = GetConnection();
  
   std::vector<int*> libVersions;
@@ -530,7 +529,7 @@ IReferenceManager::Error ZoteroReferenceManager::__performRequestsAndUpdateCache
     if(exists_in_cache)
       requestMatrix[i]+=("&since="+std::to_string(*libVersions[i]));
 
-    auto res = connection->SendRequest(requestMatrix[i],request);
+    auto res = connection->SendRequest(requestMatrix[i],input,_handler);
 
     if(res != Error::OK)
     {
@@ -542,17 +541,10 @@ IReferenceManager::Error ZoteroReferenceManager::__performRequestsAndUpdateCache
     if(exists_in_cache)
       *libVersions[i] = std::stoi(connection->GetLibraryVersion());
     else
-      to_be_inserted_into_cache.insert({std::string(original_request),std::stoi(connection->GetLibraryVersion())});
+      cache_age_.insert({std::string(original_request),std::stoi(connection->GetLibraryVersion())});
   }
 
-
-  {
-    std::unique_lock lck(exclusive_swap_);
-    cache_age_.insert(to_be_inserted_into_cache.begin(),to_be_inserted_into_cache.end());  
-    __updateCache(input,request);
-  }
-
-  auto func = [this,request]()
+  auto func = [this,request=input]()
   {
     for(auto &it : *request)
     {
@@ -562,7 +554,7 @@ IReferenceManager::Error ZoteroReferenceManager::__performRequestsAndUpdateCache
 
   //Start a thread to do the event dispatching when encoutering a lot of new
   //items
-  if(request->size() > 50)
+  if(input->size() > 50)
     std::thread(func).detach();
   else
     func();
@@ -573,6 +565,8 @@ IReferenceManager::Error ZoteroReferenceManager::__performRequestsAndUpdateCache
 
 IReferenceManager::Error ZoteroReferenceManager::GetAllItems(ZoteroReferenceManager::ptr_cont_t &items, IReferenceManager::CacheOptions opts)
 {
+  std::cout<<"Nice one: "<<opts<<std::endl;
+  std::cout<<"Input: "<<itemReferences_.get()<<std::endl;
   auto err = __tryCacheHit(itemReferences_,items,opts);
   if(err == Error::OK || opts == CacheOptions::CACHE_FAIL_ON_CACHE_MISS) return err;
  
