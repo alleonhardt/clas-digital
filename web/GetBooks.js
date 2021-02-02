@@ -640,132 +640,120 @@ function perm(xs) {
 
 function DoFuzzyMatching(x,iterator,maxHitsPerIteration)
 {
-    var t0 = performance.now();
+  var t0 = performance.now();
 
-    let suggestions = document.getElementById("fuzzysuggestions");
-    let results = 0;
-    if(iterator==undefined || suggestions.search_done)
-    {
-	let tmphits = document.getElementsByClassName("tmphit");
-	for(let i = 0; i < tmphits.length; i++)
-	{
+  let suggestions = document.getElementById("fuzzysuggestions");
+  let results = 0;
+  if(iterator==undefined || suggestions.search_done) {
+	  let tmphits = document.getElementsByClassName("tmphit");
+	  for(let i = 0; i < tmphits.length; i++) {
 	    tmphits[i].parentNode.insertBefore(tmphits[i].firstChild,tmphits[i]);
 	    tmphits[i].parentNode.removeChild(tmphits[i]);
-	}
-	suggestions.innerHTML = '';
-	suggestions.selec = undefined;
-	suggestions.scrollTop = 0;
-	iterator = 0;
-	suggestions.results = 0;
-	suggestions.is_fuzzy = true;
-	maxHitsPerIteration = 30;
-	console.log("New search started");
-    }
-    else
-    {
-	results = suggestions.results;
-	console.log("Scroll update started");
-    }
+	  }
+    suggestions.innerHTML = '';
+    suggestions.selec = undefined;
+    suggestions.scrollTop = 0;
+    iterator = 0;
+    suggestions.results = 0;
+    suggestions.is_fuzzy = true;
+    maxHitsPerIteration = 30;
+    console.log("New search started");
+  }
+  else {
+	    results = suggestions.results;
+	    console.log("Scroll update started");
+  }
 
-    if(x=="")
-    {
-	suggestions.style.visibility = 'hidden';
-	return;
-    }
+  if(x=="") {
+	  suggestions.style.visibility = 'hidden';
+	  return;
+  }
 
-    let value = document.getElementsByClassName("ocrpage");
+  let value = document.getElementsByClassName("ocrpage");
 
-    x = x.toLowerCase();
-    x = x.replace(new RegExp(' ','g'),'+');
-    x = x.replace(new RegExp('ö','g'),'o');
-    x = x.replace(new RegExp('ü','g'),'u');
-    x = x.replace(new RegExp('ä','g'),'a');
-    x = x.replace(new RegExp('ß','g'),'s');
-    x = x.replace(new RegExp('ſ','g'),'s');
+  x = x.toLowerCase();
+  x = x.replace(new RegExp(' ','g'),'+');
+  x = x.replace(new RegExp('ö','g'),'o');
+  x = x.replace(new RegExp('ü','g'),'u');
+  x = x.replace(new RegExp('ä','g'),'a');
+  x = x.replace(new RegExp('ß','g'),'s');
+  x = x.replace(new RegExp('ſ','g'),'s');
 
-    let arr = x.split('+');
-    let stringlengthbeforeRegex = arr[0].length;
-    let original = arr[0];
-    for(let i = 0; i < arr.length; i++)
-    {
-	arr[i] = arr[i].replace(new RegExp('o','g'),'[oö]');
-	arr[i] = arr[i].replace(new RegExp('u','g'),'[uü]');
-	arr[i] = arr[i].replace(new RegExp('a','g'),'[aä]');
-	arr[i] = arr[i].replace(new RegExp('s','g'),'[sßſ]');
-    }
-    let new_arr = []
-    for(let i = 0; i < arr.length; i++)
-	if(arr[i]!='')
+  let arr = x.split('+');
+  let stringlengthbeforeRegex = arr[0].length;
+  let original = arr[0];
+  for(let i = 0; i < arr.length; i++) {
+    arr[i] = arr[i].replace(new RegExp('o','g'),'[oö]');
+    arr[i] = arr[i].replace(new RegExp('u','g'),'[uü]');
+    arr[i] = arr[i].replace(new RegExp('a','g'),'[aä]');
+    arr[i] = arr[i].replace(new RegExp('s','g'),'[sßſ]');
+  }
+  let new_arr = []
+  for(let i = 0; i < arr.length; i++) {
+	  if(arr[i]!='')
 	    new_arr.push(arr[i]);
-    arr = new_arr;
+  }
+  arr = new_arr;
 
-    let matchstring = new RegExp('((\r\n|\r|\n|.){0,30}('+arr[0]+')(.|\r\n|\r|\n){0,30})','gi');
-    if(arr.length > 1&&arr[1].length>0)
-    {
-	let match = '';
-	let index_arr = [];
-	for(let i = 0; i < arr.length; i++)
+  let matchstring = new RegExp('((\r\n|\r|\n|.){0,30}('+arr[0]+')(.|\r\n|\r|\n){0,30})','gi');
+  if(arr.length > 1&&arr[1].length>0) {
+	  let match = '';
+	  let index_arr = [];
+	  for(let i = 0; i < arr.length; i++)
 	    index_arr.push(i);
-	index_arr = perm(index_arr);
+	  index_arr = perm(index_arr);
 
-	for(let i = 0; i < index_arr.length; i++)
-	{
-	    if(match=='')
-		match='(';
-	    else
-		match+='|(';
-	    for(let i2 = 0; i2 < index_arr[i].length; i2++)
-	    {
-		if(i2!=0)
-		    match+='(\r\n|\r|\n|.){0,80}';
-		match+=arr[index_arr[i][i2]];
+    for(let i = 0; i < index_arr.length; i++) {
+      if(match=='')
+        match='(';
+      else
+        match+='|(';
+      for(let i2 = 0; i2 < index_arr[i].length; i2++) {
+        if(i2!=0)
+          match+='(\r\n|\r|\n|.){0,80}';
+        match+=arr[index_arr[i][i2]];
+      }
+      match+='.*\\b)';
+    }
+	  matchstring = new RegExp(match,'gi');
+  }
+
+  else {
+	  x = arr[0];
+	  arr = [x];
+  }
+
+  if(gFuzzyPreindexing!=null&&suggestions.is_fuzzy&&stringlengthbeforeRegex>2) {
+	  let lkarr = original;
+	  console.log("SEARCH FOR: "+lkarr);
+	  let tmpobj = [];
+	  for(var key in gFuzzyPreindexing) {
+	    if(key.search(lkarr)!=-1) {
+		    tmpobj = tmpobj.concat(gFuzzyPreindexing[key]);
 	    }
-	    match+='.*\\b)';
-	}
-	matchstring = new RegExp(match,'gi');
+	  }
+    tmpobj = sort_unique(tmpobj);
+    console.log(tmpobj);
+    for(let i = 0; i < tmpobj.length; i++) {
+      tmpobj[i] = document.getElementById("uniqueocrpage"+tmpobj[i]);
     }
-    else
-    {
-	x = arr[0];
-	arr = [x];
-    }
+	  value = tmpobj;
+  }
+  else
+	  suggestions.is_fuzzy = false;
 
-    if(gFuzzyPreindexing!=null&&suggestions.is_fuzzy&&stringlengthbeforeRegex>2)
-    {
-	let lkarr = original;
-	console.log("SEARCH FOR: "+lkarr);
-	let tmpobj = [];
-	for(var key in gFuzzyPreindexing)
-	{
-	    if(key.search(lkarr)!=-1)
-	    {
-		tmpobj = tmpobj.concat(gFuzzyPreindexing[key]);
-	    }
-	}
-	tmpobj = sort_unique(tmpobj);
-	console.log(tmpobj);
-	for(let i = 0; i < tmpobj.length; i++)
-	{
-	    tmpobj[i] = document.getElementById("uniqueocrpage"+tmpobj[i]);
-	}
-	value = tmpobj;
-    }
-    else
-	suggestions.is_fuzzy = false;
-
-    console.log(value.length);
-    console.log(matchstring);
-    for(let i = iterator; i < value.length; i++)
-    {
-	let res = value[i].innerHTML.match(matchstring);
-	if(res==null)
+  console.log(value.length);
+  console.log(matchstring);
+  for(let i = iterator; i < value.length; i++) {
+	  let res = value[i].innerHTML.match(matchstring);
+	  if(res==null)
 	    continue;
-	for(let i2 = 0; i2 < res.length; i2++)
-	{
+	  for(let i2 = 0; i2 < res.length; i2++) {
 	    results+=1;
-	    for(let i3 = 0; i3 < arr.length; i3++)
-		if(arr[i3]!='')
-		    res[i2] = res[i2].replace(new RegExp('('+arr[i3]+')(?![^<>]*>)','gi'),'<mark>$1</mark>');
+	    for(let i3 = 0; i3 < arr.length; i3++) {
+		    if(arr[i3]!='')
+		      res[i2] = res[i2].replace(new RegExp('('+arr[i3]+')(?![^<>]*>)','gi'),'<mark>$1</mark>');
+      }
 
 	    let a = document.createElement("a");
 	    a.innerHTML = res[i2]+"<span style='font-weight: bold;float:right;margin-left: 0.8rem;'> S."+value[i].parentNode.parentNode.pageNumber+"</span>";
@@ -775,62 +763,65 @@ function DoFuzzyMatching(x,iterator,maxHitsPerIteration)
 	    a.result = results-1;
 	    a.tabIndex = 0;
 	    a.classList.add("fuzzysugslink");
-	    a.onclick = function(){
-		let page = document.getElementById("uniqueocrpage"+this.page);
-		for(let i4 = 0; i4< this.word.length; i4++)
-		    if(this.word[i4]!='')
-			page.innerHTML = page.innerHTML.replace(new RegExp('('+this.word[i4]+')(?![^<>]*>)','gi'),'<span class="tmphit">$1</span>');
-		CorrectedScrollIntoView(document.getElementById("uniquepageid"+this.page));
-		UpdateViewMode();
-		CorrectedScrollIntoView(document.getElementById("uniquepageid"+this.page));
-		document.getElementById("fuzzysuggestions").style.visibility = 'hidden';
+	    a.onclick = function() {
+		    let page = document.getElementById("uniqueocrpage"+this.page);
+		    for(let i4 = 0; i4< this.word.length; i4++) {
+		      if(this.word[i4]!='')
+			      page.innerHTML = page.innerHTML.replace(new RegExp('('+this.word[i4]+')(?![^<>]*>)','gi'),'<span class="tmphit">$1</span>');
+        }
+		    CorrectedScrollIntoView(document.getElementById("uniquepageid"+this.page));
+		    UpdateViewMode();
+		    CorrectedScrollIntoView(document.getElementById("uniquepageid"+this.page));
+		    document.getElementById("fuzzysuggestions").style.visibility = 'hidden';
 	    }
 
 	    suggestions.appendChild(a);
-	}
-	if((suggestions.results+maxHitsPerIteration)<results) {
+	  }
+
+	  if((suggestions.results+maxHitsPerIteration)<results) {
 	    suggestions.hits_found = results;
 	    suggestions.iterator_i = i;
 	    suggestions.search_done = false;
 	    suggestions.style.visibility = 'visible';
 	    suggestions.onscroll = function(){
-		DoFuzzyMatching(document.getElementById("srchbox").value,i,40);
+		    DoFuzzyMatching(document.getElementById("srchbox").value,i,40);
 	    }
 
 	    var t1 = performance.now();
 	    console.log("Call to doSomething took " + (t1 - t0) + " milliseconds.");
 	    return;
-	}
-    }
-    if(results!=0)
-	suggestions.style.visibility = 'visible';
-    else
-	suggestions.style.visibility = 'hidden';
+	  }
+  }
+  if(results!=0)
+	  suggestions.style.visibility = 'visible';
+  else
+	  suggestions.style.visibility = 'hidden';
 
-    suggestions.search_done = true;
-    suggestions.onscroll = null;
-    var t1 = performance.now();
-    console.log("Call to doSomething took " + (t1 - t0) + " milliseconds.");
+  suggestions.search_done = true;
+  suggestions.onscroll = null;
+  var t1 = performance.now();
+  console.log("Call to doSomething took " + (t1 - t0) + " milliseconds.");
 }
 
-function doCompleteNewSearch()
-{
+function doCompleteNewSearch() {
 	/* ideally use the existing window.location; see:
 	   https://github.com/ShadowItaly/clas-digital/issues/172
 	*/
 	let newurl='';
-	if(fuzzyness>0)
+	if(fuzzyness>0) {
     		newurl = "/books/"+scanId+"/pages?highlight="+document.getElementById("srchbox").value+"&fuzzyness="+fuzzyness;
-	else
+  }
+	else {
     		newurl = "/books/"+scanId+"/pages?highlight="+document.getElementById("srchbox").value;
-/*    if(window.history.pushState)
-    {
-
-	window.history.pushState({},document.title,newurl);
-	removeElementsByClass("pagecontainer");
-	CreatePageLayout();
+  }
+  /*    
+    if(window.history.pushState) {
+	    window.history.pushState({},document.title,newurl);
+	    removeElementsByClass("pagecontainer");
+	    CreatePageLayout();
     }
-    else*/
+    else
+  */
 	window.location = newurl;
 }
 

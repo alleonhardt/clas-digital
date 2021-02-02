@@ -11,6 +11,7 @@
 #include <httplib.h>
 
 #include "book_manager/book_manager.h"
+#include "func.hpp"
 #include "gramma.h"
 #include "nlohmann/json.hpp"
 #include "search/search_options.h"
@@ -35,6 +36,12 @@ std::string GetPage(std::string file) {
   return login_page;
 }
 
+std::string GetReqParam(const Request&req, std::string key, std::string def="") {
+  if (req.has_param(key.c_str()))
+    return req.get_param_value(key.c_str());
+  return def;
+}
+
 /**
  * Search in all entries in corpus. And all metadata.
  * @param[in] req (request)
@@ -46,20 +53,21 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
   
   try {
     // Get query (necessary value!)
-    bool relevant_neighbors = false;
     if (!req.has_param("q")) return;
-    std::string query = req.get_param_value("q", 0);
-    if(query.front() == '$') {
-      query.erase(0, 1);
-      relevant_neighbors = true;
-    }
+    std::string query = GetReqParam(req, "q");
+    std::cout << query << std::endl;
+    query = func::convertStr(query); // replace som non-english characters.
+    std::cout << query << std::endl;
+    func::transform(query); // remove leading and trailing non-characters.
+    std::cout << query << std::endl;
     std::replace(query.begin(), query.end(), ' ', '+');
-      
+    std::cout << query << std::endl;
+
+    // Relevant neighbors.
+    bool relevant_neighbors = GetReqParam(req, "relevant_neighbors", "0") == "1";
 
     // Get fuzzyness
-    bool fuzzyness = false;
-    if (req.has_param("fuzzyness")) 
-      fuzzyness = std::stoi(req.get_param_value("fuzzyness", 0)) != 0;
+    bool fuzzyness = GetReqParam(req, "fuzzyness", "0") == "1";
 
     // Get pillars
     std::vector<std::string> pillars;
@@ -77,34 +85,32 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
     }
 
     // Get scope.
-    std::string scope = "all";
-    if (req.has_param("scope")) 
-      scope = req.get_param_value("scope", 0);
+    std::string scope = GetReqParam(req, "scope", "all");
 
     // Get author.
-    std::string author = "";
-    if (req.has_param("author"))
-      author = req.get_param_value("author", 0);
+    std::string author = GetReqParam(req, "author");
 
     // Get published after/ published before.
     int pubafter = 1700, pubbefore = 2049;
-    try{ pubafter = std::stoi(req.get_param_value("publicatedafter")); } 
-    catch(...) {};
-    try{ pubbefore = std::stoi(req.get_param_value("publicatedbefore")); } 
-    catch(...) {};
+    try{ 
+      pubafter = std::stoi(req.get_param_value("publicatedafter")); 
+    } catch(...) {};
+    try{ 
+      pubbefore = std::stoi(req.get_param_value("publicatedbefore")); 
+    } catch(...) {};
 
     // Get sorting type.
-    std::string sort = "relevance";
-    if (req.has_param("sorting"))
-      sort = req.get_param_value("sorting", 0);
+    std::string sort = GetReqParam(req, "sorting", "relevance");
 
     // Get limit and start: results per page, and current page, user is on.
     int resultsperpage = 10;
-    try{ resultsperpage = std::stoi(req.get_param_value("limit", 0)); }
-    catch(...) {};
+    try{ 
+      resultsperpage = std::stoi(req.get_param_value("limit", 0)); 
+    } catch(...) {};
     int list_start = 0;
-    try { list_start = std::stoi(req.get_param_value("start")); }
-    catch(...) {};
+    try { 
+      list_start = std::stoi(req.get_param_value("start")); 
+    } catch(...) {};
 
     // Debug printing.
     std::cout << "Recieved search request!" << std::endl;
