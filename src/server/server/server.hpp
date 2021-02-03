@@ -74,6 +74,7 @@ namespace clas_digital
 
 
       void do_upload(const httplib::Request& req, httplib::Response &resp);
+      void do_create_bibliography(const httplib::Request &req,httplib::Response &resp);
       void HandleLogin(const httplib::Request& req, httplib::Response &resp);
       void SendUserList(const httplib::Request& req, httplib::Response &resp);
       void UpdateUserList(const httplib::Request& req, httplib::Response &resp);

@@ -55,16 +55,20 @@ void create_topnav_json(nlohmann::json &topnav) {
   topnav["topnav"]["time_human"] = get_human_readable_time();
 }
 
-void createSearchPage() {
+void createSearchPage(IReferenceManager::ptr_cont_t &pillars) {
   inja::Environment env;
   nlohmann::json j;
 
   create_topnav_json(j);
   j["topnav"]["search"] = "class='dropdown-banner active'";
+  j["pillars"] = nlohmann::json::array();
+  for(auto &it : *pillars) {
+    j["pillars"].push_back(it.second->json()["data"]);
+  }
 
   inja::Template temp = env.parse_template("templates/search_template.html");
   std::string result = env.render(temp, j);  
-  atomic_write_file("web/Search.html", result);
+  atomic_write_file("web/index.html", result);
 }
 
 void createInformationPage()
@@ -117,7 +121,7 @@ void createMetadataPage(IReference *item, IReferenceManager::ptr_cont_t &collect
   info["show"] = item->GetShow2();
   info["bib"] = m_info["bib"].get<std::string>();
   info["bib_own"] = ""; 
-  info["hasContent"] = item->HasContent();
+  info["hasContent"] = item->HasOcr();
   info["itemType"] = itemType;
   info["title"] = title;
   info["authors"] = nlohmann::json::array();
@@ -168,6 +172,22 @@ void createMetadataPage(IReference *item, IReferenceManager::ptr_cont_t &collect
   atomic_write_file("web/books/"+item->GetKey()+"/index.html",result);
 }
 
+void escapeHTML(std::string& data) {
+    std::string buffer;
+    buffer.reserve(data.size());
+    for(size_t pos = 0; pos != data.size(); ++pos) {
+        switch(data[pos]) {
+            case '&':  buffer.append("&amp;");       break;
+            case '\"': buffer.append("&quot;");      break;
+            case '\'': buffer.append("&apos;");      break;
+            case '<':  buffer.append("&lt;");        break;
+            case '>':  buffer.append("&gt;");        break;
+            default:   buffer.append(&data[pos], 1); break;
+        }
+    }
+    data.swap(buffer);
+}
+
 void createPagesPage(IReference *item)
 {
   nlohmann::json js;
@@ -180,7 +200,9 @@ void createPagesPage(IReference *item)
   js["key"] = item->GetKey();
   js["title"] = item->GetShow2();
   js["bib"] = m_info["bib"].get<std::string>();
-  js["bib_esc"] = m_info["bib"].get<std::string>();
+  std::string bib_esc = m_info["bib"].get<std::string>();
+  escapeHTML(bib_esc);
+  js["bib_esc"] = bib_esc;
   inja::Environment env;
   inja::Template temp = env.parse_template("templates/pages_template.html");
   std::string result = env.render(temp, js);
@@ -284,7 +306,7 @@ void CreateCatalogueBooks(IReferenceManager::ptr_cont_t &mapbooks)
     entry["key"] = it.second->GetKey();
     entry["title"] = it.second->GetShow2();
     entry["bib"] = it.second->GetBibliography();
-    entry["has_ocr"] = it.second->HasContent();
+    entry["has_ocr"] = it.second->HasOcr();
 
     vBooks.push_back(std::move(entry));
   }
@@ -382,7 +404,7 @@ void CreateCatalogueAuthor(IReferenceManager::ptr_cont_t &books,std::map<std::st
             {"id", jt},
             { "title", (*books)[jt]->GetShow2()},
             { "bib", (*books)[jt]->GetBibliography()},
-            { "has_ocr", (*books)[jt]->HasContent()}
+            { "has_ocr", (*books)[jt]->HasOcr()}
             });
       }
 
@@ -445,7 +467,7 @@ void CreateCatalogueCollection(IReferenceManager::ptr_cont_t &items, IReferenceM
           {"id", jt.first},
           { "title", jt.second->GetShow2()},
           { "bib", jt.second->GetBibliography()},
-          {"has_ocr",jt.second->HasContent()}
+          {"has_ocr",jt.second->HasOcr()}
           });
     }
 
@@ -493,7 +515,7 @@ bool CorpusManager::UpdateZotero(clas_digital::IReferenceManager *manager, clas_
   res2 = manager->GetAllCollections(collection_references_);
   //manager->SaveToFile();
 
-  createSearchPage();
+  createSearchPage(collection_references_);
   std::cout<<"After search"<<std::endl;
   createInformationPage();
   std::cout<<"After information"<<std::endl;

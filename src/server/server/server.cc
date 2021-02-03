@@ -39,8 +39,11 @@ void CLASServer::HandleLogin(const httplib::Request &req, httplib::Response &res
     //Create the Set Cookie id to make the browser set the cookie on receiving
     //this.
     std::string set_cookie = "SESSID=" + cookie;
-    set_cookie += "; SECURE";
+    set_cookie += ";";
+    //SECURE in HTTTPS
+    //set_cookie += ";";
     resp.status = 200;
+    std::cout<<set_cookie<<std::endl;
     resp.set_header("Set-Cookie", std::move(set_cookie));
   }
 }
@@ -51,7 +54,7 @@ void CLASServer::SendUserList(const httplib::Request &req, httplib::Response &re
   //is an user associated with the cookie and if it is. Check if the user is an
   //admin user
   auto usr = GetUserFromCookie(req.get_header_value("Cookie"));
-  if(access_func_(req,GetUserFromCookie(req.get_header_value("cookie")).get()))
+  if(usr && (usr->GetAccess()&User::Access::ACC_ADMIN == User::Access::ACC_ADMIN))
     resp.set_content(users_->GetAsJSON().dump(),"application/json");
   else
     resp.status = 403;
@@ -61,13 +64,8 @@ void CLASServer::UpdateUserList(const httplib::Request &req, httplib::Response &
 {
   //Update the user list based on the json commands received
   auto usr = GetUserFromCookie(req.get_header_value("Cookie"));
-  if(!usr.get()) {
-    resp.status = 403;
-    return;
-  }
 
-  // Check if the user has the required access
-  if(!access_func_(req,GetUserFromCookie(req.get_header_value("cookie")).get()))
+  if(usr && (usr->GetAccess()&User::Access::ACC_ADMIN == User::Access::ACC_ADMIN))
     resp.status = 403;
   else
   {
@@ -131,12 +129,6 @@ std::shared_ptr<IUser> CLASServer::GetUserFromCookie(const std::string &cookie_p
 
 void CLASServer::GetMetadata(const httplib::Request& req, httplib::Response &resp)
 {
-  if(!access_func_(req,GetUserFromCookie(req.get_header_value("cookie")).get()))
-  {
-    resp.status = 403;
-    return;
-  }
-
   auto &items = corpus_manager_->item_references();
   auto find = items->find(req.get_header_value("key"));
   if(find!=items->end())
@@ -168,13 +160,51 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::Start(std::string listenAddres
 
   server_.Post("/api/v2/server/userlist",[this](const httplib::Request &req, httplib::Response &resp){this->UpdateUserList(req,resp);});
    server_.Post("/upload",[&](const httplib::Request &req, httplib::Response &resp){do_upload(req,resp);});
+   server_.Get("/createbibliography",[this](const httplib::Request &req, httplib::Response &resp) { do_create_bibliography(req,resp);});
+ 
+ 
+ 
+   server_.set_error_handler([this](const auto& req, auto& res) {
+       auto usr = GetUserFromCookie(req.get_header_value("Cookie"));
+       const std::regex base_regex("/books/([a-z0-9]+)/pages/.*");
+       std::smatch base_match; 
+       if(std::regex_match(req.path,base_match,base_regex)) {
+          std::string key = base_match[1]; 
+          try {
+            auto book = corpus_manager_->item_references()->at(key);
+            if(book->HasCopyright()) {
+            if(!usr || (usr->GetAccess()&User::Access::ACC_READ != User::Access::ACC_READ)) {
+            res.status = 403;
+            return;
+           }
+          }
+          }
+          catch(...) {
+            res.status = 404;
+            return;
+          }
 
+       }
+       const std::regex base_admin("/private/admin.*");
+       const std::regex base_write("/private/write.*");
+       if(std::regex_match(req.path,base_admin)) {
+         if(!usr || (usr->GetAccess()&User::Access::ACC_ADMIN != User::Access::ACC_ADMIN)) {
+            res.status = 403;
+            return;
+          }
+        }
 
+        if(std::regex_match(req.path,base_write)) {
+         if(!usr || (usr->GetAccess()&User::Access::ACC_WRITE != User::Access::ACC_WRITE)) {
+            res.status = 403;
+            return;
+          }
+        }
 
-  server_.set_error_handler([this](const auto& req, auto& res) {
-        this->file_handler_->ServeFile(req,res);
-      });
+       this->file_handler_->ServeFile(req,res);
+           });
 
+  file_handler_->AddAlias({"/search"},"web/index.html");
 
 
   event_manager_->TriggerEvent(EventManager::ON_SERVER_START, (void*)&server_);
@@ -195,248 +225,305 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::Start(std::string listenAddres
   return debug::Error(ReturnCodes::OK);
 }
 
+void CLASServer::do_create_bibliography(const httplib::Request &req,httplib::Response &resp)
+{
+  try
+  {
+    std::string inBook = req.get_param_value("books");
+    std::string_view inBookView(inBook);
+    if(inBook=="")
+    {resp.set_content("{}","application/json");return;}
+
+    std::string retval="<html><head><meta charset=\"utf-8\"></head><body>";
+    auto &mapBooks = corpus_manager_->item_references();
+
+    size_t x_new = 0;
+    size_t x_last = 0;
+    for(;;)
+    {
+      x_new = inBookView.find(",",x_last);
+      std::string key;
+      if(x_new == std::string::npos)
+        key = inBookView.substr(x_last);
+      else
+        key = inBookView.substr(x_last,x_new-x_last);
+
+      try
+      {
+        auto &book = mapBooks->at(key);
+        retval+= "<p>";
+        retval+= book->json()["citation"];
+        retval+="</p>";
+      }
+      catch(...) {}
+
+      if(x_new==std::string::npos) break;
+      x_last = x_new+1;
+    }
+    retval+="</body></html>";
+    resp.set_content(retval.c_str(),"text/html");
+  }
+  catch(...)
+  {
+    resp.set_content("{}","application/json");return;
+  }
+}
+
+
 void CLASServer::do_upload(const httplib::Request& req, httplib::Response &resp)
 {
-    bool forcedWrite=false;
-    std::string scanId = "";
-    std::string fileName = "";
-    std::string ocr_create = "";
-    std::string ocr_lang = "";
+  auto usr = GetUserFromCookie(req.get_header_value("Cookie"));
+  if(usr && (usr->GetAccess()&User::Access::ACC_ADMIN == User::Access::ACC_WRITE)) {
+    resp.status = 403;
+    return;
+  }
+  bool forcedWrite=false;
+  std::string scanId = "";
+  std::string fileName = "";
+  std::string ocr_create = "";
+  std::string ocr_lang = "";
 
-    try{forcedWrite = req.get_param_value("forced")=="true";}catch(...){};
-    try{scanId = req.get_param_value("scanid");}catch(...){};
-    try{fileName = req.get_param_value("filename");}catch(...){};
-    try{ocr_create = req.get_param_value("create_ocr");}catch(...){};
-    try{ocr_lang = req.get_param_value("language");}catch(...){};
+  try{forcedWrite = req.get_param_value("forced")=="true";}catch(...){};
+  try{scanId = req.get_param_value("scanid");}catch(...){};
+  try{fileName = req.get_param_value("filename");}catch(...){};
+  try{ocr_create = req.get_param_value("create_ocr");}catch(...){};
+  try{ocr_lang = req.get_param_value("language");}catch(...){};
 
-    std::cout<<"Authorized request to upload files"<<std::endl;
-    std::cout<<"Parsed fileName: "<<fileName<<std::endl;
-    std::cout<<"Parsed scanID: "<<scanId<<std::endl;
-    std::cout<<"Parsed force Overwrite: "<<forcedWrite<<std::endl;
-    if(scanId==""||fileName==""||fileName.find("..")!=std::string::npos||fileName.find("~")!=std::string::npos||scanId.find("..")!=std::string::npos||scanId.find("~")!=std::string::npos)
-    {
-	resp.status=403;
-	resp.set_content("malformed_parameters","text/plain");
-	return;
-    }
-    auto pos = fileName.find_last_of('.');
-    std::string fileEnd = fileName.substr(pos+1,std::string::npos);
-    std::string fileNameWithoutEnding = fileName.substr(0,pos);
+  std::cout<<"Authorized request to upload files"<<std::endl;
+  std::cout<<"Parsed fileName: "<<fileName<<std::endl;
+  std::cout<<"Parsed scanID: "<<scanId<<std::endl;
+  std::cout<<"Parsed force Overwrite: "<<forcedWrite<<std::endl;
+  if(scanId==""||fileName==""||fileName.find("..")!=std::string::npos||fileName.find("~")!=std::string::npos||scanId.find("..")!=std::string::npos||scanId.find("~")!=std::string::npos)
+  {
+    resp.status=403;
+    resp.set_content("malformed_parameters","text/plain");
+    return;
+  }
+  auto pos = fileName.find_last_of('.');
+  std::string fileEnd = fileName.substr(pos+1,std::string::npos);
+  std::string fileNameWithoutEnding = fileName.substr(0,pos);
 
-    IReference *book;
+  IReference *book;
+  try
+  {
+    book = corpus_manager_->book(scanId);
+  }
+  catch(...)
+  {
+    resp.status=403;
+    resp.set_content("book_unknown","text/plain");
+    return;
+  }
+
+  if(fileEnd == "txt" || fileEnd == "TXT")
+    fileName = "ocr.txt";
+
+  auto ret_val = GetFreeSpace(book->GetPath());
+  std::cout<<"Free hard disk space on current book path is: "<<ret_val<<std::endl;
+  if( ret_val < 2000000000000 ) {
+    std::cout<<"Space is too low selecting other upload point"<<std::endl;
+    book->MoveTo(file_handler_->GetFreestMountPoint());
+  }
+
+  std::string writePath = book->GetPath();
+  std::string directory = writePath;
+
+  writePath+="/";
+  writePath+=fileName;
+
+  bool doOverwrite = std::filesystem::exists(writePath);
+  doOverwrite |= std::filesystem::exists(directory+"/pages/"+fileName);
+  if((doOverwrite||!std::filesystem::exists(directory))&&!forcedWrite)
+  {
+    resp.status=403;
+    resp.set_content("file_exists","text/plain");
+    return;
+  }
+  const char *buffer = req.body.c_str();
+  auto buffer_length = req.body.length();
+  char imgbuffer[4*1014*1024];
+  if(fileEnd=="jpg"||fileEnd=="png"||fileEnd=="JPG"||fileEnd=="PNG"||fileEnd=="jp2"||fileEnd=="JP2")
+  {
     try
     {
-	    book = corpus_manager_->book(scanId);
+      static std::mutex m;
+      std::lock_guard lck(m);
+      if(fileEnd=="JP2" || fileEnd == "jp2")
+      {
+        fileName = fileNameWithoutEnding+".jpg";
+        std::string endTmpFileName = "tmp021.jpg";
+        bool deleteJP2 = true;
+        bool deleteBMP = true;
+
+        std::ofstream ofs("tmp021.jp2",std::ios::out);
+        ofs.write(req.body.c_str(),req.body.length());
+        ofs.close();
+
+        if(system("opj_decompress -i tmp021.jp2 -o tmp021.bmp") != 0)
+        {
+          resp.status = 403;
+          resp.set_content("Could not convert jp2 to jpg missing openjpeg library!","text/plain");
+          return;
+        }
+
+        if(system("convert tmp021.bmp tmp021.jpg") == 0)
+        {
+        }
+
+        if((deleteJP2 && (system("rm tmp021.jp2") != 0)) || (deleteBMP && (system("rm tmp021.bmp") != 0)))
+        {
+          resp.status = 403;
+          resp.set_content("Cleanup error!","text/plain");
+          return;
+        }
+        std::ifstream ifs(endTmpFileName.c_str(),std::ios::in);
+        if(!ifs)
+        {
+          resp.status = 403;
+          resp.set_content("Could not convert jp2 to jpg!","text/plain");
+          return;
+        }
+        ifs.read(imgbuffer,4*1024*1024);
+        auto len = ifs.gcount();
+        ifs.close();
+        std::string delname = "rm "+endTmpFileName;
+        if(system(delname.c_str()) != 0)
+        {
+          resp.status = 403;
+          resp.set_content("Cleanup error!","text/plain");
+          return;
+        }
+
+        buffer = imgbuffer;
+        buffer_length = len;
+      }
+      std::string pa = directory;
+      pa+="/readerInfo.json";
+      nlohmann::json file_desc;
+      if(std::filesystem::exists(pa))
+      {
+        std::ifstream readerFile(pa.c_str(),std::ios::in);
+        readerFile>>file_desc;
+        readerFile.close();
+      }
+      else
+      {
+        file_desc["maxPageNum"] = 0;
+        file_desc["pages"] = nlohmann::json::array();
+      }
+
+      nlohmann::json entry;
+      entry["file"] = fileName;
+      std::regex reg("_0*([0-9]+)");
+      std::smatch cm;
+      int maxPageNum = file_desc["maxPageNum"];
+      std::cout<<fileName<<std::endl;
+      std::regex_search(fileName,cm,reg);
+      std::cout<<"Match size: "<<cm.size()<<std::endl;
+      if(cm.size()<2)
+      {
+        resp.status = 403;
+        resp.set_content("Wrong format: Expected [ bsbid_pagenumber.jpg ]","text/plain");
+        return;
+      }
+      std::cout<<"Match: "<<cm[1]<<std::endl;
+      entry["pageNumber"]=std::stoi(cm[1]);
+      maxPageNum = std::max(maxPageNum,std::stoi(cm[1]));
+
+      int width,height,z;
+      stbi_info_from_memory(reinterpret_cast<const unsigned char*>(buffer),buffer_length,&width,&height,&z);
+      entry["width"] = width;
+      entry["height"] = height;
+      bool replace = false;
+      for(auto &iter : file_desc["pages"])
+      {
+        if(iter["pageNumber"]==entry["pageNumber"])
+        {
+          iter["width"] = width;
+          iter["height"] = height;
+          iter["file"] = fileName;
+          replace=true;
+          break;
+        }
+      }
+      file_desc["maxPageNum"] = maxPageNum;
+      int what = entry["pageNumber"];
+      if(!replace)
+        file_desc["pages"].push_back(std::move(entry));
+
+      std::ofstream writer(pa.c_str(),std::ios::out);
+      writer<<file_desc;
+      writer.close();
     }
-    catch(...)
+    catch(std::exception &e)
     {
-	    resp.status=403;
-	    resp.set_content("book_unknown","text/plain");
-	    return;
+      resp.status = 403;
+      std::string error = "Error while creating readerInfo.json: ";
+      error+=e.what();
+      resp.set_content(error.c_str(),"text/plain");
+      return;
     }
-
-    if(fileEnd == "txt" || fileEnd == "TXT")
-	fileName = "ocr.txt";
-
-    std::string writePath = book->GetPath();
-    std::string directory = writePath;
-
+    writePath = directory;
+    writePath += "/pages";
+    std::error_code ec;
+    if(!std::filesystem::exists(writePath))
+      std::filesystem::create_directory(writePath,ec);
     writePath+="/";
-    writePath+=fileName;
+    writePath += fileName;
+  }
+  else if((fileEnd!="txt")&&(fileEnd!="TXT"))
+  {
+    resp.status = 403;
+    resp.set_content("Unsupported file type, the uploader only supports .txt, .jpg and .png files!","text/plain");
+    return;
+  }
+  else
+  {
+    writePath = directory;
+    writePath += "/ocr.txt";
+    std::cout<<writePath<<std::endl;
+  }
+  std::cout<<"Uploading file now! File size: "<<req.body.length()<<std::endl;
 
-    bool doOverwrite = std::filesystem::exists(writePath);
-    doOverwrite |= std::filesystem::exists(directory+"/pages/"+fileName);
-    if((doOverwrite||!std::filesystem::exists(directory))&&!forcedWrite)
+  if(doOverwrite)
+  {
+    static std::mutex ml;
+    std::lock_guard lck(ml);
+    std::string backupfolder = "web/books/";
+    backupfolder += scanId;
+    backupfolder+="/backups";
+    if(!std::filesystem::exists(backupfolder))
+      std::filesystem::create_directory(backupfolder);
+
+    std::string newpath = backupfolder;
+    newpath+="/";
+    newpath+=fileName;
+    if(!std::filesystem::exists(newpath))
+      std::filesystem::create_directory(newpath);
+
+    int version = 0;
+    for(const auto &dirEntry : std::filesystem::directory_iterator(newpath))
     {
-  	  resp.status=403;
-	    resp.set_content("file_exists","text/plain");
-	    return;
+      (void)dirEntry;
+      ++version;
     }
-    const char *buffer = req.body.c_str();
-    auto buffer_length = req.body.length();
-    char imgbuffer[4*1014*1024];
-    if(fileEnd=="jpg"||fileEnd=="png"||fileEnd=="JPG"||fileEnd=="PNG"||fileEnd=="jp2"||fileEnd=="JP2")
-    {
-	try
-	{
-	    static std::mutex m;
-	    std::lock_guard lck(m);
-	    if(fileEnd=="JP2" || fileEnd == "jp2")
-	    {
-		fileName = fileNameWithoutEnding+".jpg";
-		std::string endTmpFileName = "tmp021.jpg";
-		bool deleteJP2 = true;
-		bool deleteBMP = true;
 
-		std::ofstream ofs("tmp021.jp2",std::ios::out);
-		ofs.write(req.body.c_str(),req.body.length());
-		ofs.close();
+    std::string finnewpath = newpath;
+    finnewpath+="/";
 
-		if(system("opj_decompress -i tmp021.jp2 -o tmp021.bmp") != 0)
-		{
-		    resp.status = 403;
-		    resp.set_content("Could not convert jp2 to jpg missing openjpeg library!","text/plain");
-		    return;
-		}
-
-		if(system("convert tmp021.bmp tmp021.jpg") == 0)
-		{
-		}
-		
-		if((deleteJP2 && (system("rm tmp021.jp2") != 0)) || (deleteBMP && (system("rm tmp021.bmp") != 0)))
-		{
-		    resp.status = 403;
-		    resp.set_content("Cleanup error!","text/plain");
-		    return;
-		}
-		std::ifstream ifs(endTmpFileName.c_str(),std::ios::in);
-		if(!ifs)
-		{
-		    resp.status = 403;
-		    resp.set_content("Could not convert jp2 to jpg!","text/plain");
-		    return;
-		}
-		ifs.read(imgbuffer,4*1024*1024);
-		auto len = ifs.gcount();
-		ifs.close();
-		std::string delname = "rm "+endTmpFileName;
-		if(system(delname.c_str()) != 0)
-		{
-		    resp.status = 403;
-		    resp.set_content("Cleanup error!","text/plain");
-		    return;
-		}
-
-		buffer = imgbuffer;
-		buffer_length = len;
-	    }
-	    std::string pa = directory;
-	    pa+="/readerInfo.json";
-	    nlohmann::json file_desc;
-	    if(std::filesystem::exists(pa))
-	    {
-		std::ifstream readerFile(pa.c_str(),std::ios::in);
-		readerFile>>file_desc;
-		readerFile.close();
-	    }
-	    else
-	    {
-		file_desc["maxPageNum"] = 0;
-		file_desc["pages"] = nlohmann::json::array();
-	    }
-
-	    nlohmann::json entry;
-	    entry["file"] = fileName;
-	    std::regex reg("_0*([0-9]+)");
-	    std::smatch cm;
-	    int maxPageNum = file_desc["maxPageNum"];
-	    std::cout<<fileName<<std::endl;
-	    std::regex_search(fileName,cm,reg);
-	    std::cout<<"Match size: "<<cm.size()<<std::endl;
-	    if(cm.size()<2)
-	    {
-		resp.status = 403;
-		resp.set_content("Wrong format: Expected [ bsbid_pagenumber.jpg ]","text/plain");
-		return;
-	    }
-	    std::cout<<"Match: "<<cm[1]<<std::endl;
-	    entry["pageNumber"]=std::stoi(cm[1]);
-	    maxPageNum = std::max(maxPageNum,std::stoi(cm[1]));
-
-	    int width,height,z;
-	    stbi_info_from_memory(reinterpret_cast<const unsigned char*>(buffer),buffer_length,&width,&height,&z);
-	    entry["width"] = width;
-	    entry["height"] = height;
-	    bool replace = false;
-	    for(auto &iter : file_desc["pages"])
-	    {
-		if(iter["pageNumber"]==entry["pageNumber"])
-		{
-		    iter["width"] = width;
-		    iter["height"] = height;
-		    iter["file"] = fileName;
-		    replace=true;
-		    break;
-		}
-	    }
-	    file_desc["maxPageNum"] = maxPageNum;
-	    int what = entry["pageNumber"];
-	    if(!replace)
-		file_desc["pages"].push_back(std::move(entry));
-
-	    std::ofstream writer(pa.c_str(),std::ios::out);
-	    writer<<file_desc;
-	    writer.close();
-	}
-	catch(std::exception &e)
-	{
-	    resp.status = 403;
-	    std::string error = "Error while creating readerInfo.json: ";
-	    error+=e.what();
-	    resp.set_content(error.c_str(),"text/plain");
-	    return;
-	}
-	writePath = directory;
-	writePath += "/pages";
-	std::error_code ec;
-	if(!std::filesystem::exists(writePath))
-	    std::filesystem::create_directory(writePath,ec);
-	writePath+="/";
-	writePath += fileName;
-    }
-    else if((fileEnd!="txt")&&(fileEnd!="TXT"))
-    {
-	resp.status = 403;
-	resp.set_content("Unsupported file type, the uploader only supports .txt, .jpg and .png files!","text/plain");
-	return;
-    }
-    else
-    {
-	writePath = directory;
-	writePath += "/ocr.txt";
-	std::cout<<writePath<<std::endl;
-    }
-    std::cout<<"Uploading file now! File size: "<<req.body.length()<<std::endl;
-
-    if(doOverwrite)
-    {
-	static std::mutex ml;
-	std::lock_guard lck(ml);
-	std::string backupfolder = "web/books/";
-	backupfolder += scanId;
-	backupfolder+="/backups";
-	if(!std::filesystem::exists(backupfolder))
-	    std::filesystem::create_directory(backupfolder);
-
-	std::string newpath = backupfolder;
-	newpath+="/";
-	newpath+=fileName;
-	if(!std::filesystem::exists(newpath))
-	    std::filesystem::create_directory(newpath);
-
-	int version = 0;
-	for(const auto &dirEntry : std::filesystem::directory_iterator(newpath))
-	{
-	    (void)dirEntry;
-	    ++version;
-	}
-
-	std::string finnewpath = newpath;
-	finnewpath+="/";
-
-	std::stringstream ss;
-	ss << std::setw(6) << std::setfill('0') << version;
-	finnewpath+=ss.str();
-	finnewpath+="some_user";
-	finnewpath+="-";
-	finnewpath+=fileName;
-	std::filesystem::rename(writePath,finnewpath);
-    }
-    std::cout<<"Writing to "<<writePath<<std::endl;
-    std::ofstream ofs(writePath.c_str(),std::ios::out);
-    ofs.write(buffer,buffer_length);
-    ofs.close();
-    resp.status=200;
+    std::stringstream ss;
+    ss << std::setw(6) << std::setfill('0') << version;
+    finnewpath+=ss.str();
+    finnewpath+="some_user";
+    finnewpath+="-";
+    finnewpath+=fileName;
+    std::filesystem::rename(writePath,finnewpath);
+  }
+  std::cout<<"Writing to "<<writePath<<std::endl;
+  std::ofstream ofs(writePath.c_str(),std::ios::out);
+  ofs.write(buffer,buffer_length);
+  ofs.close();
+  resp.status=200;
 }
 
 

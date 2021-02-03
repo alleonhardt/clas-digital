@@ -320,7 +320,6 @@ function getParameterByName(name, url) {
 
 
 window.addEventListener("load", function() {
-  GetPillarsFromServer();
   AddListeners();
   ReflectUrlValues();
   GetSearchResultsFromServer();
@@ -481,34 +480,6 @@ function ReflectUrlValues() {
     + "book search collection of over 100,000 pages.";
 	document.querySelector('meta[name="description"]').setAttribute("content", 
     description);
-}
-
-function GetPillarsFromServer() {
-  
-  //TODO(fux): Request should NOT go to search server! 
-  let requ = "api/v2/search/pillars";
-
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    //Add pillars
-    if(this.status == 200) {
-
-      //Parse search results from respond
-      if (this.responseText == "")
-        return;
-      var pillars = JSON.parse(this.responseText);
-
-      //Add pillars
-      for(let i=0; i<pillars.length; i++) {
-        var opt = document.createElement("option");
-        opt.value=pillars[i].key;
-        opt.text=pillars[i].name;
-        document.getElementById("collections").add(opt);
-      }
-    }
-  }
-  xhttp.open("GET", requ, true);
-  xhttp.send();
 }
 
 function GetSearchResultsFromServer() {

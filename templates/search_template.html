@@ -50,6 +50,9 @@
             <div class='selectdiv' style="display:inline-block;">
                 <label>
                 <select id='collections' onchange='ResetFocus();return true;'>
+                    {% for pill in pillars %}
+                    <option value="{{ pill.key }}">{{ pill.name }}</option>
+                    {% endfor %}
                     <option value='all' selected>Search all Collections</option>
                 </select>
                 </label>
