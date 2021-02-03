@@ -95,13 +95,15 @@ class BookManager {
      */
     std::list<Book*> DoSearch(SearchOptions* searchOptions);
 
+	  typedef std::function<bool(std::pair<std::string, double>, std::pair<std::string, double>)> Comp;
+    typedef std::set<std::pair<std::string, double>, Comp> sorted_set;
     /**
-     * @brief convert to list and sort list
-     * @param[in] mapBooks map of books that have been found to contains the searched word
-     * @param[in, out] matches Map of books and there match with the searched word
+     * @brief sort a map by it's value and return as set.
+     * @param[in] unordered_results of books that have been found to contains the searched word
+     * @param[in] type of sort algorythem (0: relevance, 1: chronological, 2: alphabetical. 
      * @return list of searchresulst
      */
-    std::list<Book*> ConvertToList(std::map<std::string, double>* mapResults, int sorting);
+    sorted_set SortMapByValue(std::map<std::string, double>* unordered_results, int type);
 
     /**
      * @brief create map of all words (key) and books in which the word occurs (value)
@@ -126,8 +128,8 @@ class BookManager {
     /**
      * @brief return a list of 10 words, fitting search Word, sorted by in how many books they apear
      */
-    std::list<Book*> GetSuggestions(std::string sWord, std::string sWhere);
-    std::list<Book*> GetSuggestions(std::string sWord, sortedList& listWords);
+    std::list<std::string> GetSuggestions(std::string sWord, std::string sWhere);
+    std::list<std::string> GetSuggestions(std::string sWord, sortedList& listWords);
 }; 
 
 #endif

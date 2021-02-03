@@ -2,6 +2,7 @@
 #include "book_manager/book.h"
 #include "search/search.h"
 #include <ostream>
+#include <utility>
 #include <vector>
 
 BookManager::BookManager(std::vector<std::string> mount_points, std::string dictionary_low) 
@@ -209,20 +210,20 @@ std::list<Book*> BookManager::DoSearch(SearchOptions* searchOpts) {
         ++it;
     }
   }
-  //Sort results results
-  return ConvertToList(results, searchOpts->getFilterResults());
+  //Sort results results and convert to list of books.
+  std::list<Book*> sorted_search_results;
+  for (auto it : SortMapByValue(results, searchOpts->getFilterResults()))
+    sorted_search_results.push_back(map_books_[it.first]); 
+  return sorted_search_results;
 }
 
-std::list<Book*> BookManager::ConvertToList(std::map<std::string, double>* search_results, 
-    int sorting) {
-  if (search_results->size() == 0) 
-    return std::list<Book*>();
-  else if (search_results->size() == 1)
-    return {map_books_[search_results->begin()->first]};
+BookManager::sorted_set BookManager::SortMapByValue(
+    std::map<std::string, double>* unordered_results, int sorting) {
+  if (unordered_results->size() == 0) 
+    return sorted_set();
+  else if (unordered_results->size() == 1)
+    return {std::make_pair(unordered_results->begin()->first, unordered_results->begin()->second)};
 
-	// Declaring the type of Predicate that accepts 2 pairs and return a bool
-	typedef std::function<bool(std::pair<std::string, double>, std::pair<std::string, double>)> Comp;
- 
 	// Defining a lambda function to compare two pairs. It will compare two pairs using second field.
 	Comp compFunctor;
   if (sorting == 0) {
@@ -251,14 +252,8 @@ std::list<Book*> BookManager::ConvertToList(std::map<std::string, double>* searc
   }
 
   //Sort by defined sort logic
-	std::set<std::pair<std::string, double>, Comp> sorted(search_results->begin(), 
-      search_results->end(), compFunctor);
-
-  //Convert to list
-  std::list<Book*> sorted_search_results;
-  for (std::pair<std::string, double> element : sorted)
-    sorted_search_results.push_back(map_books_[element.first]); 
-  return sorted_search_results;
+	sorted_set sorted_results(unordered_results->begin(), unordered_results->end(), compFunctor);
+  return sorted_results;
 }
 
 
@@ -328,25 +323,30 @@ void BookManager::CreateListWords(MAPWORDS& mapWords, sortedList& listWords) {
 }
 
 
-std::list<Book*> BookManager::GetSuggestions(std::string sWord, std::string sWhere) {
-  if(sWhere=="corpus") return GetSuggestions(sWord, list_words_);
-  if(sWhere=="author") return GetSuggestions(sWord, list_authors_);
-  return std::list<Book*>();
+std::list<std::string> BookManager::GetSuggestions(std::string word, std::string scope) {
+  if(scope=="corpus") 
+    return GetSuggestions(word, list_words_);
+  if(scope=="author") 
+    return GetSuggestions(word, list_authors_);
+  return std::list<std::string>();
 }
 
-std::list<Book*> BookManager::GetSuggestions(std::string sWord, sortedList& listWords) {
-  func::convertToLower(sWord);
-  sWord = func::convertStr(sWord);
+std::list<std::string> BookManager::GetSuggestions(std::string word, sortedList& list_words) {
+  std::cout << "GetSuggestions" << std::endl;
+  func::convertToLower(word);
+  word = func::convertStr(word);
   std::map<std::string, double>* suggs = new std::map<std::string, double>;
   size_t counter=0;
-  for (auto it=listWords.begin(); it!=listWords.end() && counter < 10; it++) {
-    double value = fuzzy::fuzzy_cmp(it->first, sWord);
+  for (auto it=list_words.begin(); it!=list_words.end() && counter < 10; it++) {
+    double value = fuzzy::fuzzy_cmp(it->first, word);
     if(value > 0 && value <= 0.2) {
       (*suggs)[it->first] = value*(-1);
       counter++;
     }
   }
-  std::list<Book*> listSuggestions = ConvertToList(suggs, 0);
+  std::list<std::string> sorted_search_results;
+  for (auto it : SortMapByValue(suggs, 0)) 
+    sorted_search_results.push_back(it.first); 
   delete suggs;
-  return listSuggestions;
+  return sorted_search_results;
 }
