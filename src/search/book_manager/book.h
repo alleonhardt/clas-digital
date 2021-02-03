@@ -130,12 +130,18 @@ private:
   bool has_ocr_;  ///< Book has ocr path
   bool has_images_; ///has images or ocr
 
-  //From json/ metadata-handler
+  // From json/ metadata-handler
   MetadataHandler metadata_;  ///< Json with all metadata 
   std::string author_;  ///< Author for fast access during search
   int date_;  ///< Date for fast access during search
   std::vector<std::string> collections_; ///< Collections (fast access)
+
+  // For fast access:
   std::string author_date_;  ///< [author], [date] (fast access)
+  std::string quick_author_; ///< author in lowercase.
+  std::string quick_title_;  ///< title in lowercase.
+  std::map<std::string, int> quick_authors_words_; ///< words, lowercase, utf-8-safe.
+  std::map<std::string, int> quick_title_words_;  ///< worlds, lowercase, utf-8-safe.
 
   ///Map of matches found with fuzzy-search (contains/ fuzzy)
   std::unordered_map<std::string, std::list<std::pair<std::string, double>>> 
