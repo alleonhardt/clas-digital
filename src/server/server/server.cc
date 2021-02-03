@@ -166,6 +166,9 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::Start(std::string listenAddres
  
    server_.set_error_handler([this](const auto& req, auto& res) {
        auto usr = GetUserFromCookie(req.get_header_value("Cookie"));
+       if(!usr) {
+        res.set_header("Set-Cookie","SESSID=deleted; expires=Thu, 01 Jan 1970 00:00:00 GMT");
+       }
        const std::regex base_regex("/books/([a-z0-9]+)/pages/.*");
        std::smatch base_match; 
        if(std::regex_match(req.path,base_match,base_regex)) {
@@ -189,14 +192,16 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::Start(std::string listenAddres
        const std::regex base_write("/private/write.*");
        if(std::regex_match(req.path,base_admin)) {
          if(!usr || (usr->GetAccess()&User::Access::ACC_ADMIN != User::Access::ACC_ADMIN)) {
-            res.status = 403;
+            res.status = 307;
+            res.set_header("Location","/");
             return;
           }
         }
 
         if(std::regex_match(req.path,base_write)) {
          if(!usr || (usr->GetAccess()&User::Access::ACC_WRITE != User::Access::ACC_WRITE)) {
-            res.status = 403;
+            res.status = 307;
+            res.set_header("Location","/");
             return;
           }
         }
