@@ -65,7 +65,7 @@ void CLASServer::UpdateUserList(const httplib::Request &req, httplib::Response &
   //Update the user list based on the json commands received
   auto usr = GetUserFromCookie(req.get_header_value("Cookie"));
 
-  if(usr && (usr->GetAccess()&User::Access::ACC_ADMIN == User::Access::ACC_ADMIN))
+  if(!usr || (usr->GetAccess()&User::Access::ACC_ADMIN != User::Access::ACC_ADMIN))
     resp.status = 403;
   else
   {
@@ -273,7 +273,7 @@ void CLASServer::do_create_bibliography(const httplib::Request &req,httplib::Res
 void CLASServer::do_upload(const httplib::Request& req, httplib::Response &resp)
 {
   auto usr = GetUserFromCookie(req.get_header_value("Cookie"));
-  if(usr && (usr->GetAccess()&User::Access::ACC_ADMIN == User::Access::ACC_WRITE)) {
+  if(!usr || (usr->GetAccess()&User::Access::ACC_ADMIN != User::Access::ACC_WRITE)) {
     resp.status = 403;
     return;
   }
