@@ -470,7 +470,7 @@ bool createWebpage(IReference *item,IReferenceManager::ptr_cont_t &collections,c
   std::filesystem::create_directory("web/books/"+item->GetKey(), ec);
   std::filesystem::create_directory("web/books/"+item->GetKey()+"/pages", ec);
 
-  if(std::filesystem::exists(item->GetPath()+"/ocr.txt"))
+  if(item->HasContent())
   {
     createPagesPage(item);
   }
@@ -536,6 +536,10 @@ bool CorpusManager::UpdateZotero(clas_digital::IReferenceManager *manager, clas_
     && res2 == clas_digital::IReferenceManager::Error::OK;
 
   return no_error;
+}
+
+IReference *CorpusManager::book(std::string ref) {
+  return item_references_->at(ref);
 }
 
 

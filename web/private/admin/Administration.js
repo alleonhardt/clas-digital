@@ -43,7 +43,7 @@ let UserList = [];
 function OnUserList()
 {
     let xhr = new XMLHttpRequest();
-    let requ = "/userlist";
+    let requ = "/api/v2/server/userlist";
     xhr.open("GET",requ,true);
     xhr.onload = function() {
 
@@ -113,6 +113,9 @@ function OnUserList()
     xhr.send(null);
 }
 
+function TriggerAlert(msg) {
+    StateBanner.ChangeBanner(msg,StateBannerType.danger);
+}
 function CreateNewUser()
 {
     let name = document.getElementById("NUsrName");
@@ -136,7 +139,7 @@ function CreateNewUser()
     }
 
     let xhr = new XMLHttpRequest();
-	let requ = "/userlist";
+	let requ = "/api/v2/server/userlist";
   xhr.open("POST",requ,true);
   xhr.onload = function() {
   if(xhr.status==200)
@@ -159,7 +162,7 @@ function DeleteUser(elem)
     if(confirm("Do you really want to delete user "+elem.from_who))
     {
         let xhr = new XMLHttpRequest();
-        let requ = "/userlist";
+        let requ = "/api/v2/server/userlist";
         xhr.open("POST",requ,true);
         xhr.onload = function(){
             if(xhr.status==200)
@@ -212,7 +215,7 @@ function UpdateZotero()
 function SaveUserList()
 {
   let xhr = new XMLHttpRequest();
-  let requ = "/userlist";
+  let requ = "/api/v2/server/userlist";
   xhr.open("POST",requ,true);
   
   let sendReq = "";
@@ -222,7 +225,12 @@ function SaveUserList()
 	  sendObj.push({action: "CHANGEACCESS",email: i, access: UserList[i]});
   }
   xhr.onload = function() {
+    if(xhr.status == 200) {
     StateBanner.ChangeBanner("Changed user rights successfully!",StateBannerType.success);
+    }
+    else {
+      StateBanner.ChangeBanner("You are not authorized to change the user table!",StateBannerType.danger);
+    }
     }
     xhr.onerror = function() {
     StateBanner.ChangeBanner("You are not authorized to change the user table!",StateBannerType.danger);

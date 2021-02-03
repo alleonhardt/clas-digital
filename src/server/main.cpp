@@ -25,7 +25,7 @@ int main(int argc, char **argv)
   }
 
   nlohmann::json root_user;
-  root_user["email"] = "root";
+  root_user["email"] = "root@gmail.com";
   root_user["password"] = "123";
   root_user["access"] = 7;
 

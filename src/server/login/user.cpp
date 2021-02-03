@@ -97,6 +97,11 @@ bool User::CheckCredentials(nlohmann::json options)
   else return false;
 }
 
+void User::SetAccess(int new_acc)
+{
+  access_ = new_acc;
+}
+
 int User::GetAccess()
 {
   //Always allow access
@@ -250,6 +255,7 @@ std::string UserTable::LogIn(nlohmann::json credentials)
       std::string cookie = CreateRandomString(32);
       if(logged_in_.count(cookie) == 0)
       {
+        cookie = shared_user->GetPrimaryKey()+"::"+std::to_string(shared_user->GetAccess())+":::"+cookie;
         logged_in_.insert({cookie,shared_user});
         return cookie;
       }
