@@ -185,35 +185,36 @@ function loadOCRFile(ocrtxt) {
 let gTitle = document.title;
 
 function CreatePageLayout() {
-  console.log("OCR size: "+gOcrSplittedFile.arr.length);
-  console.log("Pages size: "+gPageLayoutFile.pages.length);
-  for(let i = 0; i < gOcrSplittedFile.arr.length; i++) {
-    let x = document.createElement("p");
-    let cont = document.createElement("div");
-    let ocrcont = document.createElement("div");
-    let anchor = document.createElement("a");
-    let pagenumshow = document.createElement("b");
-    anchor.id = "page"+gOcrSplittedFile.pageNum[i];
+  if( gOcrSplittedFile != null && gOcrSplittedFile.length != 0) {
+    console.log(gOcrSplittedFile);
+    for(let i = 0; i < gOcrSplittedFile.arr.length; i++) {
+      let x = document.createElement("p");
+      let cont = document.createElement("div");
+      let ocrcont = document.createElement("div");
+      let anchor = document.createElement("a");
+      let pagenumshow = document.createElement("b");
+      anchor.id = "page"+gOcrSplittedFile.pageNum[i];
 
-    ocrcont.classList.add("ocrcontainer");
+      ocrcont.classList.add("ocrcontainer");
 
-    cont.classList.add('pagecontainer');
-    cont.id = "uniquepageid"+gOcrSplittedFile.pageNum[i];
-    x.innerHTML = gOcrSplittedFile.arr[i];
-    pagenumshow.innerHTML = gOcrSplittedFile.pageNum[i]+"/"+gOcrSplittedFile.maxPageNum;
-    pagenumshow.style.position = "absolute";
-    pagenumshow.style.bottom = "0.5rem";
-    pagenumshow.style.right = "0.5rem";
-    pagenumshow.style["font-size"] = 'small';
-    x.id = "uniqueocrpage"+gOcrSplittedFile.pageNum[i];
-    x.classList.add('ocrpage');
-    ocrcont.appendChild(anchor);
-    ocrcont.appendChild(x);
-    ocrcont.appendChild(pagenumshow);
-    cont.appendChild(ocrcont);
-    cont.pageNumber = gOcrSplittedFile.pageNum[i];
+      cont.classList.add('pagecontainer');
+      cont.id = "uniquepageid"+gOcrSplittedFile.pageNum[i];
+      x.innerHTML = gOcrSplittedFile.arr[i];
+      pagenumshow.innerHTML = gOcrSplittedFile.pageNum[i]+"/"+gOcrSplittedFile.maxPageNum;
+      pagenumshow.style.position = "absolute";
+      pagenumshow.style.bottom = "0.5rem";
+      pagenumshow.style.right = "0.5rem";
+      pagenumshow.style["font-size"] = 'small';
+      x.id = "uniqueocrpage"+gOcrSplittedFile.pageNum[i];
+      x.classList.add('ocrpage');
+      ocrcont.appendChild(anchor);
+      ocrcont.appendChild(x);
+      ocrcont.appendChild(pagenumshow);
+      cont.appendChild(ocrcont);
+      cont.pageNumber = gOcrSplittedFile.pageNum[i];
 
-    document.body.appendChild(cont);
+      document.body.appendChild(cont);
+    }
   }
 
   for(let i = 0; i < gPageLayoutFile.pages.length; i++) {

@@ -181,6 +181,10 @@ static std::string returnToLower(std::string &str)
         return count > 0;
       }
 
+      virtual bool HasOcr() override {
+        return std::filesystem::exists(std::filesystem::path(GetPath())/"ocr.txt");
+      }
+
       std::string GetShow2() override {
         bool html = true;
         // *** Add Author *** //

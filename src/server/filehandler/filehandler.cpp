@@ -11,6 +11,7 @@ FileHandler::FileHandler(long long size) : cache_(size)
   file_types_[".html"] = "text/html";
   file_types_[".htm"] = "text/html";
   file_types_[".jpg"] = "image/jpg";
+  file_types_[".svg"] = "image/svg+xml";
   file_types_[".jpeg"] = "image/jpg";
   file_types_[".pdf"] = "application/pdf";
   file_types_[".png"] = "application/png";
@@ -52,6 +53,8 @@ void FileHandler::ServeFile(const httplib::Request &req, httplib::Response &resp
     return;
   }
 
+
+
   cache_.load(req.path,
       [&resp,&req,this](void* data,long long size)
       {
@@ -61,6 +64,7 @@ void FileHandler::ServeFile(const httplib::Request &req, httplib::Response &resp
       [&req,this,&resp,abortoncachemiss](int err)
       {
         if(abortoncachemiss) return;
+
 
         for(auto &it : mount_points_)
         {

@@ -32,6 +32,7 @@ namespace clas_digital
       virtual std::string GetShow2() = 0;
       virtual std::string GetName()  = 0;
       virtual bool HasContent() = 0;
+      virtual bool HasOcr() = 0;
       virtual bool MoveTo(std::filesystem::path new_root) = 0;
       virtual std::vector<std::map<std::string,std::string>> GetAuthorKeys() = 0;
 
