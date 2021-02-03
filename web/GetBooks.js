@@ -22,6 +22,9 @@ let scanId = '';
 let fuzzyness = 0;
 
 function CorrectedScrollIntoView(elem) {
+  if(elem == null) {
+    return;
+  }
   let rect = document.getElementsByClassName("searchbox")[0].getBoundingClientRect();
   window.scrollTo(0,elem.offsetTop-(rect.bottom+50));
 }
