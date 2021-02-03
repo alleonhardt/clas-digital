@@ -175,10 +175,10 @@ static std::string returnToLower(std::string &str)
 
       virtual bool HasContent() override {
         int count = 0;
-        for(auto &it : std::filesystem::directory_iterator(GetPath())) {
+        for(auto &it : std::filesystem::directory_iterator(std::filesystem::path(GetPath())/"pages")) {
           count++;
         }
-        return count > 1;
+        return count > 0;
       }
 
       std::string GetShow2() override {
@@ -311,6 +311,17 @@ static std::string returnToLower(std::string &str)
 
         //Return -1 if regex nether matched
         return -1;
+      }
+
+      bool MoveTo(std::filesystem::path new_root) override {
+        std::error_code ec;
+        std::cout<<"New root? " << new_root<<std::endl;
+        std::filesystem::rename(std::filesystem::path(GetPath()),new_root/GetKey(),ec);
+        if(!ec) {
+          _path = (new_root/GetKey()).string();
+          return true;
+        }
+        return false;
       }
 
       bool HasCopyright() override

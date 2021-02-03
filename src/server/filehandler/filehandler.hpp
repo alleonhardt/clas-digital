@@ -17,6 +17,16 @@
 
 namespace clas_digital
 {
+
+  static unsigned long long GetFreeSpace(std::filesystem::path path) {
+    std::error_code ec;
+    std::filesystem::space_info tmp = std::filesystem::space(path,ec);
+    if(!ec) {
+      return tmp.free;
+    }
+    else
+      return -1;
+  }
  
   class IFileHandler
   {
@@ -27,6 +37,7 @@ namespace clas_digital
       virtual void AddAlias(std::vector<std::string> from, std::filesystem::path to) = 0;
       virtual std::vector<std::filesystem::path> &GetMountPoints() = 0;
       virtual std::vector<std::filesystem::path> &GetUploadPoints() = 0;
+      virtual std::filesystem::path GetFreestMountPoint() = 0;
   };
 
   class FileHandler : public IFileHandler
@@ -50,6 +61,21 @@ namespace clas_digital
 
       std::vector<std::filesystem::path> &GetUploadPoints() {
         return upload_points_;
+      }
+      
+      std::filesystem::path GetFreestMountPoint() override {
+        unsigned long long maxSpace = 0;
+        std::filesystem::path maxPath;
+        std::error_code ec;
+        for(auto &it : upload_points_) {
+          std::cout<<"Processing: "<<it<<std::endl;
+          std::filesystem::space_info tmp = std::filesystem::space(it,ec);
+          if(!ec && maxSpace <= tmp.free) {
+            maxPath = it;
+            maxSpace = tmp.free;
+          }
+        }
+        return maxPath;
       }
     private:
       FixedSizeCache<std::string> cache_;

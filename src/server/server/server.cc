@@ -39,8 +39,11 @@ void CLASServer::HandleLogin(const httplib::Request &req, httplib::Response &res
     //Create the Set Cookie id to make the browser set the cookie on receiving
     //this.
     std::string set_cookie = "SESSID=" + cookie;
-    set_cookie += "; SECURE";
+    set_cookie += ";";
+    //SECURE in HTTTPS
+    //set_cookie += ";";
     resp.status = 200;
+    std::cout<<set_cookie<<std::endl;
     resp.set_header("Set-Cookie", std::move(set_cookie));
   }
 }
@@ -236,7 +239,14 @@ void CLASServer::do_upload(const httplib::Request& req, httplib::Response &resp)
     }
 
     if(fileEnd == "txt" || fileEnd == "TXT")
-	fileName = "ocr.txt";
+	    fileName = "ocr.txt";
+
+    auto ret_val = GetFreeSpace(book->GetPath());
+    std::cout<<"Free hard disk space on current book path is: "<<ret_val<<std::endl;
+    if( ret_val < 2000000000000 ) {
+      std::cout<<"Space is too low selecting other upload point"<<std::endl;
+      book->MoveTo(file_handler_->GetFreestMountPoint());
+    }
 
     std::string writePath = book->GetPath();
     std::string directory = writePath;
