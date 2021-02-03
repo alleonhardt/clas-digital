@@ -186,7 +186,7 @@ debug::Error<CLASServer::ReturnCodes> CLASServer::Start(std::string listenAddres
 
        }
        const std::regex base_admin("/private/admin.*");
-       const std::regex base_write("/private/admin.*");
+       const std::regex base_write("/private/write.*");
        if(std::regex_match(req.path,base_admin)) {
          if(!usr || (usr->GetAccess()&User::Access::ACC_ADMIN != User::Access::ACC_ADMIN)) {
             res.status = 403;
