@@ -423,8 +423,8 @@ function initialise() {
   if(!hasFullscreen(document.documentElement))
 	  document.getElementById("fullbut").style.display = 'none';
 
-  ServerGet("/books/"+scanId+"/ocr.txt", loadOCRFile,loadOCRFileError);
-  ServerGet("/books/"+scanId+"/readerInfo.json",loadPageLayoutFile,loadMetadataFileError);
+  ServerGet("/books/"+scanId+"/ocr.txt", loadOCRFile,loadOCRFileError); 
+  ServerGet("/books/"+scanId+"/readerInfo.json",loadPageLayoutFile,loadPageLayoutFileError);
   if(query!=null && query!='null') {
     console.log(query);
     ServerGet("/api/v2/search/pages?scanId=" + scanId + '&query=' + query
