@@ -11,7 +11,7 @@ FileHandler::FileHandler(long long size) : cache_(size)
   file_types_[".html"] = "text/html";
   file_types_[".txt"] = "text/plain";
   file_types_[".htm"] = "text/html";
-  file_types_[".jpg"] = "image/jpg";
+  file_types_[".jpg"] = "image/jpeg";
   file_types_[".svg"] = "image/svg+xml";
   file_types_[".jpeg"] = "image/jpg";
   file_types_[".pdf"] = "application/pdf";

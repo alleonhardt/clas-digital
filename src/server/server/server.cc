@@ -14,6 +14,7 @@
 #include "zotero/zotero.hpp"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+#include "pdf_extractor/pdf_extractor.h"
 
 using namespace clas_digital;
 
@@ -278,7 +279,7 @@ void CLASServer::do_create_bibliography(const httplib::Request &req,httplib::Res
 void CLASServer::do_upload(const httplib::Request& req, httplib::Response &resp)
 {
   auto usr = GetUserFromCookie(req.get_header_value("Cookie"));
-  if(!usr || (usr->GetAccess()&User::Access::ACC_ADMIN != User::Access::ACC_WRITE)) {
+  if(!usr || (usr->GetAccess()&User::Access::ACC_WRITE != User::Access::ACC_WRITE)) {
     resp.status = 403;
     return;
   }
@@ -325,7 +326,7 @@ void CLASServer::do_upload(const httplib::Request& req, httplib::Response &resp)
 
   auto ret_val = GetFreeSpace(book->GetPath());
   std::cout<<"Free hard disk space on current book path is: "<<ret_val<<std::endl;
-  if( ret_val < 2000000000000 ) {
+  if( ret_val < 20000000000 ) {
     std::cout<<"Space is too low selecting other upload point"<<std::endl;
     book->MoveTo(file_handler_->GetFreestMountPoint());
   }
@@ -347,7 +348,7 @@ void CLASServer::do_upload(const httplib::Request& req, httplib::Response &resp)
   const char *buffer = req.body.c_str();
   auto buffer_length = req.body.length();
   char imgbuffer[4*1014*1024];
-  if(fileEnd=="jpg"||fileEnd=="png"||fileEnd=="JPG"||fileEnd=="PNG"||fileEnd=="jp2"||fileEnd=="JP2")
+  if(fileEnd=="jpg"||fileEnd=="png"||fileEnd=="JPG"||fileEnd=="PNG"||fileEnd=="jp2"||fileEnd=="JP2" || fileEnd == "pdf" || fileEnd == "PDF")
   {
     try
     {
@@ -402,6 +403,65 @@ void CLASServer::do_upload(const httplib::Request& req, httplib::Response &resp)
         buffer = imgbuffer;
         buffer_length = len;
       }
+      else if(fileEnd == "pdf") {
+        if(book->HasContent()) {
+          resp.status = 403;
+          resp.set_content("Could not upload pdf as this books is not empty, pdf will only work on empty books","text/plain");
+          return;
+        }
+        std::ofstream ofs(writePath.c_str(),std::ios::out);
+        ofs.write(buffer,buffer_length);
+        ofs.close();
+
+        PdfExtractor pdfext;
+        if(pdfext.Extract(directory)) {
+          nlohmann::json file_desc;
+          file_desc["maxPageNum"] = 0;
+          file_desc["pages"] = nlohmann::json::array();
+          for(auto &it : std::filesystem::directory_iterator(directory+"/pages")) {
+            std::cout<<"Its working!"<<it.path().string()<<std::endl;
+            if( it.path().extension() == ".jpg") {
+              std::cout<<"Inside path"<<std::endl;
+              std::string name = it.path().filename().string();
+              nlohmann::json entry;
+              entry["file"] = name;
+              std::regex reg("page_([0-9]+)");
+              std::smatch cm;
+              int maxPageNum = file_desc["maxPageNum"];
+              std::regex_search(name,cm,reg);
+              if(cm.size()<2)
+              {
+                resp.status = 403;
+                resp.set_content("Wrong format: Expected [ bsbid_pagenumber.jpg ]","text/plain");
+                return;
+              }
+              entry["pageNumber"]=std::stoi(cm[1]);
+              maxPageNum = std::max(maxPageNum,std::stoi(cm[1]));
+
+              int width,height,z;
+              stbi_info_from_file(std::fopen(it.path().string().c_str(),"r"),&width,&height,&z);
+              entry["width"] = width;
+              entry["height"] = height;
+              file_desc["maxPageNum"] = maxPageNum;
+              file_desc["pages"].push_back(std::move(entry));
+            }
+          }
+          std::string pa = directory;
+          pa+="/readerInfo.json";
+          std::ofstream writer(pa.c_str(),std::ios::out);
+          writer<<file_desc;
+          writer.close();
+          corpus_manager_->CreateWebpage(book,file_handler_.get());
+          resp.status = 200;
+          return;
+        }
+        else {
+          resp.status = 404;
+          resp.set_content("Something went wrong...","text/plain");
+          return;
+        }
+
+      }
       std::string pa = directory;
       pa+="/readerInfo.json";
       nlohmann::json file_desc;
@@ -452,7 +512,6 @@ void CLASServer::do_upload(const httplib::Request& req, httplib::Response &resp)
         }
       }
       file_desc["maxPageNum"] = maxPageNum;
-      int what = entry["pageNumber"];
       if(!replace)
         file_desc["pages"].push_back(std::move(entry));
 
@@ -528,6 +587,7 @@ void CLASServer::do_upload(const httplib::Request& req, httplib::Response &resp)
   std::ofstream ofs(writePath.c_str(),std::ios::out);
   ofs.write(buffer,buffer_length);
   ofs.close();
+  corpus_manager_->CreateWebpage(book,file_handler_.get());
   resp.status=200;
 }
 

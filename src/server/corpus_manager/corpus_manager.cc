@@ -484,7 +484,7 @@ void CreateCatalogueCollection(IReferenceManager::ptr_cont_t &items, IReferenceM
 
 
 
-bool createWebpage(IReference *item,IReferenceManager::ptr_cont_t &collections,clas_digital::IFileHandler *handler)
+bool CorpusManager::CreateWebpage(IReference *item,clas_digital::IFileHandler *handler)
 {
   std::string webpath = "/books/"+item->GetKey()+"/pages";
   std::error_code ec;
@@ -498,7 +498,7 @@ bool createWebpage(IReference *item,IReferenceManager::ptr_cont_t &collections,c
   }
 
   {
-    createMetadataPage(item,collections);
+    createMetadataPage(item,collection_references_);
   }
 
   return true;
@@ -528,7 +528,7 @@ bool CorpusManager::UpdateZotero(clas_digital::IReferenceManager *manager, clas_
   std::cout<<"Value of pointer: "<<collection_references_.get()<<std::endl;
 
   for(auto &i : *item_references_) {
-    createWebpage(i.second,collection_references_,handler);
+    CreateWebpage(i.second,handler);
   }
   
   for(auto &it : *item_references_)
@@ -562,17 +562,6 @@ bool CorpusManager::UpdateZotero(clas_digital::IReferenceManager *manager, clas_
 
 IReference *CorpusManager::book(std::string ref) {
   return item_references_->at(ref);
-}
-
-
-void CorpusManager::WriteCollectionPage(IReference *ref) {
-
-}
-
-void CorpusManager::WriteMetadataPage(IReference *ref) {
-}
-
-void CorpusManager::BookIndex(IReference* ref) {
 }
 
 IReferenceManager::ptr_cont_t &CorpusManager::item_references() {

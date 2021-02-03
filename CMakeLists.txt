@@ -51,7 +51,8 @@ add_library(clas_server_lib OBJECT src/shared/metadata_handler.cc
   src/server/plugins/EventManager.cpp
   src/server/plugins/PlugInManager.cpp
   src/server/filehandler/filehandler.cpp
-  src/server/corpus_manager/corpus_manager.cc)
+  src/server/corpus_manager/corpus_manager.cc
+  src/server/pdf_extractor/pdf_extractor.cpp)
 
 
 set(SRC_FILES_SERVER_TEST src/server/test/main.cc
