@@ -188,7 +188,9 @@ function loadOCRFile(ocrtxt) {
 let gTitle = document.title;
 
 function CreatePageLayout() {
-  if( gOcrSplittedFile != null && gOcrSplittedFile.length != 0) {
+  console.log("CREATE PAGE LAYOUT");
+  console.log(gOcrSplittedFile);
+  if( gOcrSplittedFile != null && gOcrSplittedFile != undefined) {
     console.log(gOcrSplittedFile);
     for(let i = 0; i < gOcrSplittedFile.arr.length; i++) {
       let x = document.createElement("p");
@@ -198,9 +200,13 @@ function CreatePageLayout() {
       let pagenumshow = document.createElement("b");
       anchor.id = "page"+gOcrSplittedFile.pageNum[i];
 
+      if(gPageLayoutFile.pages.length == 0)
+        cont.classList.add("container_ocr");
+      else
+        cont.classList.add('pagecontainer');
+
       ocrcont.classList.add("ocrcontainer");
 
-      cont.classList.add('pagecontainer');
       cont.id = "uniquepageid"+gOcrSplittedFile.pageNum[i];
       x.innerHTML = gOcrSplittedFile.arr[i];
       pagenumshow.innerHTML = gOcrSplittedFile.pageNum[i]+"/"+gOcrSplittedFile.maxPageNum;
@@ -220,6 +226,7 @@ function CreatePageLayout() {
     }
   }
 
+  console.log(gPageLayoutFile);
   for(let i = 0; i < gPageLayoutFile.pages.length; i++) {
     let doc = document.getElementById("uniquepageid"+gPageLayoutFile.pages[i].pageNumber);
     if(doc==null) {
@@ -229,7 +236,7 @@ function CreatePageLayout() {
 	    anchor.id = "page"+gPageLayoutFile.pages[i].pageNumber;
 
 
-	    cont.classList.add('pagecontainerFullImg');
+	    cont.classList.add('container_full');
 	    cont.id = "uniquepageid"+gPageLayoutFile.pages[i].pageNumber;
 	    cont.pageNumber = gPageLayoutFile.pages[i].pageNumber;
 
@@ -354,7 +361,7 @@ function isElementInViewport (el) {
 
 
 function loadOCRFileError(errortext) {
-  gOcrSplittedFile = [];
+  gOcrSplittedFile = undefined;
   
   if(gHitsLoaded)
     HighlightHitsAndConstructLinkList();
@@ -384,14 +391,17 @@ function loadMetadataFileError(errortxt,state) {
 
 function loadPageLayoutFile(layout) {
   gPageLayoutFile = JSON.parse(layout);
+  console.log("Hello World");
+  console.log(gOcrSplittedFile);
   //OCR loaded and splitted yet? Then start building the page!
-  if(gOcrSplittedFile!=null)
+  if(gOcrSplittedFile!=null || gOcrSplittedFile == undefined)
 	  CreatePageLayout();
 }
 
 function loadPageLayoutFileError(errortxt) {
   gPageLayoutFile = {pages:[]};
-  if(gOcrSplittedFile!=null)
+
+  if(gOcrSplittedFile!=null || gOcrSplittedFile == undefined)
 	  CreatePageLayout();
 }
 

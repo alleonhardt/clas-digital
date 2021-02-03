@@ -9,6 +9,7 @@ FileHandler::FileHandler(long long size) : cache_(size)
   file_types_[".css"] = "text/css";
   file_types_[".js"] = "application/javascript";
   file_types_[".html"] = "text/html";
+  file_types_[".txt"] = "text/plain";
   file_types_[".htm"] = "text/html";
   file_types_[".jpg"] = "image/jpg";
   file_types_[".svg"] = "image/svg+xml";
