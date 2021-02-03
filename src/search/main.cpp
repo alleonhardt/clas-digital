@@ -20,24 +20,6 @@
 
 using namespace httplib;
 
-/**
- * Load a page (html/ css/ javascript) from disc and return as string
- * @param[in] path to file
- * @return complete file as string
- * Load the login
- */
-std::string GetPage(std::string file) {
-  // Read page and send.
-  std::string path = "web/"+file;
-  std::ifstream read(path);
-  std::string login_page( (std::istreambuf_iterator<char>(read) ),
-                           std::istreambuf_iterator<char>()     );
-
-  // Delete file-end marker.
-  login_page.pop_back();
-  return login_page;
-}
-
 std::string GetReqParam(const Request&req, std::string key, std::string def="") {
   if (req.has_param(key.c_str()))
     return req.get_param_value(key.c_str());
@@ -282,6 +264,8 @@ void Suggestions(const Request& req, Response& resp, BookManager& manager,
 }
 
 int main() {
+  std::cout << "Starting super fast, but partly sucking c++ search api...\n" << std::endl;
+  
   // Create server.
   Server srv;
 
@@ -297,11 +281,11 @@ int main() {
   std::cout << "done.\n\n";
 
   // Load corpus metadata from disc.
-  std::cout << "Loading metadata at " << config["zotero_metadata"] << std::endl;
+  std::cout << "Loading metadata at " << config["zotero_metadata"];
   std::ifstream read(config["zotero_metadata"], std::ios::in);
   // Check if metadata was found.
   if(!read) {
-    std::cout << "No metadata found! Server fails to load\n";
+    std::cout << "]nNo metadata found! Server fails to load\n";
     return 1;
   }
   nlohmann::json metadata;
@@ -313,7 +297,6 @@ int main() {
   nlohmann::json zotero_pillars = nlohmann::json::array();
   for (auto it : metadata["collections"]["data"])
     zotero_pillars.push_back(nlohmann::json({{"key", it["key"]}, {"name", it["data"]["name"]}}));
-  std::cout << zotero_pillars << std::endl;
   std::cout << "done.\n\n";
 
   // Create book manager:
@@ -325,6 +308,7 @@ int main() {
   else
     std::cout << "Initialization failed!\n\n";
   
+  // Specify port to run on.
   int start_port = std::stoi("4848");
   std::cout << "Starting on port: " << start_port << std::endl;
 
@@ -338,24 +322,7 @@ int main() {
   srv.Get("/api/v2/search/suggestions/author", [&](const Request& req, Response& resp)
       { Suggestions(req, resp, manager, "author"); });
 
-  // TODO (fux): this should be handled from main server
-  srv.Get("/api/v2/search/pillars", [&](const Request& req, Response& resp)
-      { resp.set_content(zotero_pillars.dump(), "application/json"); });
-
-  // Serve static pages ONLY FOR TESTING!
-  srv.Get("/search", [](const Request& req, Response& resp) 
-      { resp.set_content(GetPage("Search.html"), "text/html"); });
-  srv.Get("/search(.*)", [](const Request& req, Response& resp)
-      { resp.set_content(GetPage("Search.html"), "text/html"); });
-  srv.Get("/Search.js", [](const Request& req, Response& resp) 
-      { resp.set_content(GetPage("Search.js"), "application/javascript"); });
-  srv.Get("/topnav.css", [](const Request& req, Response& resp) 
-      { resp.set_content(GetPage("topnav.css"), "text/css"); });
-  srv.Get("/Search.css", [](const Request& req, Response& resp) 
-      { resp.set_content(GetPage("Search.css"), "text/css"); });
-
   std::cout << "C++ Api server startup successfull!" << std::endl;
   srv.listen("0.0.0.0", start_port);
-
   return 0;
 }

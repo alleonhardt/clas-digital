@@ -188,11 +188,12 @@ void BookManager::AddBook(std::string path, std::string sKey) {
 
 std::list<Book*> BookManager::DoSearch(SearchOptions* searchOpts) {
     std::vector<std::string> sWords = func::split2(searchOpts->getSearchedWord(), "+");
-  //Start first search
+  //Start first search:
   Search search(searchOpts, sWords[0]);
   auto* results = search.search(map_words_, map_words_title_, map_words_authors_, 
       map_books_, dict_);
 
+  // Do search for every other word.
   for (size_t i=1; i<sWords.size(); i++) {
     if(sWords[i].length() == 0)
       continue;

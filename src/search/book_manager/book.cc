@@ -17,8 +17,18 @@ Book::Book(nlohmann::json metadata) : metadata_(metadata) {
   author_ = (metadata_.GetAuthor().size() == 0) ? "No Author" : metadata_.GetAuthor();
   author_date_ = author_;
   date_ = metadata_.GetDate();
-  author_date_ += (date_ != -1) ? ", " + std::to_string(date_) : author_date_ += ".";
   collections_ = metadata_.GetCollections();
+
+  // Fast-access-members.
+  author_date_ += (date_ != -1) ? ", " + std::to_string(date_) : author_date_ += ".";
+  quick_author_ = metadata_.GetAuthor(); // what about multiple authors.
+  func::convertToLower(quick_author_); 
+  std::string converted_author = func::convertStr(quick_author_); // check if this is needed.
+  quick_authors_words_ = func::extractWordsFromString(converted_author);
+  quick_title_ = metadata_.GetTitle();
+  func::convertToLower(quick_author_);  // check if this is needed.
+  std::string converted_title = func::convertStr(quick_title_);
+  quick_title_words_ = func::extractWordsFromString(converted_title);
 }
 
 // **** GETTER **** //
@@ -243,19 +253,19 @@ void Book::LoadPages() {
 
 // **** GET PAGES FUNCTIONS **** //
 
-std::map<int, std::vector<std::string>>* Book::GetPages(std::string sInput, 
+std::map<int, std::vector<std::string>>* Book::GetPages(std::string input, 
     bool fuzzyness) {
   // Initialize new map and return empty map in case the book has no ocr.
-  auto* mapPages = new std::map<int, std::vector<std::string>>;
+  auto* map_pages = new std::map<int, std::vector<std::string>>;
   if (has_ocr_ == false)
-    return mapPages;
+    return map_pages;
 
   // Do some parsing, as user can use ' ' or + to indicate searching for several words.
-  std::replace(sInput.begin(), sInput.end(), ' ', '+');
-  std::vector<std::string> vWords = func::split2(func::returnToLower(sInput), "+");
+  std::replace(input.begin(), input.end(), ' ', '+');
+  std::vector<std::string> vWords = func::split2(func::returnToLower(input), "+");
 
   // Create map of pages and found words for first word.
-  mapPages = FindPages(vWords[0], fuzzyness);
+  map_pages = FindPages(vWords[0], fuzzyness);
 
   // Iterate over all 1..n words create list of pages, and remove words not on same page.
   for (size_t i=1; i<vWords.size(); i++) {
@@ -263,10 +273,10 @@ std::map<int, std::vector<std::string>>* Book::GetPages(std::string sInput,
     auto* mapPages2 = FindPages(vWords[i], fuzzyness);
 
     // Remove all elements from mapPages, which do not exist in results2. 
-    RemovePages(mapPages, mapPages2);
+    RemovePages(map_pages, mapPages2);
     delete mapPages2;
   }
-  return mapPages;
+  return map_pages;
 }
 
 std::map<int, std::vector<std::string>>* Book::FindPages(std::string sWord, 
@@ -362,12 +372,10 @@ bool Book::MetadataCmp(std::vector<std::string> words, bool fuzzyness) {
           
   // Iterate over all words and check for occurrence in metadata.
   for (const auto& word : words) {
-    std::string title = metadata_.GetTitle(); func::convertToLower(title);
-    std::string author = metadata_.GetAuthor(); func::convertToLower(author);
 
     // If word occurs neither in author, title, or date, set inMetadata to false.
-    if (author.find(word) == std::string::npos  
-        && title.find(word) == std::string::npos 
+    if (quick_author_.find(word) == std::string::npos  
+        && quick_title_.find(word) == std::string::npos 
         && std::to_string(date_) != word) 
       in_metadata = false;
 
@@ -375,15 +383,13 @@ bool Book::MetadataCmp(std::vector<std::string> words, bool fuzzyness) {
     if (fuzzyness == true) {
       // Check title:
       bool found = false;
-      title = func::convertStr(title);
-      for (auto it : func::extractWordsFromString(title)) {
+      for (auto it : quick_title_words_) {
         if(fuzzy::fuzzy_cmp(word, it.first) <= 0.2)
           found = true;
       }
 
       // Check author:
-      author = func::convertStr(author);
-      for (auto it : func::extractWordsFromString(author)) {
+      for (auto it : quick_authors_words_) {
         if(fuzzy::fuzzy_cmp(word, it.first) <= 0.2)
           found = true;
       }
@@ -455,20 +461,21 @@ std::string Book::GetPreview(std::string input) {
 }
 
 std::string Book::GetOnePreview(std::string word) {
-  size_t pos = 0, page = 1000000;
+  size_t pos = -1, page = 1000000;
 
   // Get Source string and position, if no source, then return "no preview".
-  std::string preview = "";
-  if (has_ocr_ == true) 
-    preview = GetPreviewText(word, pos, page);
-  else
-    preview = GetPreviewTitle(word, pos);
-  if (preview=="") return "No Preview.";
+  std::string preview = (has_ocr()) ? GetPreviewText(word, pos, page) : GetPreviewTitle(word, pos);
+  
+  // If no preview was found, return "No Preview"
+  if (preview == "") 
+    return "No Preview.";
 
-  // Highlight searched word.
-  if (pos > 75) 
-    pos = 75;
-  preview.replace(pos, preview.find(" ", pos+1)-pos, "<mark>"+word+"</mark>");
+  // Highlight searched word, only if exact position was found.
+  if (pos != -1) {
+    if (pos > 75) 
+      pos = 75;
+    preview.replace(pos, preview.find(" ", pos+1)-pos, "<mark>"+word+"</mark>");
+  }
 
   // Delete or escape invalid characters if needed.
   EscapeDeleteInvalidChars(preview);
@@ -481,7 +488,7 @@ std::string Book::GetOnePreview(std::string word) {
 }
 
 std::string Book::GetPreviewText(std::string& word, size_t& pos, size_t& page) {
-  // Get match (full, gramatical, fuzzy).
+  // Get match (full, grammatical, fuzzy).
   if (map_words_pages_.count(word) > 0)
     word = word;
   else if (found_grammatical_matches_.count(word) > 0) {
@@ -522,32 +529,29 @@ std::string Book::GetPreviewText(std::string& word, size_t& pos, size_t& page) {
 }
 
 std::string Book::GetPreviewTitle(std::string& word, size_t& pos) {
-  // Get title.
-  std::string sTitle = metadata_.GetTitle() + " ";
-  func::convertToLower(sTitle);
-
-  // Find position where searched word occures.
-  pos = sTitle.find(word);
+  // Find position where searched word occurs.
+  pos = quick_title_.find(word);
 
   // If word could not be found. Try to find it with fuzzy search. 
-  if (pos == std::string::npos || sTitle == "" || pos > sTitle.length()) {
-    for (auto it : func::split2(sTitle, " ")) {
-      if (fuzzy::fuzzy_cmp(func::convertStr(it), word) < 0.2) {
-        pos=sTitle.find(it);
-        if(pos != std::string::npos && sTitle != "" && pos <= sTitle.length())
-          return sTitle;
+  if (pos == std::string::npos && quick_title_ != "") {
+    for (auto it : quick_title_words_) {
+      if (fuzzy::fuzzy_cmp(it.first, word) < 0.2) {
+        pos = quick_title_.find(it.first);
+        if(pos == std::string::npos && pos > quick_title_.length())
+          pos = -1; 
+        return quick_title_;
       }
     }
     return "";
   }
-  return sTitle;
+  return quick_title_;
 }
 
 
 size_t Book::GetPreviewPosition(std::string word) {
   std::vector<size_t> pages = map_words_pages_[word].pages();
   for (size_t i=0; i<pages.size(); i++) {
-    // Read ocr and kontent and find match.
+    // Read ocr and content and find match.
     std::ifstream read(path_ + "/intern/page" + std::to_string(pages[i]) 
         + ".txt", std::ios::in);
     std::string page((std::istreambuf_iterator<char>(read)), 
