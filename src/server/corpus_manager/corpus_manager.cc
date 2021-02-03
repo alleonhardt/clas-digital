@@ -306,7 +306,7 @@ void CreateCatalogueBooks(IReferenceManager::ptr_cont_t &mapbooks)
     entry["key"] = it.second->GetKey();
     entry["title"] = it.second->GetShow2();
     entry["bib"] = it.second->GetBibliography();
-    entry["has_ocr"] = it.second->HasContent();
+    entry["has_ocr"] = it.second->HasOcr();
 
     vBooks.push_back(std::move(entry));
   }
@@ -404,7 +404,7 @@ void CreateCatalogueAuthor(IReferenceManager::ptr_cont_t &books,std::map<std::st
             {"id", jt},
             { "title", (*books)[jt]->GetShow2()},
             { "bib", (*books)[jt]->GetBibliography()},
-            { "has_ocr", (*books)[jt]->HasContent()}
+            { "has_ocr", (*books)[jt]->HasOcr()}
             });
       }
 
@@ -467,7 +467,7 @@ void CreateCatalogueCollection(IReferenceManager::ptr_cont_t &items, IReferenceM
           {"id", jt.first},
           { "title", jt.second->GetShow2()},
           { "bib", jt.second->GetBibliography()},
-          {"has_ocr",jt.second->HasContent()}
+          {"has_ocr",jt.second->HasOcr()}
           });
     }
 
