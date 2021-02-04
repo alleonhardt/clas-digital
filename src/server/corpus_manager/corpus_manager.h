@@ -29,6 +29,9 @@ class CorpusManager {
     clas_digital::IReferenceManager::ptr_cont_t& item_references();
     clas_digital::IReference* book(std::string ref);
 
+    
+    bool CreateWebpage(clas_digital::IReference *item,clas_digital::IFileHandler *handler);
+  
 
   private:
     ///<The item references meaning books in this context.
@@ -39,22 +42,6 @@ class CorpusManager {
     ///<Map of unique authors of all books to create the id for every author
     std::map<std::string,std::vector<std::string>> m_mapUniqueAuthors;
   
-    /**
-     * Write the metadata page for one book
-     * @param ref The reference to get the book from
-     */
-    void WriteMetadataPage(clas_digital::IReference *ref);
-  
-
-    /**
-     * Update the book index.
-     */
-    void BookIndex(clas_digital::IReference *ref);
-
-    /**
-     * Write the collection page for a reference, the reference should have the type of a collection
-     */
-    void WriteCollectionPage(clas_digital::IReference *ref);
 };
 
 #endif
