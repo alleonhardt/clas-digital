@@ -1,6 +1,7 @@
 #include "book.h"
 #include "func.hpp"
 #include <ctime>
+#include <filesystem>
 
 namespace fs = std::filesystem;
 
@@ -92,7 +93,7 @@ bool Book::HasContent() const {
 std::string Book::GetAuthorDateScanned() {
   if(has_ocr_ == true)
     return author_date_;
-  return author_date_ + "<span style='color:orange;font-size:80%'>"
+  return author_date_ + "<span style='color:orange;font-size:80%;margin-left:1rem;'>"
     "Book is not yet scanned, sorry for that.</span>";
 }    
 
@@ -105,7 +106,7 @@ void Book::SetPath(std::string path) {
 
 // **** CREATE BOOK AND MAPS (PAGES, RELEVANCE, PREVIEW) **** // 
 
-void Book::InitializeBook(std::string path) {
+void Book::InitializeBook(std::string path, bool reload_pages) {
   // Set absolute path.
   path_ = path;
 
@@ -117,10 +118,10 @@ void Book::InitializeBook(std::string path) {
 
   // if books has ocr, pre-process ocr and create map of worlds/ pages.
   if (std::filesystem::exists(ocr_path()))
-    InitializePreProcessing();
+    InitializePreProcessing(reload_pages);
 }
 
-void Book::InitializePreProcessing() {
+void Book::InitializePreProcessing(bool reload_pages) {
   has_ocr_ = true;
 
   //Write json to disc.
@@ -128,9 +129,10 @@ void Book::InitializePreProcessing() {
 
   // Check whether list of words_pages already exists, if yes load, otherwise, create
   std::string path = path_ + "/intern/pages.txt";
-  if (!std::filesystem::exists(path) || std::filesystem::is_empty(path)) {
+  if (!std::filesystem::exists(path) || std::filesystem::is_empty(path) || reload_pages) {
     CreatePages();
     CreateMapPreview(); // find (first) preview.
+    ConvertKeys(); // convert word to only english!
     SafePages();
   }
   else
@@ -141,6 +143,7 @@ void Book::CreatePages() {
   std::cout << "Creating map of words... \n";
   // Load ocr and create ne directory "intern" for this book.
   std::ifstream read(ocr_path());
+  fs::remove_all(path_ + "/intern");
   fs::create_directories(path_ + "/intern");
 
   std::string buffer = "", cur_line = "";
@@ -183,8 +186,17 @@ void Book::CreatePage(std::string sBuffer, size_t page) {
 
 void Book::CreateMapPreview() {
   std::cout << "Create map Prev." << std::endl;
-  for(auto it : map_words_pages_) 
+  for(auto it : map_words_pages_)
     map_words_pages_[it.first].set_position(GetPreviewPosition(it.first));
+}
+
+void Book::ConvertKeys() {
+  std::unordered_map<std::string, WordInfo> map_words_pages_new;
+  for (auto it : map_words_pages_) {
+    std::string new_key = it.first;
+    map_words_pages_new[func::convertStr(new_key)] = map_words_pages_[it.first];
+  }
+  map_words_pages_ = map_words_pages_new;
 }
 
 void Book::SafePages() {
@@ -196,8 +208,7 @@ void Book::SafePages() {
   // Iterate over map of words.
   for (auto it : map_words_pages_) {
     // Write word in converted format (replace a by ä, é by e ...).
-    std::string word = it.first;
-    std::string buffer = func::convertStr(word) + ";";
+    std::string buffer = it.first + ";";
 
     // Add all pages the word occurs on.
     for (size_t page : it.second.pages())
@@ -531,20 +542,19 @@ std::string Book::GetPreviewText(std::string& word, size_t& pos, size_t& page) {
 std::string Book::GetPreviewTitle(std::string& word, size_t& pos) {
   // Find position where searched word occurs.
   pos = quick_title_.find(word);
+  if (pos != std::string::npos) 
+    return quick_title_;
 
   // If word could not be found. Try to find it with fuzzy search. 
-  if (pos == std::string::npos && quick_title_ != "") {
-    for (auto it : quick_title_words_) {
-      if (fuzzy::fuzzy_cmp(it.first, word) < 0.2) {
-        pos = quick_title_.find(it.first);
-        if(pos == std::string::npos && pos > quick_title_.length())
-          pos = -1; 
-        return quick_title_;
-      }
+  for (auto it : quick_title_words_) {
+    if (fuzzy::fuzzy_cmp(it.first, word) < 0.2) {
+      pos = quick_title_.find(it.first);
+      if(pos == std::string::npos && pos > quick_title_.length())
+        pos = -1; 
+      return quick_title_;
     }
-    return "";
   }
-  return quick_title_;
+  return "";
 }
 
 

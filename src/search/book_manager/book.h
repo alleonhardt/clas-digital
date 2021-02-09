@@ -63,14 +63,14 @@ public:
    * Sets path, has_ocr and has_images.
    * @param path to book.
    */
-  void InitializeBook(std::string path);
+  void InitializeBook(std::string path, bool reload_pages);
 
   /**
   * Pre-processes ocr-file.
   * Creates/loads map of pages, safes to json.
   * @param[in] sPath (path to book)
   */
-  void InitializePreProcessing();
+  void InitializePreProcessing(bool reload_pages);
 
   /**
    * Add a single new pages, generate by Teseract. 
@@ -175,6 +175,11 @@ private:
   * Find preview position for each word in map of words/pages.
   */
   void CreateMapPreview();
+
+  /**
+   * Convert all keys.
+   */
+  void ConvertKeys();
 
   /**
   * Safe map of all words and pages to disc

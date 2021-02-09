@@ -19,12 +19,14 @@
 
 #include "book_manager/book.h"
 #include "func.hpp"
+#include "gramma.h"
 #include "search/search.h"
 #include "search/search_options.h"
 
 
 class BookManager {
   private:
+    Dict* full_dict_;
     const std::vector<std::string> upload_points_; ///< mount_points for book-locations.
 
     std::unordered_map<std::string, Book*> map_books_; ///< map of all books.
@@ -37,9 +39,6 @@ class BookManager {
     MAPWORDS map_words_authors_; ///< Map of all authors: name -> ocuring books:score.
     std::map<std::string, std::vector<std::string>> map_unique_authors_;
 
-    typedef std::unordered_map<std::string, std::set<std::string>> dict;
-    dict dict_; ///< Dictionary from grammatic puroses. F.e. finding base form.
-
     typedef std::list<std::pair<std::string, size_t>> sortedList;
     sortedList list_words_; ///< Sorted list of all words by score (for typeahead).
     sortedList list_authors_; ///< Sorted list of all authors by score (for typeahead). 
@@ -48,7 +47,7 @@ class BookManager {
 
   public:
     ///< Constructor
-    BookManager(std::vector<std::string> paths_to_books, std::string mount_points);
+    BookManager(std::vector<std::string> paths_to_books, Dict* dict);
 
     // **** getter **** //
 
@@ -73,7 +72,7 @@ class BookManager {
      * @brief load all books.
      * @return boolean for successful of not
      */
-    bool Initialize(); 
+    bool Initialize(bool reload_pages=false); 
 
     /**
      * @brief parse json of all items. If item exists, change metadata of item, create new book.
@@ -86,7 +85,7 @@ class BookManager {
      * @param[in] path path to book.
      * @param[in] key key to book
      */
-    void AddBook(std::string path, std::string key);
+    void AddBook(std::string path, std::string key, bool reload_pages);
 
     /**
      * @brief search function calling fitting function from search class
@@ -133,4 +132,3 @@ class BookManager {
 }; 
 
 #endif
-

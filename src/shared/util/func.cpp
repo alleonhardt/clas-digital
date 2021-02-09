@@ -1,4 +1,8 @@
 #include "func.hpp"
+#include <algorithm>
+#include <cctype>
+#include <cstddef>
+#include <type_traits>
 
 namespace func 
 {
@@ -195,16 +199,17 @@ std::vector<std::string> split2(std::string str, std::string delimiter)
     return vStr;
 }
 
-std::string convertStr(std::string& str)
-{
-    std::map<wchar_t, wchar_t> rep = {{L'ä','a'},{L'ö','o'},{L'ü','u'},{L'ö','o'},{L'ß','s'},{L'é','e'},{L'è','e'},{L'á','a'},{L'ê','e'},{L'â','a'}, {L'ſ','s'}};
-    
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-    std::wstring wide = converter.from_bytes(str); 
-    for(size_t i=0; i<wide.length(); i++)
-        if(rep.count(wide[i]) > 0) wide[i] = rep[wide[i]];
-    std::string newStr = converter.to_bytes(wide);
-    return newStr;
+std::string convertStr(std::string& str) {
+  std::map<wchar_t, wchar_t> rep = {{L'ä','a'},{L'ö','o'},{L'ü','u'},{L'ö','o'},{L'ß','s'},{L'é','e'},{L'è','e'},{L'á','a'},{L'ê','e'},{L'â','a'}, {L'ſ','s'}};
+  
+  std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+  std::wstring wide = converter.from_bytes(str); 
+  for(size_t i=0; i<wide.length(); i++) {
+    if(rep.count(wide[i]) > 0) 
+      wide[i] = rep[wide[i]];
+  }
+  std::string newStr = converter.to_bytes(wide);
+  return newStr;
 }
 
 /**
@@ -212,19 +217,24 @@ std::string convertStr(std::string& str)
 * @param[in, out] string to modify
 */
 void transform(std::string& str) {
-  if(str.length() == 0)
-    return;
+  if (str.length() == 0) return;
+  std::map<wchar_t, wchar_t> rep = {{L'ä','a'},{L'ö','o'},{L'ü','u'},{L'ö','o'},{L'ß','s'},{L'é','e'},{L'è','e'},{L'á','a'},{L'ê','e'},{L'â','a'}, {L'ſ','s'}};
 
-  if(isalpha(str.front()) == false)
-    transform(str.erase(0,1));
+  std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+  std::wstring wide = converter.from_bytes(str); 
+  for(;;) {
+    if (wide.length() == 0) break;
 
-  if(str.length() == 0)
-    return;
-
-  if(isalpha(str.back()) == false) {
-      str.pop_back();
-      transform(str);
+    size_t len = wide.length();
+    if (!std::isalpha(wide.front()) && rep.count(wide.front()) == 0) 
+      wide.erase(0,1);
+    if (wide.length() == 0) break;
+    if (!std::isalpha(wide.back()) && rep.count(wide.back()) == 0) 
+      wide.pop_back();
+    if (len == wide.length())
+      break;
   }
+  str = (wide.length() == 0) ? "" : converter.to_bytes(wide);
 }
 
 /**
@@ -262,64 +272,63 @@ bool isWord(const char* chWord) {
   return false;
 }
 
+void add_spaces_after(std::string& str, std::vector<char> chars) {
+  for (size_t i=0; i<str.length(); i++) {
+    for (const char c : chars) {
+      if (str[i] == c) 
+        str.insert(++i, " ");
+    }
+  }
+}
+
 /**
 * @brief extract words from a string into a map (drop all sequences which  aren't a word).
 * @param[in] sWords string of which map shall be created 
 * @param[out] mapWords map to which new words will be added
 */
-std::map<std::string, int> extractWordsFromString(std::string& sBuffer) {
+std::map<std::string, int> extractWordsFromString(std::string& buffer) {
   //Replace all \n and ; with " "
-  std::replace(sBuffer.begin(), sBuffer.end(), '\n', ' ');
-  std::replace(sBuffer.begin(), sBuffer.end(), ';', ' ');
-  std::replace(sBuffer.begin(), sBuffer.end(), ',', ' ');
+  add_spaces_after(buffer, {'.', ',',';',':'}); // assure splitting.
 
-  std::vector<std::string> vStrs = split2(sBuffer, " ");
+  std::vector<std::string> vStrs = split2(buffer, " ");
   std::map<std::string, int> mapWords;
 
   for(unsigned int i=0; i<vStrs.size();i++) {
     if (vStrs[i].length() <= 2)
       continue;
 
-    transform(vStrs[i]);
-    if(vStrs[i].length() >= 2 && vStrs[i].length() <= 25 && isWord(vStrs[i].c_str()) == true) {
-      vStrs[i].erase(std::remove(vStrs[i].begin(), vStrs[i].end(), '-'), vStrs[i].end());
-      vStrs[i].erase(std::remove(vStrs[i].begin(), vStrs[i].end(), '.'), vStrs[i].end());
-      sBuffer.erase(std::remove(sBuffer.begin(), sBuffer.end(), '-'), sBuffer.end());
-      sBuffer.erase(std::remove(sBuffer.begin(), sBuffer.end(), '.'), sBuffer.end());
-      convertToLower(vStrs[i]);
-      mapWords[vStrs[i]] += 1;
+    std::string cur_word = returnToLower(vStrs[i]);
+    transform(cur_word);
+    if(cur_word.length() >= 2 && cur_word.length() <= 25 && isWord(cur_word.c_str()) == true) {
+      mapWords[cur_word] += 1;
     }
   }
+  convertToLower(buffer);
   return mapWords;
 }
-
 
 /**
 * @brief check whether string indicates, that next page is reached
 * @param[in] buffer 
 * @return 
 */
-bool checkPage(std::string &buffer)
-{
-    const char arr[] = "----- ";
-    if(buffer.length()<6)
-        return false;
+bool checkPage(std::string &buffer) {
+  const char arr[] = "----- ";
+  if(buffer.length()<6)
+    return false;
 
-    for(unsigned int i=0; i < 6;i++)
-    {
-        if(arr[i]!=buffer[i])
-        return false;
-    }
+  for(unsigned int i=0; i < 6;i++) {
+    if(arr[i]!=buffer[i])
+      return false;
+  }
 
-    for(unsigned int i = 6; i < buffer.length(); i++)
-    {
-        if(buffer[i]==' ')
-            return true;
-        else if(buffer[i]<48||buffer[i]>57)
-            return false;
-   }
-   return false;
+  for(unsigned int i = 6; i < buffer.length(); i++) {
+    if(buffer[i]==' ')
+      return true;
+    else if(buffer[i]<48||buffer[i]>57)
+      return false;
+  }
+  return false;
 }
-
 
 } //Close namespace 
