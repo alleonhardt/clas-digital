@@ -25,28 +25,29 @@ SearchOptions::SearchOptions()
 * @param[in] from date from which books shall be searched
 * @param[in] to date to which books shall be searched
 **/
-SearchOptions::SearchOptions(std::string chSearchedWord, bool fuzzyness, std::vector<std::string> sCollections, std::string sScope, std::string slastName, int from, int to, bool full, std::string filterResults)
-{
-    func::convertToLower(chSearchedWord);
-    std::replace(chSearchedWord.begin(), chSearchedWord.end(), ' ', '+');
-	m_chSearchedWord = func::convertStr(chSearchedWord);
-    m_fuzzyness = fuzzyness;
-    m_sCollections = sCollections;
-	func::convertToLower(slastName);
-    m_slastName.assign(slastName); 
-    m_From = from;
-    m_To = to;
+SearchOptions::SearchOptions(std::string chSearchedWord, bool fuzzyness, 
+    std::vector<std::string> sCollections, std::string sScope, std::string slastName, 
+    int from, int to, bool full, std::string filterResults) {
+  func::convertToLower(chSearchedWord);
+  std::replace(chSearchedWord.begin(), chSearchedWord.end(), ' ', '+');
+  m_chSearchedWord = func::convertStr(chSearchedWord);
+  m_fuzzyness = fuzzyness;
+  m_sCollections = sCollections;
+  func::convertToLower(slastName);
+  m_slastName.assign(slastName); 
+  m_From = from;
+  m_To = to;
 
-    m_onlyTitle = false;
-    m_onlyOCR = false;
-    if(sScope=="metadata") m_onlyTitle = true;
-    if(sScope=="body")     m_onlyOCR = true;
+  m_onlyTitle = false;
+  m_onlyOCR = false;
+  if(sScope=="metadata") m_onlyTitle = true;
+  if(sScope=="body")     m_onlyOCR = true;
 
-    m_fullAccess = full;
+  m_fullAccess = full;
 
-    m_filterResults = 0;
-    if (filterResults == "alphabetically") m_filterResults = 2;
-    if (filterResults == "chronologically") m_filterResults = 1;
+  m_filterResults = 0;
+  if (filterResults == "alphabetically") m_filterResults = 2;
+  if (filterResults == "chronologically") m_filterResults = 1;
 }
 
 

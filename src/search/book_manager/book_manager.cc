@@ -1,24 +1,16 @@
 #include "book_manager.h"
 #include "book_manager/book.h"
+#include "gramma.h"
 #include "search/search.h"
+#include <cstddef>
 #include <ostream>
 #include <utility>
 #include <vector>
 
-BookManager::BookManager(std::vector<std::string> mount_points, std::string dictionary_low) 
+BookManager::BookManager(std::vector<std::string> mount_points, Dict* dict) 
   : upload_points_(mount_points){
   std::string sBuffer;
-  std::ifstream read(dictionary_low);
-  
-  while(getline(read, sBuffer)) {
-    std::vector<std::string> vec = func::split2(sBuffer, ":");
-    std::vector<std::string> vec2 = func::split2(vec[1], ",");
-    for(size_t i=0; i<vec2.size(); i++) {
-      dict_[vec[0]].insert(vec2[i]);
-      dict_[vec2[i]].insert(vec[0]);
-    }
-  }
-  std::cout << "Created dictionary. Size: " << dict_.size() << "\n";
+  full_dict_ = dict;
 }
 
 std::unordered_map<std::string, Book*>& BookManager::map_of_books() {
@@ -134,7 +126,7 @@ void BookManager::WriteListofBooksWithBSB() {
   }
 }
 
-bool BookManager::Initialize() {
+bool BookManager::Initialize(bool reload_pages) {
   std::cout << "BookManager: Starting initializing..." << std::endl;
 
   std::cout << "BookManager: Extracting books." << std::endl;
@@ -143,7 +135,7 @@ bool BookManager::Initialize() {
     for (const auto& p : std::filesystem::directory_iterator(upload_point)) {
       std::string filename = p.path().stem().string();
       if (map_books_.count(filename) > 0)
-        AddBook(p.path(), filename);
+        AddBook(p.path(), filename, reload_pages);
     }
   }
 
@@ -155,6 +147,20 @@ bool BookManager::Initialize() {
   std::cout << "Map words:   " << map_words_.size() << "\n";
   std::cout << "Map title:   " << map_words_title_.size() << "\n";
   std::cout << "Map authors: " << map_words_authors_.size() << "\n";
+  
+  std::cout << "creating base only" << std::endl;
+  std::map<std::string, int> base_only;
+  for (auto it : map_words_) {
+    std::string base = full_dict_->GetBaseForm(it.first);
+    base = (base == "") ? it.first : base; 
+    base_only[base]++;
+  }
+  for (auto it : base_only) {
+    std::cout << it.first << ": " << it.second << std::endl;
+  }
+  std::cout << "Size: " << base_only.size() << std::endl;
+  std::cout << "Map words:   " << map_words_.size() << "\n";
+
 
   // WriteListofBooksWithBSB();
   return true;
@@ -179,38 +185,43 @@ void BookManager::UpdateZotero(nlohmann::json j_items) {
   }
 }
 
-void BookManager::AddBook(std::string path, std::string sKey) {
+void BookManager::AddBook(std::string path, std::string sKey, bool reload_pages) {
   if(!std::filesystem::exists(path))
     return;
-  map_books_[sKey]->InitializeBook(path);
+  map_books_[sKey]->InitializeBook(path, reload_pages);
 }
     
 
 std::list<Book*> BookManager::DoSearch(SearchOptions* searchOpts) {
-    std::vector<std::string> sWords = func::split2(searchOpts->getSearchedWord(), "+");
+  std::vector<std::string> words = func::split2(searchOpts->getSearchedWord(), "+");
+
+  words.erase(std::remove_if(words.begin(), words.end(), 
+        [](std::string x) { return x == ""; }), words.end());
+
   //Start first search:
-  Search search(searchOpts, sWords[0]);
-  auto* results = search.search(map_words_, map_words_title_, map_words_authors_, 
-      map_books_, dict_);
+  Search search(searchOpts, words[0], full_dict_);
+  auto* results = search.search(map_words_, map_words_title_, map_words_authors_, map_books_);
 
   // Do search for every other word.
-  for (size_t i=1; i<sWords.size(); i++) {
-    if(sWords[i].length() == 0)
+  size_t counter = 1;
+  for (size_t i=1; i<words.size(); i++) {
+    if(words[i].length() == 0)
       continue;
 
-    Search search2(searchOpts, sWords[i]);
-    auto* results2 = search2.search(map_words_, map_words_title_, 
-        map_words_authors_, map_books_, dict_);
+    Search search2(searchOpts, words[i], full_dict_);
+    auto* results2 = search2.search(map_words_, map_words_title_, map_words_authors_, map_books_);
 
     for (auto it=results->begin(); it!=results->end();) {
       if(results2->count(it->first) == 0)
         it = results->erase(it);
-      else if(map_books_[it->first]->OnSamePage(sWords, searchOpts->getFuzzyness())==false)
+      else if(map_books_[it->first]->OnSamePage(words, searchOpts->getFuzzyness())==false)
         it = results->erase(it);
       else
         ++it;
     }
+    counter++;
   }
+  std::cout << "Done searching. Executed search for " << counter << " words.\n";
   //Sort results results and convert to list of books.
   std::list<Book*> sorted_search_results;
   for (auto it : SortMapByValue(results, searchOpts->getFilterResults()))
@@ -270,7 +281,6 @@ void BookManager::CreateMapWords() {
           ->map_words_pages()[yt.first].relevance())/it->second->num_pages();
     }
   }
-
   CreateListWords(map_words_, list_words_);
 } 
 

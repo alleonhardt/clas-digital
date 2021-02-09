@@ -10,6 +10,7 @@
 #include <string>
 
 #include <httplib.h>
+#include <vector>
 
 #include "book_manager/book.h"
 #include "book_manager/book_manager.h"
@@ -41,9 +42,7 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
     return;
   }
   std::string query = GetReqParam(req, "q");
-  query = func::convertStr(query); // replace some non-english characters.
-  func::transform(query); // remove leading and trailing non-characters.
-  std::replace(query.begin(), query.end(), ' ', '+');
+  std::cout << "Searching for: " << query << std::endl;
 
   // Get searcing for relevant neighbors:
   bool relevant_neighbors = GetReqParam(req, "relevant_neighbors", "0") == "1";
@@ -263,7 +262,19 @@ void Suggestions(const Request& req, Response& resp, BookManager& manager,
   resp.status = 200;
 }
 
-int main() {
+int main(int argc, char *argv[]) {
+
+  std::string str = "der;hund ?läuft__ durch das über-krasse Häuser-virtel.Und verteilt un?!!äch-te bonbons";
+  for (auto it : func::extractWordsFromString(str)) {
+    std::string word = it.first;
+    size_t pos = str.find(word);
+    std::cout << word; 
+    if (pos != std::string::npos) 
+      std::cout << " still found!\n";
+    else
+     std::cout << " not found.\n";
+  }
+  std::cout << str << std::endl;
   std::cout << "Starting super fast, but partly sucking c++ search api...\n" << std::endl;
   
   // Create server.
@@ -278,14 +289,18 @@ int main() {
   // Load dictionary.
   std::cout << "Loading dictionary at " << config["dictionary"] << std::endl;
   Dict dict(config["dictionary"]);
+  for (auto it : dict.GetAllConjugations("hund")) 
+    std::cout << it << std::endl;
   std::cout << "done.\n\n";
+  std::cout << "Base Hündin: " << dict.GetBaseForm("Hunden") << ", "
+    << dict.GetBaseForm("Hündin") << std::endl;
 
   // Load corpus metadata from disc.
   std::cout << "Loading metadata at " << config["zotero_metadata"];
   std::ifstream read(config["zotero_metadata"], std::ios::in);
   // Check if metadata was found.
   if(!read) {
-    std::cout << "]nNo metadata found! Server fails to load\n";
+    std::cout << "No metadata found! Server fails to load\n";
     return 1;
   }
   nlohmann::json metadata;
@@ -301,9 +316,12 @@ int main() {
 
   // Create book manager:
   std::cout << "initializing bookmanager..." << std::endl;
-  BookManager manager(config["upload_points"], config["dictionary_old"]);
+  std::string cmd_arg = (argc > 1) ? argv[1] : "";
+  BookManager manager(config["upload_points"], &dict);
+  std::cout << "Updating zoteror..." << std::endl;
   manager.UpdateZotero(metadata["items"]["data"]);
-  if (manager.Initialize())
+  std::cout << "done" << std::endl;
+  if (manager.Initialize(cmd_arg == "reload_pages"))
     std::cout << "Initialization successful!\n\n"; 
   else
     std::cout << "Initialization failed!\n\n";

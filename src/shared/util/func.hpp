@@ -111,6 +111,8 @@ namespace func {
   */
   void transform(std::string& str);
 
+  void add_spaces_after(std::string& str, std::vector<char> chars);
+
   /**
   * @param[in] sWords string of which map shall be created 
   * @param[out] mapWords map to which new words will be added
