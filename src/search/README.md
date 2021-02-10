@@ -49,6 +49,7 @@ struct WordInfo {
   size_t preview_position_;
   size_t preview_page_;
   double relevance_;
+}
 ```
 
 Assuming however, we found a word with fuzzy-search. F.e. we search for
@@ -57,8 +58,8 @@ this word can later be found, to get the preview, or the pages?
 For each books, we store all words, not existing in the `Book::map_of_words_` in the following two maps: 
 
 ```c++
-std::unordered_map<string, set<pair<string, double, comp>>> metadata_fuzzy_matches;
-std::unordered_map<string, set<pair<string, double, comp>>> corpus_fuzzy_matches;
+std::unordered_map<string, set<pair<string, double>, comp>> metadata_fuzzy_matches;
+std::unordered_map<string, set<pair<string, double>, comp>> corpus_fuzzy_matches;
 ```
 The first string (the key) is the searched word, which does not exist in
 `CBook::map_of_words_`.
@@ -72,16 +73,36 @@ Also a few things should be guaranteed:
 - if existing, then every word should be converted to it's __base-form__: `"hunden"->"hund" ...` 
 
 To find a word, we need to apply the same conversion to the query as to the stored words. Also we may want to store the query into as separate words (`"Armeise+Krieg"-> ["Armeise", "Krieg"`)
-This makes it necessary to have a data-structure for the search. 
+This makes it necessary to have a data-structure for the search, which will be created for both `full_search` and `seach_in_book`.
 
 ```c++
 class SearchObject {
   std::string query_;
-  std::vector<string> words_;
-  std::vector<string> converted_words_;
+  std::vector<string> words_;	// created in constructor
+  std::vector<string> converted_words_;	// created in constructor
   SearchOptions search_options_;
 }
 ```
+
+The search-object is combined with an object for the search-results:
+
+```c++
+class SearchOptions {
+    bool fuzzy_search_;
+    bool only_metadata_;
+    bool only_corpus_;
+    int from_;	// year
+    int to_;	// year
+    int sort_result_; // 0=relevance, 1=chronologically, 2=alphabetically
+    std::string author_; // last-name of author.
+    std::vector<std::string> collections_; 
+}
+```
+TODO: investigate which constructor(s) might be needed apart from a full-args
+constructor.
+
+
+Also we need a object storing the results. During the search the result-objects will be stored in a map `std::map<std::string, ResultObject>` to easy remove duplicates (the key being the book-key). After the search is done, the map will be sorted and converted to a list: `std::list<ResultObject`.  
 
 ```c++
 class ResultObject {
@@ -89,8 +110,11 @@ class ResultObject {
   bool found_in_corpus_;
   int meta_data_score_;
   int corpus_score;
+  Book* book;
 }
 ```
+
+It is obvious, that this object is only used, for the full search. The additional information, makes it easy to use this object, when search the different results for a book (search_in_book).
 
 ## Algorithms
 
@@ -171,9 +195,11 @@ Summary:
 - iterates over all words in current map of pages.
 - for every word: 
   - As we now found the best preview position, we can convert the string:
-    - call `convertStr()`, replacing non-utf-8 characters, by utf-8-characters
     - convert string to lower-case.
+    - call `convertStr()`, replacing non-utf-8 characters, by utf-8-characters
   - search base-form,
+    - `base_form = (GetBaseForm(cur_word) == "") ? cur_word : base_form;` So the
+      base_form is now either the base-form, or (if not found) the current word itself.
     - if exists: add to, or set as first word for this base_form
     - if not: add to `Book::map_of_words_` 
   - As now we have the number of pages, we can construct the relevance as

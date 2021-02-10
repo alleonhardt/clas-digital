@@ -1,7 +1,13 @@
 #include "book.h"
+#include "book_manager/word_info.h"
 #include "func.hpp"
+#include "sorted_matches.h"
+#include "tmp_word_info.h"
+#include <cstddef>
+#include <cstdlib>
 #include <ctime>
 #include <filesystem>
+#include <iostream>
 
 namespace fs = std::filesystem;
 
@@ -77,13 +83,12 @@ std::unordered_map<std::string, WordInfo>& Book::map_words_pages() {
   return map_words_pages_;
 }
 
-std::unordered_map<std::string, std::list<std::pair<std::string, double>>>& 
-Book::found_fuzzy_matches() {
-  return found_fuzzy_matches_;
+std::unordered_map<std::string, SortedMatches>& Book::corpus_fuzzy_matches() {
+  return corpus_fuzzy_matches_;
 }
 
-std::unordered_map<std::string, std::list<std::string>>& Book::found_grammatical_matches() {
-  return found_grammatical_matches_;
+std::unordered_map<std::string, SortedMatches>& Book::metadata_fuzzy_matches() {
+  return metadata_fuzzy_matches_;
 }
 
 bool Book::HasContent() const { 
@@ -129,23 +134,29 @@ void Book::InitializePreProcessing(bool reload_pages) {
 
   // Check whether list of words_pages already exists, if yes load, otherwise, create
   std::string path = path_ + "/intern/pages.txt";
-  if (!std::filesystem::exists(path) || std::filesystem::is_empty(path) || reload_pages) {
-    CreatePages();
-    CreateMapPreview(); // find (first) preview.
-    ConvertKeys(); // convert word to only english!
-    SafePages();
-  }
+  if (!std::filesystem::exists(path) || std::filesystem::is_empty(path) || reload_pages)
+    CreateIndex();
   else
     LoadPages();
 }
 
-void Book::CreatePages() {
-  std::cout << "Creating map of words... \n";
-  // Load ocr and create ne directory "intern" for this book.
-  std::ifstream read(ocr_path());
+void Book::CreateIndex() {
+  // Delete old index-directory and create new.
   fs::remove_all(path_ + "/intern");
   fs::create_directories(path_ + "/intern");
 
+  std::map<std::string, TempWordInfo> temp_map_pages;
+  SeperatePages(temp_map_pages);
+  CreateMapPreview(temp_map_pages);
+  GenerateBaseFormMap(temp_map_pages);
+  SafePages();
+}
+
+void Book::SeperatePages(temp_index_map& temp_map_pages) {
+  std::cout << "Creating map of words... \n";
+  // Load ocr and create ne directory "intern" for this book.
+  std::ifstream read(ocr_path());
+  
   std::string buffer = "", cur_line = "";
   size_t page=1, num_pages_=0;
   while (!read.eof()) {
@@ -154,7 +165,7 @@ void Book::CreatePages() {
     // Add a page when new page is reached.
     if (func::checkPage(cur_line)) {
       // Add new page to map of pages and update values. Safe page to disc.
-      CreatePage(buffer, page);
+      CreatePage(temp_map_pages, buffer, page);
       
       // Parse new page-number from line, reset buffer and increate page_counter.
       page = stoi(cur_line.substr(6, cur_line.find("/")-7));
@@ -168,35 +179,67 @@ void Book::CreatePages() {
   }
   // If there is "something left", safe as new page.
   if (buffer.length() !=0)
-    CreatePage(buffer, page);
+    CreatePage(temp_map_pages, buffer, page);
 
   read.close();
 }
 
-void Book::CreatePage(std::string sBuffer, size_t page) {
-  // Add entry, or update entry in map of words/ pages (new page + relevance)
-  for (auto it : func::extractWordsFromString(sBuffer)) {
-    map_words_pages_[it.first].AddPage(page);
-    map_words_pages_[it.first].AddRelevance(it.second);
+void Book::CreatePage(temp_index_map& temp_map_pages, std::string sBuffer, size_t page) {
+
+  // Extract words and calculate number of found words.
+  auto extracted_words = func::extractWordsFromString(sBuffer);
+  size_t num_words_on_page;
+  // Add page to word and increase relevance.
+  for (auto it : extracted_words) {
+    temp_map_pages[it.first].AddPage({page, num_words_on_page});
+    temp_map_pages[it.first].IncreaseRelevance(it.second);
   } 
-  // Create new page
-  func::WriteContentToDisc(path_ + "/intern/page" + std::to_string(page) + ".txt", 
-      func::returnToLower(sBuffer));
+  // Save page to disc.
+  func::WriteContentToDisc(path_ + "/intern/page" + std::to_string(page) + ".txt", sBuffer);
 }
 
-void Book::CreateMapPreview() {
+void Book::CreateMapPreview(temp_index_map& temp_map_pages) {
   std::cout << "Create map Prev." << std::endl;
-  for(auto it : map_words_pages_)
-    map_words_pages_[it.first].set_position(GetPreviewPosition(it.first));
+  for(auto it : temp_map_pages) {
+    size_t best_page = temp_map_pages[it.first].GetBestPage();
+    temp_map_pages[it.first].set_preview_position(GetPreviewPosition(it.first, best_page));
+    temp_map_pages[it.first].set_preview_page(best_page);
+  }
 }
 
-void Book::ConvertKeys() {
-  std::unordered_map<std::string, WordInfo> map_words_pages_new;
-  for (auto it : map_words_pages_) {
-    std::string new_key = it.first;
-    map_words_pages_new[func::convertStr(new_key)] = map_words_pages_[it.first];
+size_t Book::GetPreviewPosition(std::string word, size_t best_page) {
+  // Read ocr and content and find match.
+  std::ifstream read(path_ + "/intern/page" + std::to_string(best_page) + ".txt", std::ios::in);
+  std::string page((std::istreambuf_iterator<char>(read)), std::istreambuf_iterator<char>());
+  size_t pos = page.find(word);
+
+  // Stop indexing and exit programm, when preview could not be found.
+  if (pos == std::string::npos) {
+    std::cout << "Preview not found! " << key_ << ", " << word << ", " << best_page << std::endl;
+    std::exit(404);  
   }
-  map_words_pages_ = map_words_pages_new;
+  return pos;
+}
+
+void Book::GenerateBaseFormMap(temp_index_map& temp_map_pages) {
+  // TODO (implement handling resulting duplicates)
+  for (auto it : temp_map_pages) {
+    // Full conversion of word (to lower, non utf-8 removed.
+    std::string cur_word = it.first;
+    cur_word = func::convertStr(func::returnToLower(cur_word));
+
+    // Get base-form of word (hunden -> hund)
+    std::string base_form = dict_->GetBaseForm(it.first);
+    // If the base-form was not found, set the current word as it's base-form.
+    if (base_form == "") 
+      base_form = cur_word;
+
+    // Create word info of current word:
+    double relevance = static_cast<double>(it.second.relevance())/num_pages_;
+    WordInfo word_info{cur_word, it.second.GetAllPages(), it.second.preview_position(),
+        it.second.preview_page(), relevance};
+    map_words_pages_[base_form].push_back(word_info);
+  }
 }
 
 void Book::SafePages() {
@@ -232,7 +275,7 @@ void Book::LoadPages() {
   // Read number of pages, if first line does not indicate pages, recreate book.
   getline(read, buffer);
   if (std::isdigit(buffer[0]) == false) {
-    CreatePages();
+    SeperatePages();
     CreateMapPreview();
     SafePages();
     return;
@@ -297,29 +340,24 @@ std::map<int, std::vector<std::string>>* Book::FindPages(std::string sWord,
 
   // Normal-search:
   if (fuzzyness == false) {
-    // Check for different grammatical forms.
-    if (found_grammatical_matches_.count(sWord) > 0) {
-      // Obtain pages from each word.
-      for (auto elem : found_grammatical_matches_[sWord]) {
-        for (auto page : map_words_pages_.at(elem).pages())
-          (*map_pages)[page].push_back(elem);
-      }
-    }
-    // Obtains pages.
-    else if (map_words_pages_.count(sWord) > 0) {
+    // Obtains pages. 
+    if (map_words_pages_.count(sWord) > 0) {
       for (auto page : map_words_pages_.at(sWord).pages())
         (*map_pages)[page].push_back(sWord);
+    }
+    else {
+      std::cout << "Serious error occured!!" << std::endl;
     }
   }
 
   // Fuzzy-search:
   else {
     // Check for words in map of fuzzy matches.
-    if (found_fuzzy_matches_.count(sWord) > 0) {
+    if (corpus_fuzzy_matches_.count(sWord) > 0) {
       // Obtain pages from each word found by fuzzy-search.
-      for (auto elem : found_fuzzy_matches_[sWord]) {
-        for (auto page : map_words_pages_.at(elem.first).pages())
-          (*map_pages)[page].push_back(elem.first);
+      for (auto match : corpus_fuzzy_matches_[sWord].GetAllMatches()) {
+        for (auto page : map_words_pages_.at(match).pages())
+          (*map_pages)[page].push_back(match);
       }
     }
   }
@@ -426,18 +464,10 @@ std::vector<size_t> Book::PagesFromWord(std::string word, bool fuzzyness) {
     pages.insert(foo.begin(), foo.end());
   }
 
-  // Obtain pages from grammatical matches.
-  if (found_grammatical_matches_.count(word) > 0) {
-    for (auto elem : found_grammatical_matches_[word]) {
-      std::vector<size_t> foo = map_words_pages_.at(elem).pages();
-      pages.insert(foo.begin(), foo.end());
-    }
-  }
-
   // Obtain pages from fuzzy match.
-  if (found_fuzzy_matches_.count(word) > 0 && fuzzyness == true)  {
-    for (auto elem : found_fuzzy_matches_[word]) {
-      std::vector<size_t> foo = map_words_pages_.at(elem.first).pages();
+  if (corpus_fuzzy_matches_.count(word) > 0 && fuzzyness == true)  {
+    for (auto match : corpus_fuzzy_matches_[word].GetAllMatches()) {
+      std::vector<size_t> foo = map_words_pages_.at(match).pages();
       pages.insert(foo.begin(), foo.end());
     }
   }
@@ -502,13 +532,8 @@ std::string Book::GetPreviewText(std::string& word, size_t& pos, size_t& page) {
   // Get match (full, grammatical, fuzzy).
   if (map_words_pages_.count(word) > 0)
     word = word;
-  else if (found_grammatical_matches_.count(word) > 0) {
-    word = found_grammatical_matches_[word].front();
-    if (map_words_pages_.count(word) == 0)
-      return "";
-  }
-  else if (found_fuzzy_matches_.count(word) > 0) 
-    word = found_fuzzy_matches_[word].front().first;
+  else if (corpus_fuzzy_matches_.count(word) > 0) 
+    word = corpus_fuzzy_matches_[word].GetBestMatch();
   else 
     return "";
 
@@ -557,23 +582,6 @@ std::string Book::GetPreviewTitle(std::string& word, size_t& pos) {
   return "";
 }
 
-
-size_t Book::GetPreviewPosition(std::string word) {
-  std::vector<size_t> pages = map_words_pages_[word].pages();
-  for (size_t i=0; i<pages.size(); i++) {
-    // Read ocr and content and find match.
-    std::ifstream read(path_ + "/intern/page" + std::to_string(pages[i]) 
-        + ".txt", std::ios::in);
-    std::string page((std::istreambuf_iterator<char>(read)), 
-        std::istreambuf_iterator<char>());
-    size_t pos = page.find(word);
-
-    // Return "error" if not found.
-    if (pos != std::string::npos) 
-      return pos;
-  }
-  return 1000000; //Maybe change the default value some time?
-}
 
 void Book::EscapeDeleteInvalidChars(std::string& str) {
   // Delete invalid chars front.

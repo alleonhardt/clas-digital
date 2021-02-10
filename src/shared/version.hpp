@@ -5,9 +5,9 @@
 
 namespace clas_digital
 {
-  inline const char gGitSha[] = "14a4645cfe703012c04da5db9dcc2d0de3dc1f88-dirty";
-  inline const char gDate[] = "Tue Feb 2 19:45:53 2021";
-  inline const char gCommitSubject[] = "Merge branch 'cpp' of github.com:ShadowItaly/clas-digital into cpp";
+  inline const char gGitSha[] = "feb9ce161f684384fc9d88bbc0d9ba062c88ea2a-dirty";
+  inline const char gDate[] = "Tue Feb 9 16:41:33 2021";
+  inline const char gCommitSubject[] = "Working on new search";
 
   inline void print_version()
   {

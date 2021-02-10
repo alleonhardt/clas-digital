@@ -5,6 +5,7 @@
 #ifndef CLASDIGITAL_SRC_SEARCH_BOOKMANAGER_BOOK_H_
 #define CLASDIGITAL_SRC_SEARCH_BOOKMANAGER_BOOK_H_
 
+#include <cstddef>
 #include <fstream>
 #include <filesystem>
 #include <iostream> 
@@ -14,11 +15,13 @@
 #include <set>
 #include <vector>
 
-#include "book_manager/word_info.h"
+#include "word_info.h"
+#include "tmp_word_info.h"
 #include "func.hpp"
 #include "fuzzy.hpp"
 #include "gramma.h"
 #include "metadata_handler.h"
+#include "sorted_matches.h"
 
 class Book {
 public:
@@ -42,10 +45,9 @@ public:
   std::string author();
   int date();
   std::vector<std::string> collections();
-  std::unordered_map<std::string, WordInfo>& map_words_pages();
-  std::unordered_map<std::string, std::list<std::pair<std::string, double>>>& found_fuzzy_matches();
-  std::unordered_map<std::string, std::list<std::string>>& 
-  found_grammatical_matches();
+  std::unordered_map<std::string, std::vector<WordInfo>>& map_words_pages();
+  std::unordered_map<std::string, SortedMatches>& corpus_fuzzy_matches();
+  std::unordered_map<std::string, SortedMatches>& metadata_fuzzy_matches();
   
   ///< Return whether book has images or ocr
   bool HasContent() const;
@@ -54,6 +56,8 @@ public:
   std::string GetAuthorDateScanned();
 
   // **** setter **** //
+  static void set_dict(Dict* dict) { dict_ = dict; }
+
   void SetPath(std::string sPath);
   
 
@@ -124,6 +128,8 @@ public:
    
 private:
 
+  static Dict* dict_;
+
   // *** member variables *** //
   std::string key_;  ///< Key of the book
   std::string path_;  ///< Path to book (if exists)
@@ -144,14 +150,11 @@ private:
   std::map<std::string, int> quick_title_words_;  ///< worlds, lowercase, utf-8-safe.
 
   ///Map of matches found with fuzzy-search (contains/ fuzzy)
-  std::unordered_map<std::string, std::list<std::pair<std::string, double>>> 
-  found_fuzzy_matches_;
-  ///Map of matches found via different grammatical forms
-  std::unordered_map<std::string, std::list<std::string>> 
-  found_grammatical_matches_; 
+  std::unordered_map<std::string, SortedMatches> corpus_fuzzy_matches_;
+  std::unordered_map<std::string, SortedMatches> metadata_fuzzy_matches_;
 
   ///Map of words_pages_pos_relevance
-  std::unordered_map<std::string, WordInfo> map_words_pages_;
+  std::unordered_map<std::string, std::vector<WordInfo>> map_words_pages_;
 
   int num_pages_;  ///< Number of pages in book
 
@@ -160,8 +163,11 @@ private:
  
   // *** create book and maps (pages, relevance and preview) *** // 
 
+  void CreateIndex();
+  
+  typedef  std::map<std::string, TempWordInfo> temp_index_map;
   ///Create map of all pages and safe.
-  void CreatePages();
+  void SeperatePages(temp_index_map& temp_map_pages);
 
   /**
   * Function adding all words from one page to map of words. 
@@ -169,17 +175,25 @@ private:
   * @param[in] buffer (string holding current page)
   * @param[in] page (number indexing current page)
   */
-  void CreatePage(std::string buffer, size_t page);
+  void CreatePage(temp_index_map& temp_map_pages, std::string buffer, size_t page);
 
   /**
   * Find preview position for each word in map of words/pages.
   */
-  void CreateMapPreview();
+  void CreateMapPreview(temp_index_map& temp_map_pages);
+
+  /**
+   * Find preview with matched word + pages.
+   * @param[in] sWord (best Match)
+   * @param[in] page (page on which match was found)
+   * @return preview for this book
+   */
+  size_t GetPreviewPosition(std::string word, size_t page);
 
   /**
    * Convert all keys.
    */
-  void ConvertKeys();
+  void GenerateBaseFormMap(temp_index_map& temp_map_pages);
 
   /**
   * Safe map of all words and pages to disc
@@ -257,15 +271,7 @@ private:
    * @return title.
    */
   std::string GetPreviewTitle(std::string& word, size_t& pos);
-
-  /**
-   * Find preview with matched word + pages.
-   * @param[in] sWord (best Match)
-   * @param[in] page (page on which match was found)
-   * @return preview for this book
-   */
-  size_t GetPreviewPosition(std::string word);
-
+  
   /**
    * Delete brocken characters and escape invalid literals.
    * @param[in, out] str (string to escape)

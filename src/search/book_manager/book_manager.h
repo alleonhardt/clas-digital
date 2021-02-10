@@ -1,5 +1,5 @@
 /**
- * @author fux
+* @author fux
 */
 
 #ifndef CLASDIGITAL_SRC_SEARCH_BOOKMANAGER_H_
@@ -17,11 +17,12 @@
 #include <string>
 #include <vector>
 
-#include "book_manager/book.h"
+#include "book.h"
 #include "func.hpp"
 #include "gramma.h"
-#include "search/search.h"
-#include "search/search_options.h"
+#include "result_object.h"
+#include "search_object.h"
+#include "search_options.h"
 
 
 class BookManager {
@@ -58,17 +59,6 @@ class BookManager {
     std::map<std::string, std::vector<std::string>>& map_unique_authors();
 
     /**
-     * @brief Generate lists on information about stored books.
-     * - currenttly untracked books.
-     * - books with bsb-link but without ocr.
-     * - books with Tag "gibtEsBeiBSB" but without ocr.
-     * - books with tag "gibtEsBeiBSB" but with ocr.
-     * - books with tag "BSBDownLoadFertig" but without ocr.
-     * - books in collection "Geschichte des Tierwissens" but without ocr.
-     */
-    void WriteListofBooksWithBSB();
-
-    /**
      * @brief load all books.
      * @return boolean for successful of not
      */
@@ -78,7 +68,7 @@ class BookManager {
      * @brief parse json of all items. If item exists, change metadata of item, create new book.
      * @param[in] j_items json with all items
      */
-    void UpdateZotero(nlohmann::json j_Items);
+    void CreaeItemsFromMetadata(nlohmann::json j_Items);
 
     /**
      * @brief add a book, or rather: add ocr to book
@@ -92,7 +82,13 @@ class BookManager {
      * @param[in] searchOPts 
      * @return list of all found books
      */
-    std::list<Book*> DoSearch(SearchOptions* searchOptions);
+    std::list<ResultObject> DoSearch(SearchObject& search_object);
+
+    void NormalSearch(std::string word, SearchOptions& search_options, 
+        std::map<std::string, ResultObject>& results);
+    void FuzzySearch(std::string word, SearchOptions& search_options, 
+        std::map<std::string, ResultObject>& results);
+    bool CheckSearchOptions(SearchOptions& search_options, Book* book);
 
 	  typedef std::function<bool(std::pair<std::string, double>, std::pair<std::string, double>)> Comp;
     typedef std::set<std::pair<std::string, double>, Comp> sorted_set;
@@ -102,7 +98,10 @@ class BookManager {
      * @param[in] type of sort algorythem (0: relevance, 1: chronological, 2: alphabetical. 
      * @return list of searchresulst
      */
-    sorted_set SortMapByValue(std::map<std::string, double>* unordered_results, int type);
+    sorted_set SortMapByValue(std::map<std::string, double> unordered_results, int type);
+    sorted_set SortByRelavance(std::map<std::string, double> unordered_results);
+    sorted_set SortChronologically(std::map<std::string, double> unordered_results);
+    sorted_set SortAlphabetically(std::map<std::string, double> unordered_results);
 
     /**
      * @brief create map of all words (key) and books in which the word occurs (value)

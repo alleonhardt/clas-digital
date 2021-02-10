@@ -199,7 +199,7 @@ std::vector<std::string> split2(std::string str, std::string delimiter)
     return vStr;
 }
 
-std::string convertStr(std::string& str) {
+std::string convertStr(std::string str) {
   std::map<wchar_t, wchar_t> rep = {{L'ä','a'},{L'ö','o'},{L'ü','u'},{L'ö','o'},{L'ß','s'},{L'é','e'},{L'è','e'},{L'á','a'},{L'ê','e'},{L'â','a'}, {L'ſ','s'}};
   
   std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
@@ -297,13 +297,12 @@ std::map<std::string, int> extractWordsFromString(std::string& buffer) {
     if (vStrs[i].length() <= 2)
       continue;
 
-    std::string cur_word = returnToLower(vStrs[i]);
+    std::string cur_word = vStrs[i];
     transform(cur_word);
     if(cur_word.length() >= 2 && cur_word.length() <= 25 && isWord(cur_word.c_str()) == true) {
       mapWords[cur_word] += 1;
     }
   }
-  convertToLower(buffer);
   return mapWords;
 }
 
