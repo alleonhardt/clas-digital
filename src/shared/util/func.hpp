@@ -83,7 +83,7 @@ namespace func {
   */
   void escapeHTML(std::string &str);
   
-  std::string convertStr(std::string &str);
+  std::string convertStr(std::string str);
 
   /**
   * @brief checks whether a string is a word

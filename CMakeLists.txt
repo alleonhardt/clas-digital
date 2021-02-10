@@ -39,9 +39,18 @@ configure_file("${CMAKE_SOURCE_DIR}/src/shared/version.hpp.in"
 
 
 
-
-
-set(SRC_FILES_SEARCH src/search/book_manager/book.cc src/search/book_manager/book_manager.cc src/search/book_manager/word_info.cc src/search/search/search.cc src/search/search/search_options.cc src/search/main.cpp src/shared/metadata_handler.cc src/shared/util/func.cpp src/shared/util/fuzzy.cpp)
+set(SRC_FILES_SEARCH 
+  src/search/book_manager/book.cc 
+  src/search/book_manager/book_manager.cc 
+  src/search/data_models/tmp_word_info.cc 
+  src/search/data_models/result_object.cc
+  src/search/data_models/search_object.cc 
+  src/search/data_models/search_options.cc 
+  src/search/data_models/sorted_matches.cc 
+  src/search/main.cpp 
+  src/shared/metadata_handler.cc 
+  src/shared/util/func.cpp 
+  src/shared/util/fuzzy.cpp)
 
 add_library(clas_server_lib OBJECT src/shared/metadata_handler.cc
   src/shared/util/URLParser.cpp src/shared/util/ubuntu20matherror.cpp
@@ -131,6 +140,7 @@ target_include_directories(clas_digital_search.o PUBLIC
   "src/shared"
   "src/shared/util"
   "src/search"
+  "src/search/data_models"
 )
 
 target_link_libraries(clas_digital_server.o ${CONAN_LIBS} ${CXX_STDLIB})

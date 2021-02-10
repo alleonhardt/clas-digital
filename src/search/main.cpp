@@ -17,7 +17,8 @@
 #include "func.hpp"
 #include "gramma.h"
 #include "nlohmann/json.hpp"
-#include "search/search_options.h"
+#include "search_object.h"
+#include "search_options.h"
 
 using namespace httplib;
 
@@ -42,7 +43,6 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
     return;
   }
   std::string query = GetReqParam(req, "q");
-  std::cout << "Searching for: " << query << std::endl;
 
   // Get searcing for relevant neighbors:
   bool relevant_neighbors = GetReqParam(req, "relevant_neighbors", "0") == "1";
@@ -90,9 +90,9 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
   } catch(...) {};
 
   // Debug printing.
-  std::cout << "Recieved search request!" << std::endl;
   std::cout << "Searching with query: " << query << 
-    "; fuzzyness: " << fuzzyness <<
+    "; fuzzyness: " << fuzzyness << std::endl;
+  /*
     "; scope: " << scope <<
     "; author: " << author <<
     "; publicated after: " << pubafter <<
@@ -100,18 +100,26 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
     "; searched pillars: " << str_pillars << 
     "; vector pillar size: " << pillars.size() <<
     "; sorting with value: " << sort << " and max results per page: " 
-    << resultsperpage << std::endl;
+    << resultsperpage << std::endl;*/
 
   // Construct search-options.
-  SearchOptions options(query, fuzzyness, pillars, scope, author, pubafter,
-    pubbefore, true, sort);
+  int sort_result_by = 0;
+  if (sort == "chronologically") sort_result_by = 1;
+  if (sort == "alphabetically") sort_result_by = 2;
+  SearchOptions search_options(fuzzyness, scope=="metadata", scope=="corpus", pubafter, pubbefore, 
+      sort_result_by, author, pillars);
+  SearchObject search_object = SearchObject(query, search_options);
 
   // Start search.
   auto time_start = std::chrono::system_clock::now();
-  auto result_list = manager.DoSearch(&options);
+  auto result_list = manager.DoSearch(search_object);
 
   // Construct response.
-  std::cout << "Constructing response json." << std::endl;
+  std::cout << "Results: " << result_list.size() << std::endl;
+  for (auto it : result_list) {
+    it.Print(search_object.converted_words()[0]);
+  }
+  std::cout << std::endl;
   nlohmann::json search_response;
 
   if (result_list.size() == 0) {
@@ -120,18 +128,18 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
   }
   else {
     size_t counter = 0;
-    for (auto book : result_list) {
+    for (auto res_obj: result_list) {
       // Create entry for each book in result.
       nlohmann::json entry;
-      entry["scanId"] = book->key();
-      entry["copyright"] = !book->metadata().GetPublic();
-      entry["hasocr"] = book->HasContent();
-      entry["description"] = book->GetAuthorDateScanned();
-      entry["bibliography"] = book->metadata().GetMetadata("bib");
+      entry["scanId"] = res_obj.book()->key();
+      entry["copyright"] = !res_obj.book()->metadata().GetPublic();
+      entry["hasocr"] = res_obj.book()->HasContent();
+      entry["description"] = res_obj.book()->GetAuthorDateScanned();
+      entry["bibliography"] = res_obj.book()->metadata().GetMetadata("bib");
 
-      std::string preview = book->GetPreview(query);
+      std::string preview = res_obj.book()->GetPreview(query);
       if (relevant_neighbors == true) {
-        std::string str = book->GetMostRelevantNeighbors(query, dict);
+        std::string str = res_obj.book()->GetMostRelevantNeighbors(query, dict);
         if (str != "") preview += "<br>" + str;
       }
       entry["preview"] = preview;
@@ -145,7 +153,6 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
     auto elapsed_seconds = std::chrono::system_clock::now() - time_start;
     search_response["time"] = elapsed_seconds.count();
   }
-  std::cout << "Finished constructing json response." << std::endl;
   resp.set_content(search_response.dump(), "application/json");
 }
 
@@ -292,8 +299,7 @@ int main(int argc, char *argv[]) {
   for (auto it : dict.GetAllConjugations("hund")) 
     std::cout << it << std::endl;
   std::cout << "done.\n\n";
-  std::cout << "Base Hündin: " << dict.GetBaseForm("Hunden") << ", "
-    << dict.GetBaseForm("Hündin") << std::endl;
+  Book::set_dict(&dict);
 
   // Load corpus metadata from disc.
   std::cout << "Loading metadata at " << config["zotero_metadata"];
@@ -318,8 +324,8 @@ int main(int argc, char *argv[]) {
   std::cout << "initializing bookmanager..." << std::endl;
   std::string cmd_arg = (argc > 1) ? argv[1] : "";
   BookManager manager(config["upload_points"], &dict);
-  std::cout << "Updating zoteror..." << std::endl;
-  manager.UpdateZotero(metadata["items"]["data"]);
+  std::cout << "Updating zoter0..." << std::endl;
+  manager.CreaeItemsFromMetadata(metadata["items"]["data"]);
   std::cout << "done" << std::endl;
   if (manager.Initialize(cmd_arg == "reload_pages"))
     std::cout << "Initialization successful!\n\n"; 
