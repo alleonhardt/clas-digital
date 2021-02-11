@@ -38,7 +38,8 @@ class TempWordInfo {
      */
     TempWordInfo();
 
-    //Getter 
+    //Getter
+    std::set<weighted_match, Cmp>& pages_with_relevance();
     size_t preview_position() const;
     size_t preview_page() const ;
     int relevance() const;
@@ -72,6 +73,15 @@ class TempWordInfo {
      * @return page with highest relevance.
      */
     size_t GetBestPage();
+
+    /**
+     * Join two word-infos.
+     * This is mainly used, when after converting a word to lower case, there
+     * might be an already existing WordInfo (for the word in upper-case), so we
+     * need to joing both WordInfos.
+     * @param word_info word info to join with this word info.
+     */
+    void Join(TempWordInfo& word_info);
 };
 
 #endif
