@@ -222,13 +222,17 @@ size_t Book::GetPreviewPosition(std::string word, size_t best_page) {
 }
 
 void Book::GenerateBaseFormMap(temp_index_map& temp_map_pages) {
-  // TODO (implement handling resulting duplicates)
+  temp_index_map map_pages_handle_duplicates;
   for (auto it : temp_map_pages) {
-    // Full conversion of word (to lower, non utf-8 removed.
+    // Full conversion of word (to lower, non utf-8 removed).
     std::string cur_word = it.first;
     cur_word = func::convertStr(func::returnToLower(cur_word));
+    map_pages_handle_duplicates[cur_word].Join(it.second); 
+  }
 
+  for (auto it : temp_map_pages) {
     // Get base-form of word (hunden -> hund)
+    std::string cur_word = it.first;
     std::string base_form = dict_->GetBaseForm(it.first);
     // If the base-form was not found, set the current word as it's base-form.
     if (base_form == "") 
