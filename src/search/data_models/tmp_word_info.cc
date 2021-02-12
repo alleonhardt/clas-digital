@@ -1,8 +1,9 @@
 #include "tmp_word_info.h"
 #include <cstddef>
+#include <vector>
 
-TempWordInfo::TempWordInfo() : pages_with_relevance_(&cmp) {}
-
+TempWordInfo::TempWordInfo() : pages_with_relevance_(&cmp), relevance_(0), 
+  preview_page_(0), preview_position_(0) {}
 
 std::set<TempWordInfo::weighted_match, TempWordInfo::Cmp>& TempWordInfo::pages_with_relevance() {
   return pages_with_relevance_;
@@ -36,8 +37,20 @@ void TempWordInfo::IncreaseRelevance(int val) {
 size_t TempWordInfo::GetBestPage() {
   return pages_with_relevance_.begin()->first;
 }
+std::vector<size_t> TempWordInfo::GetAllPages() const {
+  std::map<size_t, size_t> sorted_pages;
+  for (auto it : pages_with_relevance_) 
+    sorted_pages[it.first] = 0;
+  std::vector<size_t> all_pages;
+  for (auto it : sorted_pages) 
+    all_pages.push_back(it.first);
+  return all_pages;
+}
 
 void TempWordInfo::Join(TempWordInfo& word_info) {
+  std::cout << "relevance a: " << relevance_;
+  std::cout << "relevance b: " << word_info.relevance();
+
   // Add up relevance of both word-infos.
   relevance_ += word_info.relevance();
 
@@ -49,7 +62,7 @@ void TempWordInfo::Join(TempWordInfo& word_info) {
   }
   size_t page_with_relevance_b = 0;
   for (auto it : word_info.pages_with_relevance()) {
-    if (it.first == preview_page_) 
+    if (it.first == word_info.preview_page()) 
       page_with_relevance_b = it.second;
   }
   // Set preview-position and preview-page accordingly.

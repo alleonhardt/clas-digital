@@ -1,6 +1,8 @@
 #include "book.h"
 #include "book_manager/word_info.h"
 #include "func.hpp"
+#include "nlohmann/json.hpp"
+#include "search_object.h"
 #include "sorted_matches.h"
 #include "tmp_word_info.h"
 #include <cstddef>
@@ -8,6 +10,7 @@
 #include <ctime>
 #include <filesystem>
 #include <iostream>
+#include <string>
 
 namespace fs = std::filesystem;
 
@@ -222,6 +225,7 @@ size_t Book::GetPreviewPosition(std::string word, size_t best_page) {
 }
 
 void Book::GenerateBaseFormMap(temp_index_map& temp_map_pages) {
+  // Convert all words in map, if this results in a duplicate, join word-infos.
   temp_index_map map_pages_handle_duplicates;
   for (auto it : temp_map_pages) {
     // Full conversion of word (to lower, non utf-8 removed).
@@ -230,11 +234,12 @@ void Book::GenerateBaseFormMap(temp_index_map& temp_map_pages) {
     map_pages_handle_duplicates[cur_word].Join(it.second); 
   }
 
+  // Add base-form to map_words_pages_ and current word as one of it conjunctions.
   for (auto it : temp_map_pages) {
     // Get base-form of word (hunden -> hund)
     std::string cur_word = it.first;
     std::string base_form = dict_->GetBaseForm(it.first);
-    // If the base-form was not found, set the current word as it's base-form.
+    // If the base-form was not found, set the current word as it's own base-form.
     if (base_form == "") 
       base_form = cur_word;
 
@@ -249,136 +254,138 @@ void Book::GenerateBaseFormMap(temp_index_map& temp_map_pages) {
 void Book::SafePages() {
   std::cout << "Saving pages" << std::endl;
   // Open file for writing and write number of pages as first value.
-  std::ofstream write(path_ + "/intern/pages.txt");
-  write << num_pages_ << "\n";
+  nlohmann::json json_index_map;
+  json_index_map["num_pages"] = num_pages_;
+  json_index_map["base_forms"] = nlohmann::json::object();
 
-  // Iterate over map of words.
-  for (auto it : map_words_pages_) {
-    // Write word in converted format (replace a by ä, é by e ...).
-    std::string buffer = it.first + ";";
+  // Iterate over all base forms and create word-info-entries for it's conjunctions.
+  for (auto base_form : map_words_pages_) {
+    json_index_map[base_form.first] = nlohmann::json::array();
+    // Iterate over conjunctions and create word-info-entries.
+    for (auto word_info : base_form.second) {
+      // Create word-info-entry.
+      nlohmann::json entry = nlohmann::json::object();
+      entry["word"] = word_info.word_;
+      entry["pages"] = word_info.pages_;
+      entry["preview_position"] = word_info.preview_position_;
+      entry["preview_page"] = word_info.preview_page_;
+      entry["relevance"] = word_info.relevance_;
 
-    // Add all pages the word occurs on.
-    for (size_t page : it.second.pages())
-      buffer += std::to_string(page) + ",";
-
-    // Add preview-position and relevance.
-    buffer += ";" + std::to_string(map_words_pages_[it.first].relevance())
-            + ";" + std::to_string(map_words_pages_[it.first].position()) + "\n";
-
-    write << buffer;
+      // Add entry to base-form.
+      json_index_map[base_form.first].push_back(entry);
+    }
   }
+
+  // Write constructed json to disc.
+  std::ofstream write(path_ + "/intern/pages.txt");
+  write << json_index_map;
   write.close();
 }
 
 void Book::LoadPages() {
   std::cout << key_ << " Loading pages." << std::endl;
-  // Load map.
+  // Load json with index-map from disc.
+  nlohmann::json json_index_map;
   std::ifstream read(path_ + "/intern/pages.txt");
-  std::string buffer = "";
-
-  // Read number of pages, if first line does not indicate pages, recreate book.
-  getline(read, buffer);
-  if (std::isdigit(buffer[0]) == false) {
-    SeperatePages();
-    CreateMapPreview();
-    SafePages();
-    return;
-  }
-  num_pages_ = stoi(buffer);
-
-  // Read words, pages, and relevance, preview-position.
-  while (!read.eof()) {
-    getline(read, buffer);
-    if(buffer.length() < 2) continue;
-
-    // Extract word (vec[0] = word, vec[1] = sBuffer.
-    std::vector<std::string> vec = func::split2(buffer, ";");
-
-    // Extract pages and convert to size_t.
-    std::vector<size_t> pages;
-    for (auto page : func::split2(vec[1], ",")) {
-      // Check if page actually is number, then add to pages.
-      if (isdigit(page[0]))
-        pages.push_back(std::stoi(page));
-    }
-
-    // Add word and pages to map.
-    map_words_pages_[vec[0]] = WordInfo(pages, std::stoi(vec[3]), std::stoi(vec[2]));
-  }
+  read >> json_index_map;
   read.close();
+
+  // Extract number of pages.
+  num_pages_ = json_index_map["num_pages"];
+
+  // Iterate over all base forms and create word-info-entries for it's conjunctions.
+  for (auto base_form = json_index_map["base_forms"].begin(); 
+      base_form < json_index_map["base_forms"].end(); base_form++) {
+    // Iterate over conjunctions and create word-info-entries.
+    for (auto word_info : base_form.value()) {
+      // Create word-info-entry and add to base-form.
+      map_words_pages_[base_form.key()].push_back({
+          word_info["word"],
+          word_info["pages"],
+          word_info["preview_position"],
+          word_info["preview_page"],
+          word_info["relevance"]
+        });
+    }
+  }
 }
 
 
 // **** GET PAGES FUNCTIONS **** //
 
-std::map<int, std::vector<std::string>>* Book::GetPages(std::string input, 
-    bool fuzzyness) {
-  // Initialize new map and return empty map in case the book has no ocr.
-  auto* map_pages = new std::map<int, std::vector<std::string>>;
-  if (has_ocr_ == false)
-    return map_pages;
+std::map<int, std::vector<std::string>> Book::GetPages(SearchObject search_object) {
 
-  // Do some parsing, as user can use ' ' or + to indicate searching for several words.
-  std::replace(input.begin(), input.end(), ' ', '+');
-  std::vector<std::string> vWords = func::split2(func::returnToLower(input), "+");
+  std::vector<std::string> words = search_object.converted_words();
+  if (words.size() == 0) 
+    return std::map<int, std::vector<std::string>>();
 
   // Create map of pages and found words for first word.
-  map_pages = FindPages(vWords[0], fuzzyness);
+  auto map_pages = FindPagesAndMatches(words[0], search_object.search_options().fuzzy_search());
 
   // Iterate over all 1..n words create list of pages, and remove words not on same page.
-  for (size_t i=1; i<vWords.size(); i++) {
-    // Get pages from word i.
-    auto* mapPages2 = FindPages(vWords[i], fuzzyness);
-
-    // Remove all elements from mapPages, which do not exist in results2. 
-    RemovePages(map_pages, mapPages2);
-    delete mapPages2;
+  for (size_t i=1; i<words.size(); i++) {
+    // Get pages from word i and remove all pages, which don't occure in both results
+    auto map_pages2 = FindPagesAndMatches(words[i], search_object.search_options().fuzzy_search());
+    RemovePages(map_pages, map_pages2);
   }
   return map_pages;
 }
 
-std::map<int, std::vector<std::string>>* Book::FindPages(std::string sWord, 
-    bool fuzzyness) {
-  // Create empty list of pages
-  auto* map_pages = new std::map<int, std::vector<std::string>>;
+std::map<int, std::vector<std::string>> Book::FindPagesAndMatches(std::string word, 
+    bool fuzzy_search) {
+  // Find matching base_forms.
+  auto base_forms = FindBaseForms(word, fuzzy_search);
 
-  // Normal-search:
-  if (fuzzyness == false) {
-    // Obtains pages. 
-    if (map_words_pages_.count(sWord) > 0) {
-      for (auto page : map_words_pages_.at(sWord).pages())
-        (*map_pages)[page].push_back(sWord);
-    }
-    else {
-      std::cout << "Serious error occured!!" << std::endl;
-    }
-  }
-
-  // Fuzzy-search:
-  else {
-    // Check for words in map of fuzzy matches.
-    if (corpus_fuzzy_matches_.count(sWord) > 0) {
-      // Obtain pages from each word found by fuzzy-search.
-      for (auto match : corpus_fuzzy_matches_[sWord].GetAllMatches()) {
-        for (auto page : map_words_pages_.at(match).pages())
-          (*map_pages)[page].push_back(match);
-      }
+  // Find pages for all conjunctions corresponding to base-form.
+  std::map<int, std::vector<std::string>> map_pages;
+  for (auto base_form : base_forms) {
+    for (auto conjunction  : map_words_pages_[base_form]) {
+      for (auto page : conjunction.pages_)
+        map_pages[page].push_back(conjunction.word_);
     }
   }
   return map_pages;
 }
 
-void Book::RemovePages(std::map<int, std::vector<std::string>>* results1, 
-    std::map<int, std::vector<std::string>>* results2) {
+std::vector<size_t> Book::FindOnlyPages(std::string word, bool fuzzy_search) {
+  // Find matching base_forms.
+  auto base_forms = FindBaseForms(word, fuzzy_search);
+  
+  // Find pages for all conjunctions corresponding to base-form.
+  std::vector<size_t> pages;
+  for (auto base_form : base_forms) {
+    for (auto conjunction  : map_words_pages_[base_form]) {
+      for (auto page : conjunction.pages_)
+        pages.push_back(page);
+    }
+  }
+  return pages;
+}
+
+std::vector<std::string> Book::FindBaseForms(std::string word, bool fuzzy_search) {
+  std::vector<std::string> base_forms;
+  if (map_words_pages_.count(word) > 0) 
+    base_forms.push_back(word);
+  if (fuzzy_search && corpus_fuzzy_matches_.count(word) > 0) {
+    for (auto match : corpus_fuzzy_matches_)
+      base_forms.push_back(match.first);
+  }
+  if (base_forms.size() == 0)
+    std::cout << "\x1B[31mNo base form found!! \033[0m\t\t" << word << std::endl;
+  return base_forms;
+}
+
+void Book::RemovePages(
+    std::map<int, std::vector<std::string>>& results1, 
+    std::map<int, std::vector<std::string>>& results2) {
   // Iterate over results-1.
-  for (auto it=results1->begin(); it!=results1->end();) {
+  for (auto it=results1.begin(); it!=results1.end();) {
     // Erase if, page does not exist in results-2.
-    if (results2->count(it->first) == 0)
-      it = results1->erase(it);
+    if (results2.count(it->first) == 0)
+      it = results1.erase(it);
     // Insert words on page i in results-2 into words on page i in results-1.
     else {
-      std::vector<std::string> vec = (*results2)[it->first];
-      it->second.insert(it->second.end(), vec.begin(), vec.end());
+      it->second.insert(it->second.end(), results2[it->first].begin(), results2[it->first].end());
       ++it;
     }
   }
@@ -388,35 +395,22 @@ bool Book::OnSamePage(std::vector<std::string> vWords, bool fuzzyness) {
   //Check if words occur only in metadata (Author, Title, Date)
   if (MetadataCmp(vWords, fuzzyness) == true)
     return true;
-
-  // Get all pages, the first word is on.
-  std::vector<size_t> pages1 = PagesFromWord(vWords[0], fuzzyness);
-
-  // If no pages or found, return false.
+  // Get all pages, the first word is on and return false if no pages found
+  auto pages1 = FindOnlyPages(vWords[0], fuzzyness);
   if (pages1.size() == 0) 
     return false;
 
   // Iterate over words 1..n.
   for (size_t i=1; i<vWords.size(); i++) {
     // Get all pages of word i.
-    std::vector<size_t> pages2 = PagesFromWord(vWords[i], fuzzyness);
+    std::vector<size_t> pages2 = FindOnlyPages(vWords[i], fuzzyness);
 
-    // Return false if pages are empty.
-    if (pages2.size() == 0) 
-      return false;
-
-    // Check if all pages in pages-1 occur in pages-2.
-    bool found=false;
-    for (size_t j=0; j<pages1.size(); j++) {
-      if(std::find(pages2.begin(), pages2.end(), pages1[j]) != pages2.end()) {
-        found=true;
-        break;
-      }
-    }
-    if (!found) 
+    // Remove all pages from pages-1, which don't occur on pages-2
+    pages1.erase( remove_if( begin(pages1), end(pages1),
+          [&](auto x){ return find(begin(pages2),end(pages2), x)==end(pages2);}), end(pages1) );
+    if (pages1.size() == 0)
       return false;
   }
-  
   return true;
 }
 
@@ -456,29 +450,6 @@ bool Book::MetadataCmp(std::vector<std::string> words, bool fuzzyness) {
       return false;
   }
   return in_metadata;
-}
-
-std::vector<size_t> Book::PagesFromWord(std::string word, bool fuzzyness) {
-  // Use set to automatically erase duplicates.
-  std::set<size_t> pages;
-
-  // Obtain pages with exact match.
-  if (map_words_pages_.count(word) > 0) {
-    std::vector<size_t> foo = map_words_pages_.at(word).pages();
-    pages.insert(foo.begin(), foo.end());
-  }
-
-  // Obtain pages from fuzzy match.
-  if (corpus_fuzzy_matches_.count(word) > 0 && fuzzyness == true)  {
-    for (auto match : corpus_fuzzy_matches_[word].GetAllMatches()) {
-      std::vector<size_t> foo = map_words_pages_.at(match).pages();
-      pages.insert(foo.begin(), foo.end());
-    }
-  }
-  
-  // Convert set to vector.
-  std::vector<size_t> vec(pages.begin(), pages.end());
-  return vec;
 }
 
 

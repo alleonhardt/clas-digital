@@ -15,6 +15,7 @@
 #include <set>
 #include <vector>
 
+#include "search_object.h"
 #include "word_info.h"
 #include "tmp_word_info.h"
 #include "func.hpp"
@@ -100,12 +101,10 @@ public:
   * GetPages calls findPages (extracting all pages from given word) for each 
   * word searched and removes duplicates and/ or pages, where not all words searched
   * occur.
-  * @param[in] sInput (list of searched words as a string, separated by ' ' or + 
-  * @param[in] fuzzyness (boolean indicating whether fuzziness is set or not)
-  * @return map of pages, with vector of words on this page 
-  * (all the same if fuzziness==false)
+  * @param search_object storing search word(s) and fuzzyness.
+  * @return map of pages, with vector of words on this page.
   */
-  std::map<int, std::vector<std::string>>* GetPages(std::string input, bool fuzzyness);
+  std::map<int, std::vector<std::string>> GetPages(SearchObject search_object);
 
 
   // ***** GET PREVIEW - functions ***** //
@@ -209,39 +208,48 @@ private:
   // *** get-pages functions *** //
 
   /**
-  * Create map of pages and found words on page. As words found may differ 
-  * from searched word. (F.e. "Löwe" may match for "Löwin" even if fuzziness
-  * == false).
-  * @param[in] sWord (word search)
-  * @param[in] fuzzyness (boolean indicating whether fuzziness is set or not)
-  * @return map of all pages on which word was found.
-  */
-  std::map<int, std::vector<std::string>>* FindPages(std::string word, bool fuzzyness);
+   * Create map of pages and found words on page. As words found may differ from 
+   * searched word. (F.e. "Löwe" may match for "Löwin" even if fuzziness == false).
+   * @param word searched.
+   * @param fuzzyness indicating whether to search fuzzy or not.
+   * @return map of all pages on which word was found.
+   */
+  std::map<int, std::vector<std::string>> FindPagesAndMatches(std::string word, bool fuzzyness);
 
   /**
-  * Remove all elements from results-1, which do not exist in results-2. 
-  * @param[in, out] results1 (map of pages and words on page).
-  * @param[in] results2 (map of param and words on page).
-  */
-  void RemovePages(std::map<int, std::vector<std::string>>* results1, 
-                   std::map<int, std::vector<std::string>>* results2);
+   * Create map of only pages and found words on page.
+   * @param word searched.
+   * @param fuzzyness indicating whether to search fuzzy or not.
+   * @return map of all pages.
+   */
+  std::vector<size_t> FindOnlyPages(std::string word, bool fuzzyness);
+
+  /**
+   * Remove all elements from results1, which do not exist in results2. 
+   * Also add all matches on a page in results2 to matches on same page in results1.
+   * @param[in, out] results1 (map of pages and words on page).
+   * @param[in] results2 (map of param and words on page).
+   */
+  void RemovePages(std::map<int, std::vector<std::string>>& results1, 
+                   std::map<int, std::vector<std::string>>& results2);
 
   /** 
-  * Check whether all words occur in metadata
-  * @param[in] vWords (words to check)
-  * @param[in] fuzzyness (fuzzy-search yes/ no)
-  * @return boolean whether all words are in metadata or not.
-  */
+   * Check whether all words occur in metadata
+   * @param[in] vWords (words to check)
+   * @param[in] fuzzyness (fuzzy-search yes/ no)
+   * @return boolean whether all words are in metadata or not.
+   */
   bool MetadataCmp(std::vector<std::string> words, bool fuzzyness);
 
   /**
-  * Generates list of all pages the searched word occurs on.
-  * This function also checks preview fuzzy-matches found when searching for
-  * this word. 
-  * @param[in] word to generate list of pages for.
-  * @return list of pages
-  */
-  std::vector<size_t> PagesFromWord(std::string word, bool fuzzyness);
+   * Find all base-forms matching the searched word. 
+   * Find matching base-form(s). In case of fuzzy search these are all
+   * corresponding entries in corpus_fuzzy_matches. 
+   * @param word search for.
+   * @param fuzzy_search indicating whether to search fuzzy.
+   * @return vector of all base-forms matching the searched word.
+   */
+  std::vector<std::string> FindBaseForms(std::string word, bool fuzzy_search);
 
 
   // *** Previews *** //
