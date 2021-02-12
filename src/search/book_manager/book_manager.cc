@@ -102,15 +102,18 @@ std::list<ResultObject> BookManager::DoSearch(SearchObject& search_object) {
       NormalSearch(words[0], search_object.search_options(), results2);
  
     for (auto it=results.begin(); it!=results.end();) {
-      if(results2.count(it->first) == 0)
+      if (results2.count(it->first) == 0)
         it = results.erase(it);
-      else if(it->second.book()->OnSamePage(words, 
+      else if (!it->second.found_in_metadata() 
+          && it->second.book()->OnSamePage(words, 
             search_object.search_options().fuzzy_search())==false)
         it = results.erase(it);
       else
         ++it;
     }
     counter++;
+    if (results.size() == 0)
+      return {};
   }
   //Sort results results and convert to list of books.
   std::map<std::string, double> simplified_results;
