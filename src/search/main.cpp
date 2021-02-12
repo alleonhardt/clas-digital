@@ -44,7 +44,7 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
   }
   std::string query = GetReqParam(req, "q");
 
-  // Get searcing for relevant neighbors:
+  // Get searching for relevant neighbors:
   bool relevant_neighbors = GetReqParam(req, "relevant_neighbors", "0") == "1";
   // Get fuzzyness:
   bool fuzzyness = GetReqParam(req, "fuzzyness", "0") == "1";
@@ -137,11 +137,7 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
       entry["description"] = res_obj.book()->GetAuthorDateScanned();
       entry["bibliography"] = res_obj.book()->metadata().GetMetadata("bib");
 
-      std::string preview = res_obj.book()->GetPreview(query);
-      if (relevant_neighbors == true) {
-        std::string str = res_obj.book()->GetMostRelevantNeighbors(query, dict);
-        if (str != "") preview += "<br>" + str;
-      }
+      std::string preview = res_obj.book()->GetPreview(search_object, res_obj.found_in_corpus());
       entry["preview"] = preview;
       search_response["books"].push_back(std::move(entry)); 
       if (++counter == resultsperpage)

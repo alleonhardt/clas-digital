@@ -224,14 +224,14 @@ Summary:
 - call `FindPreview(first word, fuzziness, scope)` 
 - for all n+1 words:
   - check if word could be found in first preview. 
-  - if yes: call `HighLightMatchInPreview(first_preview, cur_word)`.
+  - if yes: call `HighLightMatchInPreview(text=first_preview, pos)`.
   - if no: call `FindPreview(nth word, fuzziness, scope)` 
 
 #### FindPreview(word (original/ converted, fuzziness, scope)
 Summary:
 - call `FindPreviewText(word (converted/ original), fuzziness)` or `FindPreviewMetadata(word (converted/ original), fuzziness)` both return a position and a string the not-shortened preview.
 - call `TrimString(not-shortened, pos)` trimming the string to 150 characters.
-- call `HighLightMatchInPreview(pos)` which highlights the searched word.
+- call `HighLightMatchInPreview(text, pos)` which highlights the searched word.
 - return preview.
 
 #### FindPreviewText(word (converted/ original), fuzziness)

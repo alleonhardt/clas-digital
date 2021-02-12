@@ -1,15 +1,15 @@
 #include "book.h"
-#include "book_manager/word_info.h"
 #include "func.hpp"
+#include "fuzzy.hpp"
 #include "nlohmann/json.hpp"
 #include "search_object.h"
 #include "sorted_matches.h"
-#include "tmp_word_info.h"
 #include <cstddef>
 #include <cstdlib>
 #include <ctime>
 #include <filesystem>
 #include <iostream>
+#include <stdexcept>
 #include <string>
 
 namespace fs = std::filesystem;
@@ -82,7 +82,7 @@ std::vector<std::string> Book::collections() {
   return collections_; 
 }
 
-std::unordered_map<std::string, WordInfo>& Book::map_words_pages() { 
+std::unordered_map<std::string, std::vector<WordInfo>>& Book::map_words_pages() { 
   return map_words_pages_;
 }
 
@@ -375,6 +375,33 @@ std::vector<std::string> Book::FindBaseForms(std::string word, bool fuzzy_search
   return base_forms;
 }
 
+WordInfo Book::FindBestWordInfo(std::string original_word, 
+    std::string converted_word, bool fuzzy_search) {
+  
+  // Get all matching baseforms and take first, as automatically best.
+  std::vector<std::string> base_forms = FindBaseForms(converted_word, fuzzy_search);
+  if (base_forms.size() == 0) 
+    throw std::out_of_range("No baseform found!");
+  std::string base_form = base_forms[0];
+
+  // Find best matching conjunction.
+  double cur_best_score = 0.2;
+  std::string cur_best_match = base_form;
+  for (auto conjunction : map_words_pages_[base_form]) {
+    double score = fuzzy::fuzzy_cmp(original_word, conjunction.word_);
+    if (score < cur_best_score) {
+      cur_best_score = score;
+      cur_best_match = conjunction.word_;
+    }
+  }
+  for (auto conjunction : map_words_pages_[base_form]) {
+    if (conjunction.word_ == cur_best_match) 
+      return conjunction;
+  }
+  return map_words_pages_[base_form].front();
+}
+
+
 void Book::RemovePages(
     std::map<int, std::vector<std::string>>& results1, 
     std::map<int, std::vector<std::string>>& results2) {
@@ -392,9 +419,6 @@ void Book::RemovePages(
 }
 
 bool Book::OnSamePage(std::vector<std::string> vWords, bool fuzzyness) {
-  //Check if words occur only in metadata (Author, Title, Date)
-  if (MetadataCmp(vWords, fuzzyness) == true)
-    return true;
   // Get all pages, the first word is on and return false if no pages found
   auto pages1 = FindOnlyPages(vWords[0], fuzzyness);
   if (pages1.size() == 0) 
@@ -414,140 +438,81 @@ bool Book::OnSamePage(std::vector<std::string> vWords, bool fuzzyness) {
   return true;
 }
 
-bool Book::MetadataCmp(std::vector<std::string> words, bool fuzzyness) {
-  bool in_metadata = true;
-          
-  // Iterate over all words and check for occurrence in metadata.
-  for (const auto& word : words) {
-
-    // If word occurs neither in author, title, or date, set inMetadata to false.
-    if (quick_author_.find(word) == std::string::npos  
-        && quick_title_.find(word) == std::string::npos 
-        && std::to_string(date_) != word) 
-      in_metadata = false;
-
-    // Check title and author again with fuzzy search.
-    if (fuzzyness == true) {
-      // Check title:
-      bool found = false;
-      for (auto it : quick_title_words_) {
-        if(fuzzy::fuzzy_cmp(word, it.first) <= 0.2)
-          found = true;
-      }
-
-      // Check author:
-      for (auto it : quick_authors_words_) {
-        if(fuzzy::fuzzy_cmp(word, it.first) <= 0.2)
-          found = true;
-      }
-      
-      // If found with fuzzy-search, set check-variable to true.
-      if (found == true)
-        in_metadata = found;
-    }
-
-    if (in_metadata == false)
-      return false;
-  }
-  return in_metadata;
-}
-
-
 // **** GET PREVIEW FUNCTIONS **** //
 
-std::string Book::GetPreview(std::string input) {
+std::string Book::GetPreview(SearchObject& search_object, bool in_corpus) {
   // Get vector of search words and first preview.
-  std::vector<std::string> words = func::split2(input, "+");
-  std::string prev = GetOnePreview(words[0]);
+  std::vector<std::string> words = search_object.words();
+  std::vector<std::string> converted_words = search_object.converted_words();
+  std::string preview = "";
 
   // Get previous for extra words, that have been searched for.
-  for (size_t i=1; i<words.size(); i++) {
-    // Try finding second word in current preview.
-    size_t pos = prev.find(words[i]);
+  for (size_t i=0; i<converted_words.size(); i++) {
+    
+    // Try finding second (converted) word in current preview.
+    size_t pos = preview.find(converted_words[i]);
+    if (pos == std::string::npos) 
+      pos = preview.find(words[i]);
+
+    // If found, simply hightlight this word also.
     if (pos!=std::string::npos) {
-      prev.replace(pos, prev.find(" ", pos+1)-pos, "<mark>"+words[i]+"</mark>");
+      func::HighlightWordByPos(preview, pos, "<mark>", "</mark>");
     } 
+    // Otherwise find a new preview for next word.
     else {
-      std::string new_prev = GetOnePreview(words[i]);
+      std::string new_prev = GetOnePreview(words[i], converted_words[i], 
+          search_object.search_options().fuzzy_search(), in_corpus);
       if(new_prev != "No Preview.")
-        prev += "\n" + new_prev;
+        preview += "\n" + new_prev;
     }
-  }
-  return prev;
-}
-
-std::string Book::GetOnePreview(std::string word) {
-  size_t pos = -1, page = 1000000;
-
-  // Get Source string and position, if no source, then return "no preview".
-  std::string preview = (has_ocr()) ? GetPreviewText(word, pos, page) : GetPreviewTitle(word, pos);
-  
-  // If no preview was found, return "No Preview"
-  if (preview == "") 
-    return "No Preview.";
-
-  // Highlight searched word, only if exact position was found.
-  if (pos != -1) {
-    if (pos > 75) 
-      pos = 75;
-    preview.replace(pos, preview.find(" ", pos+1)-pos, "<mark>"+word+"</mark>");
-  }
-
-  // Delete or escape invalid characters if needed.
-  EscapeDeleteInvalidChars(preview);
-
-  // Append [...] front and back.
-  preview.insert(0, " \u2026"); 
-  if (page!=1000000)
-    return preview += " \u2026 (S. " + std::to_string(page) +")";
-  return preview += " \u2026";
-}
-
-std::string Book::GetPreviewText(std::string& word, size_t& pos, size_t& page) {
-  // Get match (full, grammatical, fuzzy).
-  if (map_words_pages_.count(word) > 0)
-    word = word;
-  else if (corpus_fuzzy_matches_.count(word) > 0) 
-    word = corpus_fuzzy_matches_[word].GetBestMatch();
-  else 
-    return "";
-
-  // Get page number from map of words and pages.
-  page = map_words_pages_[word].pages()[0];
-  if (page == 1000000) 
-    return "";
-
-  // Find position, where word occurs.
-  pos = map_words_pages_[word].position();
-
-  // Calculate beginning and ende of 150 character preview surounding word.
-  size_t front = 0, len = 150;
-  if (pos > 75) front = pos - 75;
-
-  // Generate substring of 150 characters, with search word in the center.
-  std::ifstream file(path_ + "/intern/page" + std::to_string(page) + ".txt",
-      std::ifstream::ate | std::ifstream::binary);
-  std::string preview = "";
-  if (file.is_open()) {
-    size_t file_length = file.tellg();
-    if(front+len >= file_length) len = file_length-front;
-    file.seekg(front);
-    preview.resize(len);
-    file.read(&preview[0], len); 
-    file.close();
   }
   return preview;
 }
 
-std::string Book::GetPreviewTitle(std::string& word, size_t& pos) {
+std::string Book::GetOnePreview(std::string original_word, std::string converted_word, 
+    bool fuzzy_search, bool in_corpus) {
+  size_t pos = -1, page = 1000000;
+  std::string prev_str = "";
+
+  if (in_corpus) {
+    WordInfo word_info = FindBestWordInfo(original_word, converted_word, fuzzy_search);
+    pos = word_info.preview_position_;
+    page = word_info.preview_page_;
+    prev_str = func::LoadStringFromDisc(path_ + "/intern/page" + std::to_string(page) + ".txt");
+    if (prev_str == "")
+      throw std::out_of_range("Page not found!");
+  }
+  else {
+    prev_str = GetPreviewMetadata(original_word, converted_word, fuzzy_search, pos);
+  }
+
+  if (prev_str == "") 
+    return "No Preview";
+
+  // Highlight searched word, only if exact position was found.
+  func::HighlightWordByPos(prev_str, pos, "<mark>", "</mark>");
+
+  // Trim string (text, position to center, min threschold, result-length)
+  func::TrimString(prev_str, pos, 150);
+
+  // Delete or escape invalid characters if needed.
+  func::EscapeDeleteInvalidChars(prev_str);
+
+  // Append [...] front and back.
+  prev_str = "\u2026" + prev_str + " \u2026";
+  return (page != 1000000) ? prev_str + "S. " + std::to_string(page) : prev_str;
+}
+
+std::string Book::GetPreviewMetadata(std::string original_word,
+      std::string converted_word, bool fuzzy_search, size_t& pos) {
   // Find position where searched word occurs.
-  pos = quick_title_.find(word);
+  pos = quick_title_.find(converted_word);
   if (pos != std::string::npos) 
     return quick_title_;
 
   // If word could not be found. Try to find it with fuzzy search. 
   for (auto it : quick_title_words_) {
-    if (fuzzy::fuzzy_cmp(it.first, word) < 0.2) {
+    if (fuzzy::fuzzy_cmp(it.first, converted_word) < 0.2) {
       pos = quick_title_.find(it.first);
       if(pos == std::string::npos && pos > quick_title_.length())
         pos = -1; 
@@ -557,48 +522,20 @@ std::string Book::GetPreviewTitle(std::string& word, size_t& pos) {
   return "";
 }
 
-
-void Book::EscapeDeleteInvalidChars(std::string& str) {
-  // Delete invalid chars front.
-  for (;;) {
-    if ((int)str.front() < 0)
-      str.erase(0,1);
-    else if ((int)str.back() < 0)
-      str.pop_back();
-    else
-      break;
-  }
-
-  //Check vor invalid literals and escape
-  for (unsigned int i=str.length(); i>0; i--) {
-    if (str[i-1] == '\"' || str[i-1] == '\'' || str[i-1] == '\\')
-      str.erase(i-1, 1);
-    if (str[i-1] == '<' && str[i] != 'm' && str[i] != '/')
-      str.erase(i-1, 1);
-  }
-}
-
 void Book::AddPage(std::string page_text, std::string pagenumber, 
     std::string max_pagenumber) {
   // Write the single given page to disc.
-  std::ofstream write_page(path_ + "/intern/add" + pagenumber + ".txt");
-  write_page << page_text;
-  write_page.close();
+  func::WriteContentToDisc(path_ + "/intern/add" + pagenumber + ".txt", page_text);
 
-  // Add given page to existing ocr.
-  fs::path p = ocr_path();
-  fs::exists(p);
+  // Create new ocr
   std::string new_ocr;
-
-  // If path doesnt exist, simple set current page + pagemark as new_ocr. 
-  if (fs::exists(p) == false) {
+  // If path doesn't exist, simply set current page + pagemark as new_ocr. 
+  if (fs::exists(ocr_path()) == false) {
     std::cout << "create new ocr..." << std::endl;
-    page_text.insert(0, "\n----- " + pagenumber + " / "+ max_pagenumber 
-        + " -----\n"); 
+    page_text.insert(0, "\n----- " + pagenumber + " / "+ max_pagenumber + " -----\n"); 
     new_ocr = page_text;
   }
 
-  // Load.
   else {
     // Load all pages to be added and sort by page-number.
     std::map<int, std::string> order_pages;
@@ -608,77 +545,19 @@ void Book::AddPage(std::string page_text, std::string pagenumber,
 
       // Check for correct format, then add to ordered map of pages.
       if (filename.find("add") != std::string::npos) {
-        std::string num = filename.substr(3, filename.length()-2-filename.
-            find("."));
+        std::string num = filename.substr(3, filename.length()-2-filename.find("."));
         order_pages[stoi(num)] = p.path().string();
       }
     }
 
     // Iterate over all (sorted) pages: load and add each to ocr
     for (auto it : order_pages) {
-      // Add pagemark.
-      new_ocr.append("\n\n----- " + std::to_string(it.first) + " / " 
-          + max_pagenumber+" -----\n");
-
-      // Load and add to ocr.
-      std::ifstream new_page(it.second);
-      std::string str((std::istreambuf_iterator<char>(new_page)), 
-          std::istreambuf_iterator<char>());
-      new_ocr.append(str);
+      // Add pagemark, then load new page from disc and add to ocr.
+      new_ocr.append("\n\n----- " + std::to_string(it.first) + " / " + max_pagenumber+" -----\n");
+      new_ocr.append(func::LoadStringFromDisc(it.second));
     }
   }
 
-  std::ofstream write_ocr(path_ + "/ocr.txt");
-  write_ocr << new_ocr;
-  write_ocr.close();
-}
-
-std::string Book::GetMostRelevantNeighbors(std::string word, Dict& dict) {
-  std::map<std::string, int> neighbors;
-  if (map_words_pages_.count(word) == 0)
-    return "";
-  for (auto page : map_words_pages_[word].pages()) {
-    // Get source string of complete page. 
-    std::ifstream read(path_ + "/intern/page" + std::to_string(page) + ".txt", std::ios::in);
-    std::string source((std::istreambuf_iterator<char>(read)), std::istreambuf_iterator<char>());
-    size_t pos = source.find(word);
-    if (pos == std::string::npos) continue;
-
-    std::string part = "";
-    while (true) {
-      size_t front = source.find(".");
-      if (front == std::string::npos || front > pos) front = 0;
-      size_t end = source.find(".", pos);
-      if (end == std::string::npos) end = pos+30; 
-      if (end >= source.length()) end = source.length();
-      part = source.substr(front, end-front);
-      size_t pos = source.find(word, pos);
-      if (pos == std::string::npos) break;
-    }
-    for (auto it : func::extractWordsFromString(part)) {
-      if (dict.IsWordX(it.first, "f", {"ADJ", "SUB", "VER"}) == true)
-        neighbors[it.first] += it.second*(it.second+1)/2;
-    }
-  }
-  
-  // Create compare function.
-	typedef std::function<bool(std::pair<std::string, int>, std::pair<std::string, int>)> Comp;
-  Comp comp_function = [](const auto& a, const auto& b) {
-    if (a.second == b.second)
-      return a.first > b.first;
-    return a.second > b.second;
-  };
-
-  // Convert map to sorted set.
-	std::set<std::pair<std::string, int>, Comp> sorted(neighbors.begin(), 
-      neighbors.end(), comp_function);
-
-  // Convert set to vector.
-  size_t counter = 0;
-  std::string result="";
-  for (auto it : sorted) {
-    result += it.first + "(" + std::to_string(it.second) + ")" + ", ";
-    if (++counter == 10) break;
-  }
-  return result;
+  // Write new ocr to disc.
+  func::WriteContentToDisc(path_ + "/ocr.txt", new_ocr);
 }

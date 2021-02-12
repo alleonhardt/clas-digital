@@ -19,7 +19,7 @@ SearchObject::SearchObject(std::string query, SearchOptions search_options)
   // Convert all words to lower and replace non utf-8 characters.
   for (auto word : words_) {
     std::cout << word << std::endl;
-    // TODO (fux): reduce to base-form.
+#warning reduce to base form!
     converted_words_.push_back(func::convertStr(func::returnToLower(word)));
   }
 }

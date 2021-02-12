@@ -30,8 +30,6 @@ std::map<std::string, std::vector<std::string>>& BookManager::map_unique_authors
 }
 
 bool BookManager::Initialize(bool reload_pages) {
-  std::cout << "BookManager: Starting initializing..." << std::endl;
-
   std::cout << "BookManager: Extracting books." << std::endl;
   //Go though all books and create book
   for (auto upload_point : upload_points_) {
@@ -261,8 +259,10 @@ void BookManager::CreateMapWords() {
       continue;
     //Iterate over all words in book and add word to map and book to list with score.
     for(auto yt : it->second->map_words_pages()) {
-      map_words_[yt.first][it->first] = static_cast<double>(it->second
-          ->map_words_pages()[yt.first].relevance())/it->second->num_pages();
+      double total_relevance = 0;
+      for (auto word_info : it->second->map_words_pages()[yt.first])
+        total_relevance += word_info.relevance_;
+      map_words_[yt.first][it->first] = total_relevance;
     }
   }
   CreateListWords(map_words_, list_words_);

@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cctype>
 #include <cstddef>
+#include <filesystem>
 #include <type_traits>
 
 namespace func 
@@ -328,6 +329,77 @@ bool checkPage(std::string &buffer) {
       return false;
   }
   return false;
+}
+
+void HighlightWordByPos(std::string& str, int pos, std::string left, std::string right) {
+  // Check that position is valid.
+  if (pos < 0) {
+    std::cout << "\x1B[31mNo preview found!! \033[0m\t\t" << std::endl;
+  }
+  else {
+    // Find end of word (next space, or end of string).
+    size_t pos2 = str.find(" ", pos+1);
+    if (pos2 == std::string::npos)
+      pos2 = str.length();
+    #warning might find more than the accutall word!
+    
+    // Get word and then insert left and right symbol
+    std::string word = str.substr(pos, pos2-pos);
+    str.replace(pos, pos2-pos, left+word+right);
+  }
+}
+
+void TrimString(std::string& str, int pos, int length) {
+  int before = pos-75;  
+  int after = pos+75;
+
+  // Correct before if below zero and add negative numbers to after.
+  if (before < 0) {
+    after+=-1*before;
+    before = 0;
+  }
+
+  // Correct after and subtract exceeding numbers from before.
+  if (after > str.length()) {
+    before -= after - str.length();
+    // If now before is incorrect (below zero), set before to zero.
+    if (before < 0) 
+      before = 0;
+  }
+  str = str.substr(before, after);
+}
+
+void EscapeDeleteInvalidChars(std::string& str) {
+  // Delete invalid chars front.
+  for (;;) {
+    if ((int)str.front() < 0)
+      str.erase(0,1);
+    else if ((int)str.back() < 0)
+      str.pop_back();
+    else
+      break;
+  }
+
+  //Check vor invalid literals and escape
+  for (unsigned int i=str.length(); i>0; i--) {
+    if (str[i-1] == '\"' || str[i-1] == '\'' || str[i-1] == '\\')
+      str.erase(i-1, 1);
+    if (str[i-1] == '<' && str[i] != 'm' && str[i] != '/')
+      str.erase(i-1, 1);
+  }
+}
+
+std::string LoadStringFromDisc(std::string path) {
+  // Check if path exists.
+  if (!std::filesystem::exists(path))
+    return "";
+
+  // Load file from disc and return.
+  std::ifstream new_page(path);
+  std::string str(
+      (std::istreambuf_iterator<char>(new_page)), 
+      std::istreambuf_iterator<char>());
+  return str;
 }
 
 } //Close namespace 

@@ -113,18 +113,11 @@ public:
   * Get a preview for each searched word. Try to highlight/ find words
   * in one preview. Only add a new preview if word could not be found in
   * the preview created so far.
-  * @param input (user input, possibly containing several words)
+  * @param search_object (searched object).
   * @return one ore more previews ready formatted for output.
   */
-  std::string GetPreview(std::string word);
+  std::string GetPreview(SearchObject& search_object, bool in_corpus);
 
-   /**
-   * Returns the 10 most relevant neighboors of a given word.
-   * @param[in] word
-   * @return vector of the 10 most relevant neighboors.
-   */
-  std::string GetMostRelevantNeighbors(std::string word, Dict& dict);
-   
 private:
 
   static Dict* dict_;
@@ -233,14 +226,6 @@ private:
   void RemovePages(std::map<int, std::vector<std::string>>& results1, 
                    std::map<int, std::vector<std::string>>& results2);
 
-  /** 
-   * Check whether all words occur in metadata
-   * @param[in] vWords (words to check)
-   * @param[in] fuzzyness (fuzzy-search yes/ no)
-   * @return boolean whether all words are in metadata or not.
-   */
-  bool MetadataCmp(std::vector<std::string> words, bool fuzzyness);
-
   /**
    * Find all base-forms matching the searched word. 
    * Find matching base-form(s). In case of fuzzy search these are all
@@ -251,6 +236,8 @@ private:
    */
   std::vector<std::string> FindBaseForms(std::string word, bool fuzzy_search);
 
+  WordInfo FindBestWordInfo(std::string original_word, std::string converted_word, 
+      bool fuzzy_search);
 
   // *** Previews *** //
 
@@ -259,17 +246,8 @@ private:
    * @param sWord (searched word)
    * @return Preview.
    */
-  std::string GetOnePreview(std::string word);
-
-  /**
-   * @brief Return page on which word occures, the position on the page and the
-   * page number.
-   * @param[in] word (searched word)
-   * @param[in, out] pos (position on the page)
-   * @param[in, out] page (page number the word was found on)
-   * @return complete text of the page the word was found on.
-   */
-  std::string GetPreviewText(std::string& word, size_t& pos, size_t& page);
+  std::string GetOnePreview(std::string original_word, std::string converted_word, 
+    bool fuzzy_search, bool in_corpus);
 
   /**
    * Get the complete title and the position where the word was found.
@@ -278,13 +256,8 @@ private:
    * @param[in, out] pos (position, where in title word was found)
    * @return title.
    */
-  std::string GetPreviewTitle(std::string& word, size_t& pos);
-  
-  /**
-   * Delete brocken characters and escape invalid literals.
-   * @param[in, out] str (string to escape)
-   */
-  void EscapeDeleteInvalidChars(std::string& str);
+  std::string GetPreviewMetadata(std::string original_word,
+      std::string converted_word, bool fuzzy_search, size_t& pos);
 };
 
 #endif

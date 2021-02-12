@@ -126,6 +126,32 @@ namespace func {
   */
   bool checkPage(std::string &buffer);
 
+  /**
+   * Identify word and insert left and write to highlight.
+   * Allowing to specify left and write is a more dynamic approach.
+   * @param[in, out] str string to modify.
+   * @param pos position, where word should be.
+   * @param left string to insert left (f.e. "<mark>")
+   * @param right string to insert right (f.e. "</mar>")
+   */
+  void HighlightWordByPos(std::string& str, int pos, std::string left, std::string right);
+
+  /**
+   * Trim a string to a max length centering around a given position.
+   * @param[in, out] str to trim.
+   * @param pos position to center.
+   * @param length length to trim string to
+   */
+  void TrimString(std::string& str, int pos, int length);
+
+  /**
+   * Delete non-valid characters and escape html code.
+   * @param[in, out] str string to modify.
+   */
+  void EscapeDeleteInvalidChars(std::string& str);
+
+  std::string LoadStringFromDisc(std::string path);
+
   template<typename T>
   void WriteContentToDisc(std::string path, T content) {
     //Write json to disc.
