@@ -168,15 +168,15 @@ void Pages(const Request& req, Response& resp, BookManager& manager) {
   // Retrieve necessary query and scan-/ book-id.
   std::string scan_id = req.get_param_value("scanId"); 
   std::string query = req.get_param_value("query"); 
-  func::convertToLower(query);
-  query = func::convertStr(query);
-  
   int fuzzyness=0;
   try {
     fuzzyness = stoi(req.get_param_value("fuzzyness"));
   } catch (std::exception& e) {
     std::cout << "Recieved fuzzyness with invalid value, using 0 instead.";
   }
+
+  SearchOptions search_options(fuzzyness!=0);
+  SearchObject search_object = SearchObject(query, search_options);
   
   // Construct response.
   nlohmann::json json_response;
@@ -189,11 +189,12 @@ void Pages(const Request& req, Response& resp, BookManager& manager) {
   if (manager.map_of_books().count(scan_id) == 0) {
     std::cout << "Search in book: given book not found!" << std::endl;
     resp.status = 404;
+    return;
   }
 
   // Get pages.
   auto book = manager.map_of_books()[scan_id];
-  auto pages = book->GetPages(query, fuzzyness!=0);
+  auto pages = book->GetPages(search_object);
   std::cout << "Got " << pages->size() << " pages for this book." << std::endl;
   if (pages->size() == 0) {
     resp.status = 200;

@@ -13,6 +13,21 @@ SearchOptions::SearchOptions(bool fuzzy_search, bool only_metadata, bool only_co
       author_(func::convertStr(func::returnToLower(author))),
       collections_(collections) {}
 
+SearchOptions(
+        bool fuzzy_search
+      ) :
+      fuzzy_search_(fuzzy_search),
+      only_metadata_(false),
+      only_corpus_(false),
+      year_from_(0),
+      year_to_(0),
+      sort_result_by_(0),
+      author_(""),
+      collections_({}) 
+{
+
+}
+
 bool SearchOptions::fuzzy_search() const {
   return fuzzy_search_;
 }

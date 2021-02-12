@@ -35,6 +35,15 @@ class SearchOptions {
         std::string author,
         std::vector<std::string> collections);
 
+  /**
+   * Constructor for the search-options, when searchin the pages of a book
+   * will only set the fuzzynes and set the other values to zero or false
+   * @param fuzzy_search Is this search a fuzzy search?
+   */
+  SearchOptions(
+        bool fuzzy_search
+      );
+
   // getter:
   bool fuzzy_search() const;
   bool only_metadata() const;
