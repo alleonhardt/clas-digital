@@ -13,3 +13,4 @@ bin/*
 compile_commands.json
 server.config
 .clangd/*
+src/search/tests/test_books/UEHEJINT/intern
