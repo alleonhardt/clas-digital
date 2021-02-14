@@ -52,6 +52,22 @@ set(SRC_FILES_SEARCH
   src/shared/util/func.cpp 
   src/shared/util/fuzzy.cpp)
 
+set(SRC_FILES_SEARCH_TEST 
+  src/search/book_manager/book.cc 
+  src/search/book_manager/book_manager.cc 
+  src/search/data_models/tmp_word_info.cc 
+  src/search/data_models/result_object.cc
+  src/search/data_models/search_object.cc 
+  src/search/data_models/search_options.cc 
+  src/search/data_models/sorted_matches.cc 
+  src/shared/metadata_handler.cc 
+  src/shared/util/func.cpp 
+  src/shared/util/fuzzy.cpp
+  src/search/tests/book_manager/test_book.cc
+  src/search/tests/test_search.cc
+  src/search/tests/test_func.cc)
+
+
 add_library(clas_server_lib OBJECT src/shared/metadata_handler.cc
   src/shared/util/URLParser.cpp src/shared/util/ubuntu20matherror.cpp
   src/shared/util/func.cpp src/server/login/user.cpp
@@ -91,6 +107,7 @@ set(CXX_STDLIB "")
 
 
 add_executable(clas_digital_search.o  ${SRC_FILES_SEARCH})
+add_executable(clas_digital_search_test.o  ${SRC_FILES_SEARCH_TEST})
 
 if(MSVC)
   add_compile_options(/W4 /WX)
@@ -143,9 +160,18 @@ target_include_directories(clas_digital_search.o PUBLIC
   "src/search/data_models"
 )
 
+target_include_directories(clas_digital_search_test.o PUBLIC
+  "src/shared"
+  "src/shared/util"
+  "src/search"
+  "src/search/data_models"
+  "src/search/tests"
+)
+
 target_link_libraries(clas_digital_server.o ${CONAN_LIBS} ${CXX_STDLIB})
 target_link_libraries(clas_digital_server_test.o ${CONAN_LIBS} ${CXX_STDLIB})
 target_link_libraries(clas_digital_search.o ${CONAN_LIBS} ${CXX_STDLIB})
+target_link_libraries(clas_digital_search_test.o ${CONAN_LIBS} ${CXX_STDLIB})
 
 set(INSTALL_DIRS /etc/clas-digital-devel)
 set(SERVICE_TARGET clas-digital-devel)
@@ -156,6 +182,7 @@ install(FILES src/server/${SERVICE_TARGET}.service DESTINATION /etc/systemd/syst
 install(FILES src/default DESTINATION /etc/nginx/sites-available)
 install(PROGRAMS build/bin/clas_digital_server.o DESTINATION ${INSTALL_DIRS})
 install(PROGRAMS build/bin/clas_digital_search.o DESTINATION ${INSTALL_DIRS})
+install(PROGRAMS build/bin/clas_digital_search_test.o DESTINATION ${INSTALL_DIRS})
 install(DIRECTORY web DESTINATION ${INSTALL_DIRS} PATTERN "web/books/*" EXCLUDE)
 install(DIRECTORY bin/trainingdata DESTINATION ${INSTALL_DIRS})
 install(CODE "MESSAGE(\"Installing files done. Restarting nginx and the service ${SERVICE_TARGET}\")")

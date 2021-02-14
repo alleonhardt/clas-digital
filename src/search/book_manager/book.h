@@ -24,7 +24,10 @@
 #include "metadata_handler.h"
 #include "sorted_matches.h"
 
+#define private public
+
 class Book {
+
 public:
 
   Book();
@@ -57,7 +60,7 @@ public:
   std::string GetAuthorDateScanned();
 
   // **** setter **** //
-  static void set_dict(Dict* dict) { dict_ = dict; }
+  static void set_dict(Dict* dict);
 
   void SetPath(std::string sPath);
   
@@ -182,8 +185,17 @@ private:
    */
   size_t GetPreviewPosition(std::string word, size_t page);
 
+
   /**
-   * Convert all keys.
+   * Convert all words and handle resulting duplicates.
+   * All words are converted to lowercase and non-utf8-characters are replaced. 
+   * Also if duplicate are resulting the word-infos are "joined".
+   * @param[in, out] temp_map_pages.
+   */
+  void ConvertWords(temp_index_map& temp_map_pages);
+  /**
+   * Convert index map to a map of base-forms and conjunction.
+   * @param[in, out] temp_map_pages.
    */
   void GenerateBaseFormMap(temp_index_map& temp_map_pages);
 

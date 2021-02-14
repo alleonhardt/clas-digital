@@ -48,9 +48,6 @@ std::vector<size_t> TempWordInfo::GetAllPages() const {
 }
 
 void TempWordInfo::Join(TempWordInfo& word_info) {
-  std::cout << "relevance a: " << relevance_;
-  std::cout << "relevance b: " << word_info.relevance();
-
   // Add up relevance of both word-infos.
   relevance_ += word_info.relevance();
 

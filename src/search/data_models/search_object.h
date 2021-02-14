@@ -7,6 +7,7 @@
 #ifndef SRC_SEARCH_DATA_MODELS_SEARCHOBJECT_H_
 #define SRC_SEARCH_DATA_MODELS_SEARCHOBJECT_H_
 
+#include "gramma.h"
 #include "search_options.h"
 #include <string>
 #include <vector>
@@ -16,9 +17,10 @@ class SearchObject {
      * constructor
      * @param query (original query)
      * @param search_options describing what search results to filter, how to
+     * @param dict reference do dictionary to reduces searched words to base-from.
      * sort, fuzzyness etc.
      */
-    SearchObject(std::string query, SearchOptions search_options);
+    SearchObject(std::string query, SearchOptions search_options, Dict& dict);
 
     // getter:
     std::string query() const;

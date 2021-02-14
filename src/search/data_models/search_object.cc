@@ -4,7 +4,7 @@
 #include "search_options.h"
 #include <algorithm>
 
-SearchObject::SearchObject(std::string query, SearchOptions search_options) 
+SearchObject::SearchObject(std::string query, SearchOptions search_options, Dict& dict) 
     : query_(query), search_options_(search_options) {
  
   // replace all spaces by "+" as the user may use " " or "+" as a delimitter.
@@ -19,8 +19,11 @@ SearchObject::SearchObject(std::string query, SearchOptions search_options)
   // Convert all words to lower and replace non utf-8 characters.
   for (auto word : words_) {
     std::cout << word << std::endl;
-#warning reduce to base form!
-    converted_words_.push_back(func::convertStr(func::returnToLower(word)));
+    std::string cur_word = func::convertStr(func::returnToLower(word));
+    std::string base_form = dict.GetBaseForm(cur_word);
+    if (base_form == "") 
+      base_form = cur_word;
+    converted_words_.push_back(base_form);
   }
 }
 

@@ -108,7 +108,7 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
   if (sort == "alphabetically") sort_result_by = 2;
   SearchOptions search_options(fuzzyness, scope=="metadata", scope=="corpus", pubafter, pubbefore, 
       sort_result_by, author, pillars);
-  SearchObject search_object = SearchObject(query, search_options);
+  SearchObject search_object = SearchObject(query, search_options, dict);
 
   // Start search.
   auto time_start = std::chrono::system_clock::now();
@@ -117,7 +117,6 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
   // Construct response.
   std::cout << "Results: " << result_list.size() << std::endl;
   for (auto it : result_list) {
-    it.Print(search_object.converted_words()[0]);
   }
   std::cout << std::endl;
   nlohmann::json search_response;
@@ -127,6 +126,7 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
     search_response["time"] = 0;
   }
   else {
+    std::cout << "Constructing response-object" << std::endl;
     size_t counter = 0;
     for (auto res_obj: result_list) {
       // Create entry for each book in result.
@@ -139,6 +139,7 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
 
       std::string preview = res_obj.book()->GetPreview(search_object, res_obj.found_in_corpus());
       entry["preview"] = preview;
+      res_obj.Print(search_object.converted_words()[0], entry["preview"]);
       search_response["books"].push_back(std::move(entry)); 
       if (++counter == resultsperpage)
         break;
@@ -158,7 +159,7 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
  * @param[in, out] resp (respsonse)
  * @param[in] manager (book manager, to do get book which to search in.)
  */
-void Pages(const Request& req, Response& resp, BookManager& manager) {
+void Pages(const Request& req, Response& resp, BookManager& manager, Dict& dict) {
   if (!req.has_param("scanId") || !req.has_param("query") || !req.has_param("fuzzyness")) {
     std::cout << "Invalid or missing query-parameter in search_in_book: " << std::endl; 
     resp.status = 400;
@@ -176,7 +177,7 @@ void Pages(const Request& req, Response& resp, BookManager& manager) {
   }
 
   SearchOptions search_options(fuzzyness!=0);
-  SearchObject search_object = SearchObject(query, search_options);
+  SearchObject search_object = SearchObject(query, search_options, dict);
   
   // Construct response.
   nlohmann::json json_response;
@@ -195,8 +196,8 @@ void Pages(const Request& req, Response& resp, BookManager& manager) {
   // Get pages.
   auto book = manager.map_of_books()[scan_id];
   auto pages = book->GetPages(search_object);
-  std::cout << "Got " << pages->size() << " pages for this book." << std::endl;
-  if (pages->size() == 0) {
+  std::cout << "Got " << pages.size() << " pages for this book." << std::endl;
+  if (pages.size() == 0) {
     resp.status = 200;
     resp.set_content(json_response.dump(), "application/json");
     return;
@@ -205,7 +206,7 @@ void Pages(const Request& req, Response& resp, BookManager& manager) {
   // Create hitlist of books.
   try {
     json_response["books"] = nlohmann::json::array();
-    for (auto const &it : *pages) {
+    for (auto const &it : pages) {
       nlohmann::json entry;
       entry["page"] = it.first;
       std::string matches_on_page = "";
@@ -268,19 +269,6 @@ void Suggestions(const Request& req, Response& resp, BookManager& manager,
 
 int main(int argc, char *argv[]) {
 
-  std::string str = "der;hund ?läuft__ durch das über-krasse Häuser-virtel.Und verteilt un?!!äch-te bonbons";
-  for (auto it : func::extractWordsFromString(str)) {
-    std::string word = it.first;
-    size_t pos = str.find(word);
-    std::cout << word; 
-    if (pos != std::string::npos) 
-      std::cout << " still found!\n";
-    else
-     std::cout << " not found.\n";
-  }
-  std::cout << str << std::endl;
-  std::cout << "Starting super fast, but partly sucking c++ search api...\n" << std::endl;
-  
   // Create server.
   Server srv;
 
@@ -293,9 +281,6 @@ int main(int argc, char *argv[]) {
   // Load dictionary.
   std::cout << "Loading dictionary at " << config["dictionary"] << std::endl;
   Dict dict(config["dictionary"]);
-  for (auto it : dict.GetAllConjugations("hund")) 
-    std::cout << it << std::endl;
-  std::cout << "done.\n\n";
   Book::set_dict(&dict);
 
   // Load corpus metadata from disc.
@@ -308,22 +293,18 @@ int main(int argc, char *argv[]) {
   }
   nlohmann::json metadata;
   read >> metadata;
-  std::cout << "done.\n\n";
 
   // Load active pillars:
   std::cout << "Loading active collections...";
   nlohmann::json zotero_pillars = nlohmann::json::array();
   for (auto it : metadata["collections"]["data"])
     zotero_pillars.push_back(nlohmann::json({{"key", it["key"]}, {"name", it["data"]["name"]}}));
-  std::cout << "done.\n\n";
 
   // Create book manager:
   std::cout << "initializing bookmanager..." << std::endl;
   std::string cmd_arg = (argc > 1) ? argv[1] : "";
   BookManager manager(config["upload_points"], &dict);
-  std::cout << "Updating zoter0..." << std::endl;
   manager.CreaeItemsFromMetadata(metadata["items"]["data"]);
-  std::cout << "done" << std::endl;
   if (manager.Initialize(cmd_arg == "reload_pages"))
     std::cout << "Initialization successful!\n\n"; 
   else
@@ -337,7 +318,7 @@ int main(int argc, char *argv[]) {
   srv.Get("/api/v2/search", [&](const Request& req, Response& resp) 
       { Search(req, resp, zotero_pillars, manager, dict); });
   srv.Get("/api/v2/search/pages", [&](const Request& req, Response& resp) 
-      { Pages(req, resp, manager); });
+      { Pages(req, resp, manager, dict); });
   srv.Get("/api/v2/search/suggestions/corpus", [&](const Request& req, Response& resp)
       { Suggestions(req, resp, manager, "corpus"); });
   srv.Get("/api/v2/search/suggestions/author", [&](const Request& req, Response& resp)

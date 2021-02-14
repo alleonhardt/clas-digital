@@ -9,10 +9,14 @@
 #include <ctime>
 #include <filesystem>
 #include <iostream>
+#include <ostream>
 #include <stdexcept>
 #include <string>
 
 namespace fs = std::filesystem;
+
+Dict* Book::dict_ = nullptr;
+void Book::set_dict(Dict* dict) { Book::dict_ = dict; }
 
 Book::Book () {}
 
@@ -21,6 +25,7 @@ Book::Book(nlohmann::json metadata) : metadata_(metadata) {
   path_ = ""; 
   has_ocr_ = false;
   has_images_ = false;
+  num_pages_ = 0;
 
   // Set Metadata.
   key_ = metadata["key"];
@@ -156,12 +161,13 @@ void Book::CreateIndex() {
 }
 
 void Book::SeperatePages(temp_index_map& temp_map_pages) {
-  std::cout << "Creating map of words... \n";
+  std::cout << "Creating map of words for " << key_ << "... \n";
   // Load ocr and create ne directory "intern" for this book.
   std::ifstream read(ocr_path());
   
   std::string buffer = "", cur_line = "";
-  size_t page=1, num_pages_=0;
+  size_t page=1; 
+  num_pages_ = 0;
   while (!read.eof()) {
     getline(read, cur_line);
     
@@ -224,7 +230,7 @@ size_t Book::GetPreviewPosition(std::string word, size_t best_page) {
   return pos;
 }
 
-void Book::GenerateBaseFormMap(temp_index_map& temp_map_pages) {
+void Book::ConvertWords(temp_index_map& temp_map_pages) {
   // Convert all words in map, if this results in a duplicate, join word-infos.
   temp_index_map map_pages_handle_duplicates;
   for (auto it : temp_map_pages) {
@@ -233,6 +239,13 @@ void Book::GenerateBaseFormMap(temp_index_map& temp_map_pages) {
     cur_word = func::convertStr(func::returnToLower(cur_word));
     map_pages_handle_duplicates[cur_word].Join(it.second); 
   }
+  temp_map_pages = map_pages_handle_duplicates;
+}
+
+void Book::GenerateBaseFormMap(temp_index_map& temp_map_pages) {
+  // Converts all words to lower case and removes non utf-8 characters 
+  // also handles resulting dublicates.
+  ConvertWords(temp_map_pages);
 
   // Add base-form to map_words_pages_ and current word as one of it conjunctions.
   for (auto it : temp_map_pages) {
@@ -256,11 +269,12 @@ void Book::SafePages() {
   // Open file for writing and write number of pages as first value.
   nlohmann::json json_index_map;
   json_index_map["num_pages"] = num_pages_;
+  std::cout << "Number of pages: " << num_pages_;
   json_index_map["base_forms"] = nlohmann::json::object();
 
   // Iterate over all base forms and create word-info-entries for it's conjunctions.
   for (auto base_form : map_words_pages_) {
-    json_index_map[base_form.first] = nlohmann::json::array();
+    json_index_map["base_forms"][base_form.first] = nlohmann::json::array();
     // Iterate over conjunctions and create word-info-entries.
     for (auto word_info : base_form.second) {
       // Create word-info-entry.
@@ -272,7 +286,7 @@ void Book::SafePages() {
       entry["relevance"] = word_info.relevance_;
 
       // Add entry to base-form.
-      json_index_map[base_form.first].push_back(entry);
+      json_index_map["base_forms"][base_form.first].push_back(entry);
     }
   }
 
@@ -295,7 +309,7 @@ void Book::LoadPages() {
 
   // Iterate over all base forms and create word-info-entries for it's conjunctions.
   for (auto base_form = json_index_map["base_forms"].begin(); 
-      base_form < json_index_map["base_forms"].end(); base_form++) {
+      base_form != json_index_map["base_forms"].end(); base_form++) {
     // Iterate over conjunctions and create word-info-entries.
     for (auto word_info : base_form.value()) {
       // Create word-info-entry and add to base-form.
@@ -367,8 +381,8 @@ std::vector<std::string> Book::FindBaseForms(std::string word, bool fuzzy_search
   if (map_words_pages_.count(word) > 0) 
     base_forms.push_back(word);
   if (fuzzy_search && corpus_fuzzy_matches_.count(word) > 0) {
-    for (auto match : corpus_fuzzy_matches_)
-      base_forms.push_back(match.first);
+    for (auto match : corpus_fuzzy_matches_[word].GetAllMatches())
+      base_forms.push_back(match);
   }
   if (base_forms.size() == 0)
     std::cout << "\x1B[31mNo base form found!! \033[0m\t\t" << word << std::endl;
@@ -380,9 +394,16 @@ WordInfo Book::FindBestWordInfo(std::string original_word,
   
   // Get all matching baseforms and take first, as automatically best.
   std::vector<std::string> base_forms = FindBaseForms(converted_word, fuzzy_search);
-  if (base_forms.size() == 0) 
+  if (base_forms.size() == 0) {
+    std::cout << "\x1B[31mNo base form found!! \033[0m\t\t" << converted_word << std::endl;
     throw std::out_of_range("No baseform found!");
+  }
   std::string base_form = base_forms[0];
+
+  if (map_words_pages_.count(base_form) == 0) {
+    std::cout << "\x1B[31mBaseform not in map of words!! \033[0m\t\t" << base_form << std::endl;
+    throw std::out_of_range("Baseform not in map of words:" + base_form);
+  }
 
   // Find best matching conjunction.
   double cur_best_score = 0.2;
@@ -479,8 +500,10 @@ std::string Book::GetOnePreview(std::string original_word, std::string converted
     pos = word_info.preview_position_;
     page = word_info.preview_page_;
     prev_str = func::LoadStringFromDisc(path_ + "/intern/page" + std::to_string(page) + ".txt");
-    if (prev_str == "")
+    if (prev_str == "") {
+      std::cout << "\x1B[31mPreview-Page n ot loaded!! \033[0m\t\t" << std::endl;
       throw std::out_of_range("Page not found!");
+    }
   }
   else {
     prev_str = GetPreviewMetadata(original_word, converted_word, fuzzy_search, pos);
@@ -499,8 +522,8 @@ std::string Book::GetOnePreview(std::string original_word, std::string converted
   func::EscapeDeleteInvalidChars(prev_str);
 
   // Append [...] front and back.
-  prev_str = "\u2026" + prev_str + " \u2026";
-  return (page != 1000000) ? prev_str + "S. " + std::to_string(page) : prev_str;
+  prev_str = "\u2026" + prev_str + "\u2026";
+  return (page != 1000000) ? prev_str + " S. " + std::to_string(page) : prev_str;
 }
 
 std::string Book::GetPreviewMetadata(std::string original_word,

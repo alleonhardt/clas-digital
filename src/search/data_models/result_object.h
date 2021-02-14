@@ -59,7 +59,8 @@ class ResultObject {
      */
     double GetOverallScore() const;
 
-    void Print(std::string word="") {
+    void Print(std::string word, std::string preview) {
+      if (!found_in_corpus_) return;
       std::cout << "--- " << book_->key() << " --- " << std::endl;  
       std::cout << "Found metadata: " << found_in_metadata_ << std::endl;
       std::cout << "Found corpus: " << found_in_corpus_ << std::endl;
@@ -67,23 +68,22 @@ class ResultObject {
       std::cout << "Corpus score: " << corpus_score_ << std::endl;
       std::cout << "Overall score: " << GetOverallScore() << std::endl;
       
-      if (word != "") {
-        if (book_->map_words_pages().count(word) > 0) {
-          std::cout << "Direct match: true" << std::endl;
-        }
-        else if (book_->corpus_fuzzy_matches().count(word) > 0) {
-          std::cout << "Fuzzy match (corpus): " 
-            << book_->corpus_fuzzy_matches()[word].GetBestMatch() << std::endl;
-        }
-        else if (book_->metadata_fuzzy_matches().count(word) > 0) {
-          std::cout << "Fuzzy match (metadata): " 
-            << book_->metadata_fuzzy_matches()[word].GetBestMatch() << std::endl;
-        }
-        else {
-          std::cout << "Something went wrong: no match could be tracked. "
-            "(Or direct match in title/ author)" << std::endl;
-        }
+      if (book_->map_words_pages().count(word) > 0) {
+        std::cout << "Direct match: true" << std::endl;
       }
+      else if (book_->corpus_fuzzy_matches().count(word) > 0) {
+        std::cout << "Fuzzy match (corpus): " 
+          << book_->corpus_fuzzy_matches()[word].GetBestMatch() << std::endl;
+      }
+      else if (book_->metadata_fuzzy_matches().count(word) > 0) {
+        std::cout << "Fuzzy match (metadata): " 
+          << book_->metadata_fuzzy_matches()[word].GetBestMatch() << std::endl;
+      }
+      else {
+        std::cout << "Something went wrong: no match could be tracked. "
+          "(Or direct match in title/ author)" << std::endl;
+      }
+      std::cout << "Preview: " << preview << std::endl;
       std::cout << std::endl;
     }
 

@@ -366,7 +366,7 @@ void TrimString(std::string& str, int pos, int length) {
     if (before < 0) 
       before = 0;
   }
-  str = str.substr(before, after);
+  str = str.substr(before, after-before);
 }
 
 void EscapeDeleteInvalidChars(std::string& str) {
