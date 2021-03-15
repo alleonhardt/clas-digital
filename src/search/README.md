@@ -31,18 +31,28 @@ To achieve the specified tasks, we need:
 
 ## Data-structures.
 For this we developed two Data-structures: 
-1. Map of _all words_: mapping a word to a list of books and every book to a relevance.
+1. Map of _all words_: mapping a word to a list of books and every book to a relevance and a scope (metadata (1), corpus (2), both (3)).
 
 ```c++
-BookManager:: std::unordered_map<string, map<string, double>> map_of_words_;
+BookManager:: std::unordered_map<string, map<string, MatchObject>> map_of_words_;
+```
+
+With `MatchObject` being:
+```c++
+struct MatchObject {
+  double relevance;
+  _int8 scope // 1: only metadata, 2: scope, 3: metadata+scope.
+}
+
 ```
 2. Map of all words in _a book_: mapping every base-form to a list of conjunctions. Every conjunction has a `WordInfo` containing
    further information (pages, relevance, first-preview-position)
 ```c++
-Book:: std::unordered_map<string, WordStem> map_of_words_;
-struct WordStem {
-    std::vector<WordInfo> words_;
-}
+Book:: std::unordered_map<string, std::vector<WordInfo>> map_of_words_pages_;
+```
+
+With `WordInfo` being:
+```c++
 struct WordInfo {
   std::string word_;
   std::vector<size_t> pages_;
@@ -52,19 +62,36 @@ struct WordInfo {
 }
 ```
 
-Assuming however, we found a word with fuzzy-search. F.e. we search for
+Assuming however, we found a word with fuzzy-search. F.e. we searched for
 "Phifosophie" (typo on input), and found "Philosophie". How do we assure, that
 this word can later be found, to get the preview, or the pages?
-For each books, we store all words, not existing in the `Book::map_of_words_` in the following two maps: 
+For each books, we store all words, not existing in the `Book::map_of_words_pages_` in the following two maps: 
 
 ```c++
-std::unordered_map<string, set<pair<string, double>, comp>> metadata_fuzzy_matches;
-std::unordered_map<string, set<pair<string, double>, comp>> corpus_fuzzy_matches;
+std::unordered_map<string, SortedMatches> metadata_fuzzy_matches;
+std::unordered_map<string, SortedMatches> corpus_fuzzy_matches;
 ```
+
+With `SortedMatches` being:
+```c++
+class SortedMatches {
+  private:
+    typedef std::pair<std::string, double> weighted_match;
+    typedef std::function<bool(const weighted_match&, const weighted_match&)> Cmp;
+    std::set<weighted_match, Cmp> matches_;
+  public:
+    void Insert(weighted_match new_match); // inserts, resorts (O(10)), keep size<10
+    std::string GetBestMatch();
+    std::vector<std::string> GetAllMatches();
+}
+```
+
 The first string (the key) is the searched word, which does not exist in
 `CBook::map_of_words_`.
-The set represents a sorted set of matches, that _do_ exist in the map of 
-words. We keep these sorted, so, when retrieving matches, we can be sure, to always find the best matches
+The `SortedMatches` object represents a sorted set of matches, that _do_ exist in the map of 
+words. We keep these sorted, so, when retrieving matches, we can be sure, to always find the best matches.
+The matches are kept below 10 to keep the insert-operation as "cheep" as
+possible.
 
 
 Also a few things should be guaranteed:
@@ -77,14 +104,14 @@ This makes it necessary to have a data-structure for the search, which will be c
 
 ```c++
 class SearchObject {
-  std::string query_;
+  const std::string query_;
   std::vector<string> words_;	// created in constructor
   std::vector<string> converted_words_;	// created in constructor
   SearchOptions search_options_;
 }
 ```
 
-The search-object is combined with an object for the search-results:
+With `SearchOptions` being:
 
 ```c++
 class SearchOptions {
@@ -98,11 +125,8 @@ class SearchOptions {
     std::vector<std::string> collections_; 
 }
 ```
-TODO: investigate which constructor(s) might be needed apart from a full-args
-constructor.
 
-
-Also we need a object storing the results. During the search the result-objects will be stored in a map `std::map<std::string, ResultObject>` to easy remove duplicates (the key being the book-key). After the search is done, the map will be sorted and converted to a list: `std::list<ResultObject`.  
+Also we need an object storing the results. During the search the result-objects will be stored in a map `std::map<std::string, ResultObject>` to easy remove duplicates (the key being the book-key). After the search is done, the map will be sorted and converted to a list: `std::list<ResultObject`.  
 
 ```c++
 class ResultObject {
@@ -114,7 +138,18 @@ class ResultObject {
 }
 ```
 
-It is obvious, that this object is only used, for the full search. The additional information, makes it easy to use this object, when search the different results for a book (search_in_book).
+It is obvious, that this object is only used, for the full search (not "search in book", i.e. `Book::get_pages()`. 
+The stored (scope), makes it easy to use this object, when f.e. createing the preview. 
+As searching for multiple words it might be useful to store the cope for each
+word. Also it might be useful to stick to the same scope design used in
+`MatchObject`. This would result in the `ResultObject` looking as follows:
+
+```c++
+class ResultObject {
+  Book* book_;
+  std::vector<MatchObject> 
+}
+```
 
 ## Algorithms
 
@@ -122,17 +157,24 @@ It is obvious, that this object is only used, for the full search. The additiona
 
 __NOTE__: _up to the step_ `ConvertToBaseFormMap()` _we are using a temporary
 structure, which will later be converted to the_ `Book::map_of_words_`
-structure:
+structure. The temporary structure looks as follows:
 ```c++
 Book:: std::unordered_map<string, WordInfo> map_of_words_;
-struct WordInfo {
-  std::string word_;
-  std::map<size_t, size_t> pages_; // <rank:page> sorted by second values.
-  size_t preview_position_;
-  size_t preview_page_;
-  int relevance_; // later converted to double (relevance_/ number_of_pages)
+class TempWordInfo {
+  typedef std::pair<size_t, size_t> weighted_match; ///< page:relevance.
+  typedef std::function<bool(const weighted_match&, const weighted_match&)> Cmp;
+    
+  //Membervariable
+  std::set<weighted_match, Cmp> pages_with_relevance_; ///< set for sorting + dublicates.
+  size_t preview_position_;  ///< Position best preview.
+  size_t preview_page_;  ///< Page on which preview is found.
+  int relevance_;  ///< Relevance (how often word occures on pages).
 }
 ```
+The class has several functions making the creation of the index map easier.
+Also it stores the pages sorted by relevance. The relevance of the page is given
+by the number of actual words. This gives us the possibility to create better
+preview. (IN a former step we simply chose the first page).
 
 #### CreatePages()
 Splits pages at specified page-break. Calls CreatePage();
@@ -186,29 +228,43 @@ Summary:
 #### FindBestPreview(Current Word (string))
 
 Summary: 
-- searches page with the highest number of words.
+- gets page with the highest number of words.
 - finds and returns the position of the given word `100000` otherwise. (we will definitely find the word, as no conversion has taken place)
 
 #### ConvertToBaseFormMap()
 
 Summary:
-- iterates over all words in current map of pages.
-- for every word: 
-  - As we now found the best preview position, we can convert the string:
+Convert words:
+- As we now found the best preview position, we can convert the string:
+  We do this by calling `ConvertWords` which
+  1. Converts each word in the current index-map:
     - convert string to lower-case.
     - call `convertStr()`, replacing non-utf-8 characters, by utf-8-characters
-  - search base-form,
+  2. For every resulting duplicate (maybe "Hund" and "hund" existed, now we
+     need to handle that we have to seperate `TempWordInfo`s for "hund") we
+     "join" the WordInfos:
+     - Find best preview position (preview on page with higher relevance)
+     - Set preview-position and preview-page accordingly.
+     - Join all pages: Page_A ∪ Page_B (no need to keep 
+     - TODO: Handle pages_with_relevance_ this would need joining too.
+Create Baseforms:
+- iterates over all words in current map of pages.
+- for every word: 
+    - search base-form,
     - `base_form = (GetBaseForm(cur_word) == "") ? cur_word : base_form;` So the
-      base_form is now either the base-form, or (if not found) the current word itself.
-    - if exists: add to, or set as first word for this base_form
-    - if not: add to `Book::map_of_words_` 
+      base_form is now either the base-form, or (if not found exists) the current word itself.
+    - create (real) word-info for current word __Note that the current word is__
+      __used rather than the baseform__.
+    - `map_words_pages_[base_form].push_back(word_info);` Either creating a new
+      entry (if the current word/ baseform is not tracked) and always adding the
+      current word as a entry for this base-form.
   - As now we have the number of pages, we can construct the relevance as
     `relevance/ number_of_pages` 
 
 ### Find Preview
-First of: with out a lot of searching every preview should be found easily, as
+First of: with out a lot of work and close to O(1) every preview should be found easily, as
 the word for which a preview should be found either exists in the map of words
-(so we have the page and position of the preview), or it exists either the
+(so we have the page and position of the preview), or it exists either in the
 `metadata_fuzzy_matches`-map, or the `corpus_fuzzy_matches`-map and we simply
 find our entry in the map of words by taking the first (and best, as corresponding 
 sets are sorted) entry in one of these maps.

@@ -66,6 +66,7 @@ void TempWordInfo::Join(TempWordInfo& word_info) {
   if (page_with_relevance_a < page_with_relevance_b) {
     preview_page_ = word_info.preview_page();
     preview_position_ = word_info.preview_position();
+    //TODO: Handle pages_with_relevance_ this would need joining too.
   }
 
   // Join all pages of both word infos.
