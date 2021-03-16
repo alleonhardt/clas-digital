@@ -16,3 +16,9 @@ server.config
 .cache/*
 src/search/tests/test_books_2/
 src/search/tests/test_books/UEHEJINT/intern
+
+BSBDownLoadFertig_noOCR.txt
+gibtEsBeiBSB_OCR.txt
+gibtEsBeiBSB_noOCR.txt
+tierwissen_noOCR.txt
+untracked_books.txt
