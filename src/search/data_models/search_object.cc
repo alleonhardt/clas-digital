@@ -4,7 +4,7 @@
 #include "search_options.h"
 #include <algorithm>
 
-SearchObject::SearchObject(std::string query, SearchOptions search_options, Dict& dict) 
+SearchObject::SearchObject(std::string query, SearchOptions search_options, Dict &dict) 
     : query_(query), search_options_(search_options) {
  
   // replace all spaces by "+" as the user may use " " or "+" as a delimitter.

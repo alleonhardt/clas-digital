@@ -20,7 +20,7 @@ class SearchObject {
      * @param dict reference do dictionary to reduces searched words to base-from.
      * sort, fuzzyness etc.
      */
-    SearchObject(std::string query, SearchOptions search_options, Dict& dict);
+    SearchObject(std::string query, SearchOptions search_options, Dict &dict);
 
     // getter:
     std::string query() const;

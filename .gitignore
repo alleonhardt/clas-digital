@@ -13,4 +13,6 @@ bin/*
 compile_commands.json
 server.config
 .clangd/*
+.cache/*
+src/search/tests/test_books_2/
 src/search/tests/test_books/UEHEJINT/intern

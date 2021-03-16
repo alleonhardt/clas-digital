@@ -75,5 +75,5 @@ TEST_CASE( "The map of base-forms is created as expected", "[generate_base_forms
 
   REQUIRE(book.map_words_pages().count("strasse") > 0);
   REQUIRE(book.map_words_pages()["strasse"].size() == 1);
-  REQUIRE(book.map_words_pages()["strasse"].front().word_ == "strasen");
+  REQUIRE(book.map_words_pages()["strasse"].front().word_ == "strassen");
 }

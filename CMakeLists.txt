@@ -50,7 +50,8 @@ set(SRC_FILES_SEARCH
   src/search/main.cpp 
   src/shared/metadata_handler.cc 
   src/shared/util/func.cpp 
-  src/shared/util/fuzzy.cpp)
+  src/shared/util/fuzzy.cpp
+)
 
 set(SRC_FILES_SEARCH_TEST 
   src/search/book_manager/book.cc 
@@ -64,8 +65,11 @@ set(SRC_FILES_SEARCH_TEST
   src/shared/util/func.cpp 
   src/shared/util/fuzzy.cpp
   src/search/tests/book_manager/test_book.cc
-  src/search/tests/test_search.cc
-  src/search/tests/test_func.cc)
+  src/search/tests/test_ocr_fuzzy_search.cc
+  src/search/tests/test_wiki_search.cc
+  src/search/tests/test_func.cc
+  src/search/tests/util.cc
+)
 
 
 add_library(clas_server_lib OBJECT src/shared/metadata_handler.cc

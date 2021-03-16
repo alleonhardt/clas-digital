@@ -280,8 +280,10 @@ void BookManager::CreateMapWordsTitle() {
     std::map<std::string, int> mapWords = func::extractWordsFromString(sTitle);
     
     //Iterate over all words in this book. Check whether word already exists in list off all words.
-    for (auto yt=mapWords.begin(); yt!=mapWords.end(); yt++)
-      map_words_title_[yt->first][it->first] = 0.1;
+    for (auto yt=mapWords.begin(); yt!=mapWords.end(); yt++) {
+      std::string word = yt->first;
+      map_words_title_[func::returnToLower(word)][it->first] = 0.1;
+    }
     // Add author names and year.
     map_words_title_[std::to_string(it->second->date())][it->first] = 0.1;
   }

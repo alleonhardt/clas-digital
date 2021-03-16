@@ -1,5 +1,6 @@
 #pragma once
 
+#include "nlohmann/json.hpp"
 #include <iostream>
 #include <fstream>
 #include <string.h>
@@ -152,6 +153,8 @@ namespace func {
 
   std::string LoadStringFromDisc(std::string path);
 
+  nlohmann::json LoadJsonFromDisc(std::string path);
+
   template<typename T>
   void WriteContentToDisc(std::string path, T content) {
     //Write json to disc.
@@ -166,5 +169,3 @@ namespace func {
     }
   }
 }
-
-

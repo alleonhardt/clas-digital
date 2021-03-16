@@ -1,7 +1,9 @@
 #include "func.hpp"
+#include "nlohmann/json.hpp"
 #include <algorithm>
 #include <cctype>
 #include <cstddef>
+#include <exception>
 #include <filesystem>
 #include <type_traits>
 
@@ -400,6 +402,20 @@ std::string LoadStringFromDisc(std::string path) {
       (std::istreambuf_iterator<char>(new_page)), 
       std::istreambuf_iterator<char>());
   return str;
+}
+
+nlohmann::json LoadJsonFromDisc(std::string path) {
+  std::string json_content = LoadStringFromDisc(path);
+  if (json_content == "")
+    return nlohmann::json();
+  nlohmann::json json;
+  try {
+    json = nlohmann::json::parse(json_content);
+    return json;
+  } catch (std::exception &e) {
+    std::cout << "Failed parsing json: " << e.what() << std::endl;
+    return nlohmann::json();
+  }
 }
 
 } //Close namespace 
