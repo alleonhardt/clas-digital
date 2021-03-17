@@ -356,3 +356,114 @@ Summary:
   page = current word to the result-list.
 - if n>1: find some funny algo, which makes sure that all matches not in all
   result-list are removed.
+
+## Metadata 
+What has not been discussed a lot is how to search for the metadata. In general,
+there are two different approaches:
+1. Decide on a basic set of tags which should be searched. (f.e. authors, title,
+   year, date)
+2. Allow searching all tags.
+
+As storing metadata is not very costy and also the map-based-design reduces the
+stored data additionally, we will go for the second approach.
+
+### Storing metadata 
+The metadata will basically be stored just like any other data, also storing
+conjunctions of a baseform with certain information to later find the
+preview of the searched word.
+
+```c++
+Book:: std::unordered_map<string, std::vector<WordInfo>> map_of_metadata_;
+```
+
+We can use the same `WordInfo` structure to achieve this, the words only need a
+slight different meaning:
+- `word_` is obviously simply the word.
+- `pages_` can be seen as `locations` with each location being an `location-id`. 
+- `preview_position_` stays the same. 
+- `preview_page_` becomes `preview_location` and determines on which location
+  the preview can be found. 
+- `relevance_` stays the same. 
+
+The hard point is the location-id. The first assumption would be to say the
+location-id is the json-path to the specific tag. However this would consume way
+to much RAM. So we expect a config saying which tags to use for searching. The
+we create a new json, where all the needed tags are stored, under a certain id.
+Conceder the following json: 
+```json
+{
+  "data": {
+      "ISBN": "978-3-412-50582-0 978-3-412-50658-2",
+      "bookTitle": "Tiere: Begleiter des Menschen in der Literatur des Mittelalters",
+      "collections": [
+          "XCFFDRQC"
+      ],
+      "creators": [
+          {
+              "creatorType": "editor",
+              "firstName": "Andreas",
+              "lastName": "Kra\u00df"
+          },
+          {
+              "creatorType": "editor",
+              "firstName": "Judith",
+              "lastName": "Klinger"
+          },
+          {
+              "creatorType": "author",
+              "firstName": "Lina",
+              "lastName": "Herz"
+          }
+      ],
+      "date": "2017",
+      "dateAdded": "2020-08-20T22:13:48Z",
+      "dateModified": "2020-08-20T22:19:03Z",
+      "itemType": "bookSection",
+      "key": "KX8EW9D7",
+      "language": "ger",
+      "libraryCatalog": "Gemeinsamer Bibliotheksverbund ISBN",
+      "place": "K\u00f6ln Weimar Wien",
+      "shortTitle": "",
+      "title": "Der Hund"
+  }
+}
+```
+
+Assuming the user wanted to search for alls authors (as authors), all editors (as editors), 
+title or bookTitle (as title, prefering bookTitle) and  shortTitle, we would expect the following 
+json as a config. 
+
+```json
+{
+  "searchableTags":{
+      "title": { 
+        "tags_or":["data/bookTitle", "data/title"],
+        "relevance":2
+      },
+      "shortTitle": {
+        "tag":"data/shortTitle",
+        "relevance":1
+      },
+      "authorsFirstNames": {
+        "tag":"data/creators?creatorType=author/firstName"
+      },
+      "authorsLastNames": {
+        "tag":"data/creators?creatorType=author/firstName"
+      }
+  },
+  "representations": {
+      "authors": {"1":"authorsLastNames", "2":"authorsFirstNames", "separator":", "}
+  }
+}
+```
+
+
+```json
+{
+  "title":"Tiere: Begleiter des Menschen in der Literatur des Mittelalters",
+  "shortTitle":""
+  "authors":"Herz, Lina",
+  "editors":"Klinger, Judith, Kraüf, Andreas"
+}
+```
+

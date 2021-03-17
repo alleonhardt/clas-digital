@@ -35,6 +35,7 @@ Book::Book(nlohmann::json metadata) : metadata_(metadata) {
   collections_ = metadata_.GetCollections();
 
   // Fast-access-members.
+  
   author_date_ += (date_ != -1) ? ", " + std::to_string(date_) : author_date_ += ".";
   quick_author_ = metadata_.GetAuthor(); // what about multiple authors.
   func::convertToLower(quick_author_); 

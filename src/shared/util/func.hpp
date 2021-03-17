@@ -168,4 +168,11 @@ namespace func {
         << e.what() << std::endl;
     }
   }
+
+  /**
+   * Converts any json to usable format.
+   */
+  nlohmann::json ConvertJson(nlohmann::json& source, nlohmann::json& config);
+
+  nlohmann::json ExtractFieldFromJson(nlohmann::json& source, std::string path);
 }

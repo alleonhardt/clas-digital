@@ -137,6 +137,8 @@ private:
   int date_;  ///< Date for fast access during search
   std::vector<std::string> collections_; ///< Collections (fast access)
 
+  std::string metadata_string_; ///< [Authors]:[Title|ShortTitle], year, place
+
   // For fast access:
   std::string author_date_;  ///< [author], [date] (fast access)
   std::string quick_author_; ///< author in lowercase.

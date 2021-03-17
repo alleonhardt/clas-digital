@@ -5,7 +5,10 @@
 #include <cstddef>
 #include <exception>
 #include <filesystem>
+#include <iostream>
+#include <string>
 #include <type_traits>
+#include <vector>
 
 namespace func 
 {
@@ -393,8 +396,10 @@ void EscapeDeleteInvalidChars(std::string& str) {
 
 std::string LoadStringFromDisc(std::string path) {
   // Check if path exists.
-  if (!std::filesystem::exists(path))
+  if (!std::filesystem::exists(path)) {
+    std::cout << "Path not found: " << path << std::endl;
     return "";
+  }
 
   // Load file from disc and return.
   std::ifstream new_page(path);
@@ -416,6 +421,94 @@ nlohmann::json LoadJsonFromDisc(std::string path) {
     std::cout << "Failed parsing json: " << e.what() << std::endl;
     return nlohmann::json();
   }
+}
+
+nlohmann::json ConvertJson(nlohmann::json& source, nlohmann::json& config) {
+  // Extract fields.
+  nlohmann::json extracted_fields;
+  for (auto& [key, value]: config["searchableTags"].items()) {
+
+    std::cout << "Next key: " << key << std::endl;
+
+    // Only one tag.
+    if (value.contains("tag")) 
+      extracted_fields[key] = ExtractFieldFromJson(source, value["tag"]);
+
+    // Take the first found tag (first tag when search is != "").
+    else if (value.contains("tags_or")) {
+      for (const auto& tag : value["tags_or"]) {
+        extracted_fields[key] = ExtractFieldFromJson(source, tag);
+        if (extracted_fields[key] != "")
+          break;
+      }
+    }
+    else if (value.contains("tags_and")) {
+      extracted_fields[key] = ExtractFieldFromJson(source, value["tags_and"][0]);
+      for (size_t i=1; i<value["tags_and"].size(); i++) {
+        nlohmann::json new_value = ExtractFieldFromJson(source, value["tags_and"][i]);
+        if (new_value.is_array()) {
+          for (auto it : new_value)
+            extracted_fields[key].push_back(it);
+        }
+        else {
+          extracted_fields[key]+=new_value;
+        }
+      }
+    }
+
+    std::cout << std::endl;
+  }
+
+  // Handle replacements
+  return extracted_fields;
+}
+
+nlohmann::json ExtractFieldFromJson(nlohmann::json& source, std::string path) {
+  std::cout << "Got path: " << path << std::endl;
+
+  nlohmann::json temp = source; 
+  size_t pos = 0;
+  do {
+    pos = path.find("/");
+    std::cout << "\n\n";
+    std::cout << temp << std::endl;
+    std::string path_elem = path.substr(0, pos); // Get next element.
+    path = path.substr(pos+1);  // Cut string.
+    std::cout << "Path elem: " << path_elem << std::endl;
+    std::cout << "Remaining path: " << path << std::endl;
+
+    // If array -> elem is array-index, 
+    if (temp.is_array()) {
+      temp = temp[std::stoi(path_elem)];
+    }
+
+    // If object -> elem is key.
+    else {
+      // Might be just "[key]" or in the format: 
+      size_t pos = path_elem.find("?"); 
+      std::string key = path_elem.substr(0,pos);
+      temp = temp[key];
+
+      // "[key]?[field_key]=[field_value]" then we're already building the result
+      if (pos != std::string::npos) {
+        std::string field_key = func::split2(path_elem.substr(pos+1), "=")[0];
+        std::string field_value = func::split2(path_elem.substr(pos+1), "=")[1];
+        std::cout << "field_key: " << field_key << std::endl;
+        std::cout << "field_value: " << field_value << std::endl;
+        nlohmann::json result = nlohmann::json::array();
+        for (auto elem : temp) {
+          if (elem[field_key] == field_value) {
+            nlohmann::json new_value = ExtractFieldFromJson(elem, path);
+            if (new_value != NULL && !new_value.empty())  
+              result.push_back(new_value);
+          }
+        }
+        return result;
+      }
+    }
+  } while(pos != std::string::npos);
+
+  return temp;
 }
 
 } //Close namespace 

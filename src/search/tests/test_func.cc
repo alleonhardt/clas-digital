@@ -1,5 +1,7 @@
 #include <catch2/catch.hpp>
+#include <sys/types.h>
 #include "func.hpp"
+#include "nlohmann/json.hpp"
 
 
 TEST_CASE ("Trimming a string works as expected", "[trim_string]") {
@@ -47,5 +49,22 @@ TEST_CASE ("Trimming a string works as expected", "[trim_string]") {
     REQUIRE(cur[0] == str[str.length()-150]); // As 150-75 = 25 
     REQUIRE(cur[149] == str.back()); // As 100 + 75 = 175
     REQUIRE(cur.length() == 150);
+  }
+}
+
+TEST_CASE("Converting a json is working", "[convert_json]") {
+  nlohmann::json example_case = func::LoadJsonFromDisc("src/search/tests/example_data/convert_json/example1.json");
+  nlohmann::json config = example_case["config"];
+  nlohmann::json metadata = example_case["metadata"];
+  nlohmann::json expected = example_case["expected"];
+  std::cout << "config: " << config << std::endl;
+  std::cout << "metadata: " << metadata << std::endl;
+
+  nlohmann::json new_metadata = func::ConvertJson(metadata, config);
+  std::cout << "config: " << new_metadata << std::endl;
+
+  for (const auto& it : config["searchableTags"].items()) {
+    REQUIRE(new_metadata.contains(it.key()));
+    REQUIRE(new_metadata[it.key()] == expected[it.key()]);
   }
 }
