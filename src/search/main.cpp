@@ -5,6 +5,7 @@
 #include <chrono>
 #include <cstddef>
 #include <exception>
+#include <fstream>
 #include <iostream>
 #include <ostream>
 #include <string>
@@ -269,30 +270,32 @@ void Suggestions(const Request& req, Response& resp, BookManager& manager,
 
 int main(int argc, char *argv[]) {
 
+
   // Create server.
   Server srv;
 
   // Load and parse config file.
-  nlohmann::json config;
-  std::ifstream read_config("server.config");
-  read_config >> config;
-  read_config.close();
+  nlohmann::json config = func::LoadJsonFromDisc("server.config");
+  std::cout << 0 << std::endl;
+
+  //Load and parse metadata 
+  std::cout << "Loading metadata at " << config["zotero_metadata"] << std::endl;
+  nlohmann::json metadata = func::LoadJsonFromDisc(config["zotero_metadata"]);
+  std::cout << "Accessing metadata-parse-config" << std::endl;
+  nlohmann::json metadata_parse_config = config["parse_config"];
+  std::cout << "Parsing metadata." << std::endl;
+  nlohmann::json items = nlohmann::json::array();
+  for (auto item : metadata["items"]["data"]) {
+    items.push_back(func::ConvertJson(item, metadata_parse_config));
+  }
+  std::cout << "Writing new metadata to disc" << std::endl;
+  func::WriteContentToDisc("parsed_metadata.json", items.dump());
+  return 0;
 
   // Load dictionary.
   std::cout << "Loading dictionary at " << config["dictionary"] << std::endl;
   Dict dict(config["dictionary"]);
   Book::set_dict(&dict);
-
-  // Load corpus metadata from disc.
-  std::cout << "Loading metadata at " << config["zotero_metadata"];
-  std::ifstream read(config["zotero_metadata"], std::ios::in);
-  // Check if metadata was found.
-  if(!read) {
-    std::cout << "No metadata found! Server fails to load\n";
-    return 1;
-  }
-  nlohmann::json metadata;
-  read >> metadata;
 
   // Load active pillars:
   std::cout << "Loading active collections...";
