@@ -92,8 +92,7 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
 
   // Debug printing.
   std::cout << "Searching with query: " << query << 
-    "; fuzzyness: " << fuzzyness << std::endl;
-  /*
+    "; fuzzyness: " << fuzzyness <<
     "; scope: " << scope <<
     "; author: " << author <<
     "; publicated after: " << pubafter <<
@@ -101,7 +100,7 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
     "; searched pillars: " << str_pillars << 
     "; vector pillar size: " << pillars.size() <<
     "; sorting with value: " << sort << " and max results per page: " 
-    << resultsperpage << std::endl;*/
+    << resultsperpage << std::endl;
 
   // Construct search-options.
   int sort_result_by = 0;
@@ -113,13 +112,12 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
 
   // Start search.
   auto time_start = std::chrono::system_clock::now();
-  auto result_list = manager.DoSearch(search_object);
+  std::cout << "Start searching..." << std::endl;
+  auto result_list = manager.Search(search_object);
 
   // Construct response.
-  std::cout << "Results: " << result_list.size() << std::endl;
-  for (auto it : result_list) {
-  }
-  std::cout << std::endl;
+  std::cout << "Hallo" << std::endl;
+  std::cout << "Results found: " << result_list.size() << std::endl;
   nlohmann::json search_response;
 
   if (result_list.size() == 0) {
@@ -129,18 +127,21 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
   else {
     std::cout << "Constructing response-object" << std::endl;
     size_t counter = 0;
-    for (auto res_obj: result_list) {
+    for (auto result_obj: result_list) {
       // Create entry for each book in result.
       nlohmann::json entry;
-      entry["scanId"] = res_obj.book()->key();
-      entry["copyright"] = !res_obj.book()->metadata().GetPublic();
-      entry["hasocr"] = res_obj.book()->HasContent();
-      entry["description"] = res_obj.book()->GetAuthorDateScanned();
-      entry["bibliography"] = res_obj.book()->metadata().GetMetadata("bib");
+      entry["scanId"] = result_obj.book()->key();
+      entry["copyright"] = !result_obj.book()->IsPublic();
+      entry["hasocr"] = result_obj.book()->HasContent();
+      // entry["description"] = res_obj.book()->GetFromMetadata("description");
+      entry["bibliography"] = result_obj.book()->GetFromMetadata("bib");
 
-      std::string preview = res_obj.book()->GetPreview(search_object, res_obj.found_in_corpus());
+      std::string preview = result_obj.book()->GetPreview(
+        result_obj.GetSearchWords(search_object.converted_to_original()), 
+        search_object.search_options().fuzzy_search()
+      );
       entry["preview"] = preview;
-      res_obj.Print(search_object.converted_words()[0], entry["preview"]);
+      result_obj.Print(search_object.converted_words()[0], entry["preview"]);
       search_response["books"].push_back(std::move(entry)); 
       if (++counter == resultsperpage)
         break;
@@ -270,6 +271,9 @@ void Suggestions(const Request& req, Response& resp, BookManager& manager,
 
 int main(int argc, char *argv[]) {
 
+  // Parse command-line argument and check.
+  std::string cmd_arg = (argc > 1) ? argv[1] : "";
+  bool reload_pages = cmd_arg == "reload_pages";
 
   // Create server.
   Server srv;
@@ -281,17 +285,12 @@ int main(int argc, char *argv[]) {
   //Load and parse metadata 
   std::cout << "Loading metadata at " << config["zotero_metadata"] << std::endl;
   nlohmann::json metadata = func::LoadJsonFromDisc(config["zotero_metadata"]);
-  std::cout << "Accessing metadata-parse-config" << std::endl;
-  nlohmann::json metadata_parse_config = config["parse_config"];
-  std::cout << "Parsing metadata." << std::endl;
-  nlohmann::json items = nlohmann::json::array();
-  for (auto item : metadata["items"]["data"]) {
-    items.push_back(func::ConvertJson(item, metadata_parse_config));
-  }
-  std::cout << "Writing new metadata to disc" << std::endl;
-  func::WriteContentToDisc("parsed_metadata.json", items.dump());
-  return 0;
+  std::cout << "Parse config: " << config["parse_config"] << std::endl;
 
+  std::cout << "Seachable: " << config["parse_config"]["searchableTags"] << std::endl;
+  std::cout << "replacements: " << config["parse_config"]["representations"] << std::endl;
+  std::cout << "Regex: " << config["parse_config"]["regex"] << std::endl;
+  
   // Load dictionary.
   std::cout << "Loading dictionary at " << config["dictionary"] << std::endl;
   Dict dict(config["dictionary"]);
@@ -303,12 +302,15 @@ int main(int argc, char *argv[]) {
   for (auto it : metadata["collections"]["data"])
     zotero_pillars.push_back(nlohmann::json({{"key", it["key"]}, {"name", it["data"]["name"]}}));
 
-  // Create book manager:
+  // Create book manager
   std::cout << "initializing bookmanager..." << std::endl;
-  std::string cmd_arg = (argc > 1) ? argv[1] : "";
-  BookManager manager(config["upload_points"], &dict);
-  manager.CreaeItemsFromMetadata(metadata["items"]["data"]);
-  if (manager.Initialize(cmd_arg == "reload_pages"))
+  BookManager manager(config["upload_points"], &dict, config["parse_config"]);
+
+  // Create items form metadata-json.
+  manager.CreateItemsFromMetadata(metadata["items"]["data"]);
+
+  // Initialize corpus data
+  if (manager.Initialize(reload_pages))
     std::cout << "Initialization successful!\n\n"; 
   else
     std::cout << "Initialization failed!\n\n";

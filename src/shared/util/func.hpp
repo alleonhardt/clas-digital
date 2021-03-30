@@ -153,6 +153,11 @@ namespace func {
 
   std::string LoadStringFromDisc(std::string path);
 
+  /**
+   * Load json from disc.
+   * @param path to json which to load.
+   * @return loaded json (empy, if path not found or failed to parse)
+   */
   nlohmann::json LoadJsonFromDisc(std::string path);
 
   template<typename T>
@@ -172,7 +177,17 @@ namespace func {
   /**
    * Converts any json to usable format.
    */
-  nlohmann::json ConvertJson(nlohmann::json& source, nlohmann::json& config);
+  std::map<std::string, std::string> ConvertJson(nlohmann::json& source, nlohmann::json& config);
+
+  std::string ConvertBuild(std::map<std::string, nlohmann::json> build_elems, std::vector<std::string> &used_fields, 
+    nlohmann::json &extracted_fields);
+
+  std::string ConvertJoin(nlohmann::json value, std::vector<std::string>& used_fields, 
+    nlohmann::json& extracted_fields);
 
   nlohmann::json ExtractFieldFromJson(nlohmann::json& source, std::string path);
+
+  std::map<short, std::pair<std::string, double>> CreateMetadataTags(nlohmann::json search_config);
+
+  std::string GetCurrentTime();
 }

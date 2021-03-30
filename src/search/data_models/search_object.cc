@@ -24,6 +24,7 @@ SearchObject::SearchObject(std::string query, SearchOptions search_options, Dict
     if (base_form == "") 
       base_form = cur_word;
     converted_words_.push_back(base_form);
+    converted_to_original_[base_form] = word;
   }
 }
 
@@ -35,6 +36,9 @@ const std::vector<std::string>& SearchObject::words() const {
 }
 const std::vector<std::string>& SearchObject::converted_words() const {
   return converted_words_;
+}
+const std::map<std::string, std::string>& SearchObject::converted_to_original() const {
+  return converted_to_original_;
 }
 SearchOptions& SearchObject::search_options() {
   return search_options_;

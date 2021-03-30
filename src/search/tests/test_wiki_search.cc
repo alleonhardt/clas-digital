@@ -13,36 +13,77 @@
 #include "search_options.h"
 #include "util.h"
 
-BaseData* BaseData::instance2_ = 0;
+BaseData* BaseData::wiki_instance_ = 0;
 
 
 SCENARIO ("Searching for wiki words with fuzzysearch", "[wiki_fuzzy]") {
 
   GIVEN ("An existing index based on a wikipedia entries and fuzzy-search") {
 
-    BaseData* base_data = BaseData::instance2("test_books_2", "metadata_2");
+    BaseData* base_data = BaseData::wiki_instance("wiki_data");
 
     // Initialize basic search_options.
     SearchOptions search_options(true, true, true, 0, 2070, 0, "", {"XCFFDRQC"});
 
     WHEN ("Searching for 'Longacre'") {
-      util::CheckResultsForQuery2("Longacre", search_options, base_data);
+      util::CheckResultsForQuery("Longacre", search_options, base_data);
     }
 
     WHEN ("Searching for 'Mahadevi'") {
-      util::CheckResultsForQuery2("Mahadewi", search_options, base_data);
+      util::CheckResultsForQuery("Mahadewi", search_options, base_data);
     }
 
     WHEN ("Searching for 'André'") {
-      util::CheckResultsForQuery2("André", search_options, base_data);
+      util::CheckResultsForQuery("André", search_options, base_data);
     }
 
     WHEN ("Searching for 'inclination'") {
-      util::CheckResultsForQuery2("inklination", search_options, base_data);
+      util::CheckResultsForQuery("inklination", search_options, base_data);
     }
 
     WHEN ("Searching for 'sexual'") {
-      util::CheckResultsForQuery2("sexual", search_options, base_data);
+      util::CheckResultsForQuery("sexual", search_options, base_data);
+    }
+
+    WHEN ("Searching for 'morality'") {
+      util::CheckResultsForQuery("morality", search_options, base_data);
+    }
+
+    WHEN ("Searching for 'england'") {
+      util::CheckResultsForQuery("england", search_options, base_data);
+    }
+
+    WHEN ("Searching for 'Islamic morality'") {
+      util::CheckResultsForQuery("Islamic+morality", search_options, base_data);
+    }
+
+    WHEN ("Searching for 'education england'") {
+      util::CheckResultsForQuery("education+england", search_options, base_data);
+    }
+    WHEN ("Searching for 'and'") {
+      util::CheckResultsForQuery("and", search_options, base_data);
+    }
+  }
+}
+
+SCENARIO ("Searching for wiki words with fuzzysearch2", "[wiki_fuzzy]") {
+
+  GIVEN ("An existing index based on a wikipedia entries and fuzzy-search") {
+
+    BaseData* base_data = BaseData::wiki_instance("wiki_data");
+
+    // Initialize basic search_options.
+    SearchOptions search_options(true, true, true, 0, 2070, 0, "", {"XCFFDRQC"});
+
+    WHEN ("Searching for 'england'") {
+      util::CheckResultsForQuery("england", search_options, base_data);
+    }
+
+    WHEN ("Searching for 'education'") {
+      util::CheckResultsForQuery("education", search_options, base_data);
+    }
+    WHEN ("Searching for 'education england'") {
+      util::CheckResultsForQuery("education+england", search_options, base_data);
     }
   }
 }

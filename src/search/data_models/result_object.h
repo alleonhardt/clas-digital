@@ -11,7 +11,6 @@
 #define SRC_SEARCH_DATA_MODELS_RESULTOBJECT_H_
 
 #include "book_manager/book.h"
-
 class ResultObject {
 
   public:
@@ -19,79 +18,46 @@ class ResultObject {
      * Constructor for result object. 
      * @param book
      */
-    ResultObject(Book* book, bool found_in_corpus, double init_score);
     ResultObject() {}
 
     // getter:
     bool found_in_metadata() const;
     bool found_in_corpus() const;
-    double metadata_score() const;
-    double corpus_score() const;
+    short scope() const;
+    double score() const;
+    std::map<std::string, short> words_with_scope() const;
     Book* book() const;
+
+    // setter:
+    void set_book(Book* book);
 
     /**
      * Sets found_in_metadata to true and sets initial metadata score.
      * @param init_score
      */
-    void FoundInMetadataSetInitScore(double init_score);
+    void NewResult(std::string word, short scope, double score);
 
     /**
-     * Sets found_in_corpus to true and sets initial corpus score.
-     * @param init_score
+     * Join to result objects.
+     * - Update found in metadata/ corpus.
+     * - Add score.
+     * - (Bitwise) add scopes for each world.
      */
-    void FoundInCorpusSetInitScore(double init_score);
+    void Join(ResultObject& result_object);
 
+    void Print(std::string word, std::string preview);
+    
     /**
-     * Increses metadata score by given value
-     * @param inc value to increase score by.
+     * Returns a vectror of all searched-words, with the original word, the
+     * converted word, and the scope in which the word was found in each entry.
+     * @return list of all searched words.
      */
-    void IncreaseMetadataScore(double inc);
-
-    /**
-     * Increses corpus score by given value
-     * @param inc value to increase score by.
-     */
-    void IncreaseCorpusScore(double inc);
-
-    /**
-     * Returns a combined score. 
-     * @return metadata_score+10*corpus_score.
-     */
-    double GetOverallScore() const;
-
-    void Print(std::string word, std::string preview) {
-      if (!found_in_corpus_) return;
-      std::cout << "--- " << book_->key() << " --- " << std::endl;  
-      std::cout << "Found metadata: " << found_in_metadata_ << std::endl;
-      std::cout << "Found corpus: " << found_in_corpus_ << std::endl;
-      std::cout << "Metadata core: " << metadata_score_ << std::endl;
-      std::cout << "Corpus score: " << corpus_score_ << std::endl;
-      std::cout << "Overall score: " << GetOverallScore() << std::endl;
+    std::vector<SearchedWordObject> GetSearchWords(std::map<std::string, std::string> converted_to_original_map);
       
-      if (book_->map_words_pages().count(word) > 0) {
-        std::cout << "Direct match: true" << std::endl;
-      }
-      else if (book_->corpus_fuzzy_matches().count(word) > 0) {
-        std::cout << "Fuzzy match (corpus): " 
-          << book_->corpus_fuzzy_matches()[word].GetBestMatch() << std::endl;
-      }
-      else if (book_->metadata_fuzzy_matches().count(word) > 0) {
-        std::cout << "Fuzzy match (metadata): " 
-          << book_->metadata_fuzzy_matches()[word].GetBestMatch() << std::endl;
-      }
-      else {
-        std::cout << "Something went wrong: no match could be tracked. "
-          "(Or direct match in title/ author)" << std::endl;
-      }
-      std::cout << "Preview: " << preview << std::endl;
-      std::cout << std::endl;
-    }
-
   private:
-    bool found_in_metadata_;
-    bool found_in_corpus_;
-    double metadata_score_; 
-    double corpus_score_; 
+    short scope_;
+    double score_; 
+    std::map<std::string, short> words_with_scope_;
     Book* book_;
 };
 

@@ -15,6 +15,7 @@
 #include <set>
 #include <vector>
 
+#include "searched_word_object.h"
 #include "search_object.h"
 #include "word_info.h"
 #include "tmp_word_info.h"
@@ -36,7 +37,7 @@ public:
   * Constructor initializing metadata.
   * @param[in] metadata for this book.
   */
-  Book(nlohmann::json metadata);
+  Book(std::map<short, std::string> metadata);
 
   // **** Getter **** //
   const std::string& key();
@@ -45,24 +46,30 @@ public:
   bool has_ocr() const;
   bool has_images() const;
   int num_pages();
-  MetadataHandler& metadata();
-  std::string author();
   int date();
   std::vector<std::string> collections();
-  std::unordered_map<std::string, std::vector<WordInfo>>& map_words_pages();
-  std::unordered_map<std::string, SortedMatches>& corpus_fuzzy_matches();
-  std::unordered_map<std::string, SortedMatches>& metadata_fuzzy_matches();
+  typedef std::unordered_map<std::string, std::vector<WordInfo>> index_map_type;
+  index_map_type& words_on_pages();
+  index_map_type& words_in_tags();
+  typedef std::unordered_map<std::string, SortedMatches> fuzzy_result_type;
+  fuzzy_result_type& corpus_fuzzy_matches();
+  fuzzy_result_type& metadata_fuzzy_matches();
   
   ///< Return whether book has images or ocr
   bool HasContent() const;
 
-  ///< Return "[author], [date]" and add "book not yet scanned", when hasOcr == false
-  std::string GetAuthorDateScanned();
+  std::string GetFromMetadata(std::string tag) const;
+
+  bool IsPublic() const;
 
   // **** setter **** //
   static void set_dict(Dict* dict);
+  static void set_metadata_tag_reference(std::map<short, std::pair<std::string, double>> ref);
+  static void set_reverted_tag_reference(std::map<std::string, short> reverted_ref);
 
   void SetPath(std::string sPath);
+
+  void UpdateMetadata(std::map<short, std::string> metadata);
   
 
   // **** create book and maps (pages, relevance, preview) **** // 
@@ -116,14 +123,18 @@ public:
   * Get a preview for each searched word. Try to highlight/ find words
   * in one preview. Only add a new preview if word could not be found in
   * the preview created so far.
-  * @param search_object (searched object).
+  * @param words list of all searched words each entry containing the original
+  * word, the converted word and the scope in which the word was found, as a
+  * SearchedWord-Object.
   * @return one ore more previews ready formatted for output.
   */
-  std::string GetPreview(SearchObject& search_object, bool in_corpus);
+  std::string GetPreview(const std::vector<SearchedWordObject>& words, bool fuzzy_search);
 
 private:
 
   static Dict* dict_;
+  static std::map<short, std::pair<std::string, double>> metadata_tag_reference_;
+  static std::map<std::string, short> reverted_tag_reference_;
 
   // *** member variables *** //
   std::string key_;  ///< Key of the book
@@ -131,27 +142,20 @@ private:
   bool has_ocr_;  ///< Book has ocr path
   bool has_images_; ///has images or ocr
 
+  // New Metadata
+  std::map<short, std::string> metadata_;
+
   // From json/ metadata-handler
-  MetadataHandler metadata_;  ///< Json with all metadata 
-  std::string author_;  ///< Author for fast access during search
   int date_;  ///< Date for fast access during search
   std::vector<std::string> collections_; ///< Collections (fast access)
-
-  std::string metadata_string_; ///< [Authors]:[Title|ShortTitle], year, place
-
-  // For fast access:
-  std::string author_date_;  ///< [author], [date] (fast access)
-  std::string quick_author_; ///< author in lowercase.
-  std::string quick_title_;  ///< title in lowercase.
-  std::map<std::string, int> quick_authors_words_; ///< words, lowercase, utf-8-safe.
-  std::map<std::string, int> quick_title_words_;  ///< worlds, lowercase, utf-8-safe.
 
   ///Map of matches found with fuzzy-search (contains/ fuzzy)
   std::unordered_map<std::string, SortedMatches> corpus_fuzzy_matches_;
   std::unordered_map<std::string, SortedMatches> metadata_fuzzy_matches_;
 
   ///Map of words_pages_pos_relevance
-  std::unordered_map<std::string, std::vector<WordInfo>> map_words_pages_;
+  std::unordered_map<std::string, std::vector<WordInfo>> words_on_pages_;
+  std::unordered_map<std::string, std::vector<WordInfo>> words_in_tags_;
 
   int num_pages_;  ///< Number of pages in book
 
@@ -160,7 +164,8 @@ private:
  
   // *** create book and maps (pages, relevance and preview) *** // 
 
-  void CreateIndex();
+  void CreateCorpusIndex();
+  void CreateMetadataIndex();
   
   typedef  std::map<std::string, TempWordInfo> temp_index_map;
   ///Create map of all pages and safe.
@@ -199,7 +204,8 @@ private:
    * Convert index map to a map of base-forms and conjunction.
    * @param[in, out] temp_map_pages.
    */
-  void GenerateBaseFormMap(temp_index_map& temp_map_pages);
+  void GenerateBaseFormMap(temp_index_map& temp_map_pages, 
+      std::unordered_map<std::string, std::vector<WordInfo>>& index_map);
 
   /**
   * Safe map of all words and pages to disc
@@ -243,15 +249,18 @@ private:
   /**
    * Find all base-forms matching the searched word. 
    * Find matching base-form(s). In case of fuzzy search these are all
-   * corresponding entries in corpus_fuzzy_matches. 
+   * corresponding entries in found_fuzzy_matches (might be corpus or metadata). 
    * @param word search for.
    * @param fuzzy_search indicating whether to search fuzzy.
+   * @param found_fuzzy_matches map of already found fuzzy matches (corpus or
+   * metadata).
    * @return vector of all base-forms matching the searched word.
    */
-  std::vector<std::string> FindBaseForms(std::string word, bool fuzzy_search);
+  std::vector<std::string> FindBaseForms(std::string word, bool fuzzy_search,
+    const index_map_type& index_map, const fuzzy_result_type& found_fuzzy_matches) const;
 
   WordInfo FindBestWordInfo(std::string original_word, std::string converted_word, 
-      bool fuzzy_search);
+      bool fuzzy_search, const index_map_type& index_map, const fuzzy_result_type& found_fuzzy_matches) const;
 
   // *** Previews *** //
 
@@ -260,18 +269,7 @@ private:
    * @param sWord (searched word)
    * @return Preview.
    */
-  std::string GetOnePreview(std::string original_word, std::string converted_word, 
-    bool fuzzy_search, bool in_corpus);
-
-  /**
-   * Get the complete title and the position where the word was found.
-   * Only used for books without ocr.
-   * @param[in] word (searched word)
-   * @param[in, out] pos (position, where in title word was found)
-   * @return title.
-   */
-  std::string GetPreviewMetadata(std::string original_word,
-      std::string converted_word, bool fuzzy_search, size_t& pos);
+  std::string GetOnePreview(std::string orginal, std::string converted, short scope, bool fuzzy_search);
 };
 
 #endif

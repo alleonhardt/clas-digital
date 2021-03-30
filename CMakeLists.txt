@@ -65,7 +65,7 @@ set(SRC_FILES_SEARCH_TEST
   src/shared/util/func.cpp 
   src/shared/util/fuzzy.cpp
   src/search/tests/book_manager/test_book.cc
-  src/search/tests/test_ocr_fuzzy_search.cc
+  src/search/tests/test_ocr_search.cc
   src/search/tests/test_wiki_search.cc
   src/search/tests/test_func.cc
   src/search/tests/util.cc

@@ -1,4 +1,5 @@
 #include <catch2/catch.hpp>
+#include <cstddef>
 #include <sys/types.h>
 #include "func.hpp"
 #include "nlohmann/json.hpp"
@@ -57,14 +58,45 @@ TEST_CASE("Converting a json is working", "[convert_json]") {
   nlohmann::json config = example_case["config"];
   nlohmann::json metadata = example_case["metadata"];
   nlohmann::json expected = example_case["expected"];
-  std::cout << "config: " << config << std::endl;
-  std::cout << "metadata: " << metadata << std::endl;
 
-  nlohmann::json new_metadata = func::ConvertJson(metadata, config);
-  std::cout << "config: " << new_metadata << std::endl;
+  std::map<std::string, std::string> new_metadata = func::ConvertJson(metadata, config);
 
-  for (const auto& it : config["searchableTags"].items()) {
-    REQUIRE(new_metadata.contains(it.key()));
-    REQUIRE(new_metadata[it.key()] == expected[it.key()]);
+  for (const auto& [key, value] : config["expected"].items()) {
+    REQUIRE(new_metadata.count(key) > 0);
+    REQUIRE(new_metadata[key] == value["value"]);
   }
+}
+
+TEST_CASE("Converting a config to bit representation", "[bit_rep]") {
+  nlohmann::json example_case = func::LoadJsonFromDisc("src/search/tests/example_data/convert_json/example1.json");
+  nlohmann::json config = example_case["config"];
+  nlohmann::json expected = example_case["expected"];
+
+  auto convert_map = func::CreateMetadataTags(config);
+  REQUIRE(convert_map.size() == expected.size());
+  
+  for (const auto& it : convert_map) {
+    std::cout << it.first << ":" << it.second.first << ", " << it.second.second << std::endl;
+    REQUIRE(expected.contains(it.second.first));
+  }
+}
+
+TEST_CASE("Using regex when converting json", "[regex]") {
+  nlohmann::json example_case = func::LoadJsonFromDisc("src/search/tests/example_data/convert_json/example2.json");
+  nlohmann::json config = example_case["config"];
+  nlohmann::json metadata = example_case["metadata"];
+
+  std::vector<std::map<std::string, std::string>> items;
+  for (auto it : metadata) {
+    auto new_metadata = func::ConvertJson(it, config);
+    std::cout << "CHECKING " << new_metadata["date"] << " == 2017" << std::endl;
+    REQUIRE(new_metadata["date"] == "2017");
+    items.push_back(new_metadata);
+  }
+
+  size_t counter = 0;
+  for (auto it : metadata) {
+    std::cout << it["data"]["date"].get<std::string>() << " → " << items[counter++]["date"] << std::endl;
+  }
+
 }

@@ -13,14 +13,14 @@
 #include "search_options.h"
 #include "util.h"
 
-BaseData* BaseData::instance_ = 0;
+BaseData* BaseData::ocr_instance_ = 0;
 
 
 SCENARIO ("Searching for hard words with fuzzysearch", "[ocr_fuzzy]") {
 
   GIVEN ("An existing index based on a actual ocr and fuzzy-search") {
 
-    BaseData* base_data = BaseData::instance("test_books", "metadata");
+    BaseData* base_data = BaseData::ocr_instance("ocr_data", "UEHEJINT");
 
     // Initialize basic search_options.
     SearchOptions search_options(true, false, true, 0, 2070,
@@ -53,6 +53,9 @@ SCENARIO ("Searching for hard words with fuzzysearch", "[ocr_fuzzy]") {
     WHEN ("Searching for 'Erdball'") {
       util::CheckResultsForQuery("Erdball", search_options, base_data);
     }
+    WHEN ("Searching for 'Genealogie'") {
+      util::CheckResultsForQuery("Erdball", search_options, base_data);
+    }
   }
 }
 
@@ -60,10 +63,10 @@ SCENARIO("Searching for metadata", "[metadata]" ) {
 
   GIVEN ("An existing index based on a metadata normal-search") {
 
-    BaseData* base_data = BaseData::instance("test_books", "metadata");
+    BaseData* base_data = BaseData::ocr_instance("ocr_data");
 
     // Initialize basic search_options.
-    SearchOptions search_options(false, true, false, 0, 2070,
+    SearchOptions search_options(true, true, false, 0, 2070,
         0, "", {"XCFFDRQC"});
 
     WHEN ("Searching for 'Genealogie'") {
@@ -83,23 +86,32 @@ SCENARIO("Searching for metadata", "[metadata]" ) {
     }
 
     WHEN ("Searching for 'Nietzsche'") {
-      util::CheckResultsForQuery("Moral", search_options, base_data);
+      util::CheckResultsForQuery("Nietzsche", search_options, base_data);
     }
 
     WHEN ("Searching for 'Nietzsche+1999'") {
-      util::CheckResultsForQuery("Moral", search_options, base_data);
+      util::CheckResultsForQuery("Nietzsche+1999", search_options, base_data);
     }
 
     WHEN ("Searching for 'Moral+1999'") {
-      util::CheckResultsForQuery("Moral", search_options, base_data);
+      util::CheckResultsForQuery("Moral+1999", search_options, base_data);
     }
 
     WHEN ("Searching for 'Moral+Nietzsche'") {
-      util::CheckResultsForQuery("Moral", search_options, base_data);
+      util::CheckResultsForQuery("Moral+Nietzsche", search_options, base_data);
     }
 
     WHEN ("Searching for 'Moral+Nietzsche+1999'") {
-      util::CheckResultsForQuery("Moral", search_options, base_data);
+      util::CheckResultsForQuery("Moral+Nietzsche+1999", search_options, base_data);
+    }
+    WHEN ("Searching for '1989'") {
+      util::CheckResultsForQuery("1989", search_options, base_data);
+    }
+    WHEN ("Searching for 'Mistakes'") {
+      util::CheckResultsForQuery("Mistakes", search_options, base_data);
+    }
+    WHEN ("Searching for 'Ingensiep'") {
+      util::CheckResultsForQuery("Ingensiep", search_options, base_data);
     }
   }
 }

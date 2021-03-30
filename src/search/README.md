@@ -423,7 +423,7 @@ Conceder the following json:
       "language": "ger",
       "libraryCatalog": "Gemeinsamer Bibliotheksverbund ISBN",
       "place": "K\u00f6ln Weimar Wien",
-      "shortTitle": "",
+      "shortTitle": "Der Hund",
       "title": "Der Hund"
   }
 }
@@ -445,25 +445,84 @@ json as a config.
         "relevance":1
       },
       "authorsFirstNames": {
-        "tag":"data/creators?creatorType=author/firstName"
+        "tag":"data/creators?creatorType=author/firstName",
+        "relevance":2
       },
       "authorsLastNames": {
-        "tag":"data/creators?creatorType=author/firstName"
+        "tags_or": ["data/creators?creatorType=author/lastName", "data/creators?creatorType=author/name"],
+        "relevance":2
+      },
+      "editorsFirstNames": {
+        "tag":"data/creators?creatorType=editor/firstName",
+        "relevance":2
+      },
+      "editorsLastNames": {
+        "tag":"data/creators?creatorType=editor/lastName",
+        "relevance":2
+      }
+      "key": {
+        "tag":"key",
+        "relevance":0
+      }
+      "collections": {
+        "tag":"data/collections",
+        relevance:0
       }
   },
   "representations": {
-      "authors": {"1":"authorsLastNames", "2":"authorsFirstNames", "separator":", "}
+      "authors": {"join": ["authorsLastNames", "authorsFirstNames"], "separator":", "}
+      "editors": {"join": ["editorsLastNames", "editorsFirstNames"], "separator":", "}
   }
 }
 ```
 
+We also included the "key", which is needed to store the books. In general there
+will later be a set of values, which _must be included_ (key, author, title),
+however theres might also be left bankl.
+The field "representations" allows the user to build string from certains
+values, f.e. join the first and last names of authors or editors. Thus the
+following json would be the result:
+
 
 ```json
 {
-  "title":"Tiere: Begleiter des Menschen in der Literatur des Mittelalters",
-  "shortTitle":""
-  "authors":"Herz, Lina",
-  "editors":"Klinger, Judith, Kraüf, Andreas"
+  "title": { 
+    "value":"Tiere: Begleiter des Menschen in der Literatur des Mittelalters", 
+    "relevance":2
+  },
+  "shortTitle": {
+    "value":"Der Hund",
+    "relevance":1
+  },
+  "authors": { 
+    "value":"Herz, Lina",
+    "relevance", 2
+  }
+  "editors": {
+    "Klinger, Judith, Kraüf, Andreas",
+    "relevance":2,
+  }
+  "key": {
+    "value":"KX8EW9D7",
+    "relevance":0
+  }
 }
 ```
 
+Important rules for the relevance are: 
+- `relevance = 0` → won't be searched (in this example, we are given the path to
+  the key, however it won't be searched).
+- the relevance of a representations will be the average of all relevance used
+  to build the representations (thus `authorsFirstNames` and `-LastNames` both
+  had relevance `2`)
+
+Important riles for necessary tags:
+- "key" a tag is needed, to clearly identify one item.
+- "collections" as it is expected that each book is part of a certain collection. 
+If however no collections are used for your search case, collections might as
+well be an empty string (still the tag is needed).
+- "description" if sorting alphabetically shall be supported natively (of course
+  it is possible to sort alphabetically with the search-resulsts anyway)
+- "date" if sorting chronologically shall be supported and if one expects to use
+  the search-options (in particularly the search-options frome-date and
+  to-date)_

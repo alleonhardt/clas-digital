@@ -52,7 +52,7 @@ class SortedMatches {
      * Gets all matches.
      * @return vector of all matches.
      */
-    std::vector<std::string> GetAllMatches();
+    std::vector<std::string> GetAllMatches() const;
 };
 
 #endif

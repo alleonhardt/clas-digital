@@ -62,18 +62,18 @@ TEST_CASE( "The map of base-forms is created as expected", "[generate_base_forms
   tmp_index_map["Hündin"] = create_word_info({{1,1,},{2,2},{4,3},{5,2}}, 10, 4, 30);
   tmp_index_map["Strassen"] = create_word_info({{7,1},{8,2},{3,1},{5,2}}, 5, 8, 20);
   Book book;
-  book.GenerateBaseFormMap(tmp_index_map);
+  book.GenerateBaseFormMap(tmp_index_map, book.words_on_pages_);
 
-  for (auto baseform : book.map_words_pages()) {
+  for (auto baseform : book.words_on_pages()) {
     std::cout << baseform.first << std::endl;
     for (auto conjunction : baseform.second) 
       std::cout << "- " << conjunction.word_ << std::endl;
   }
 
-  REQUIRE(book.map_words_pages().count("hund") > 0);
-  REQUIRE(book.map_words_pages()["hund"].size() == 3);
+  REQUIRE(book.words_on_pages().count("hund") > 0);
+  REQUIRE(book.words_on_pages()["hund"].size() == 3);
 
-  REQUIRE(book.map_words_pages().count("strasse") > 0);
-  REQUIRE(book.map_words_pages()["strasse"].size() == 1);
-  REQUIRE(book.map_words_pages()["strasse"].front().word_ == "strassen");
+  REQUIRE(book.words_on_pages().count("strasse") > 0);
+  REQUIRE(book.words_on_pages()["strasse"].size() == 1);
+  REQUIRE(book.words_on_pages()["strasse"].front().word_ == "strassen");
 }

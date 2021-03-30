@@ -31,7 +31,7 @@ void TempWordInfo::AddPage(weighted_match page_with_relevance) {
 }
 
 void TempWordInfo::IncreaseRelevance(int val) {
-  relevance_ += val*(val+1)/2;
+  relevance_ += val;
 }
 
 size_t TempWordInfo::GetBestPage() {

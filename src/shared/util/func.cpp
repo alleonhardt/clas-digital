@@ -2,10 +2,15 @@
 #include "nlohmann/json.hpp"
 #include <algorithm>
 #include <cctype>
+#include <cmath>
 #include <cstddef>
 #include <exception>
 #include <filesystem>
 #include <iostream>
+#include <numeric>
+#include <ostream>
+#include <regex>
+#include <set>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -138,14 +143,13 @@ void convertToLower(std::string &str)
 /**
 * @param[in, out] str string to be modified
 */
-std::string returnToLower(std::string &str)
-{
-    std::locale loc1("de_DE.UTF8");
-    std::string str2;
-    for(unsigned int i=0; i<str.length(); i++)
-        str2 += tolower(str[i], loc1);
+std::string returnToLower(std::string &str) {
+  std::locale loc1("de_DE.UTF8");
+  std::string str2;
+  for(unsigned int i=0; i<str.length(); i++)
+    str2 += tolower(str[i], loc1);
 
-    return str2;
+  return str2;
 }
 
 /**
@@ -229,14 +233,19 @@ void transform(std::string& str) {
   std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
   std::wstring wide = converter.from_bytes(str); 
   for(;;) {
-    if (wide.length() == 0) break;
-
     size_t len = wide.length();
-    if (!std::isalpha(wide.front()) && rep.count(wide.front()) == 0) 
+
+    if (len == 0) break;
+    // Erase from front in nonsense.
+    if (!std::isalpha(wide.front()) && !std::isdigit(wide.front()) && rep.count(wide.front()) == 0) 
       wide.erase(0,1);
+
+    // Erase from back if nonsense.
     if (wide.length() == 0) break;
-    if (!std::isalpha(wide.back()) && rep.count(wide.back()) == 0) 
+    if (!std::isalpha(wide.back()) && !std::isdigit(wide.back()) && rep.count(wide.back()) == 0) 
       wide.pop_back();
+    
+    // if the length did not change, breack.
     if (len == wide.length())
       break;
   }
@@ -266,7 +275,7 @@ bool isWord(const char* chWord) {
   while (max>0) {
     length = mbtowc(&dest, chWord, max);
     if(length<1) break;
-    if(isalpha(dest, loc) == false) count_err++;
+    if(!isalpha(dest, loc) && !std::isdigit(dest, loc)) count_err++;
     count_len++;
     chWord+=length; max-=length;
   }
@@ -309,6 +318,7 @@ std::map<std::string, int> extractWordsFromString(std::string& buffer) {
       mapWords[cur_word] += 1;
     }
   }
+
   return mapWords;
 }
 
@@ -337,6 +347,7 @@ bool checkPage(std::string &buffer) {
 }
 
 void HighlightWordByPos(std::string& str, int pos, std::string left, std::string right) {
+  std::set<char> strange_endings = {'"', '.', ',', ';', ':'};
   // Check that position is valid.
   if (pos < 0) {
     std::cout << "\x1B[31mNo preview found!! \033[0m\t\t" << std::endl;
@@ -346,8 +357,10 @@ void HighlightWordByPos(std::string& str, int pos, std::string left, std::string
     size_t pos2 = str.find(" ", pos+1);
     if (pos2 == std::string::npos)
       pos2 = str.length();
-    #warning might find more than the accutall word!
     
+    if (strange_endings.count(str[pos2-1]) > 0)
+      pos2--; 
+
     // Get word and then insert left and right symbol
     std::string word = str.substr(pos, pos2-pos);
     str.replace(pos, pos2-pos, left+word+right);
@@ -423,12 +436,12 @@ nlohmann::json LoadJsonFromDisc(std::string path) {
   }
 }
 
-nlohmann::json ConvertJson(nlohmann::json& source, nlohmann::json& config) {
+std::map<std::string, std::string> ConvertJson(nlohmann::json& source, nlohmann::json& config) {
   // Extract fields.
   nlohmann::json extracted_fields;
   for (auto& [key, value]: config["searchableTags"].items()) {
 
-    std::cout << "Next key: " << key << std::endl;
+    //std::cout << "Next key: " << key << std::endl;
 
     // Only one tag.
     if (value.contains("tag")) 
@@ -438,63 +451,109 @@ nlohmann::json ConvertJson(nlohmann::json& source, nlohmann::json& config) {
     else if (value.contains("tags_or")) {
       for (const auto& tag : value["tags_or"]) {
         extracted_fields[key] = ExtractFieldFromJson(source, tag);
-        if (extracted_fields[key] != "")
+        if (extracted_fields[key] != "" && !extracted_fields[key].empty())
           break;
       }
     }
+
+    // Add all tags under found paths.
     else if (value.contains("tags_and")) {
+      // Get first tag under first path.
       extracted_fields[key] = ExtractFieldFromJson(source, value["tags_and"][0]);
+
+      // Get tags unter all 1..n paths.
       for (size_t i=1; i<value["tags_and"].size(); i++) {
         nlohmann::json new_value = ExtractFieldFromJson(source, value["tags_and"][i]);
-        if (new_value.is_array()) {
-          for (auto it : new_value)
-            extracted_fields[key].push_back(it);
-        }
-        else {
+        // If result is an array, add all elements one by one.
+        if (new_value.is_array())
+          std::for_each(new_value.begin(), new_value.end(), [&, k=key](auto e) { extracted_fields[k].push_back(e); });
+        // Otherwise simply add result (this will probably be a string.
+        else
           extracted_fields[key]+=new_value;
-        }
       }
     }
-
-    std::cout << std::endl;
   }
 
   // Handle replacements
-  return extracted_fields;
+  std::map<std::string, std::string> converted_json;
+  std::vector<std::string> used_fields;
+  for (auto& [key, value] : config["representations"].items()) {
+    std::cout << "Handling representation: " << key << ", " << value << std::endl;
+    if (value.contains("join"))
+      converted_json[key] = ConvertJoin(value, used_fields, extracted_fields);
+    else if (value.contains("build"))
+      converted_json[key] = ConvertBuild(value["build"], used_fields, extracted_fields);
+  }
+
+  // Add all fields, which have not been used to build replacements and replace null with empty string.
+  for (auto& [key, value] : extracted_fields.items()) {
+
+    // Only add if not used to build replacements.
+    if (std::find(used_fields.begin(), used_fields.end(), key) == used_fields.end()) {
+      // check if value is NULL and replace with empty string if so.
+      if (value.is_null())
+        converted_json[key] = "";
+      else if (value.is_array()) {
+        std::vector<std::string> vec = value.get<std::vector<std::string>>();
+        converted_json[key] = std::accumulate(vec.begin()+1, vec.end(), *vec.begin(), 
+            [](const std::string& init, std::string& str) { return init + ";" + str; });
+      }
+      else
+        converted_json[key] = value;
+    }
+  }
+
+  //std::cout << "Checking for regex expressions: " << config["regex"] << std::endl;
+  for (auto& [key, value] : config["regex"].items()) {
+
+    std::string cur_val = converted_json[key];
+    bool found = false;
+    for (const auto& it : value) {
+      std::regex reg(it);
+      std::smatch m;
+      if (std::regex_search(converted_json[key], m, reg)) {
+        converted_json[key] = m[1];
+        found = true;
+        break;
+      }
+    }
+    if (!found)
+      converted_json[key] = "";
+  }
+
+  std::cout << converted_json["description"] << std::endl;
+  
+  return converted_json;
 }
 
 nlohmann::json ExtractFieldFromJson(nlohmann::json& source, std::string path) {
-  std::cout << "Got path: " << path << std::endl;
 
   nlohmann::json temp = source; 
   size_t pos = 0;
   do {
     pos = path.find("/");
-    std::cout << "\n\n";
-    std::cout << temp << std::endl;
     std::string path_elem = path.substr(0, pos); // Get next element.
     path = path.substr(pos+1);  // Cut string.
-    std::cout << "Path elem: " << path_elem << std::endl;
-    std::cout << "Remaining path: " << path << std::endl;
 
     // If array -> elem is array-index, 
     if (temp.is_array()) {
       temp = temp[std::stoi(path_elem)];
     }
 
-    // If object -> elem is key.
+    // If object → elem is key.
     else {
       // Might be just "[key]" or in the format: 
       size_t pos = path_elem.find("?"); 
       std::string key = path_elem.substr(0,pos);
+      if (!temp.contains(key)) {
+        return nlohmann::json();
+      }
       temp = temp[key];
 
       // "[key]?[field_key]=[field_value]" then we're already building the result
       if (pos != std::string::npos) {
         std::string field_key = func::split2(path_elem.substr(pos+1), "=")[0];
         std::string field_value = func::split2(path_elem.substr(pos+1), "=")[1];
-        std::cout << "field_key: " << field_key << std::endl;
-        std::cout << "field_value: " << field_value << std::endl;
         nlohmann::json result = nlohmann::json::array();
         for (auto elem : temp) {
           if (elem[field_key] == field_value) {
@@ -509,6 +568,98 @@ nlohmann::json ExtractFieldFromJson(nlohmann::json& source, std::string path) {
   } while(pos != std::string::npos);
 
   return temp;
+}
+
+std::string ConvertBuild(std::map<std::string, nlohmann::json> build_elems, std::vector<std::string> &used_fields, 
+    nlohmann::json &extracted_fields) {
+
+  std::string str = "";
+  for (const auto& it : build_elems) {
+    if (it.first == "get")
+      str += extracted_fields[it.second["field"].get<std::string>()][it.second["index"].get<int>()];
+    else if (it.first == "string")
+      str += it.second;
+    else if (it.first == "tag")
+      str += extracted_fields[it.second.get<std::string>()];
+  }
+  return str;
+}
+
+std::string ConvertJoin(nlohmann::json value, std::vector<std::string>& used_fields, 
+    nlohmann::json& extracted_fields) {
+// Find length of first list elements (as length of all list elements to
+    // join are expected to be of equal length.
+    std::string first_tag = value["join"][0];
+    size_t n = extracted_fields[first_tag].size();
+
+    // Get separator.
+    std::string separator = value["separator"];
+
+    // For for i ∈ {1..n} concat the ith element of all elements in "join" 
+    std::string joined_fields = "";
+    for (size_t i=0; i<n; i++) {
+      for (const std::string& tag : value["join"]) {
+        std::vector<std::string> elements = extracted_fields[tag].get<std::vector<std::string>>();
+        if (elements.size() > i)
+          joined_fields += elements[i] + separator;
+      }
+    }
+
+    // Add all used tags to used tags and sum-up relevance.
+    for (const std::string& tag : value["join"])
+      used_fields.push_back(tag);
+
+    // Add all build replacement to replacements and calculate relevance as
+    // average-relevance of all used fields.
+    return joined_fields.substr(0, joined_fields.length()-separator.length());
+}
+
+std::map<short, std::pair<std::string, double>> CreateMetadataTags(nlohmann::json search_config) {
+
+  std::map<short, std::pair<std::string, double>> metadata_tags;
+  std::map<std::string, double> tags_relevance;
+  
+  // Add all "normal" tags and relevance.
+  for (const auto& [key, value] : search_config["searchableTags"].items()) {
+    tags_relevance[key] = value["relevance"];
+  }
+
+  // Add all representations and calculate there relevance.
+  for (const auto& [key, value] : search_config["representations"].items()) {
+    double relevance = 0;
+    for (const auto& tag : value["join"])
+      relevance += tags_relevance[tag];
+    tags_relevance[key] = relevance/ value["join"].size();
+  }
+
+  // Remove all used tags
+  for (const auto& [key, value] : search_config["representations"].items()) {
+    for (const auto& tag : value["join"]) {
+      if (tags_relevance.count(tag) > 0)
+        tags_relevance.erase(tag);
+    }
+  }
+
+  // Replace tag with integer representation. 
+  size_t i=2;
+  for (const auto& it : tags_relevance) {
+    metadata_tags[i] = {it.first, it.second}; 
+    i*=2;
+  }
+
+  return metadata_tags;
+}
+
+
+std::string GetCurrentTime() {
+  auto timestamp = std::chrono::system_clock::now();
+
+  std::time_t now_tt = std::chrono::system_clock::to_time_t(timestamp);
+  std::tm tm = *std::localtime(&now_tt);
+
+  std::stringstream ss;
+  ss << std::put_time(&tm, "%c %Z");
+  return ss.str();
 }
 
 } //Close namespace 

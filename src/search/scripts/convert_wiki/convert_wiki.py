@@ -72,10 +72,11 @@ def main():
             + f'{new_entry["data"]["title"]}, {new_entry["data"]["place"]}, '
             + f'{new_entry["data"]["date"]}.')
         new_entry["citation"] = new_entry["bib"] 
+        new_entry["rights"] = "CLASfrei"
         proccessed_wikis.append(new_entry)
 
         # Create book directory and ocr
-        path = "../../tests/test_books_2/" + str(new_entry["key"])
+        path = "../../tests/example_data/wiki_data/test_books/" + str(new_entry["key"])
         os.mkdir(path)
         f = open(path+"/ocr.txt", "a")
         f.write(wiki_json["body"])
@@ -85,8 +86,9 @@ def main():
     print(f"Created entries 1: {proccessed_wikis[1]}\n")
 
     # Write metada.json
-    with open('../../tests/metadata_2.json', 'w') as outfile:
-        json.dump(proccessed_wikis, outfile)
+    metadata_json = {"items":{"data":proccessed_wikis}}
+    with open('../../tests/example_data/wiki_data/metadata.json', 'w') as outfile:
+        json.dump(metadata_json, outfile)
 
 if __name__ == '__main__':
     main()

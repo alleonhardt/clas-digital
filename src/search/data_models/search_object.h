@@ -26,12 +26,14 @@ class SearchObject {
     std::string query() const;
     const std::vector<std::string>& words() const;
     const std::vector<std::string>& converted_words() const;
+    const std::map<std::string, std::string>& converted_to_original() const;
     SearchOptions& search_options();
     
   private: 
     const std::string query_; ///< original query.
     std::vector<std::string> words_;	///< seperated word (created in constructor).
     std::vector<std::string> converted_words_;	/// seperated and converted words.
+    std::map<std::string, std::string> converted_to_original_; 
     SearchOptions search_options_;  ///< search_options.
 };
 
