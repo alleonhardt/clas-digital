@@ -526,3 +526,19 @@ well be an empty string (still the tag is needed).
 - "date" if sorting chronologically shall be supported and if one expects to use
   the search-options (in particularly the search-options frome-date and
   to-date)_
+
+
+## Calculating relevance
+The relevance is calculated closly to the okapi index, with some sligh
+difference:
+
+### Term frequency.
+The term frequency `ft(t,d)` for a term in a document is calculated as `f(t,d)/|(d, c|m)|`
+with `f(t,d)_ =  occurences of word in document` and `|d|= number of different
+words in metadata or corpus.` (Depending on, where the word occures (metadata/
+corpus).
+
+As we store all words just as the base-form, when creating the index map in
+`BookManager::CreateIndexMap` or more specific: `BookManager::AddWordsFromItem`
+the term frequency is calculated as the combined term_frequency of all words
+subsumised under this base-form. 

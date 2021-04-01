@@ -481,8 +481,8 @@ std::map<std::string, std::string> ConvertJson(nlohmann::json& source, nlohmann:
     std::cout << "Handling representation: " << key << ", " << value << std::endl;
     if (value.contains("join"))
       converted_json[key] = ConvertJoin(value, used_fields, extracted_fields);
-    else if (value.contains("build"))
-      converted_json[key] = ConvertBuild(value["build"], used_fields, extracted_fields);
+    //else if (value.contains("build"))
+    //  converted_json[key] = ConvertBuild(value["build"], used_fields, extracted_fields);
   }
 
   // Add all fields, which have not been used to build replacements and replace null with empty string.

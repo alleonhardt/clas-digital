@@ -68,6 +68,7 @@ set(SRC_FILES_SEARCH_TEST
   src/search/tests/test_ocr_search.cc
   src/search/tests/test_wiki_search.cc
   src/search/tests/test_func.cc
+  src/search/tests/test_fuzzy_search.cc
   src/search/tests/util.cc
 )
 

@@ -23,7 +23,7 @@ class TempWordInfo {
     std::set<weighted_match, Cmp> pages_with_relevance_; ///< set for sorting + dublicates.
     size_t preview_position_;  ///< Position best preview.
     size_t preview_page_;  ///< Page on which preview is found.
-    int relevance_;  ///< Relevance (how often word occures on pages).
+    int raw_count_;  ///< Relevance (how often word occures on pages).
     
     static bool cmp(const weighted_match& a, const weighted_match& b) {
       if (a.second == b.second) 
@@ -42,7 +42,7 @@ class TempWordInfo {
     std::set<weighted_match, Cmp>& pages_with_relevance();
     size_t preview_position() const;
     size_t preview_page() const ;
-    int relevance() const;
+    int raw_count() const;
 
     //Setter
     void set_preview_position(size_t pos);
@@ -60,7 +60,7 @@ class TempWordInfo {
      * Adds a new value to relevance: val*(val+1)/2.
      * @param val (new value)
      */
-    void IncreaseRelevance(int val);
+    void IncreaseRawCount(int val);
     
     /**
      * Gets list of pages. Converts set of pages+relevance to list of pages.

@@ -11,5 +11,5 @@ struct WordInfo {
   std::vector<size_t> pages_; ///< All pages the word occures on.
   size_t preview_position_; ///< Position of best preview.
   size_t preview_page_; ///< Page best preview is on.
-  double relevance_;  ///< Relavance of this book (how many, and how ofter per page word occures).
+  double term_frequency_;  ///< raw_count (occurences of word in document) / |D| (num (different) words in document)
 };

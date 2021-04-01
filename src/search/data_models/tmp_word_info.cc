@@ -2,7 +2,7 @@
 #include <cstddef>
 #include <vector>
 
-TempWordInfo::TempWordInfo() : pages_with_relevance_(&cmp), relevance_(0), 
+TempWordInfo::TempWordInfo() : pages_with_relevance_(&cmp), raw_count_(0), 
   preview_page_(0), preview_position_(0) {}
 
 std::set<TempWordInfo::weighted_match, TempWordInfo::Cmp>& TempWordInfo::pages_with_relevance() {
@@ -14,8 +14,8 @@ size_t TempWordInfo::preview_position() const {
 size_t TempWordInfo::preview_page() const {
   return preview_page_;
 }
-int TempWordInfo::relevance() const {
-  return relevance_;
+int TempWordInfo::raw_count() const {
+  return raw_count_;
 }
 
 void TempWordInfo::set_preview_position(size_t pos) {
@@ -30,8 +30,8 @@ void TempWordInfo::AddPage(weighted_match page_with_relevance) {
   pages_with_relevance_.insert(pages_with_relevance_.begin(), page_with_relevance);
 }
 
-void TempWordInfo::IncreaseRelevance(int val) {
-  relevance_ += val;
+void TempWordInfo::IncreaseRawCount(int val) {
+  raw_count_ += val;
 }
 
 size_t TempWordInfo::GetBestPage() {
@@ -49,7 +49,7 @@ std::vector<size_t> TempWordInfo::GetAllPages() const {
 
 void TempWordInfo::Join(TempWordInfo& word_info) {
   // Add up relevance of both word-infos.
-  relevance_ += word_info.relevance();
+  raw_count_ += word_info.raw_count();
 
   // Find preview_position with better relevance for page.
   size_t page_with_relevance_a = 0;

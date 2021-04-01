@@ -189,14 +189,14 @@ void Pages(const Request& req, Response& resp, BookManager& manager, Dict& dict)
     << " and fuzzyness: " << fuzzyness << std::endl;
     
   // Check if book exists.
-  if (manager.map_of_books().count(scan_id) == 0) {
+  if (manager.documents().count(scan_id) == 0) {
     std::cout << "Search in book: given book not found!" << std::endl;
     resp.status = 404;
     return;
   }
 
   // Get pages.
-  auto book = manager.map_of_books()[scan_id];
+  auto book = manager.documents()[scan_id];
   auto pages = book->GetPages(search_object);
   std::cout << "Got " << pages.size() << " pages for this book." << std::endl;
   if (pages.size() == 0) {

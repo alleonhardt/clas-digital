@@ -6,6 +6,7 @@
 #include "result_object.h"
 #include "search_object.h"
 #include "search_options.h"
+#include <cmath>
 #include <cstddef>
 #include <exception>
 #include <iostream>
@@ -38,8 +39,8 @@ BookManager::BookManager(std::vector<std::string> mount_points, Dict* dict, cons
   Book::set_reverted_tag_reference(reverted_tag_map_);
 }
 
-std::unordered_map<std::string, Book*>& BookManager::map_of_books() {
-  return map_books_;
+std::unordered_map<std::string, Book*>& BookManager::documents() {
+  return documents_;
 }
 
 const BookManager::index_map_type& BookManager::index_map() const {
@@ -53,7 +54,7 @@ bool BookManager::Initialize(bool reload_pages) {
   for (auto upload_point : upload_points_) {
     for (const auto& p : std::filesystem::directory_iterator(upload_point)) {
       std::string filename = p.path().stem().string();
-      if (map_books_.count(filename) > 0)
+      if (documents_.count(filename) > 0)
         AddBook(p.path(), filename, reload_pages);
     }
   }
@@ -64,9 +65,9 @@ bool BookManager::Initialize(bool reload_pages) {
   std::cout << "Map words:   " << index_map_.size() << "\n";
   std::cout << "Scopes: " << std::endl;
   for (auto it : index_map_) {
+    std::cout << it.first << ": " << std::endl;
     for (auto jt : it.second) {
-      if (jt.second.scope_ != 1)
-        std::cout << jt.first << ": " << jt.second.scope_ << " | " << jt.second.relevance_ << std::endl;
+      std::cout << "-- " << jt.first << ": " << jt.second.scope_ << " | " << jt.second.relevance_ << std::endl;
     }
   }
 
@@ -85,19 +86,19 @@ void BookManager::CreateItemsFromMetadata(nlohmann::json j_items) {
   for (auto &it : items) {
     std::string key = it[reverted_tag_map_["key"]];
     // already exists: update metadata.
-    if (map_books_.count(key) > 0)
-      map_books_[key]->UpdateMetadata(it);
+    if (documents_.count(key) > 0)
+      documents_[key]->UpdateMetadata(it);
 
     // does not exits: create new book and add to map of all books.
     else
-      map_books_[key] = new Book(it);
+      documents_[key] = new Book(it);
   }
 }
 
 void BookManager::AddBook(std::string path, std::string sKey, bool reload_pages) {
   if(!std::filesystem::exists(path))
     return;
-  map_books_[sKey]->InitializeBook(path, reload_pages);
+  documents_[sKey]->InitializeBook(path, reload_pages);
 }
     
 
@@ -139,7 +140,7 @@ std::list<ResultObject> BookManager::Search(SearchObject& search_object) {
   // Check if words are all on the same page:
   if (words.size() > 1) {
     for (auto it=results.begin(); it!=results.end();) {
-      it->second.set_book(map_books_.at(it->first));
+      it->second.set_book(documents_.at(it->first));
       if (!it->second.found_in_metadata() 
           && !it->second.book()->OnSamePage(words, search_object.search_options().fuzzy_search()))
         it = results.erase(it);
@@ -155,7 +156,7 @@ std::list<ResultObject> BookManager::Search(SearchObject& search_object) {
   // Also add a pointer to the book for every result-object.
   std::map<std::string, double> simplified_results;
   for (auto& it : results) {
-    it.second.set_book(map_books_.at(it.first));
+    it.second.set_book(documents_.at(it.first));
     simplified_results[it.first] = it.second.score();
   }
 
@@ -188,7 +189,7 @@ void BookManager::NormalSearch(std::string word, SearchOptions& search_options,
   // For each found book, whether it matches with the search-options. If so, add
   // new-search-result.
   for (const auto& it : tmp) {
-    if (CheckSearchOptions(search_options, map_books_[it.first]))
+    if (CheckSearchOptions(search_options, documents_[it.first]))
       results[it.first].NewResult(word, it.second.scope_, it.second.relevance_);
   }
 }
@@ -203,16 +204,16 @@ void BookManager::FuzzySearch(std::string word, SearchOptions& search_options,
     // Iterate over all found items:
     for (auto item : it.second) {
       // Skip if item is in conflict with search-options.
-      if (!CheckSearchOptions(search_options, map_books_[item.first])) 
+      if (!CheckSearchOptions(search_options, documents_[item.first])) 
         continue;
       // Add new information to result object.
       results[item.first].NewResult(word, item.second.scope_, item.second.relevance_);
       
       // Add found match to list of fuzzy matches found for searched word.
       if (item.second.scope_ & 1)
-        map_books_[item.first]->corpus_fuzzy_matches()[word].Insert({it.first, value});
+        documents_[item.first]->corpus_fuzzy_matches()[word].Insert({it.first, value});
       else 
-        map_books_[item.first]->metadata_fuzzy_matches()[word].Insert({it.first, value});
+        documents_[item.first]->metadata_fuzzy_matches()[word].Insert({it.first, value});
     }
   }
 }
@@ -262,8 +263,8 @@ BookManager::sorted_set BookManager::SortByRelavance(std::map<std::string, doubl
 
 BookManager::sorted_set BookManager::SortChronologically(std::map<std::string, double> unordered) {
 	sorted_set sorted_results(unordered.begin(), unordered.end(), [&](const auto &a,const auto &b) {
-        int date1 = stoi(map_books_[a.first]->GetFromMetadata("date"));
-        int date2 = stoi(map_books_[b.first]->GetFromMetadata("date"));
+        int date1 = stoi(documents_[a.first]->GetFromMetadata("date"));
+        int date2 = stoi(documents_[b.first]->GetFromMetadata("date"));
         if(date1==date2) 
           return a.first < b.first;
         return date1 < date2; });
@@ -272,8 +273,8 @@ BookManager::sorted_set BookManager::SortChronologically(std::map<std::string, d
 
 BookManager::sorted_set BookManager::SortAlphabetically(std::map<std::string, double> unordered) {
 	sorted_set sorted_results(unordered.begin(), unordered.end(), [&](const auto &a,const auto &b) {
-        std::string author1 = map_books_[a.first]->GetFromMetadata("description");
-        std::string author2 = map_books_[b.first]->GetFromMetadata("description");
+        std::string author1 = documents_[a.first]->GetFromMetadata("description");
+        std::string author2 = documents_[b.first]->GetFromMetadata("description");
         if(author1 == author2) 
           return a.first < b.first;
         return author1 < author2 ; } );
@@ -281,10 +282,43 @@ BookManager::sorted_set BookManager::SortAlphabetically(std::map<std::string, do
 }
 
 void BookManager::CreateIndexMap() {
+
+  int num_documents = documents().size();
+  double avglength = 0;
+  for (const auto& it : documents_)
+    avglength += it.second->GetLength();
+  avglength /= num_documents;
+
+
   // Create main-index map from all 
-  for (auto it : map_books_) {
+  for (auto it : documents_) {
     AddWordsFromItem(it.second->words_on_pages(), true, it.first);
     AddWordsFromItem(it.second->words_in_tags(), false, it.first);
+  }
+
+  // Calculate Okapi
+  for (auto& it : index_map_) {
+    
+    // Caluculate Inverse document frequency (idenical for each entry (word, document))
+    size_t n_q = it.second.size(); // number of documents containing current word.
+    double idf = std::log((num_documents-n_q+0.5)/(n_q+0.5)+1); 
+
+    // Caluculate document specific Part
+    for (auto& jt : it.second) {
+      double tf = jt.second.relevance_; // term frequency.
+      size_t len_document = documents_[jt.first]->GetLength();
+      double okapi = idf + ((tf*(2.0+1.0))/(tf+2.0*(1-0.75+0.75*(len_document/avglength))));
+
+      // Decrease scope if document does not have a corpus.
+      if (!documents_[jt.first]->HasContent())
+        okapi /= 2;
+      // Increase scope, if word was found in metadata.
+      else if (jt.second.scope_>1)
+        okapi *= 2;
+      
+      // Set new relevance of this match object.
+      jt.second.relevance_ = okapi;
+    }
   }
 
   // Create index map as list:
@@ -298,7 +332,7 @@ void BookManager::AddWordsFromItem(std::unordered_map<std::string, std::vector<W
   for (auto it : m) {
     // Calculate total relevance
     index_map_[it.first][item_key].relevance_ = std::accumulate(it.second.begin(), it.second.end(), 0.0, 
-        [](const double& init, const auto& word_info) { return (init+word_info.relevance_); });
+        [](const double& init, const auto& word_info) { return (init+word_info.term_frequency_); });
 
     // If found in corpus, add corpus to scope. (corpus→1), metadata→get all different tags.
     if (corpus)

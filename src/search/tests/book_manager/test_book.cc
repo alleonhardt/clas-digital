@@ -16,7 +16,7 @@ TempWordInfo create_word_info(std::vector<std::pair<size_t, size_t>> pages,
     word_info.AddPage(weigthed_page);
   word_info.set_preview_position(preview_position);
   word_info.set_preview_page(preview_page);
-  word_info.IncreaseRelevance(relevance);
+  word_info.IncreaseRawCount(relevance);
   return word_info;
 }
 
@@ -31,7 +31,7 @@ TEST_CASE( "Duplicates are joind as expected", "[handle_duplicates]" ) {
   REQUIRE(tmp_index_map.count("Hund") == 0);
   REQUIRE(tmp_index_map.count("hund") > 0);
   REQUIRE(tmp_index_map["hund"].preview_position() == 10);
-  REQUIRE(tmp_index_map["hund"].relevance() == 675);
+  REQUIRE(tmp_index_map["hund"].raw_count() == 675);
   std::vector<size_t> all_pages = tmp_index_map["hund"].GetAllPages();
   std::vector<size_t> excpected_pages = {1,2,3,4,5,7,8};
   REQUIRE(std::equal(all_pages.begin(), all_pages.end(), excpected_pages.begin()) == true);

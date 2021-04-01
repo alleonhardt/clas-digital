@@ -54,7 +54,7 @@ namespace util {
           search_options.fuzzy_search() 
         );
         REQUIRE(preview.find("mark") != std::string::npos);
-        std::cout << "Preview: " << preview << std::endl;
+        std::cout << it.book()->key() << " - preview (" << it.score() << "): " << preview << std::endl;
       }
     }
 

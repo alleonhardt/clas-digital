@@ -122,6 +122,9 @@ std::string Book::GetFromMetadata(std::string tag) const {
   return str;
 }
 
+size_t Book::GetLength() const {
+  return words_in_tags_.size() + words_on_pages_.size();
+}
 // **** SETTER **** //
 
 void Book::SetPath(std::string path) { 
@@ -200,7 +203,7 @@ void Book::CreateMetadataIndex() {
     auto extracted_words = func::extractWordsFromString(it.second);
     for (auto word_info : extracted_words) {
       temp_map_words_in_tags[word_info.first].AddPage({it.first, metadata_tag_reference_[it.first].second});
-      temp_map_words_in_tags[word_info.first].IncreaseRelevance(metadata_tag_reference_[it.first].second);
+      temp_map_words_in_tags[word_info.first].IncreaseRawCount(metadata_tag_reference_[it.first].second);
     }
   }
 
@@ -273,7 +276,7 @@ void Book::CreatePage(temp_index_map& temp_map_pages, std::string sBuffer, size_
   // Add page to word and increase relevance.
   for (auto it : extracted_words) {
     temp_map_pages[it.first].AddPage({page, num_words_on_page});
-    temp_map_pages[it.first].IncreaseRelevance(it.second);
+    temp_map_pages[it.first].IncreaseRawCount(it.second);
   } 
   // Save page to disc.
   func::WriteContentToDisc(path_ + "/intern/page" + std::to_string(page) + ".txt", sBuffer);
@@ -331,9 +334,9 @@ void Book::GenerateBaseFormMap(temp_index_map& temp_map_pages,
       base_form = cur_word;
 
     // Create word info of current word:
-    double relevance = static_cast<double>(it.second.relevance());
+    double term_frequency = static_cast<double>(it.second.raw_count())/temp_map_pages.size();
     WordInfo word_info{cur_word, it.second.GetAllPages(), it.second.preview_position(),
-        it.second.preview_page(), relevance};
+        it.second.preview_page(), term_frequency};
     index_map[base_form].push_back(word_info);
   }
 }
@@ -357,7 +360,7 @@ void Book::SafePages() {
       entry["pages"] = word_info.pages_;
       entry["preview_position"] = word_info.preview_position_;
       entry["preview_page"] = word_info.preview_page_;
-      entry["relevance"] = word_info.relevance_;
+      entry["relevance"] = word_info.term_frequency_;
 
       // Add entry to base-form.
       json_index_map["base_forms"][base_form.first].push_back(entry);

@@ -60,6 +60,13 @@ public:
 
   std::string GetFromMetadata(std::string tag) const;
 
+  /**
+   * Retuns the length of the document.
+   * The length of the document is the number of different words in the corpus
+   * and the number of different words in metadata combined.
+   */
+  size_t GetLength() const;
+
   bool IsPublic() const;
 
   // **** setter **** //
@@ -158,7 +165,6 @@ private:
   std::unordered_map<std::string, std::vector<WordInfo>> words_in_tags_;
 
   int num_pages_;  ///< Number of pages in book
-
 
   // ***** private functions *** //
  

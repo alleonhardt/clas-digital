@@ -34,7 +34,7 @@ class BookManager {
     std::map<short, std::pair<std::string, double>> metadata_tags_;
     std::map<std::string, short> reverted_tag_map_;
 
-    std::unordered_map<std::string, Book*> map_books_; ///< map of all books.
+    std::unordered_map<std::string, Book*> documents_; ///< map of all books.
 
     // Map of words / map of words in titles
     typedef std::unordered_map<std::string, std::map<std::string, MatchObject>> index_map_type;
@@ -53,7 +53,7 @@ class BookManager {
 
     // **** getter **** //
 
-    std::unordered_map<std::string, Book*>& map_of_books();
+    std::unordered_map<std::string, Book*>& documents();
 
     const index_map_type& index_map() const;
     
