@@ -63,27 +63,48 @@ SCENARIO ("Searching for wiki words with fuzzysearch", "[wiki_fuzzy]") {
     WHEN ("Searching for 'and'") {
       util::CheckResultsForQuery("and", search_options, base_data);
     }
+    WHEN ("Searching for 'xxx'") {
+      util::CheckResultsForQuery("xxx", search_options, base_data);
+    }
   }
 }
 
-SCENARIO ("Searching for wiki words with fuzzysearch2", "[wiki_fuzzy]") {
+SCENARIO ("Searching for wiki words - search options", "[wiki_fuzzy]") {
 
   GIVEN ("An existing index based on a wikipedia entries and fuzzy-search") {
 
     BaseData* base_data = BaseData::wiki_instance("wiki_data");
 
     // Initialize basic search_options.
-    SearchOptions search_options(true, true, true, 0, 2070, 0, "", {"XCFFDRQC"});
 
-    WHEN ("Searching for 'england'") {
-      util::CheckResultsForQuery("england", search_options, base_data);
+    WHEN ("Searching for 'and' with specific author (first name)") {
+      SearchOptions search_options(true, true, true, 0, 2070, 0, "Kandis", {"XCFFDRQC"});
+      auto results = util::CheckResultsForQuery("and", search_options, base_data);
+      REQUIRE(util::CheckAuthors(results, search_options.author()));
     }
 
-    WHEN ("Searching for 'education'") {
-      util::CheckResultsForQuery("education", search_options, base_data);
+    WHEN ("Searching for 'and' with specific author (last name)" ) {
+      SearchOptions search_options(true, true, true, 0, 2070, 0, "Mclaughlin", {"XCFFDRQC"});
+      auto results = util::CheckResultsForQuery("and", search_options, base_data);
+      REQUIRE(util::CheckAuthors(results, search_options.author()));
     }
-    WHEN ("Searching for 'education england'") {
-      util::CheckResultsForQuery("education+england", search_options, base_data);
+
+    WHEN ("Searching for 'and' with specific sorting: relevance") {
+      SearchOptions search_options(true, true, true, 0, 2070, 0, "", {"XCFFDRQC"});
+      auto results = util::CheckResultsForQuery("and", search_options, base_data);
+      REQUIRE(util::CheckSorting(results, search_options.sort_results_by()));
+    }
+
+    WHEN ("Searching for 'and' with specific sorting: chronologically") {
+      SearchOptions search_options(true, true, true, 0, 2070, 1, "", {"XCFFDRQC"});
+      auto results = util::CheckResultsForQuery("and", search_options, base_data);
+      REQUIRE(util::CheckSorting(results, search_options.sort_results_by()));
+    }
+
+    WHEN ("Searching for 'and' with specific sorting: alphabetically") {
+      SearchOptions search_options(true, true, true, 0, 2070, 2, "", {"XCFFDRQC"});
+      auto results = util::CheckResultsForQuery("and", search_options, base_data);
+      REQUIRE(util::CheckSorting(results, search_options.sort_results_by()));
     }
   }
 }

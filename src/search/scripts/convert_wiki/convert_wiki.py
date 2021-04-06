@@ -83,7 +83,7 @@ def main():
         f.close()
 
     print(f"Created entries 1: {proccessed_wikis[0]}\n")
-    print(f"Created entries 1: {proccessed_wikis[1]}\n")
+    print(f"Created entries 2: {proccessed_wikis[1]}\n")
 
     # Write metada.json
     metadata_json = {"items":{"data":proccessed_wikis}}

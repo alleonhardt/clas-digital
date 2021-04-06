@@ -137,7 +137,7 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
       entry["bibliography"] = result_obj.book()->GetFromMetadata("bib");
 
       std::string preview = result_obj.book()->GetPreview(
-        result_obj.GetSearchWords(search_object.converted_to_original()), 
+        result_obj.matches_as_list(), 
         search_object.search_options().fuzzy_search()
       );
       entry["preview"] = preview;

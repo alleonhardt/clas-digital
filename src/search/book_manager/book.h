@@ -23,7 +23,6 @@
 #include "fuzzy.hpp"
 #include "gramma.h"
 #include "metadata_handler.h"
-#include "sorted_matches.h"
 
 #define private public
 
@@ -46,26 +45,19 @@ public:
   bool has_ocr() const;
   bool has_images() const;
   int num_pages();
+  const std::set<std::string>& authors() const;
+  const std::set<std::string>& collections() const;
   int date();
-  std::vector<std::string> collections();
   typedef std::unordered_map<std::string, std::vector<WordInfo>> index_map_type;
   index_map_type& words_on_pages();
   index_map_type& words_in_tags();
-  typedef std::unordered_map<std::string, SortedMatches> fuzzy_result_type;
-  fuzzy_result_type& corpus_fuzzy_matches();
-  fuzzy_result_type& metadata_fuzzy_matches();
-  
+  size_t document_size() const;
+
+    
   ///< Return whether book has images or ocr
   bool HasContent() const;
 
   std::string GetFromMetadata(std::string tag) const;
-
-  /**
-   * Retuns the length of the document.
-   * The length of the document is the number of different words in the corpus
-   * and the number of different words in metadata combined.
-   */
-  size_t GetLength() const;
 
   bool IsPublic() const;
 
@@ -107,12 +99,16 @@ public:
   // *** get-pages functions *** //
   
   /**
-  * Checks whether all words found occur on the same page or in metadata.
-  * @param[in] sWords (words to check)
+  * Calculates how many searched-terms found in the corpus occure on the same page. 
+  * F.e imagine "dog", "rat" and "cat", where found in this document, if rat and
+  * cat occure on the same page, the function will return 2. If the word was
+  * found on metadata only, this word will be skiped. The function will never
+  * return a value below 1. 
+  * @param[in] matches (words to check)
   * @param[in] fuzzyness (fuzzy-search yes/ no)
-  * @return boolean indicating whether words or on the same page or not
+  * @return a score, for how many of the search terms occure on one page.
   */
-  bool OnSamePage(std::vector<std::string> words, bool fuzzyness);
+  int WordsOnSamePage(const std::vector<FoundWordsObject>& matches, bool fuzzyness);
 
   /**
   * GetPages calls findPages (extracting all pages from given word) for each 
@@ -135,7 +131,7 @@ public:
   * SearchedWord-Object.
   * @return one ore more previews ready formatted for output.
   */
-  std::string GetPreview(const std::vector<SearchedWordObject>& words, bool fuzzy_search);
+  std::string GetPreview(const std::vector<FoundWordsObject>& words, bool fuzzy_search);
 
 private:
 
@@ -148,17 +144,15 @@ private:
   std::string path_;  ///< Path to book (if exists)
   bool has_ocr_;  ///< Book has ocr path
   bool has_images_; ///has images or ocr
+  size_t document_size_; ///< number of words in document (metadata+corpus)
 
   // New Metadata
   std::map<short, std::string> metadata_;
 
   // From json/ metadata-handler
+  std::set<std::string> authors_;
   int date_;  ///< Date for fast access during search
-  std::vector<std::string> collections_; ///< Collections (fast access)
-
-  ///Map of matches found with fuzzy-search (contains/ fuzzy)
-  std::unordered_map<std::string, SortedMatches> corpus_fuzzy_matches_;
-  std::unordered_map<std::string, SortedMatches> metadata_fuzzy_matches_;
+  std::set<std::string> collections_; ///< Collections (fast access)
 
   ///Map of words_pages_pos_relevance
   std::unordered_map<std::string, std::vector<WordInfo>> words_on_pages_;
@@ -203,6 +197,10 @@ private:
    * Convert all words and handle resulting duplicates.
    * All words are converted to lowercase and non-utf8-characters are replaced. 
    * Also if duplicate are resulting the word-infos are "joined".
+   * Also the size of the document is calculated here, by adding the word-count
+   * of each word to the document size. As During indexing this function is
+   * called twice (for metdata and corpus index) we end up with the complete
+   * document size.
    * @param[in, out] temp_map_pages.
    */
   void ConvertWords(temp_index_map& temp_map_pages);
@@ -241,7 +239,7 @@ private:
    * @param fuzzyness indicating whether to search fuzzy or not.
    * @return map of all pages.
    */
-  std::vector<size_t> FindOnlyPages(std::string word, bool fuzzyness);
+  std::vector<size_t> FindOnlyPages(const FoundWordsObject& word, bool fuzzyness);
 
   /**
    * Remove all elements from results1, which do not exist in results2. 
@@ -252,22 +250,6 @@ private:
   void RemovePages(std::map<int, std::vector<std::string>>& results1, 
                    std::map<int, std::vector<std::string>>& results2);
 
-  /**
-   * Find all base-forms matching the searched word. 
-   * Find matching base-form(s). In case of fuzzy search these are all
-   * corresponding entries in found_fuzzy_matches (might be corpus or metadata). 
-   * @param word search for.
-   * @param fuzzy_search indicating whether to search fuzzy.
-   * @param found_fuzzy_matches map of already found fuzzy matches (corpus or
-   * metadata).
-   * @return vector of all base-forms matching the searched word.
-   */
-  std::vector<std::string> FindBaseForms(std::string word, bool fuzzy_search,
-    const index_map_type& index_map, const fuzzy_result_type& found_fuzzy_matches) const;
-
-  WordInfo FindBestWordInfo(std::string original_word, std::string converted_word, 
-      bool fuzzy_search, const index_map_type& index_map, const fuzzy_result_type& found_fuzzy_matches) const;
-
   // *** Previews *** //
 
   /**
@@ -275,7 +257,7 @@ private:
    * @param sWord (searched word)
    * @return Preview.
    */
-  std::string GetOnePreview(std::string orginal, std::string converted, short scope, bool fuzzy_search);
+  std::string GetOnePreview(std::pair<std::string, short> matched_word, bool fuzzy_search);
 };
 
 #endif

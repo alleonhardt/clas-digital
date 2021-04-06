@@ -20,11 +20,9 @@
 #include "book.h"
 #include "func.hpp"
 #include "gramma.h"
-#include "match_object.h"
 #include "result_object.h"
 #include "search_object.h"
 #include "search_options.h"
-
 
 class BookManager {
   private:
@@ -37,9 +35,13 @@ class BookManager {
     std::unordered_map<std::string, Book*> documents_; ///< map of all books.
 
     // Map of words / map of words in titles
-    typedef std::unordered_map<std::string, std::map<std::string, MatchObject>> index_map_type;
+    struct Match {
+      double relevance_;
+      short scope_;
+    };
+    typedef std::unordered_map<std::string, std::map<std::string, Match>> index_map_type;
     index_map_type index_map_;
-    std::vector<std::pair<std::string, std::map<std::string, MatchObject>>> index_list_;
+    std::vector<std::pair<std::string, std::map<std::string, Match>>> index_list_;
 
     typedef std::list<std::pair<std::string, size_t>> sorted_list_type;
     sorted_list_type list_words_; ///< Sorted list of all words by score (for typeahead).
@@ -103,18 +105,17 @@ class BookManager {
         std::map<std::string, ResultObject>& results);
     bool CheckSearchOptions(SearchOptions& search_options, Book* book);
 
-	  typedef std::function<bool(std::pair<std::string, double>, std::pair<std::string, double>)> Comp;
-    typedef std::set<std::pair<std::string, double>, Comp> sorted_set;
+    typedef std::list<std::pair<double, std::string>> sort_list;
     /**
      * @brief sort a map by it's value and return as set.
      * @param[in] unordered_results of books that have been found to contains the searched word
      * @param[in] type of sort algorythem (0: relevance, 1: chronological, 2: alphabetical. 
      * @return list of searchresulst
      */
-    sorted_set SortMapByValue(std::map<std::string, double> unordered_results, int type);
-    sorted_set SortByRelavance(std::map<std::string, double> unordered_results);
-    sorted_set SortChronologically(std::map<std::string, double> unordered_results);
-    sorted_set SortAlphabetically(std::map<std::string, double> unordered_results);
+    void SortMapByValue(std::list<std::pair<double, std::string>>& unordered_results, int type);
+    void SortByRelavance(std::list<std::pair<double, std::string>>& unordered_results);
+    void SortChronologically(std::list<std::pair<double, std::string>>& unordered_results);
+    void SortAlphabetically(std::list<std::pair<double, std::string>>& unordered_results);
 
     /**
      * Create index map.

@@ -63,6 +63,8 @@ bool BookManager::Initialize(bool reload_pages) {
   std::cout << "BookManager: Creating map of books." << std::endl;
   CreateIndexMap();
   std::cout << "Map words:   " << index_map_.size() << "\n";
+
+  /*
   std::cout << "Scopes: " << std::endl;
   for (auto it : index_map_) {
     std::cout << it.first << ": " << std::endl;
@@ -70,6 +72,7 @@ bool BookManager::Initialize(bool reload_pages) {
       std::cout << "-- " << jt.first << ": " << jt.second.scope_ << " | " << jt.second.relevance_ << std::endl;
     }
   }
+  */
 
   // Create type-ahead lists of sorted words and sorted authors.
   CreateListWords(list_words_, 0);
@@ -80,10 +83,12 @@ bool BookManager::Initialize(bool reload_pages) {
 
 void BookManager::CreateItemsFromMetadata(nlohmann::json j_items) {
   // Convert items according to search_config.
+  std::cout << "Converting items." << std::endl;
   auto items = ConvertMetadata(j_items);
 
   //Iterate over all items in json
   for (auto &it : items) {
+    nlohmann::json json = it;
     std::string key = it[reverted_tag_map_["key"]];
     // already exists: update metadata.
     if (documents_.count(key) > 0)
@@ -103,11 +108,11 @@ void BookManager::AddBook(std::string path, std::string sKey, bool reload_pages)
     
 
 std::list<ResultObject> BookManager::Search(SearchObject& search_object) {
-
   // Get converted words.
   std::vector<std::string> words = search_object.converted_words();
+  bool fuzzy_search = search_object.search_options().fuzzy_search();
   
-  // Caluculate elapsed seconds.
+  // Caluculate start time.
   auto start = std::chrono::system_clock::now();
 
   // Start first search:
@@ -136,39 +141,45 @@ std::list<ResultObject> BookManager::Search(SearchObject& search_object) {
     if (results.size() == 0)
       return {};
   }
-
-  // Check if words are all on the same page:
+  
+  // Simplyfy results (convert to map of book-keys and relevance. 
+  // Also add a pointer to the book for every result-object.
+  // If search query contained more than one word, also manipulate relevance of
+  // found match accoring to number of matches found on the same page.
+  std::list<std::pair<double, std::string>> simplyfied_results;
   if (words.size() > 1) {
-    for (auto it=results.begin(); it!=results.end();) {
-      it->second.set_book(documents_.at(it->first));
-      if (!it->second.found_in_metadata() 
-          && !it->second.book()->OnSamePage(words, search_object.search_options().fuzzy_search()))
-        it = results.erase(it);
-      else
-        ++it;
+    for (auto& [key, res_obj] : results) {
+      // Add book, and original words to result object and simplyfy result.
+      res_obj.set_book(documents_.at(key));
+      res_obj.set_original_words(search_object.converted_to_original());
+      simplyfied_results.push_back({res_obj.score(), key});
+
+      // Change score accoring to number of found words in one page.
+      res_obj.set_score(res_obj.score()*
+          res_obj.book()->WordsOnSamePage(res_obj.matches_as_list(), fuzzy_search));
+    }
+  }
+  else {
+    for (auto& [key, res_obj] : results) {
+      // Add book, and original words to result object and simplyfy result.
+      res_obj.set_book(documents_.at(key));
+      res_obj.set_original_words(search_object.converted_to_original());
+      simplyfied_results.push_back({res_obj.score(), key});
     }
   }
   auto end = std::chrono::system_clock::now();
   std::chrono::duration<double> elapsed_seconds = end-start;
   std::cout << "Completed search after " << elapsed_seconds.count() << " seconds." << std::endl;
 
-  // Simplyfy results (convert to map of book-keys and relevance. 
-  // Also add a pointer to the book for every result-object.
-  std::map<std::string, double> simplified_results;
-  for (auto& it : results) {
-    it.second.set_book(documents_.at(it.first));
-    simplified_results[it.first] = it.second.score();
-  }
-
-  //Sort results results and convert to list of books.
+  // Sort results results and convert to list of books.
   std::list<ResultObject> sorted_search_results;
-  for (auto it : SortMapByValue(simplified_results, search_object.search_options().sort_results_by())) {
-    sorted_search_results.push_back(results.at(it.first)); 
-  }
+  SortMapByValue(simplyfied_results, search_object.search_options().sort_results_by());
+  for (auto it : simplyfied_results)
+    sorted_search_results.push_back(results[it.second]); 
 
-  auto end2 = std::chrono::system_clock::now();
-  std::chrono::duration<double> elapsed_seconds2 = end2-start;
-  std::cout << "Completed search and sorting after " << elapsed_seconds2.count() << " seconds." << std::endl;
+  end = std::chrono::system_clock::now();
+  elapsed_seconds = end-start;
+  std::cout << "Completed sorting after " << elapsed_seconds.count() << " seconds." << std::endl;
 
   return sorted_search_results;
 }
@@ -178,19 +189,24 @@ void BookManager::DoSearch(std::map<std::string, ResultObject> &results, std::st
   if (search_options.fuzzy_search())
     FuzzySearch(word, search_options, results);
   else
-   NormalSearch(word, search_options, results);
+    NormalSearch(word, search_options, results);
 }
 
 void BookManager::NormalSearch(std::string word, SearchOptions& search_options, 
     std::map<std::string, ResultObject>& results) {
   // Get all books, which contain the searched word.
-  std::map<std::string, MatchObject> tmp = index_map_[word];
+  std::map<std::string, Match> tmp; 
+  try {
+    tmp = index_map_.at(word);
+  } catch(...) {
+    return;
+  }
 
   // For each found book, whether it matches with the search-options. If so, add
   // new-search-result.
   for (const auto& it : tmp) {
     if (CheckSearchOptions(search_options, documents_[it.first]))
-      results[it.first].NewResult(word, it.second.scope_, it.second.relevance_);
+      results[it.first].NewResult(word, word, it.second.scope_, it.second.relevance_);
   }
 }
 
@@ -198,87 +214,85 @@ void BookManager::FuzzySearch(std::string word, SearchOptions& search_options,
     std::map<std::string, ResultObject>& results) {
   // search in corpus: 
   for (const auto& it : index_list_) {
-    double value = fuzzy::fuzzy_cmp(it.first, word);
-    if (value > 0.2) 
+
+    // Calculate fuzzy score (occures in word, and levensthein-distance).
+    int score = fuzzy::cmp(word, it.first);
+    if (score == -1) 
       continue;
+
     // Iterate over all found items:
     for (auto item : it.second) {
-      // Skip if item is in conflict with search-options.
-      if (!CheckSearchOptions(search_options, documents_[item.first])) 
+      // Skip if item is in conflict with search-options. Only check 
+      // search-options, if item is not already in results.
+      if (results.count(item.first) == 0 && 
+          !CheckSearchOptions(search_options, documents_[item.first])) 
         continue;
       // Add new information to result object.
-      results[item.first].NewResult(word, item.second.scope_, item.second.relevance_);
-      
-      // Add found match to list of fuzzy matches found for searched word.
-      if (item.second.scope_ & 1)
-        documents_[item.first]->corpus_fuzzy_matches()[word].Insert({it.first, value});
-      else 
-        documents_[item.first]->metadata_fuzzy_matches()[word].Insert({it.first, value});
+      results[item.first].NewResult(word, it.first, item.second.scope_, 
+          (1.0/(1.0+score))*item.second.relevance_);
     }
   }
 }
 
 bool BookManager::CheckSearchOptions(SearchOptions& search_options, Book* book) {
-  // author:
+  // If an author is given and in the string of authors, the auther is not
+  // found, return false.
   if(search_options.author().length() > 0) {
-    if(book->GetFromMetadata("author") != search_options.author())
+    if (book->authors().count(search_options.author()) == 0)
       return false;
   }
 
+  // If date is specified (→ date is not -1) return false if date is outside of timerange.
   int date = book->date();
-  if (date == -1 || date < search_options.year_from() || date > search_options.year_to())
+  if (date != -1 && (date < search_options.year_from() || date > search_options.year_to()))
     return false;
        
-  // collections:
+  // If no collections are specified in search options, return true
   if (search_options.collections().size() == 0)
     return true;
-  for (auto const &collection : search_options.collections()) {
-    if (func::in(collection, book->collections()))
+  for (const auto& collection : search_options.collections()) {
+    if (book->collections().count(collection) > 0)
       return true;
   }
   return false;
 }
 
-BookManager::sorted_set BookManager::SortMapByValue(
-    std::map<std::string, double> unordered_results, int sorting) {
-  if (unordered_results.size() == 0) 
-    return sorted_set();
-  if (unordered_results.size() == 1)
-    return {std::make_pair(unordered_results.begin()->first, unordered_results.begin()->second)};
+void BookManager::SortMapByValue(sort_list& unordered_results, int sorting) {
+  if (unordered_results.size() < 2) 
+    return;
 
   // Call matching sorting algorythem.
   if (sorting == 0) return SortByRelavance(unordered_results);
   if (sorting == 1) return SortChronologically(unordered_results);
   if (sorting == 2) return SortAlphabetically(unordered_results);
-  return sorted_set();
 }
   
-BookManager::sorted_set BookManager::SortByRelavance(std::map<std::string, double> unordered) {
-	sorted_set sorted_results(unordered.begin(), unordered.end(), [](const auto &a,const auto &b) {
-        if(a.second == b.second) 
-          return a.first > b.first;
-        return a.second > b.second; } );
-  return sorted_results;
+void BookManager::SortByRelavance(sort_list& unordered) {
+  unordered.sort([](const auto &a, const auto &b) {
+        if (a.first == b.first) 
+          return a.second > b.second;
+        return a.first > b.first; 
+    });
 }
 
-BookManager::sorted_set BookManager::SortChronologically(std::map<std::string, double> unordered) {
-	sorted_set sorted_results(unordered.begin(), unordered.end(), [&](const auto &a,const auto &b) {
-        int date1 = stoi(documents_[a.first]->GetFromMetadata("date"));
-        int date2 = stoi(documents_[b.first]->GetFromMetadata("date"));
-        if(date1==date2) 
+void BookManager::SortChronologically(sort_list& unordered) {
+  unordered.sort([&](const auto &a, const auto &b) {
+        int date1 = documents_[a.second]->date();
+        int date2 = documents_[b.second]->date();
+        if (date1 == date2) 
           return a.first < b.first;
-        return date1 < date2; });
-  return sorted_results;
+        return date1 < date2; 
+    });
 }
 
-BookManager::sorted_set BookManager::SortAlphabetically(std::map<std::string, double> unordered) {
-	sorted_set sorted_results(unordered.begin(), unordered.end(), [&](const auto &a,const auto &b) {
-        std::string author1 = documents_[a.first]->GetFromMetadata("description");
-        std::string author2 = documents_[b.first]->GetFromMetadata("description");
-        if(author1 == author2) 
+void BookManager::SortAlphabetically(sort_list& unordered) {
+  unordered.sort([&](const auto &a,const auto &b) {
+        std::string author1 = *documents_[a.second]->authors().cbegin();
+        std::string author2 = *documents_[b.second]->authors().cbegin();
+        if (author1 == author2) 
           return a.first < b.first;
-        return author1 < author2 ; } );
-  return sorted_results;
+        return author1 < author2 ; 
+    });
 }
 
 void BookManager::CreateIndexMap() {
@@ -286,9 +300,11 @@ void BookManager::CreateIndexMap() {
   int num_documents = documents().size();
   double avglength = 0;
   for (const auto& it : documents_)
-    avglength += it.second->GetLength();
+    avglength += it.second->document_size();
   avglength /= num_documents;
 
+  std::cout << "Number of documents: " << num_documents << std::endl;
+  std::cout << "Average length of documents: " << avglength << std::endl;
 
   // Create main-index map from all 
   for (auto it : documents_) {
@@ -297,27 +313,39 @@ void BookManager::CreateIndexMap() {
   }
 
   // Calculate Okapi
+  int counter=0;
   for (auto& it : index_map_) {
     
     // Caluculate Inverse document frequency (idenical for each entry (word, document))
     size_t n_q = it.second.size(); // number of documents containing current word.
     double idf = std::log((num_documents-n_q+0.5)/(n_q+0.5)+1); 
 
+    if (counter++ < 30) {
+      std::cout << "number of documents containing " << it.first << ": " << n_q << std::endl;
+      std::cout << "IDF: " << idf << std::endl;
+    }
+
     // Caluculate document specific Part
     for (auto& jt : it.second) {
       double tf = jt.second.relevance_; // term frequency.
-      size_t len_document = documents_[jt.first]->GetLength();
+      size_t len_document = documents_[jt.first]->document_size();
       double okapi = idf + ((tf*(2.0+1.0))/(tf+2.0*(1-0.75+0.75*(len_document/avglength))));
 
-      // Decrease scope if document does not have a corpus.
+      // Decrease scope if document does not have a corpus & set relevance.
       if (!documents_[jt.first]->HasContent())
-        okapi /= 2;
-      // Increase scope, if word was found in metadata.
+        jt.second.relevance_ = okapi / 2;
+      // Increase scope, if word was found in metadata & set relevance.
       else if (jt.second.scope_>1)
-        okapi *= 2;
-      
-      // Set new relevance of this match object.
-      jt.second.relevance_ = okapi;
+        jt.second.relevance_ = okapi * 2;
+      else
+        jt.second.relevance_ = okapi;
+
+      if (counter < 30) {
+        std::cout << " -- Term frequenzy: " << tf << std::endl;
+        std::cout << " -- document length : " << len_document << std::endl;
+        std::cout << " -- okapi: " << okapi << std::endl;
+        std::cout << " -- okapi (2): " << jt.second.relevance_ << std::endl;
+      }
     }
   }
 
@@ -331,8 +359,10 @@ void BookManager::AddWordsFromItem(std::unordered_map<std::string, std::vector<W
     bool corpus, std::string item_key) {
   for (auto it : m) {
     // Calculate total relevance
-    index_map_[it.first][item_key].relevance_ = std::accumulate(it.second.begin(), it.second.end(), 0.0, 
-        [](const double& init, const auto& word_info) { return (init+word_info.term_frequency_); });
+    index_map_[it.first][item_key].relevance_ = std::accumulate(it.second.begin(), it.second.end(), 
+        0.0, [](const double& init, const auto& word_info) { 
+        return (init+word_info.term_frequency_); 
+      });
 
     // If found in corpus, add corpus to scope. (corpus→1), metadata→get all different tags.
     if (corpus)
@@ -361,7 +391,7 @@ void BookManager::CreateListWords(sorted_list_type& list_of_words, short scope) 
       map_word_relevance[it->first] = it->second.size();
   }
 
-  for (auto elem : SortByRelavance(map_word_relevance))
+  for (auto elem : func::SortByRelavance(map_word_relevance))
     list_of_words.push_back({elem.first, elem.second});
 }
 
@@ -379,13 +409,15 @@ std::list<std::string> BookManager::GetSuggestions(std::string word, sorted_list
   word = func::convertStr(func::returnToLower(word));
   std::map<std::string, double> suggs;
   size_t counter=0; // TODO (fux) Check if we could generate more matches.
-  for (auto it=list_words.begin(); it!=list_words.end() && ++counter <= 10; it++) {
-    double value = fuzzy::fuzzy_cmp(it->first, word);
-    if(value > 0 && value <= 0.2)
-      suggs[it->first] = value*(-1);
+  for (auto it=list_words.begin(); it!=list_words.end() && counter <= 10; it++) {
+    double value = fuzzy::cmp(word, it->first);
+    if(value != -1) {
+      suggs[it->first] = (1.0/(2.1-value))*it->second;
+      counter++;
+    }
   }
   std::list<std::string> sorted_search_results;
-  for (auto it : SortByRelavance(suggs)) 
+  for (auto it : func::SortByRelavance(suggs)) 
     sorted_search_results.push_back(it.first); 
   return sorted_search_results;
 }

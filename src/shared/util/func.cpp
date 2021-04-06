@@ -318,7 +318,6 @@ std::map<std::string, int> extractWordsFromString(std::string& buffer) {
       mapWords[cur_word] += 1;
     }
   }
-
   return mapWords;
 }
 
@@ -436,6 +435,14 @@ nlohmann::json LoadJsonFromDisc(std::string path) {
   }
 }
 
+sorted_set SortByRelavance(std::map<std::string, double> unordered) {
+  sorted_set sorted_results(unordered.begin(), unordered.end(), [](const auto &a,const auto &b) {
+        if(a.second == b.second) 
+          return a.first > b.first;
+        return a.second > b.second; } );
+  return sorted_results;
+}
+
 std::map<std::string, std::string> ConvertJson(nlohmann::json& source, nlohmann::json& config) {
   // Extract fields.
   nlohmann::json extracted_fields;
@@ -478,7 +485,7 @@ std::map<std::string, std::string> ConvertJson(nlohmann::json& source, nlohmann:
   std::map<std::string, std::string> converted_json;
   std::vector<std::string> used_fields;
   for (auto& [key, value] : config["representations"].items()) {
-    std::cout << "Handling representation: " << key << ", " << value << std::endl;
+    //std::cout << "Handling representation: " << key << ", " << value << std::endl;
     if (value.contains("join"))
       converted_json[key] = ConvertJoin(value, used_fields, extracted_fields);
     //else if (value.contains("build"))
@@ -521,8 +528,6 @@ std::map<std::string, std::string> ConvertJson(nlohmann::json& source, nlohmann:
       converted_json[key] = "";
   }
 
-  std::cout << converted_json["description"] << std::endl;
-  
   return converted_json;
 }
 

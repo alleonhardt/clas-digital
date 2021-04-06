@@ -9,6 +9,7 @@
 #include <list>
 #include <clocale>
 #include <regex>
+#include <set>
 #include <codecvt>
 
 namespace func {
@@ -173,6 +174,13 @@ namespace func {
         << e.what() << std::endl;
     }
   }
+
+  /**
+   * Sort map by value.
+   */
+	typedef std::function<bool(std::pair<std::string, double>, std::pair<std::string, double>)> Comp;
+  typedef std::set<std::pair<std::string, double>, Comp> sorted_set;
+  sorted_set SortByRelavance(std::map<std::string, double> unordered);
 
   /**
    * Converts any json to usable format.

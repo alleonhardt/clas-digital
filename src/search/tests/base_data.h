@@ -75,6 +75,7 @@ class BaseData {
         func::LoadJsonFromDisc(base_path_ + path_to_example_data + "/metadata.json");
       std::cout << "Done." << std::endl;
       book_manager_.CreateItemsFromMetadata(j_metadata["items"]["data"]);
+      std::cout << "Initializing books." << std::endl;
       book_manager_.Initialize(true);
       
       // Get current time in human redable format

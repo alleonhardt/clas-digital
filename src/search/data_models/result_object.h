@@ -11,6 +11,7 @@
 #define SRC_SEARCH_DATA_MODELS_RESULTOBJECT_H_
 
 #include "book_manager/book.h"
+#include "searched_word_object.h"
 class ResultObject {
 
   public:
@@ -18,24 +19,27 @@ class ResultObject {
      * Constructor for result object. 
      * @param book
      */
-    ResultObject() {}
+    ResultObject() : scope_(0), score_(0) {}
 
     // getter:
     bool found_in_metadata() const;
     bool found_in_corpus() const;
     short scope() const;
     double score() const;
-    std::map<std::string, short> words_with_scope() const;
+    std::map<std::string, FoundWordsObject> matches() const;
+    std::vector<FoundWordsObject> matches_as_list() const;
     Book* book() const;
 
     // setter:
+    void set_score(double score);
     void set_book(Book* book);
+    void set_original_words(std::map<std::string, std::string> converted_to_original_map);
 
     /**
      * Sets found_in_metadata to true and sets initial metadata score.
      * @param init_score
      */
-    void NewResult(std::string word, short scope, double score);
+    void NewResult(std::string searched_word, std::string found_word, short scope, double score);
 
     /**
      * Join to result objects.
@@ -47,17 +51,10 @@ class ResultObject {
 
     void Print(std::string word, std::string preview);
     
-    /**
-     * Returns a vectror of all searched-words, with the original word, the
-     * converted word, and the scope in which the word was found in each entry.
-     * @return list of all searched words.
-     */
-    std::vector<SearchedWordObject> GetSearchWords(std::map<std::string, std::string> converted_to_original_map);
-      
   private:
     short scope_;
     double score_; 
-    std::map<std::string, short> words_with_scope_;
+    std::map<std::string, FoundWordsObject> matches_;
     Book* book_;
 };
 
