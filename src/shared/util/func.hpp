@@ -78,7 +78,7 @@ namespace func {
   /**
   * @param[in] str
   */
-  std::string returnToLower(std::string &str);
+  std::string returnToLower(const std::string &str);
 
   /**
   * @param[in, out] str string to be modified

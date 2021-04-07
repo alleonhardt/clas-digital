@@ -2,6 +2,7 @@
 #include <bits/stdint-uintn.h>
 #include <catch2/catch.hpp>
 #include <fstream>
+#include <vector>
 #include "func.hpp"
 #include "book_manager/book.h"
 #include "base_data.h"
@@ -20,7 +21,8 @@ SCENARIO ("Searching for hard words with fuzzysearch", "[ocr_fuzzy]") {
 
   GIVEN ("An existing index based on a actual ocr and fuzzy-search") {
 
-    BaseData* base_data = BaseData::ocr_instance("ocr_data", "UEHEJINT");
+    BaseData* base_data = BaseData::ocr_instance("ocr_data");
+    base_data->set_book_key("UEHEJINT");
 
     // Initialize basic search_options.
     SearchOptions search_options(true, false, true, 0, 2070,
@@ -64,6 +66,7 @@ SCENARIO("Searching for metadata", "[metadata]" ) {
   GIVEN ("An existing index based on a metadata normal-search") {
 
     BaseData* base_data = BaseData::ocr_instance("ocr_data");
+    base_data->set_book_key("");
 
     // Initialize basic search_options.
     SearchOptions search_options(true, true, false, 0, 2070,
@@ -112,6 +115,37 @@ SCENARIO("Searching for metadata", "[metadata]" ) {
     }
     WHEN ("Searching for 'Ingensiep'") {
       util::CheckResultsForQuery("Ingensiep", search_options, base_data);
+    }
+  }
+}
+
+SCENARIO("Test creating description for books", "[descriptions]") {
+
+  GIVEN ("An existing index based on a actual ocr and fuzzy-search") {
+    BaseData* base_data = BaseData::ocr_instance("ocr_data");
+    base_data->set_book_key("UEHEJINT");
+
+    for (const auto& it : base_data->book_manager().documents()) {
+
+      // Get description.
+      std::string description = it.second->GetFromMetadata("description");
+
+      // Get author 
+      std::vector<std::string> authors = func::split2(it.second->GetFromMetadata("authorsLastNames"), ";");
+      std::string author_last_name = "undefined";
+      if (authors.size() > 0)
+        author_last_name = authors[0];
+      if (author_last_name == "")
+        author_last_name = "undefined";
+
+      // Get date.
+      std::string date = it.second->GetFromMetadata("date");
+      if (date == "")
+        date = "undefined";
+
+      // Check that description was created as expected.
+      std::cout << description << ": " << author_last_name << ", " << date << std::endl;
+      REQUIRE(description == author_last_name + ", " + date);
     }
   }
 }

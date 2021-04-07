@@ -17,22 +17,25 @@ namespace util {
 
     // Filter all results, where book_id is wrong and which are not found in corpus.
     auto it = std::find_if(results.begin(), results.end(), [&](ResultObject res_obj) { 
-        
-
-        // If a book-key is set, then book key need to match given book key.
+        // If a book-key is set, then book key needs to match given book key.
         if (base_data->book_key() != "")
           return res_obj.book()->key() == base_data->book_key(); 
 
-        // if searched in corpus and metadata, we can return true
+        // If searched in corpus and metadata, we can return true
         if (search_options.only_corpus() && search_options.only_metadata())
           return true;
 
-        // If search only in corpus, book needs to be found in corpus.
-        if (search_options.only_corpus() && !res_obj.found_in_corpus())
+        // If searching only in corpus, book needs to be found in corpus.
+        if (search_options.only_corpus() && !res_obj.found_in_corpus()) {
+          std::cout << "Removed because not found in corpus" << std::endl;
           return false;
-        // If search only in metadata, book needs to be found in metadata.
-        else if (search_options.only_metadata() && !res_obj.found_in_metadata())
+        }
+
+        // If searching only in metadata, book needs to be found in metadata.
+        else if (search_options.only_metadata() && !res_obj.found_in_metadata()) {
+          std::cout << "Removed because not found in metadata" << std::endl;
           return false;
+        }
 
         return true;
       });

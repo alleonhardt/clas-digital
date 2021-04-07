@@ -143,7 +143,7 @@ void convertToLower(std::string &str)
 /**
 * @param[in, out] str string to be modified
 */
-std::string returnToLower(std::string &str) {
+std::string returnToLower(const std::string &str) {
   std::locale loc1("de_DE.UTF8");
   std::string str2;
   for(unsigned int i=0; i<str.length(); i++)
@@ -476,10 +476,30 @@ std::map<std::string, std::string> ConvertJson(nlohmann::json& source, nlohmann:
           std::for_each(new_value.begin(), new_value.end(), [&, k=key](auto e) { extracted_fields[k].push_back(e); });
         // Otherwise simply add result (this will probably be a string.
         else
-          extracted_fields[key]+=new_value;
+          extracted_fields[key] += new_value;
       }
     }
   }
+
+  std::cout << "Checking for regex expressions: " << config["regex"] << std::endl;
+  for (auto& [key, value] : config["regex"].items()) {
+    if (!extracted_fields[key].is_number() && !extracted_fields[key].is_string())
+      continue;
+    std::string cur_val = extracted_fields[key];
+    bool found = false;
+    for (const auto& it : value) {
+      std::regex reg(it);
+      std::smatch m;
+      if (std::regex_search(cur_val, m, reg)) {
+        extracted_fields[key] = m[1];
+        found = true;
+        break;
+      }
+    }
+    if (!found)
+      extracted_fields[key] = "";
+  }
+
 
   // Handle replacements
   std::map<std::string, std::string> converted_json;
@@ -488,29 +508,34 @@ std::map<std::string, std::string> ConvertJson(nlohmann::json& source, nlohmann:
     //std::cout << "Handling representation: " << key << ", " << value << std::endl;
     if (value.contains("join"))
       converted_json[key] = ConvertJoin(value, used_fields, extracted_fields);
-    //else if (value.contains("build"))
-    //  converted_json[key] = ConvertBuild(value["build"], used_fields, extracted_fields);
+    else if (value.contains("build"))
+      converted_json[key] = ConvertBuild(value["build"], used_fields, extracted_fields);
   }
+
+  std::cout << "Done with replacements" << std::endl;
 
   // Add all fields, which have not been used to build replacements and replace null with empty string.
   for (auto& [key, value] : extracted_fields.items()) {
+    std::cout << key << ", " << value << std::endl;
 
-    // Only add if not used to build replacements.
-    if (std::find(used_fields.begin(), used_fields.end(), key) == used_fields.end()) {
-      // check if value is NULL and replace with empty string if so.
-      if (value.is_null())
+    // check if value is NULL and replace with empty string if so.
+    if (value.is_null())
+      converted_json[key] = "";
+    else if (value.is_array()) {
+      std::vector<std::string> vec = value.get<std::vector<std::string>>();
+      if (vec.size() == 0)
         converted_json[key] = "";
-      else if (value.is_array()) {
-        std::vector<std::string> vec = value.get<std::vector<std::string>>();
+      else if (vec.size() == 1)
+        converted_json[key] = *vec.begin();
+      else 
         converted_json[key] = std::accumulate(vec.begin()+1, vec.end(), *vec.begin(), 
-            [](const std::string& init, std::string& str) { return init + ";" + str; });
-      }
-      else
-        converted_json[key] = value;
+          [](const std::string& init, std::string& str) { return init + ";" + str; });
     }
+    else
+      converted_json[key] = value;
   }
 
-  //std::cout << "Checking for regex expressions: " << config["regex"] << std::endl;
+  std::cout << "Checking for regex expressions: " << config["regex"] << std::endl;
   for (auto& [key, value] : config["regex"].items()) {
 
     std::string cur_val = converted_json[key];
@@ -527,6 +552,10 @@ std::map<std::string, std::string> ConvertJson(nlohmann::json& source, nlohmann:
     if (!found)
       converted_json[key] = "";
   }
+
+
+
+  std::cout << "Done: converting json" << std::endl;
 
   return converted_json;
 }
@@ -575,18 +604,36 @@ nlohmann::json ExtractFieldFromJson(nlohmann::json& source, std::string path) {
   return temp;
 }
 
-std::string ConvertBuild(std::map<std::string, nlohmann::json> build_elems, std::vector<std::string> &used_fields, 
+std::string ConvertBuild(std::map<std::string, nlohmann::json> build_elems, 
+    std::vector<std::string> &used_fields, 
     nlohmann::json &extracted_fields) {
 
+  std::cout << "Building string from: " << std::endl;
+  std::cout << extracted_fields << std::endl;
   std::string str = "";
   for (const auto& it : build_elems) {
-    if (it.first == "get")
-      str += extracted_fields[it.second["field"].get<std::string>()][it.second["index"].get<int>()];
+    std::cout << it.first << ": " << it.second << std::endl;
+    std::string new_part = "";
+    // Assuming the tag at "field" is an array add the element at "index".
+    if (it.first == "get" && extracted_fields.contains(it.second["field"].get<std::string>())) {
+      // Skip if not an array.
+      if (extracted_fields[it.second["field"].get<std::string>()].is_array()) {
+        std::vector<std::string> elems = extracted_fields[it.second["field"].get<std::string>()];
+        if (elems.size() > it.second["index"].get<int>())
+          new_part += elems[it.second["index"].get<int>()];
+      }
+    }
+    // Simply add given string.
     else if (it.first == "string")
-      str += it.second;
-    else if (it.first == "tag")
-      str += extracted_fields[it.second.get<std::string>()];
+      new_part += it.second;
+    // Assuming the element at "tag" is a string, simply add this string.
+    else if (it.first == "tag" && extracted_fields.count(it.second.get<std::string>())) {
+      if (!extracted_fields[it.second.get<std::string>()].is_null())
+        new_part += extracted_fields[it.second.get<std::string>()];
+    }
+    str += (new_part == "") ? "undefined" : new_part;
   }
+  std::cout << "done ConvertBuild" << std::endl;
   return str;
 }
 
@@ -637,11 +684,11 @@ std::map<short, std::pair<std::string, double>> CreateMetadataTags(nlohmann::jso
     tags_relevance[key] = relevance/ value["join"].size();
   }
 
-  // Remove all used tags
+  // Set relevance of all used tag to zero, so they will be ignored 
   for (const auto& [key, value] : search_config["representations"].items()) {
     for (const auto& tag : value["join"]) {
       if (tags_relevance.count(tag) > 0)
-        tags_relevance.erase(tag);
+        tags_relevance[tag] = 0;
     }
   }
 

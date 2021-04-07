@@ -13,15 +13,15 @@ class BaseData {
   public:
 
     // getter:
-    static BaseData *ocr_instance(std::string path_to_example_data, std::string book_key="") {
+    static BaseData *ocr_instance(std::string path_to_example_data) {
       if (!ocr_instance_)
-        ocr_instance_ = new BaseData(path_to_example_data, book_key);
+        ocr_instance_ = new BaseData(path_to_example_data);
       return ocr_instance_; 
     }
 
-    static BaseData *wiki_instance(std::string path_to_example_data, std::string book_key="") {
+    static BaseData *wiki_instance(std::string path_to_example_data) {
       if (!wiki_instance_)
-        wiki_instance_ = new BaseData(path_to_example_data, book_key);
+        wiki_instance_ = new BaseData(path_to_example_data);
       return wiki_instance_; 
     }
 
@@ -30,6 +30,10 @@ class BaseData {
     BookManager& book_manager() { return book_manager_; }
 
     std::string book_key() { return book_key_; }
+
+    // setter 
+    void set_book_key(std::string book_key) { book_key_ = book_key; }
+
 
     void SafeStatistic() {
       nlohmann::json all_statistics = func::LoadJsonFromDisc(base_path_ + path_to_example_data_ + "/stats.json");
@@ -53,17 +57,17 @@ class BaseData {
     Dict dict_;
     const std::string base_path_;
     BookManager book_manager_;
-    const std::string book_key_;
+    std::string book_key_;
     const std::string path_to_example_data_;
     std::string run_id_;
     nlohmann::json statics_;
 
-    BaseData(std::string path_to_example_data, std::string book_key)
+    BaseData(std::string path_to_example_data)
       : dict_("web/dict.json"), 
       base_path_("src/search/tests/example_data/"),
       book_manager_({base_path_ + path_to_example_data + "/test_books"}, &dict_, 
           func::LoadJsonFromDisc(base_path_ + path_to_example_data + "/parse_config.json")), 
-      book_key_(book_key),
+      book_key_(""),
       path_to_example_data_(path_to_example_data) {
     
       // Give book access to dictionary.

@@ -1,5 +1,6 @@
 #include <catch2/catch.hpp>
 #include <cstddef>
+#include <iostream>
 #include <sys/types.h>
 #include "func.hpp"
 #include "nlohmann/json.hpp"
@@ -61,9 +62,10 @@ TEST_CASE("Converting a json is working", "[convert_json]") {
 
   std::map<std::string, std::string> new_metadata = func::ConvertJson(metadata, config);
 
-  for (const auto& [key, value] : config["expected"].items()) {
+  for (const auto& [key, value] : expected.items()) {
     REQUIRE(new_metadata.count(key) > 0);
     REQUIRE(new_metadata[key] == value["value"]);
+    std::cout << key << ": " << new_metadata[key] << std::endl;
   }
 }
 
