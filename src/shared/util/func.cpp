@@ -257,11 +257,11 @@ void transform(std::string& str) {
 * @param[in] chWord string to be checked
 * @return boolean for words/ no word
 */
-bool isWord(const char* chWord) {
+bool isWord(const char* word) {
   //Variables 
   size_t count_err = 0;
   size_t count_len = 0;
-  size_t max = strlen(chWord);
+  size_t max = strlen(word);
   int length;
   wchar_t dest;
 
@@ -269,19 +269,20 @@ bool isWord(const char* chWord) {
   std::locale loc("de_DE.utf8");
   std::setlocale(LC_ALL, "de_DE.utf8");
 
-  mbtowc (NULL, NULL, 0); 
+  mbtowc(NULL, NULL, 0); 
 
   //Calculate number of non-letter
-  while (max>0) {
-    length = mbtowc(&dest, chWord, max);
-    if(length<1) break;
-    if(!isalpha(dest, loc) && !std::isdigit(dest, loc)) count_err++;
+  while (max > 0) {
+    length = mbtowc(&dest, word, max);
+    if (length < 1) break;
+    if (!isalpha(dest, loc) && !std::isdigit(dest, loc)) count_err++;
     count_len++;
-    chWord+=length; max-=length;
+    word += length; 
+    max-=length;
   }
 
   //Calculate whether more the 30% of characters are non-letters (return false)
-  if(static_cast<double>(count_err)/static_cast<double>(count_len) <= 0.3)
+  if (static_cast<double>(count_err)/static_cast<double>(count_len) <= 0.3)
       return true;
 
   return false;
@@ -305,20 +306,20 @@ std::map<std::string, int> extractWordsFromString(std::string& buffer) {
   //Replace all \n and ; with " "
   add_spaces_after(buffer, {'.', ',',';',':'}); // assure splitting.
 
-  std::vector<std::string> vStrs = split2(buffer, " ");
-  std::map<std::string, int> mapWords;
+  std::vector<std::string> possible_words = split2(buffer, " ");
+  std::map<std::string, int> words;
 
-  for(unsigned int i=0; i<vStrs.size();i++) {
-    if (vStrs[i].length() <= 2)
+  for(unsigned int i=0; i<possible_words.size();i++) {
+    if (possible_words[i].length() < 2)
       continue;
 
-    std::string cur_word = vStrs[i];
+    std::string cur_word = possible_words[i];
     transform(cur_word);
-    if(cur_word.length() >= 2 && cur_word.length() <= 25 && isWord(cur_word.c_str()) == true) {
-      mapWords[cur_word] += 1;
+    if (cur_word.length() >= 2 && cur_word.length() <= 25 && isWord(cur_word.c_str()) == true) {
+      words[cur_word] += 1;
     }
   }
-  return mapWords;
+  return words;
 }
 
 /**
@@ -448,8 +449,6 @@ std::map<std::string, std::string> ConvertJson(nlohmann::json& source, nlohmann:
   nlohmann::json extracted_fields;
   for (auto& [key, value]: config["searchableTags"].items()) {
 
-    //std::cout << "Next key: " << key << std::endl;
-
     // Only one tag.
     if (value.contains("tag")) 
       extracted_fields[key] = ExtractFieldFromJson(source, value["tag"]);
@@ -481,7 +480,6 @@ std::map<std::string, std::string> ConvertJson(nlohmann::json& source, nlohmann:
     }
   }
 
-  std::cout << "Checking for regex expressions: " << config["regex"] << std::endl;
   for (auto& [key, value] : config["regex"].items()) {
     if (!extracted_fields[key].is_number() && !extracted_fields[key].is_string())
       continue;
@@ -505,19 +503,14 @@ std::map<std::string, std::string> ConvertJson(nlohmann::json& source, nlohmann:
   std::map<std::string, std::string> converted_json;
   std::vector<std::string> used_fields;
   for (auto& [key, value] : config["representations"].items()) {
-    //std::cout << "Handling representation: " << key << ", " << value << std::endl;
     if (value.contains("join"))
       converted_json[key] = ConvertJoin(value, used_fields, extracted_fields);
     else if (value.contains("build"))
       converted_json[key] = ConvertBuild(value["build"], used_fields, extracted_fields);
   }
 
-  std::cout << "Done with replacements" << std::endl;
-
   // Add all fields, which have not been used to build replacements and replace null with empty string.
   for (auto& [key, value] : extracted_fields.items()) {
-    std::cout << key << ", " << value << std::endl;
-
     // check if value is NULL and replace with empty string if so.
     if (value.is_null())
       converted_json[key] = "";
@@ -535,9 +528,8 @@ std::map<std::string, std::string> ConvertJson(nlohmann::json& source, nlohmann:
       converted_json[key] = value;
   }
 
-  std::cout << "Checking for regex expressions: " << config["regex"] << std::endl;
+  // Handle regex again (to check is they match on representations).
   for (auto& [key, value] : config["regex"].items()) {
-
     std::string cur_val = converted_json[key];
     bool found = false;
     for (const auto& it : value) {
@@ -552,10 +544,6 @@ std::map<std::string, std::string> ConvertJson(nlohmann::json& source, nlohmann:
     if (!found)
       converted_json[key] = "";
   }
-
-
-
-  std::cout << "Done: converting json" << std::endl;
 
   return converted_json;
 }
@@ -608,11 +596,8 @@ std::string ConvertBuild(std::map<std::string, nlohmann::json> build_elems,
     std::vector<std::string> &used_fields, 
     nlohmann::json &extracted_fields) {
 
-  std::cout << "Building string from: " << std::endl;
-  std::cout << extracted_fields << std::endl;
   std::string str = "";
   for (const auto& it : build_elems) {
-    std::cout << it.first << ": " << it.second << std::endl;
     std::string new_part = "";
     // Assuming the tag at "field" is an array add the element at "index".
     if (it.first == "get" && extracted_fields.contains(it.second["field"].get<std::string>())) {
@@ -633,7 +618,6 @@ std::string ConvertBuild(std::map<std::string, nlohmann::json> build_elems,
     }
     str += (new_part == "") ? "undefined" : new_part;
   }
-  std::cout << "done ConvertBuild" << std::endl;
   return str;
 }
 
@@ -679,9 +663,22 @@ std::map<short, std::pair<std::string, double>> CreateMetadataTags(nlohmann::jso
   // Add all representations and calculate there relevance.
   for (const auto& [key, value] : search_config["representations"].items()) {
     double relevance = 0;
-    for (const auto& tag : value["join"])
-      relevance += tags_relevance[tag];
-    tags_relevance[key] = relevance/ value["join"].size();
+    int counter = 0;
+    if (value.contains("build")) {
+      for (const auto& [key, value] : value["build"].items()) {
+        if (key == "field" || key == "tag") {
+          relevance += tags_relevance[value];
+          counter++;
+        }
+      }
+    }
+    if (value.contains("join")) {
+      for (const auto& tag : value["join"]) {
+        relevance += tags_relevance[tag];
+        counter++;
+      }
+    }
+    tags_relevance[key] = relevance/ counter;
   }
 
   // Set relevance of all used tag to zero, so they will be ignored 

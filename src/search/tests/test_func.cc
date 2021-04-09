@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <catch2/catch.hpp>
 #include <cstddef>
 #include <iostream>
@@ -75,11 +76,15 @@ TEST_CASE("Converting a config to bit representation", "[bit_rep]") {
   nlohmann::json expected = example_case["expected"];
 
   auto convert_map = func::CreateMetadataTags(config);
-  REQUIRE(convert_map.size() == expected.size());
+  REQUIRE(convert_map.size() == config["searchableTags"].size() + config["representations"].size());
   
-  for (const auto& it : convert_map) {
-    std::cout << it.first << ":" << it.second.first << ", " << it.second.second << std::endl;
-    REQUIRE(expected.contains(it.second.first));
+  // Assert that for each expected tag a tag exists in the created map (We need
+  // to us `std::find_if` instead of `map::count()` as the key of the newly
+  // created map ist the unique bit representation and the "name" is only stored
+  // in its value.
+  for (const auto& it : expected.items()) {
+    REQUIRE(std::find_if(convert_map.begin(), convert_map.end(), 
+          [&](const auto& tag) { return tag.second.first == it.key(); }) != convert_map.end());
   }
 }
 

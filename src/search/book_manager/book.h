@@ -231,7 +231,7 @@ private:
    * @param fuzzyness indicating whether to search fuzzy or not.
    * @return map of all pages on which word was found.
    */
-  std::map<int, std::vector<std::string>> FindPagesAndMatches(std::string word, bool fuzzyness);
+  void FindPagesAndMatches(std::string word, std::map<int, std::vector<std::string>>& pages, bool fuzzyness);
 
   /**
    * Create map of only pages and found words on page.

@@ -14,6 +14,7 @@
 #include <ostream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 namespace fs = std::filesystem;
 
@@ -320,11 +321,10 @@ void Book::ConvertWords(temp_index_map& temp_map_pages) {
 
     // Full conversion of word (to lower, non utf-8 removed).
     std::string cur_word = it.first;
-    cur_word = func::convertStr(func::returnToLower(cur_word));
+    cur_word = func::returnToLower(cur_word);
     map_pages_handle_duplicates[cur_word].Join(it.second); 
   }
   temp_map_pages = map_pages_handle_duplicates;
-
 }
 
 void Book::GenerateBaseFormMap(temp_index_map& temp_map_pages,
@@ -338,10 +338,11 @@ void Book::GenerateBaseFormMap(temp_index_map& temp_map_pages,
   for (auto it : temp_map_pages) {
     // Get base-form of word (hunden -> hund)
     std::string cur_word = it.first;
-    std::string base_form = dict_->GetBaseForm(it.first);
+    std::string converted_word = func::convertStr(cur_word);
+    std::string base_form = dict_->GetBaseForm(converted_word);
     // If the base-form was not found, set the current word as it's own base-form.
     if (base_form == "") 
-      base_form = cur_word;
+      base_form = converted_word;
 
     // Create word info of current word:
     double term_frequency = static_cast<double>(it.second.raw_count())/temp_map_pages.size();
@@ -418,32 +419,47 @@ std::map<int, std::vector<std::string>> Book::GetPages(SearchObject search_objec
   if (words.size() == 0) 
     return std::map<int, std::vector<std::string>>();
 
+  bool fuzzy_search = search_object.search_options().fuzzy_search();
+
   // Create map of pages and found words for first word.
-  auto map_pages = FindPagesAndMatches(words[0], search_object.search_options().fuzzy_search());
+  std::map<int, std::vector<std::string>> pages;
+  FindPagesAndMatches(words[0], pages, fuzzy_search);
 
   // Iterate over all 1..n words create list of pages, and remove words not on same page.
-  for (size_t i=1; i<words.size(); i++) {
-    // Get pages from word i and remove all pages, which don't occure in both results
-    auto map_pages2 = FindPagesAndMatches(words[i], search_object.search_options().fuzzy_search());
-    RemovePages(map_pages, map_pages2);
-  }
-  return map_pages;
+  for (size_t i=1; i<words.size(); i++)
+    FindPagesAndMatches(words[i], pages, fuzzy_search);
+  return pages;
 }
 
-std::map<int, std::vector<std::string>> Book::FindPagesAndMatches(std::string word, 
+void Book::FindPagesAndMatches(std::string word, std::map<int, std::vector<std::string>>& pages, 
     bool fuzzy_search) {
+  
   // Find matching base_forms.
-  std::vector<std::string> base_forms = {word};
+  std::vector<std::string> base_forms;
+
+  // Normal search.
+  if (!fuzzy_search) {
+    if (words_on_pages_.count(word) > 0)
+      base_forms.push_back(word);
+  }
+  else {
+    for (const auto& it : words_on_pages_) {
+      // Calculate fuzzy score (occures in word, and levensthein-distance).
+      if (fuzzy::cmp(word, it.first) >= 0) 
+        base_forms.push_back(it.first);
+    }
+  }
+
+  if (base_forms.size() == 0)
+    return;
 
   // Find pages for all conjunctions corresponding to base-form.
-  std::map<int, std::vector<std::string>> map_pages;
   for (auto base_form : base_forms) {
     for (auto conjunction  : words_on_pages_[base_form]) {
       for (auto page : conjunction.pages_)
-        map_pages[page].push_back(conjunction.word_);
+        pages[page].push_back(conjunction.word_);
     }
   }
-  return map_pages;
 }
 
 // Returns all pages of one searched word! We need ALL pages (for each (fuzzy)

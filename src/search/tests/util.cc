@@ -27,13 +27,11 @@ namespace util {
 
         // If searching only in corpus, book needs to be found in corpus.
         if (search_options.only_corpus() && !res_obj.found_in_corpus()) {
-          std::cout << "Removed because not found in corpus" << std::endl;
           return false;
         }
 
         // If searching only in metadata, book needs to be found in metadata.
         else if (search_options.only_metadata() && !res_obj.found_in_metadata()) {
-          std::cout << "Removed because not found in metadata" << std::endl;
           return false;
         }
 
@@ -48,7 +46,7 @@ namespace util {
         search_options.fuzzy_search() 
       );
       REQUIRE(preview.find("mark") != std::string::npos);
-      it.Print("query", preview);
+      //it.Print("query", preview);
     }
 
     return results;
@@ -70,14 +68,12 @@ namespace util {
     for (const auto& it : results) {
       if (sort_style == 0) {
         if (it.score() > prev_score) {
-          std::cout << it.score() << "<" << prev_score << std::endl;
           return false;
         }
         prev_name = it.score();
       }
       else if (sort_style == 1) {
         if (it.book()->date() < prev_date) {
-          std::cout << it.book()->date() << "<" << prev_date << std::endl;
           return false;
         }
         prev_date = it.book()->date();
@@ -85,7 +81,6 @@ namespace util {
       else if (sort_style == 2) {
         std::string author = *it.book()->authors().cbegin();
         if (author < prev_name) {
-          std::cout << author << "<" << prev_name << std::endl;
           return false;
         }
         prev_name = it.book()->GetFromMetadata("authors");

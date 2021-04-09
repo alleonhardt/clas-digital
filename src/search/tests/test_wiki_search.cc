@@ -60,14 +60,59 @@ SCENARIO ("Searching for wiki words with fuzzysearch", "[wiki_fuzzy]") {
     WHEN ("Searching for 'education england'") {
       util::CheckResultsForQuery("education+england", search_options, base_data);
     }
+
     WHEN ("Searching for 'and'") {
       util::CheckResultsForQuery("and", search_options, base_data);
     }
+
     WHEN ("Searching for 'xxx'") {
       util::CheckResultsForQuery("xxx", search_options, base_data);
     }
   }
 }
+
+SCENARIO ("Searching for wiki words with normal search", "[wiki_fuzzy]") {
+
+  GIVEN ("An existing index based on a wikipedia entries and fuzzy-search") {
+
+    BaseData* base_data = BaseData::wiki_instance("wiki_data");
+
+    // Initialize basic search_options.
+    SearchOptions search_options(false, true, true, 0, 2070, 0, "", {"XCFFDRQC"});
+
+    WHEN ("Searching for 'Longacre'") {
+      util::CheckResultsForQuery("Longacre", search_options, base_data);
+    }
+
+    WHEN ("Searching for 'André'") {
+      util::CheckResultsForQuery("André", search_options, base_data);
+    }
+
+    WHEN ("Searching for 'sexual'") {
+      util::CheckResultsForQuery("sexual", search_options, base_data);
+    }
+
+    WHEN ("Searching for 'morality'") {
+      util::CheckResultsForQuery("morality", search_options, base_data);
+    }
+
+    WHEN ("Searching for 'england'") {
+      util::CheckResultsForQuery("england", search_options, base_data);
+    }
+
+    WHEN ("Searching for 'Islamic morality'") {
+      util::CheckResultsForQuery("Islamic+morality", search_options, base_data);
+    }
+
+    WHEN ("Searching for 'education england'") {
+      util::CheckResultsForQuery("education+england", search_options, base_data);
+    }
+    WHEN ("Searching for 'and'") {
+      util::CheckResultsForQuery("and", search_options, base_data);
+    }
+  }
+}
+
 
 SCENARIO ("Searching for wiki words - search options", "[wiki_fuzzy]") {
 
@@ -108,4 +153,3 @@ SCENARIO ("Searching for wiki words - search options", "[wiki_fuzzy]") {
     }
   }
 }
-

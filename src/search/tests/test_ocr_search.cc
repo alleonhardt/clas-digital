@@ -144,8 +144,117 @@ SCENARIO("Test creating description for books", "[descriptions]") {
         date = "undefined";
 
       // Check that description was created as expected.
-      std::cout << description << ": " << author_last_name << ", " << date << std::endl;
       REQUIRE(description == author_last_name + ", " + date);
+    }
+  }
+}
+
+SCENARIO("Test finding pages and matches in one book", "[search in book]") {
+  GIVEN ("An existing index based on a actual ocr and fuzzy-search") {
+
+    BaseData* base_data = BaseData::ocr_instance("ocr_data");
+    base_data->set_book_key("UEHEJINT");
+    Book* book = base_data->book_manager().documents().at("UEHEJINT");
+    
+    // Initialize basic search_options.
+    SearchOptions search_options(true);
+
+    WHEN ("Searching for 'hund'") {
+      SearchObject search_object = {"hund", search_options, base_data->dict()};
+      auto pages = book->GetPages(search_object);
+      
+      // Check a selection of matches found in corpus.
+      REQUIRE(pages.count(19) > 0);
+      REQUIRE(std::find(pages[19].begin(), pages[19].end(), "seehunde") != pages[19].end());
+      REQUIRE(pages.count(29) > 0);
+      REQUIRE(std::find(pages[29].begin(), pages[29].end(), "hunde") != pages[29].end());
+      REQUIRE(std::find(pages[29].begin(), pages[29].end(), "hunderttauſende") != pages[29].end());
+      REQUIRE(pages.count(34) > 0);
+      REQUIRE(std::find(pages[34].begin(), pages[34].end(), "seehunden") != pages[34].end());
+      REQUIRE(pages.count(43) > 0);
+      REQUIRE(std::find(pages[43].begin(), pages[43].end(), "seehunde") != pages[43].end());
+      REQUIRE(pages.count(43) > 0);
+      REQUIRE(std::find(pages[43].begin(), pages[43].end(), "seehunde") != pages[43].end());
+    }
+
+    WHEN ("Searching for 'volk'") {
+      SearchObject search_object = {"volk", search_options, base_data->dict()};
+      auto pages = book->GetPages(search_object);
+      // Check a selection of matches found in corpus.
+      REQUIRE(pages.count(60) > 0);
+      REQUIRE(std::find(pages[60].begin(), pages[60].end(), "schiffsvolk") != pages[60].end());
+      REQUIRE(pages.count(72) > 0);
+      REQUIRE(std::find(pages[72].begin(), pages[72].end(), "bevölkerung") != pages[72].end());
+    }
+
+    WHEN ("Searching for 'volk+hund'") {
+      SearchObject search_object = {"volk+hund", search_options, base_data->dict()};
+      auto pages = book->GetPages(search_object);
+
+      // All matches vor "volk" are still found.
+      SearchObject search_object_volk = {"volk", search_options, base_data->dict()};
+      auto pages_volk = book->GetPages(search_object_volk);
+      for (const auto& it : pages_volk) {
+        REQUIRE(pages.count(it.first) > 0);
+        for (const auto& word : it.second)
+          REQUIRE(std::find(pages[it.first].begin(), pages[it.first].end(), word) != pages[it.first].end());
+      }
+
+      // All matches vor "hund"  are still found.
+      SearchObject search_object_hund = {"hund", search_options, base_data->dict()};
+      auto pages_hund = book->GetPages(search_object_hund);
+      for (const auto& it : pages_hund) {
+        REQUIRE(pages.count(it.first) > 0);
+        for (const auto& word : it.second)
+          REQUIRE(std::find(pages[it.first].begin(), pages[it.first].end(), word) != pages[it.first].end());
+      }
+
+      // Check a selection of matches vor "hund" und "volk"
+      REQUIRE(pages.count(109) > 0);
+      REQUIRE(std::find(pages[109].begin(), pages[109].end(), "schiffsvolk") != pages[109].end());
+      REQUIRE(std::find(pages[109].begin(), pages[109].end(), "seehunde") != pages[109].end());
+      REQUIRE(std::find(pages[109].begin(), pages[109].end(), "seehunde") != pages[109].end());
+      REQUIRE(std::find(pages[109].begin(), pages[109].end(), "hundert") != pages[109].end());
+    }
+
+    WHEN ("Searching for 'volk+hund+bär'") {
+      SearchObject search_object = {"volk+hund+bär", search_options, base_data->dict()};
+      auto pages = book->GetPages(search_object);
+
+      // All matches vor "volk" are still found.
+      SearchObject search_object_volk = {"volk", search_options, base_data->dict()};
+      auto pages_volk = book->GetPages(search_object_volk);
+      for (const auto& it : pages_volk) {
+        REQUIRE(pages.count(it.first) > 0);
+        for (const auto& word : it.second)
+          REQUIRE(std::find(pages[it.first].begin(), pages[it.first].end(), word) != pages[it.first].end());
+      }
+
+      // All matches vor "hund"  are still found.
+      SearchObject search_object_hund = {"hund", search_options, base_data->dict()};
+      auto pages_hund = book->GetPages(search_object_hund);
+      for (const auto& it : pages_hund) {
+        REQUIRE(pages.count(it.first) > 0);
+        for (const auto& word : it.second)
+          REQUIRE(std::find(pages[it.first].begin(), pages[it.first].end(), word) != pages[it.first].end());
+      }
+      
+      // All matches vor "bär"  are still found.
+      SearchObject search_object_baer = {"bär", search_options, base_data->dict()};
+      auto pages_baer = book->GetPages(search_object_hund);
+      for (const auto& it : pages_baer) {
+        REQUIRE(pages.count(it.first) > 0);
+        for (const auto& word : it.second)
+          REQUIRE(std::find(pages[it.first].begin(), pages[it.first].end(), word) != pages[it.first].end());
+      }
+
+      // Check a selection of matches vor "hund" und "volk"
+      REQUIRE(pages.count(109) > 0);
+      REQUIRE(std::find(pages[109].begin(), pages[109].end(), "schiffsvolk") != pages[109].end());
+      REQUIRE(std::find(pages[109].begin(), pages[109].end(), "seehunde") != pages[109].end());
+      REQUIRE(std::find(pages[109].begin(), pages[109].end(), "seehunde") != pages[109].end());
+      REQUIRE(std::find(pages[109].begin(), pages[109].end(), "hundert") != pages[109].end());
+      REQUIRE(std::find(pages[109].begin(), pages[109].end(), "eisbär") != pages[109].end());
     }
   }
 }

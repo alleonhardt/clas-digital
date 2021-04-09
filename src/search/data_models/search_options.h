@@ -40,9 +40,7 @@ class SearchOptions {
    * will only set the fuzzynes and set the other values to zero or false
    * @param fuzzy_search Is this search a fuzzy search?
    */
-  SearchOptions(
-        bool fuzzy_search
-      );
+  SearchOptions(bool fuzzy_search);
 
   // getter:
   bool fuzzy_search() const;

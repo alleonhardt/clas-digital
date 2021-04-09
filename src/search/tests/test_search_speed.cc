@@ -36,33 +36,37 @@ void CheckResultsForQuery(std::string query, SearchOptions search_options, BaseD
         elapsed_seconds.count());
 }
 
-int main() {
+int main(int argc, char* argv[]) {
+
+  std::string cmd_arg = (argc > 1) ? argv[1] : "";
+  bool fuzzy_search = (cmd_arg == "fuzzy") ? true : false;
+
   BaseData* base_data = BaseData::wiki_instance("wiki_data");
   
   // Initialize basic search_options.
-  SearchOptions search_options(true, true, true, 0, 2070, 0, "", {"XCFFDRQC"});
+  SearchOptions search_options(fuzzy_search, true, true, 0, 2070, 0, "", {"XCFFDRQC"});
 
-    CheckResultsForQuery("Longacre", search_options, base_data);
+  CheckResultsForQuery("Longacre", search_options, base_data);
 
-    CheckResultsForQuery("Mahadewi", search_options, base_data);
+  CheckResultsForQuery("Mahadewi", search_options, base_data);
 
-    CheckResultsForQuery("André", search_options, base_data);
+  CheckResultsForQuery("André", search_options, base_data);
 
-    CheckResultsForQuery("inklination", search_options, base_data);
+  CheckResultsForQuery("inklination", search_options, base_data);
 
-    CheckResultsForQuery("sexual", search_options, base_data);
+  CheckResultsForQuery("sexual", search_options, base_data);
 
-    CheckResultsForQuery("morality", search_options, base_data);
+  CheckResultsForQuery("morality", search_options, base_data);
 
-    CheckResultsForQuery("england", search_options, base_data);
+  CheckResultsForQuery("england", search_options, base_data);
 
-    CheckResultsForQuery("Islamic+morality", search_options, base_data);
+  CheckResultsForQuery("Islamic+morality", search_options, base_data);
 
-    CheckResultsForQuery("education+england", search_options, base_data);
+  CheckResultsForQuery("education+england", search_options, base_data);
 
-    CheckResultsForQuery("education+england+islamic", search_options, base_data);
+  CheckResultsForQuery("education+england+and", search_options, base_data);
 
-    CheckResultsForQuery("and", search_options, base_data);
+  CheckResultsForQuery("and", search_options, base_data);
 
-    CheckResultsForQuery("xxx", search_options, base_data);
+  CheckResultsForQuery("xxx", search_options, base_data);
 }

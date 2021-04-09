@@ -40,7 +40,7 @@ TEST_CASE( "Duplicates are joined as expected", "[handle_duplicates]" ) {
   REQUIRE(std::equal(all_pages.begin(), all_pages.end(), excpected_pages.begin()) == true);
 }
 
-TEST_CASE( "Words are converted as expected", "[convert_words]" ) {
+TEST_CASE( "Words are converted to lower as expected", "[convert_words]" ) {
   std::map<std::string, TempWordInfo> tmp_index_map;
   tmp_index_map["Hündin"] = create_word_info({{1,1,},{2,2},{4,3},{5,2}}, 10, 4);
   tmp_index_map["Straße"] = create_word_info({{7,1},{8,2},{3,1},{5,2}}, 5, 8);
@@ -48,9 +48,9 @@ TEST_CASE( "Words are converted as expected", "[convert_words]" ) {
   book.ConvertWords(tmp_index_map);
 
   REQUIRE(tmp_index_map.count("Hündin") == 0);
-  REQUIRE(tmp_index_map.count("hundin") > 0);
+  REQUIRE(tmp_index_map.count("hündin") > 0);
   REQUIRE(tmp_index_map.count("Straße") == 0);
-  REQUIRE(tmp_index_map.count("strase") > 0);
+  REQUIRE(tmp_index_map.count("straße") > 0);
 }
 
 TEST_CASE( "The map of base-forms is created as expected", "[generate_base_forms]") {
@@ -66,12 +66,6 @@ TEST_CASE( "The map of base-forms is created as expected", "[generate_base_forms
   tmp_index_map["Strassen"] = create_word_info({{7,1},{8,2},{3,1},{5,2}}, 5, 8);
   Book book;
   book.GenerateBaseFormMap(tmp_index_map, book.words_on_pages_);
-
-  for (auto baseform : book.words_on_pages()) {
-    std::cout << baseform.first << std::endl;
-    for (auto conjunction : baseform.second) 
-      std::cout << "- " << conjunction.word_ << std::endl;
-  }
 
   REQUIRE(book.words_on_pages().count("hund") > 0);
   REQUIRE(book.words_on_pages()["hund"].size() == 3);
