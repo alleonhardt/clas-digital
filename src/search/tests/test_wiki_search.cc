@@ -27,8 +27,10 @@ SCENARIO ("Searching for wiki words with fuzzysearch", "[wiki_fuzzy]") {
     // Initialize basic search_options.
     SearchOptions search_options(true, true, true, 0, 2070, 0, "", {"XCFFDRQC"});
 
-    for (const auto& it : words) {
-      util::CheckResultsForQuery(it, search_options, base_data);
+    WHEN ("Searching for matches found with rust-search" ) {
+      for (const auto& it : words) {
+        util::CheckResultsForQuery(it, search_options, base_data);
+      }
     }
 
     WHEN ("Searching for 'Longacre'") {

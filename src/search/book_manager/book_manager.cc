@@ -50,7 +50,7 @@ const BookManager::index_map_type& BookManager::index_map() const {
 bool BookManager::Initialize(bool reload_pages) {
   std::cout << "BookManager: Extracting books." << std::endl;
   
-  //Go though all and create item-index-map, only if book was created from metadata. 
+  // Go though all and create item-index-map, only if book was created from metadata. 
   for (auto upload_point : upload_points_) {
     for (const auto& p : std::filesystem::directory_iterator(upload_point)) {
       std::string filename = p.path().stem().string();
@@ -63,16 +63,6 @@ bool BookManager::Initialize(bool reload_pages) {
   std::cout << "BookManager: Creating map of books." << std::endl;
   CreateIndexMap();
   std::cout << "Map words:   " << index_map_.size() << "\n";
-
-  /*
-  std::cout << "Scopes: " << std::endl;
-  for (auto it : index_map_) {
-    std::cout << it.first << ": " << std::endl;
-    for (auto jt : it.second) {
-      std::cout << "-- " << jt.first << ": " << jt.second.scope_ << " | " << jt.second.relevance_ << std::endl;
-    }
-  }
-  */
 
   // Create type-ahead lists of sorted words and sorted authors.
   CreateListWords(list_words_, 0);
@@ -105,7 +95,6 @@ void BookManager::AddBook(std::string path, std::string sKey, bool reload_pages)
     return;
   documents_[sKey]->InitializeBook(path, reload_pages);
 }
-    
 
 std::list<ResultObject> BookManager::Search(SearchObject& search_object) {
   // Get converted words.
@@ -320,11 +309,6 @@ void BookManager::CreateIndexMap() {
     size_t n_q = it.second.size(); // number of documents containing current word.
     double idf = std::log((num_documents-n_q+0.5)/(n_q+0.5)+1); 
 
-    if (counter++ < 30) {
-      std::cout << "number of documents containing " << it.first << ": " << n_q << std::endl;
-      std::cout << "IDF: " << idf << std::endl;
-    }
-
     // Caluculate document specific Part
     for (auto& jt : it.second) {
       double tf = jt.second.relevance_; // term frequency.
@@ -339,20 +323,12 @@ void BookManager::CreateIndexMap() {
         jt.second.relevance_ = okapi * 2;
       else
         jt.second.relevance_ = okapi;
-
-      if (counter < 30) {
-        std::cout << " -- Term frequenzy: " << tf << std::endl;
-        std::cout << " -- document length : " << len_document << std::endl;
-        std::cout << " -- okapi: " << okapi << std::endl;
-        std::cout << " -- okapi (2): " << jt.second.relevance_ << std::endl;
-      }
     }
   }
 
   // Create index map as list:
-  for (const auto& it : index_map_) {
+  for (const auto& it : index_map_)
     index_list_.push_back({it.first, it.second});
-  }
 }
 
 void BookManager::AddWordsFromItem(std::unordered_map<std::string, std::vector<WordInfo>> m, 
@@ -386,7 +362,8 @@ void BookManager::CreateListWords(sorted_list_type& list_of_words, short scope) 
     short cur_scope = std::accumulate(it->second.begin(), it->second.end(), 0, 
         [](const short& init, const auto& elem) { return init|elem.second.scope_; });
 
-    // Check wether scope matches given scope.
+    // Check wether scope matches given scope and insert. 
+    // RELEVANCE: number of documents containing this word.
     if (scope == 0 || cur_scope&scope) 
       map_word_relevance[it->first] = it->second.size();
   }
@@ -397,28 +374,48 @@ void BookManager::CreateListWords(sorted_list_type& list_of_words, short scope) 
 
 
 std::list<std::string> BookManager::GetSuggestions(std::string word, std::string scope) {
-  if(scope=="corpus") 
+  if (scope == "corpus") 
     return GetSuggestions(word, list_words_);
-  if(scope=="author") 
+  if (scope == "author") 
     return GetSuggestions(word, list_authors_);
   return std::list<std::string>();
 }
 
 std::list<std::string> BookManager::GetSuggestions(std::string word, sorted_list_type& list_words) {
   std::cout << "GetSuggestions" << std::endl;
+  // Replace multiple byte characters and convert to lowercase.
   word = func::ReplaceMultiByteChars(func::ReturnToLower(word));
-  std::map<std::string, double> suggs;
-  size_t counter = 0; // TODO (fux) Check if we could generate more matches.
-  for (auto it=list_words.begin(); it!=list_words.end() && counter <= 10; it++) {
-    double value = fuzzy::cmp(word, it->first);
+
+  // Create list of pairs, with the resulting relevance as first value (for sorting).
+  std::list<std::pair<double, std::string>> suggs;
+  size_t counter = 0; 
+  for (const auto& it : list_words) {
+    // calculate levensthein.
+    double value = fuzzy::cmp(word, it.first); 
+    
+    // Only add if found (0: direct match, 1,2: fuzzy or contains match)
     if(value != -1) {
-      suggs[it->first] = (1.0/(2.1-value))*it->second;
-      counter++;
+      suggs.push_back({(1.0/(1.0+value))*it.second, it.first});
+      
+      // If 50 rersults where found, stop searching. This usually only makes a
+      // difference for short, and unfinished words, the user won't feel a
+      // difference, but the search time is reduced to upto 10 times (for
+      // example when search for single letters.
+      if (++counter >= 50)
+        break;
     }
   }
+
+  // Sort list.
+  SortByRelavance(suggs);
+  
+  // Take the best 10 matches and return in expected list type.
   std::list<std::string> sorted_search_results;
-  for (auto it : func::SortByRelavance(suggs)) 
-    sorted_search_results.push_back(it.first); 
+  counter=0;
+  for (auto it : suggs) {
+    sorted_search_results.push_back(it.second); 
+    if (++counter == 10) break;
+  }
   return sorted_search_results;
 }
 

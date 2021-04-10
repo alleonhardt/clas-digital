@@ -43,7 +43,7 @@ class BookManager {
     index_map_type index_map_;
     std::vector<std::pair<std::string, std::map<std::string, Match>>> index_list_;
 
-    typedef std::list<std::pair<std::string, size_t>> sorted_list_type;
+    typedef std::vector<std::pair<std::string, size_t>> sorted_list_type;
     sorted_list_type list_words_; ///< Sorted list of all words by score (for typeahead).
     sorted_list_type list_authors_; ///< Sorted list of all authors by score (for typeahead). 
 

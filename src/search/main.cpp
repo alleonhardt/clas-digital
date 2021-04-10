@@ -116,7 +116,6 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
   auto result_list = manager.Search(search_object);
 
   // Construct response.
-  std::cout << "Hallo" << std::endl;
   std::cout << "Results found: " << result_list.size() << std::endl;
   nlohmann::json search_response;
 
@@ -133,8 +132,8 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
       entry["scanId"] = result_obj.book()->key();
       entry["copyright"] = !result_obj.book()->IsPublic();
       entry["hasocr"] = result_obj.book()->HasContent();
-      // entry["description"] = res_obj.book()->GetFromMetadata("description");
-      entry["bibliography"] = result_obj.book()->GetFromMetadata("bib");
+      entry["description"] = result_obj.book()->GetFromMetadata("description");
+      // entry["bibliography"] = result_obj.book()->GetFromMetadata("bib");
 
       std::string preview = result_obj.book()->GetPreview(
         result_obj.matches_as_list(), 
@@ -240,6 +239,7 @@ void Pages(const Request& req, Response& resp, BookManager& manager, Dict& dict)
  */
 void Suggestions(const Request& req, Response& resp, BookManager& manager, 
     std::string type) {
+  auto start = std::chrono::system_clock::now();
   std::cout << "Suggestions: " << type << std::endl;
   // Retrieve suggestions from book manager.
   std::string query = GetReqParam(req, "q", "");
@@ -267,6 +267,11 @@ void Suggestions(const Request& req, Response& resp, BookManager& manager,
   // Send response.
   resp.set_content(json_response.dump(), "application/json");
   resp.status = 200;
+  
+  // Caluculate elapsed seconds.
+  auto end = std::chrono::system_clock::now();
+  std::chrono::duration<double> elapsed_seconds = end-start;
+  std::cout << "Elaped time: " << elapsed_seconds.count() << std::endl;
 }
 
 int main(int argc, char *argv[]) {
