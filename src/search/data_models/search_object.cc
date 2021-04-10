@@ -12,14 +12,14 @@ SearchObject::SearchObject(std::string query, SearchOptions search_options, Dict
   std::replace(replaced_spaces.begin(), replaced_spaces.end(), ' ', '+');
 
   // Get all words and remove all empty words.
-  words_ = func::split2(replaced_spaces, "+");
+  words_ = func::Split2(replaced_spaces, "+");
   words_.erase(std::remove_if(words_.begin(), words_.end(), 
         [](std::string x) { return x == ""; }), words_.end());
 
   // Convert all words to lower and replace non utf-8 characters.
   for (auto word : words_) {
     std::cout << word << std::endl;
-    std::string cur_word = func::convertStr(func::returnToLower(word));
+    std::string cur_word = func::ReplaceMultiByteChars(func::ReturnToLower(word));
     std::string base_form = dict.GetBaseForm(cur_word);
     if (base_form == "") 
       base_form = cur_word;

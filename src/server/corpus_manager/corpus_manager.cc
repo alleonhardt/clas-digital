@@ -22,7 +22,7 @@ bool mySort(nlohmann::json i, nlohmann::json j) {
 
   std::string str1 = i[check];
   std::string str2 = j[check];
-  return func::returnToLower(str1)<func::returnToLower(str2);
+  return func::ReturnToLower(str1)<func::ReturnToLower(str2);
 }
 
 /**
@@ -460,7 +460,7 @@ void CreateCatalogueCollection(IReferenceManager::ptr_cont_t &items, IReferenceM
     for(auto &jt : *items) {
       std::vector<std::string> collections = jt.second->GetCollections();
 
-      if(collections.size() == 0 || func::in(key, collections) == false)
+      if(collections.size() == 0 || func::In(key, collections) == false)
         continue;
 
       vBooks.push_back({ 

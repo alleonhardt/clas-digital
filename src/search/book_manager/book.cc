@@ -37,7 +37,7 @@ Book::Book(std::map<short, std::string> metadata) : metadata_(metadata) {
   // Get needed tags from metadata.
   key_ = GetFromMetadata("key");
 
-  for (const auto& collection : func::split2(GetFromMetadata("collections"), ";") )
+  for (const auto& collection : func::Split2(GetFromMetadata("collections"), ";") )
     collections_.insert(collection);
   
   // date:
@@ -53,8 +53,8 @@ Book::Book(std::map<short, std::string> metadata) : metadata_(metadata) {
   }
 
   // Create set of authors.
-  for (auto author : func::split2(GetFromMetadata("authors"), ", "))
-    authors_.insert(func::convertStr(func::returnToLower(author)));
+  for (auto author : func::Split2(GetFromMetadata("authors"), ", "))
+    authors_.insert(func::ReplaceMultiByteChars(func::ReturnToLower(author)));
 
   CreateMetadataIndex();
 }
@@ -321,7 +321,7 @@ void Book::ConvertWords(temp_index_map& temp_map_pages) {
 
     // Full conversion of word (to lower, non utf-8 removed).
     std::string cur_word = it.first;
-    cur_word = func::returnToLower(cur_word);
+    cur_word = func::ReturnToLower(cur_word);
     map_pages_handle_duplicates[cur_word].Join(it.second); 
   }
   temp_map_pages = map_pages_handle_duplicates;
@@ -338,7 +338,7 @@ void Book::GenerateBaseFormMap(temp_index_map& temp_map_pages,
   for (auto it : temp_map_pages) {
     // Get base-form of word (hunden -> hund)
     std::string cur_word = it.first;
-    std::string converted_word = func::convertStr(cur_word);
+    std::string converted_word = func::ReplaceMultiByteChars(cur_word);
     std::string base_form = dict_->GetBaseForm(converted_word);
     // If the base-form was not found, set the current word as it's own base-form.
     if (base_form == "") 
@@ -589,7 +589,7 @@ std::string Book::GetOnePreview(std::pair<std::string, short> matched_word, bool
   func::HighlightWordByPos(prev_str, pos, "<mark>", "</mark>");
 
   // Trim string (text, position to center, min threschold, result-length)
-  func::TrimString(prev_str, pos, 150);
+  func::TrimStringToLength(prev_str, pos, 150);
 
   // Delete or escape invalid characters if needed.
   func::EscapeDeleteInvalidChars(prev_str);

@@ -44,6 +44,14 @@ SCENARIO ("Searching for hard words with fuzzysearch", "[ocr_fuzzy]") {
       util::CheckResultsForQuery("domesticon", search_options, base_data);
     }
 
+    WHEN ("Searching for 'schwedische'") {
+      util::CheckResultsForQuery("schwedische", search_options, base_data);
+    }
+
+    WHEN ("Searching for 'Naturforscher'") {
+      util::CheckResultsForQuery("Naturforscher", search_options, base_data);
+    }
+
     WHEN ("Searching for 'schwedische Naturforscher'") {
       util::CheckResultsForQuery("schwedische Naturforscher", search_options, base_data);
     }
@@ -55,6 +63,7 @@ SCENARIO ("Searching for hard words with fuzzysearch", "[ocr_fuzzy]") {
     WHEN ("Searching for 'Erdball'") {
       util::CheckResultsForQuery("Erdball", search_options, base_data);
     }
+
     WHEN ("Searching for 'Genealogie'") {
       util::CheckResultsForQuery("Erdball", search_options, base_data);
     }
@@ -131,7 +140,7 @@ SCENARIO("Test creating description for books", "[descriptions]") {
       std::string description = it.second->GetFromMetadata("description");
 
       // Get author 
-      std::vector<std::string> authors = func::split2(it.second->GetFromMetadata("authorsLastNames"), ";");
+      std::vector<std::string> authors = func::Split2(it.second->GetFromMetadata("authorsLastNames"), ";");
       std::string author_last_name = "undefined";
       if (authors.size() > 0)
         author_last_name = authors[0];

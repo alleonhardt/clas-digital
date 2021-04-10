@@ -406,9 +406,9 @@ std::list<std::string> BookManager::GetSuggestions(std::string word, std::string
 
 std::list<std::string> BookManager::GetSuggestions(std::string word, sorted_list_type& list_words) {
   std::cout << "GetSuggestions" << std::endl;
-  word = func::convertStr(func::returnToLower(word));
+  word = func::ReplaceMultiByteChars(func::ReturnToLower(word));
   std::map<std::string, double> suggs;
-  size_t counter=0; // TODO (fux) Check if we could generate more matches.
+  size_t counter = 0; // TODO (fux) Check if we could generate more matches.
   for (auto it=list_words.begin(); it!=list_words.end() && counter <= 10; it++) {
     double value = fuzzy::cmp(word, it->first);
     if(value != -1) {

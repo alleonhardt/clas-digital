@@ -4,6 +4,8 @@
 #include <cctype>
 #include <cmath>
 #include <cstddef>
+#include <cstdio>
+#include <cstring>
 #include <exception>
 #include <filesystem>
 #include <iostream>
@@ -18,274 +20,223 @@
 namespace func 
 {
 
-/**
-* @brief checks whether a string is in a vector of strings
-* @parameter string
-* @parameter vector<string> 
-* @return bool
-*/
-bool in(const std::string& str, const std::vector<std::string>& vec)
-{
-    for(unsigned int i=0; i<vec.size(); i++)
-    {
-        if(compare(str, vec[i])== true)
-            return true;
-    }
+bool In(const std::string& str, const std::vector<std::string>& vec) {
+  for (unsigned int i=0; i<vec.size(); i++) {
+    if (Compare(str, vec[i]))
+      return true;
+  }
+  return false;
+}
 
+bool Compare(const char* str1, const char* str2) {
+  // Return false, if length of words differs.
+  if (strlen(str1) != strlen(str2))
     return false;
+
+  // Iterate over characters. Return false if characters don't match.
+  for (unsigned int i=0; i<strlen(str1); i++) {
+    if (str1[i] != str2[i])
+      return false;
+  }
+  return true;
 }
 
-/**
-* @brief expects words to be non-capital letters
-* @param[in] chT1 first string to compare
-* @param[in] chT2 second string to compare
-* @return Boolean indicating, whether strings compare or not
-*/
-bool compare(const char* chT1, const char* chT2)
-{
-    //Return false, if length of words differs
-    if(strlen(chT1) != strlen(chT2))
-        return false;
+bool Compare(std::string str1, std::string str2) {
+  // Convert both strings to lower.
+  ConvertToLower(str1);
+  ConvertToLower(str2);
 
-    //Iterate over characters. Return false if characters don't match
-    for(unsigned int i=0; i<strlen(chT1); i++)
-    {
-        if(chT1[i] != chT2[i])
-            return false;
-    }
-    
-    return true;
+  // Call normal compare function.
+  return Compare(str1.c_str(), str2.c_str());
 }
 
-
-/**
-* @brief takes to strings, converts to lower and calls compare (const char*, const char*)
-* @param[in] str1 first string to compare
-* @param[in] str2 string to compare first string with
-* @return Boolean indicating, whether strings compare or not
-*/
-bool compare(std::string str1, std::string str2)
-{
-    //Convert both strings to lower
-    convertToLower(str1);
-    convertToLower(str2);
-
-    //Call normal compare funktion
-    return compare(str1.c_str(), str2.c_str());
+bool ContainsBegin(const char* str1, const char* str2) {
+  for (unsigned int i=0; i<strlen(str1); i++) {
+    if (str1[i] != str2[i])
+      return false;
+  }
+  return true;
 }
 
-bool containsBegin(const char* chT1, const char* chT2)
-{
-    for(unsigned int i=0; i<strlen(chT1); i++)
-    {
-        if(chT1[i] != chT2[i])
-            return false;
+bool Contains(const char* str1, const char* str2) {
+  bool found = true;
+  for (unsigned int i=0; i<strlen(str1); i++) {
+    found = true;
+    for (unsigned int j=0; j<strlen(str2); j++) {
+      if (str1[i+j] != str2[j]) {
+        found = false;
+        break;
+      }
     }
 
-    return true;
+    if (found)
+      return true;
+  }
+  return false;
 }
 
-/**
-* @brief expects words to be non-capital letters
-* @param[in] chT1 first string
-* @param[in] chT2 second string, check whether it is in the first
-* @return Boolean indicating, whether string1 contains string2 or not
-*/
-bool contains(const char* chT1, const char* chT2)
-{
-    bool r = true;
-    for(unsigned int i=0; i<strlen(chT1); i++)
-    {
-        r = true;
-        for(unsigned int j=0; j<strlen(chT2); j++)
-        {
-            if(chT1[i+j] != chT2[j]) {
-                r = false;
-                break;
-            }
-        }
+bool Contains(std::string s1, std::string s2) {
+  //Convert both strings to lower
+  ConvertToLower(s1);
+  ConvertToLower(s2);
 
-        if (r==true)
-            return true;
-    }
-
-    return false;
+  //Call normal contains function
+  return Contains(s1.c_str(), s2.c_str());
 }
 
-/**
-* @brief takes to strings, converts to lower and calls contains (const char*, const char*)
-* @brief expects words to be non-capital letters
-* @param[in] s1 first string
-* @param[in] s2 second string, check whether it is in the first
-* @return Boolean indicating, whether string1 contains string2 or not
-*/
-bool contains(std::string s1, std::string s2)
-{
-    //Convert both strings to lower
-    convertToLower(s1);
-    convertToLower(s2);
-
-    //Call normal contains function
-    return contains(s1.c_str(), s2.c_str());
-}
-
-
-/**
-* @param[in, out] str string to be modified
-*/
-void convertToLower(std::string &str)
-{
-    std::locale loc1("de_DE.UTF8");
-    for(unsigned int i=0; i<str.length(); i++)
-        str[i] = tolower(str[i], loc1);
-}
-
-/**
-* @param[in, out] str string to be modified
-*/
-std::string returnToLower(const std::string &str) {
+void ConvertToLower(std::string &str) {
   std::locale loc1("de_DE.UTF8");
+  for (unsigned int i=0; i<str.length(); i++)
+    str[i] = tolower(str[i], loc1);
+}
+
+std::string ReturnToLower(const std::string &str) {
+  std::locale loc("de_DE.UTF8");
   std::string str2;
-  for(unsigned int i=0; i<str.length(); i++)
-    str2 += tolower(str[i], loc1);
+  for (unsigned int i=0; i<str.length(); i++)
+    str2 += tolower(str[i], loc);
 
   return str2;
 }
 
-/**
-* @param[in, out] str string to be modified
-*/
-void escapeHTML(std::string &str)
-{
-    std::map<char, std::string> replacements = {{'>', "&gt"}, {'<', "&lt"}};
-    for(unsigned int i=0; i<str.length(); i++)
-    {
-        if(replacements.count(str[i]) > 0)
-        {
-            char s = str[i];
-            str.erase(i, 1);
-            str.insert(i, replacements[s]);
-            i+=replacements[s].length();
-        }
+void EscapeHTML(std::string &str) {
+  std::map<char, std::string> replacements = {{'>', "&gt"}, {'<', "&lt"}};
+  for (unsigned int i=0; i<str.length(); i++) {
+    if (replacements.count(str[i]) > 0) {
+      char s = str[i];
+      str.erase(i, 1);
+      str.insert(i, replacements[s]);
+      i+=replacements[s].length();
     }
+  }
 }
 
-/**
-* @brief split a string at given delimiter. Store strings in array.
-* @param[in] str string to be splitet
-* @param[in] delimitter 
-* @param[in, out] vStr vector of slpitted strings
-*/
-void split(std::string str, std::string delimiter, std::vector<std::string>& vStr)
-{
-    size_t pos=0;
-    while ((pos = str.find(delimiter)) != std::string::npos) {
-        if(pos!=0)
-            vStr.push_back(str.substr(0, pos));
-        str.erase(0, pos + delimiter.length());
-    }
+void Split(std::string str, std::string delimiter, std::vector<std::string>& strs) {
+  size_t pos=0;
+  while ((pos = str.find(delimiter)) != std::string::npos) {
+    if (pos != 0)
+      strs.push_back(str.substr(0, pos));
+    str.erase(0, pos + delimiter.length());
+  }
 
-    vStr.push_back(str);
+  strs.push_back(str);
 } 
 
-/**
-* @brief split string at given delimiter. Return string in array.
-* @param[in] str string to be splitet
-* @param[in] delimitter 
-* @return vector
-*/
-std::vector<std::string> split2(std::string str, std::string delimiter)
-{
-    std::vector<std::string> vStr;
+std::vector<std::string> Split2(std::string str, std::string delimiter) {
+  std::vector<std::string> vStr;
 
-    size_t pos=0;
-    while ((pos = str.find(delimiter)) != std::string::npos) {
-        if(pos!=0)
-            vStr.push_back(str.substr(0, pos));
-        str.erase(0, pos + delimiter.length());
-    }
-    vStr.push_back(str);
-
-    return vStr;
+  size_t pos=0;
+  while ((pos = str.find(delimiter)) != std::string::npos) {
+    if (pos != 0)
+      vStr.push_back(str.substr(0, pos));
+    str.erase(0, pos + delimiter.length());
+  }
+  // Add last element also.
+  vStr.push_back(str);
+  return vStr;
 }
 
-std::string convertStr(std::string str) {
-  std::map<wchar_t, wchar_t> rep = {{L'ä','a'},{L'ö','o'},{L'ü','u'},{L'ö','o'},{L'ß','s'},{L'é','e'},{L'è','e'},{L'á','a'},{L'ê','e'},{L'â','a'}, {L'ſ','s'}};
+std::string ReplaceMultiByteChars(std::string str) {
+  std::map<wchar_t, wchar_t> rep = {{L'ä','a'},{L'ö','o'},{L'ü','u'},{L'ö','o'},
+    {L'ß','s'},{L'é','e'},{L'è','e'},{L'á','a'},{L'ê','e'},{L'â','a'}, {L'ſ','s'}};
   
+  //Set locale
+  std::locale loc("de_DE.utf8");
+  std::setlocale(LC_ALL, "de_DE.utf8");
+
+  // Convert given string to wide-char.
   std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
   std::wstring wide = converter.from_bytes(str); 
-  for(size_t i=0; i<wide.length(); i++) {
-    if(rep.count(wide[i]) > 0) 
+
+  // Replace all multiple-byte characters with a matching replacement or a 
+  for (size_t i=0; i<wide.length(); i++) {
+
+    char c = static_cast<char>(wide[i]);
+
+    // If current char is found in list of replacements, replace current char.
+    if (rep.count(wide[i]) > 0)
       wide[i] = rep[wide[i]];
+    
+    // Skip all single-byte-characters.
+    else if ((int)c >= 0 && (int)c < 256)
+      continue;
+
+    // If cur char is non-alpha or -digit, replace this character with '*'.
+    else if (!std::isalnum(wide[i], loc))
+      wide[i] = L'*';
   }
   std::string newStr = converter.to_bytes(wide);
   return newStr;
 }
 
-/**
-* @brief cuts all non-letter-characters from end and beginning of str
-* @param[in, out] string to modify
-*/
-void transform(std::string& str) {
+void TrimNonLetterChars(std::string& str) {
   if (str.length() == 0) return;
-  std::map<wchar_t, wchar_t> rep = {{L'ä','a'},{L'ö','o'},{L'ü','u'},{L'ö','o'},{L'ß','s'},{L'é','e'},{L'è','e'},{L'á','a'},{L'ê','e'},{L'â','a'}, {L'ſ','s'}};
+  
+  //Set locale
+  std::locale loc("de_DE.utf8");
+  std::setlocale(LC_ALL, "de_DE.utf8");
 
   std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
   std::wstring wide = converter.from_bytes(str); 
-  for(;;) {
+  for (;;) {
     size_t len = wide.length();
 
     if (len == 0) break;
     // Erase from front in nonsense.
-    if (!std::isalpha(wide.front()) && !std::isdigit(wide.front()) && rep.count(wide.front()) == 0) 
+    if (!std::isalnum(wide.front(), loc)) 
       wide.erase(0,1);
 
     // Erase from back if nonsense.
     if (wide.length() == 0) break;
-    if (!std::isalpha(wide.back()) && !std::isdigit(wide.back()) && rep.count(wide.back()) == 0) 
+    if (!std::isalnum(wide.back(), loc))
       wide.pop_back();
     
-    // if the length did not change, breack.
+    // if the length did not change, stop trimming string.
     if (len == wide.length())
       break;
   }
   str = (wide.length() == 0) ? "" : converter.to_bytes(wide);
 }
 
-/**
-* @brief checks whether a string is a word
-* @param[in] chWord string to be checked
-* @return boolean for words/ no word
-*/
-bool isWord(const char* word) {
-  //Variables 
-  size_t count_err = 0;
-  size_t count_len = 0;
-  size_t max = strlen(word);
-  int length;
-  wchar_t dest;
+bool IsWord(const char* word) {
+  // Variables 
+  size_t count_err = 0; // Number of non alpha/ digit characters.
+  size_t count_len = 0; // Number of actual characters in the word.
+  size_t max = strlen(word); // Number of characters in char representation.
+  int length; // Used to calculate the length of the wchar character (1|2).
+  wchar_t dest; // Used to store the converted wchar character
 
   //Set locale
   std::locale loc("de_DE.utf8");
   std::setlocale(LC_ALL, "de_DE.utf8");
-
   mbtowc(NULL, NULL, 0); 
 
   //Calculate number of non-letter
   while (max > 0) {
+    // Get the wchar representation of the current string, to calculate isalpha/
+    // digit correctly responding to the set local. Return the length of the
+    // wide character (1 or 2)
     length = mbtowc(&dest, word, max);
-    if (length < 1) break;
-    if (!isalpha(dest, loc) && !std::isdigit(dest, loc)) count_err++;
-    count_len++;
-    word += length; 
-    max-=length;
+
+    // Check length.
+    if (length < 1) 
+      break;
+    
+    // Check, whether string is character or digit, if not increase error-count.
+    if (!isalnum(dest, loc))
+      count_err++;
+   
+    // We're counting the actual length as strlen(word) returns 2 for non-utf8
+    // characters.
+    count_len++; 
+    word += length; // Shift next byte, which shall be considered.
+    
+    // Decrease length by calculated length when converting char to wchar.
+    max -= length;
   }
 
-  //Calculate whether more the 30% of characters are non-letters (return false)
-  if (static_cast<double>(count_err)/static_cast<double>(count_len) <= 0.3)
-      return true;
-
-  return false;
+  // Calculate whether more the 30% of characters are non-letters (return false).
+  return static_cast<double>(count_err)/static_cast<double>(count_len) <= 0.3;
 }
 
 void add_spaces_after(std::string& str, std::vector<char> chars) {
@@ -297,50 +248,50 @@ void add_spaces_after(std::string& str, std::vector<char> chars) {
   }
 }
 
-/**
-* @brief extract words from a string into a map (drop all sequences which  aren't a word).
-* @param[in] sWords string of which map shall be created 
-* @param[out] mapWords map to which new words will be added
-*/
 std::map<std::string, int> extractWordsFromString(std::string& buffer) {
-  //Replace all \n and ; with " "
-  add_spaces_after(buffer, {'.', ',',';',':'}); // assure splitting.
+  // Assure splitting, by adding spaces, where they might be missing (often the
+  // case when dealing with scanned texts).
+  add_spaces_after(buffer, {'.', ',',';',':'}); 
 
-  std::vector<std::string> possible_words = split2(buffer, " ");
+  // Naive attempt to split all words.
+  std::vector<std::string> possible_words = Split2(buffer, " ");
   std::map<std::string, int> words;
 
-  for(unsigned int i=0; i<possible_words.size();i++) {
+  // Iterate over all possible words and only add, if they fulfill certain
+  // criteria (min, max length, min number of actual characters). Also
+  // "transform" word (cut nonsense characters from beginning and end).
+  for (unsigned int i=0; i<possible_words.size();i++) {
+    // Only check if length is below minimum, as word length might be reduced
+    // after next step.
     if (possible_words[i].length() < 2)
       continue;
 
+    // Get current word and erase non-chars or digits at the beginning and ending.
     std::string cur_word = possible_words[i];
-    transform(cur_word);
-    if (cur_word.length() >= 2 && cur_word.length() <= 25 && isWord(cur_word.c_str()) == true) {
-      words[cur_word] += 1;
+    TrimNonLetterChars(cur_word);
+
+    // Only add if word-length criteria or met. Only add if word actually is a word.
+    if (cur_word.length() >= 2 && cur_word.length() <= 25 && IsWord(cur_word.c_str())) {
+      words[cur_word] += 1; // Increase word-count on this page.
     }
   }
   return words;
 }
 
-/**
-* @brief check whether string indicates, that next page is reached
-* @param[in] buffer 
-* @return 
-*/
 bool checkPage(std::string &buffer) {
   const char arr[] = "----- ";
-  if(buffer.length()<6)
+  if (buffer.length()<6)
     return false;
 
-  for(unsigned int i=0; i < 6;i++) {
+  for (unsigned int i=0; i < 6;i++) {
     if(arr[i]!=buffer[i])
       return false;
   }
 
-  for(unsigned int i = 6; i < buffer.length(); i++) {
-    if(buffer[i]==' ')
+  for (unsigned int i = 6; i < buffer.length(); i++) {
+    if (buffer[i] == ' ')
       return true;
-    else if(buffer[i]<48||buffer[i]>57)
+    else if (buffer[i] < 48 || buffer[i] > 57)
       return false;
   }
   return false;
@@ -367,7 +318,7 @@ void HighlightWordByPos(std::string& str, int pos, std::string left, std::string
   }
 }
 
-void TrimString(std::string& str, int pos, int length) {
+void TrimStringToLength(std::string& str, int pos, int length) {
   int before = pos-75;  
   int after = pos+75;
 
@@ -574,8 +525,8 @@ nlohmann::json ExtractFieldFromJson(nlohmann::json& source, std::string path) {
 
       // "[key]?[field_key]=[field_value]" then we're already building the result
       if (pos != std::string::npos) {
-        std::string field_key = func::split2(path_elem.substr(pos+1), "=")[0];
-        std::string field_value = func::split2(path_elem.substr(pos+1), "=")[1];
+        std::string field_key = func::Split2(path_elem.substr(pos+1), "=")[0];
+        std::string field_value = func::Split2(path_elem.substr(pos+1), "=")[1];
         nlohmann::json result = nlohmann::json::array();
         for (auto elem : temp) {
           if (elem[field_key] == field_value) {
@@ -623,31 +574,31 @@ std::string ConvertBuild(std::map<std::string, nlohmann::json> build_elems,
 
 std::string ConvertJoin(nlohmann::json value, std::vector<std::string>& used_fields, 
     nlohmann::json& extracted_fields) {
-// Find length of first list elements (as length of all list elements to
-    // join are expected to be of equal length.
-    std::string first_tag = value["join"][0];
-    size_t n = extracted_fields[first_tag].size();
+  // Find length of first list elements (as length of all list elements to
+  // join are expected to be of equal length.
+  std::string first_tag = value["join"][0];
+  size_t n = extracted_fields[first_tag].size();
 
-    // Get separator.
-    std::string separator = value["separator"];
+  // Get separator.
+  std::string separator = value["separator"];
 
-    // For for i ∈ {1..n} concat the ith element of all elements in "join" 
-    std::string joined_fields = "";
-    for (size_t i=0; i<n; i++) {
-      for (const std::string& tag : value["join"]) {
-        std::vector<std::string> elements = extracted_fields[tag].get<std::vector<std::string>>();
-        if (elements.size() > i)
-          joined_fields += elements[i] + separator;
-      }
+  // For for i ∈ {1..n} concat the ith element of all elements in "join" 
+  std::string joined_fields = "";
+  for (size_t i=0; i<n; i++) {
+    for (const std::string& tag : value["join"]) {
+      std::vector<std::string> elements = extracted_fields[tag].get<std::vector<std::string>>();
+      if (elements.size() > i)
+        joined_fields += elements[i] + separator;
     }
+  }
 
-    // Add all used tags to used tags and sum-up relevance.
-    for (const std::string& tag : value["join"])
-      used_fields.push_back(tag);
+  // Add all used tags to used tags and sum-up relevance.
+  for (const std::string& tag : value["join"])
+    used_fields.push_back(tag);
 
-    // Add all build replacement to replacements and calculate relevance as
-    // average-relevance of all used fields.
-    return joined_fields.substr(0, joined_fields.length()-separator.length());
+  // Add all build replacement to replacements and calculate relevance as
+  // average-relevance of all used fields.
+  return joined_fields.substr(0, joined_fields.length()-separator.length());
 }
 
 std::map<short, std::pair<std::string, double>> CreateMetadataTags(nlohmann::json search_config) {

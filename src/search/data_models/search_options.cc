@@ -10,7 +10,7 @@ SearchOptions::SearchOptions(bool fuzzy_search, bool only_metadata, bool only_co
       year_from_(year_from),
       year_to_(year_to),
       sort_result_by_(sort_results_by),
-      author_(func::convertStr(func::returnToLower(author))),
+      author_(func::ReplaceMultiByteChars(func::ReturnToLower(author))),
       collections_(collections) {}
 
 SearchOptions::SearchOptions(bool fuzzy_search) :

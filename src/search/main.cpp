@@ -61,7 +61,7 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
   std::string str_pillars;
   if (req.has_param("pillars")) {
     str_pillars = req.get_param_value("pillars", 0);
-    for (auto it : func::split2(str_pillars, ","))
+    for (auto it : func::Split2(str_pillars, ","))
         pillars.push_back(it);
   }
   else {
