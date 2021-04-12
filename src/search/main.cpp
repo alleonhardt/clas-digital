@@ -133,14 +133,13 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
       entry["copyright"] = !result_obj.book()->IsPublic();
       entry["hasocr"] = result_obj.book()->HasContent();
       entry["description"] = result_obj.book()->GetFromMetadata("description");
-      // entry["bibliography"] = result_obj.book()->GetFromMetadata("bib");
+      entry["bibliography"] = result_obj.book()->GetFromMetadata("bibliography");
 
       std::string preview = result_obj.book()->GetPreview(
         result_obj.matches_as_list(), 
         search_object.search_options().fuzzy_search()
       );
       entry["preview"] = preview;
-      result_obj.Print(search_object.converted_words()[0], entry["preview"]);
       search_response["books"].push_back(std::move(entry)); 
       if (++counter == resultsperpage)
         break;

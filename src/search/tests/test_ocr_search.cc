@@ -158,6 +158,22 @@ SCENARIO("Test creating description for books", "[descriptions]") {
   }
 }
 
+SCENARIO("Test creating bibliography for books", "[descriptions]") {
+
+  GIVEN ("An existing index based on a actual ocr and fuzzy-search") {
+    BaseData* base_data = BaseData::ocr_instance("ocr_data");
+
+    for (const auto& it : base_data->book_manager().documents()) {
+      // Get description.
+      std::string bib = it.second->GetFromMetadata("bibliography");
+      std::cout << bib << std::endl;
+
+      // Check that description was created as expected.
+      REQUIRE(bib.length() > 0);
+    }
+  }
+}
+
 SCENARIO("Test finding pages and matches in one book", "[search in book]") {
   GIVEN ("An existing index based on a actual ocr and fuzzy-search") {
 

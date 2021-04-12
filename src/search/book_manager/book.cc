@@ -127,6 +127,8 @@ bool Book::IsPublic() const {
 }
 
 std::string Book::GetFromMetadata(std::string tag) const {
+  if (reverted_tag_reference_.count(tag) == 0)
+    return "undefined";
   std::string str = metadata_.at(reverted_tag_reference_.at(tag));
   return str;
 }
@@ -549,7 +551,7 @@ std::string Book::GetPreview(const std::vector<FoundWordsObject>& words, bool fu
 
     // Find a new preview for next word.
     else
-      preview += "\n" + GetOnePreview(word.matched_words_.front(), fuzzy_search);
+      preview += GetOnePreview(word.matched_words_.front(), fuzzy_search) + "\n";
   }
   return preview;
 }

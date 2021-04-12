@@ -55,12 +55,21 @@ void ResultObject::set_original_words(
 }
 
 void ResultObject::NewResult(std::string searched_word, std::string found_word, 
-    short scope, double score) {
+    short scope, double score, double rel) {
   // Update found matches. 
-  matches_[searched_word].AddWord(found_word, scope, score);
+  matches_[searched_word].AddWord(found_word, scope, {score, 0});
   
   // Increase score.
-  score_ += score;
+  score_ += (1.0/(1.0+score))*rel;
+}
+
+void ResultObject::NewResult(std::string searched_word, std::string found_word, 
+    short scope, double score, double rel, int word_count) {
+  // Update found matches. 
+  matches_[searched_word].AddWord(found_word, scope, {score, word_count});
+  
+  // Increase score.
+  score_ += (1.0/(1.0+score))*rel;
 }
 
 void ResultObject::Join(ResultObject &result_object) {

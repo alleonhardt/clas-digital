@@ -39,7 +39,8 @@ class ResultObject {
      * Sets found_in_metadata to true and sets initial metadata score.
      * @param init_score
      */
-    void NewResult(std::string searched_word, std::string found_word, short scope, double score);
+    void NewResult(std::string searched_word, std::string found_word, short scope, double score, double rel);
+    void NewResult(std::string searched_word, std::string found_word, short scope, double score, double rel, int word_count);
 
     /**
      * Join to result objects.

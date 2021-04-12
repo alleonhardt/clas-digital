@@ -195,7 +195,7 @@ void BookManager::NormalSearch(std::string word, SearchOptions& search_options,
   // new-search-result.
   for (const auto& it : tmp) {
     if (CheckSearchOptions(search_options, documents_[it.first]))
-      results[it.first].NewResult(word, word, it.second.scope_, it.second.relevance_);
+      results[it.first].NewResult(word, word, it.second.scope_, 0, it.second.relevance_);
   }
 }
 
@@ -217,8 +217,7 @@ void BookManager::FuzzySearch(std::string word, SearchOptions& search_options,
           !CheckSearchOptions(search_options, documents_[item.first])) 
         continue;
       // Add new information to result object.
-      results[item.first].NewResult(word, it.first, item.second.scope_, 
-          (1.0/(1.0+score))*item.second.relevance_);
+      results[item.first].NewResult(word, it.first, item.second.scope_, score, item.second.relevance_, it.second.size());
     }
   }
 }
