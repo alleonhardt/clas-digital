@@ -42,6 +42,7 @@ configure_file("${CMAKE_SOURCE_DIR}/src/shared/version.hpp.in"
 set(SRC_FILES_SEARCH 
   src/search/book_manager/book.cc 
   src/search/book_manager/book_manager.cc 
+  src/search/book_manager/database.cc
   src/search/data_models/tmp_word_info.cc 
   src/search/data_models/result_object.cc
   src/search/data_models/search_object.cc 
@@ -55,6 +56,7 @@ set(SRC_FILES_SEARCH
 set(SRC_FILES_SEARCH_TEST 
   src/search/book_manager/book.cc 
   src/search/book_manager/book_manager.cc 
+  src/search/book_manager/database.cc
   src/search/data_models/tmp_word_info.cc 
   src/search/data_models/result_object.cc
   src/search/data_models/search_object.cc 
@@ -73,6 +75,7 @@ set(SRC_FILES_SEARCH_TEST
 set(SRC_FILES_SPEED_TEST 
   src/search/book_manager/book.cc 
   src/search/book_manager/book_manager.cc 
+  src/search/book_manager/database.cc
   src/search/data_models/tmp_word_info.cc 
   src/search/data_models/result_object.cc
   src/search/data_models/search_object.cc 

@@ -65,8 +65,11 @@ class BaseData {
     BaseData(std::string path_to_example_data)
       : dict_("web/dict.json"), 
       base_path_("src/search/tests/example_data/"),
-      book_manager_({base_path_ + path_to_example_data + "/test_books"}, &dict_, 
-          func::LoadJsonFromDisc(base_path_ + path_to_example_data + "/parse_config.json")), 
+      book_manager_(
+          {base_path_ + path_to_example_data + "/test_books"}, 
+          &dict_, 
+          func::LoadJsonFromDisc(base_path_ + path_to_example_data + "/parse_config.json"), 
+          "search_data/" + path_to_example_data + ".db"), 
       book_key_(""),
       path_to_example_data_(path_to_example_data) {
     
@@ -78,7 +81,7 @@ class BaseData {
       nlohmann::json j_metadata = 
         func::LoadJsonFromDisc(base_path_ + path_to_example_data + "/metadata.json");
       std::cout << "Done." << std::endl;
-      book_manager_.CreateItemsFromMetadata(j_metadata["items"]["data"]);
+      book_manager_.CreateItemsFromMetadata(j_metadata["items"]["data"], true);
       std::cout << "Initializing books." << std::endl;
       book_manager_.Initialize(true);
       

@@ -15,8 +15,9 @@
 #include <utility>
 #include <vector>
 
-BookManager::BookManager(std::vector<std::string> mount_points, Dict* dict, const nlohmann::json& search_config) 
-  : upload_points_(mount_points) {
+BookManager::BookManager(std::vector<std::string> mount_points, Dict* dict, 
+    const nlohmann::json& search_config, std::string search_data_location) 
+  : db_(Database(search_data_location)),  upload_points_(mount_points){
 
   // Load dictionary
   full_dict_ = dict;
@@ -37,6 +38,7 @@ BookManager::BookManager(std::vector<std::string> mount_points, Dict* dict, cons
   // metadata-tags and their revert accessing map.
   Book::set_metadata_tag_reference(metadata_tags_);
   Book::set_reverted_tag_reference(reverted_tag_map_);
+  Book::set_datebase(&db_);
 }
 
 std::unordered_map<std::string, Book*>& BookManager::documents() {
@@ -59,6 +61,10 @@ bool BookManager::Initialize(bool reload_pages) {
     }
   }
 
+  // Afer Initializing all books is done, the pages need to be transmitted to
+  // the database.
+  db_.AddPages();
+
   //Create map of all words + and of all words in all titles
   std::cout << "BookManager: Creating map of books." << std::endl;
   CreateIndexMap();
@@ -68,10 +74,17 @@ bool BookManager::Initialize(bool reload_pages) {
   CreateListWords(list_words_, 0);
   CreateListWords(list_authors_, reverted_tag_map_["authors"]);
 
+  std::string page = db_.GetPage("12000", 1);
+  std::cout << page << std::endl;
+
   return true;
 }
 
-void BookManager::CreateItemsFromMetadata(nlohmann::json j_items) {
+void BookManager::CreateItemsFromMetadata(nlohmann::json j_items, bool reload_pages) {
+
+  if (reload_pages)
+    db_.ClearDatabase();
+
   // Convert items according to search_config.
   std::cout << "Converting items." << std::endl;
   auto items = ConvertMetadata(j_items);
@@ -87,13 +100,19 @@ void BookManager::CreateItemsFromMetadata(nlohmann::json j_items) {
     // does not exits: create new book and add to map of all books.
     else
       documents_[key] = new Book(it);
+
+    // Add document to database (only queued).
+    db_.AddDocument(key);
   }
+
+  // Submit all queued documents.
+  db_.AddDocuments();
 }
 
-void BookManager::AddBook(std::string path, std::string sKey, bool reload_pages) {
+void BookManager::AddBook(std::string path, std::string key, bool reload_pages) {
   if(!std::filesystem::exists(path))
     return;
-  documents_[sKey]->InitializeBook(path, reload_pages);
+  documents_[key]->InitializeBook(path, reload_pages);
 }
 
 std::list<ResultObject> BookManager::Search(SearchObject& search_object) {

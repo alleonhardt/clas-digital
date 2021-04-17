@@ -1,4 +1,5 @@
 #include "book.h"
+#include "book_manager/database.h"
 #include "func.hpp"
 #include "fuzzy.hpp"
 #include "nlohmann/json.hpp"
@@ -20,6 +21,7 @@ namespace fs = std::filesystem;
 
 // Initialize static variables.
 Dict* Book::dict_ = nullptr;
+Database* Book::db_ = nullptr;
 std::map<short, std::pair<std::string, double>> Book::metadata_tag_reference_ 
   = std::map<short, std::pair<std::string, double>>();
 std::map<std::string, short> Book::reverted_tag_reference_ = std::map<std::string, short>();
@@ -147,6 +149,10 @@ void Book::set_dict(Dict* dict) {
   Book::dict_ = dict; 
 }
 
+void Book::set_datebase(Database *database) {
+  db_ = database;
+}
+
 void Book::set_metadata_tag_reference(std::map<short, std::pair<std::string, double>> ref) {
   metadata_tag_reference_ = ref;
 }
@@ -176,8 +182,7 @@ void Book::InitializePreProcessing(bool reload_pages) {
   has_ocr_ = true;
 
   // Check whether list of words_pages already exists, if yes load, otherwise, create
-  std::string path = path_ + "/intern/pages.txt";
-  if (!std::filesystem::exists(path) || std::filesystem::is_empty(path) || reload_pages)
+  if (db_->GetIndexMap(key_) == "" || reload_pages)
     CreateCorpusIndex();
   else
     LoadPages();
@@ -230,6 +235,8 @@ void Book::CreateMetadataIndex() {
         << ": " << metadata_[best_tag] << std::endl;
       std::exit(404);  
     }
+
+    // And found preview position and location to temporary word-info.
     temp_map_words_in_tags[it.first].set_preview_position(pos);
     temp_map_words_in_tags[it.first].set_preview_page(best_tag);
   }
@@ -246,8 +253,7 @@ void Book::SeperatePages(temp_index_map& temp_map_pages) {
   std::ifstream read(ocr_path());
   
   std::string buffer = "", cur_line = "";
-  size_t page=1; 
-  num_pages_ = 0;
+  size_t page=0; 
   while (!read.eof()) {
     getline(read, cur_line);
     
@@ -259,7 +265,6 @@ void Book::SeperatePages(temp_index_map& temp_map_pages) {
       // Parse new page-number from line, reset buffer and increate page_counter.
       page = stoi(cur_line.substr(6, cur_line.find("/")-7));
       buffer = "";
-      num_pages_++;
     }
 
     // Append line to buffer if page end is not reached.
@@ -288,11 +293,16 @@ void Book::CreatePage(temp_index_map& temp_map_pages, std::string buffer, size_t
     temp_map_pages[it.first].AddPage({page, num_words_on_page});
     temp_map_pages[it.first].IncreaseRawCount(it.second);
   } 
-  // Save page to disc.
-  func::WriteContentToDisc(path_ + "/intern/page" + std::to_string(page) + ".txt", buffer);
+  
+  // Save page to database.
+  db_->AddPage({key_, page}, buffer);
+  
+  // Increase number of pages.
+  num_pages_++;
 }
 
 void Book::CreateMapPreview(temp_index_map& temp_map_pages) {
+  // For each word, find the best preview and add locationm (page) and position to word info.
   for(auto it : temp_map_pages) {
     size_t best_page = temp_map_pages[it.first].GetBestPage();
     temp_map_pages[it.first].set_preview_position(GetPreviewPosition(it.first, best_page));
@@ -301,9 +311,8 @@ void Book::CreateMapPreview(temp_index_map& temp_map_pages) {
 }
 
 size_t Book::GetPreviewPosition(std::string word, size_t best_page) {
-  // Read ocr and content and find match.
-  std::ifstream read(path_ + "/intern/page" + std::to_string(best_page) + ".txt", std::ios::in);
-  std::string page((std::istreambuf_iterator<char>(read)), std::istreambuf_iterator<char>());
+  // Get page from database and find word on page.
+  std::string page = db_->GetQueuedPage({key_, best_page});
   size_t pos = page.find(word);
 
   // Stop indexing and exit programm, when preview could not be found.
@@ -321,7 +330,7 @@ void Book::ConvertWords(temp_index_map& temp_map_pages) {
     // Increase document size
     document_size_ += it.second.raw_count();
 
-    // Full conversion of word (to lower, non utf-8 removed).
+    // Convert word to lower case and handle duplicates, if now words are identical.
     std::string cur_word = it.first;
     cur_word = func::ReturnToLower(cur_word);
     map_pages_handle_duplicates[cur_word].Join(it.second); 
@@ -331,8 +340,7 @@ void Book::ConvertWords(temp_index_map& temp_map_pages) {
 
 void Book::GenerateBaseFormMap(temp_index_map& temp_map_pages,
       std::unordered_map<std::string, std::vector<WordInfo>>& index_map) {
-
-  // Converts all words to lower case and removes non utf-8 characters 
+  // Converts all words to lower-case and removes non utf-8 characters 
   // also handles resulting dublicates.
   ConvertWords(temp_map_pages);
 
@@ -350,6 +358,8 @@ void Book::GenerateBaseFormMap(temp_index_map& temp_map_pages,
     double term_frequency = static_cast<double>(it.second.raw_count())/temp_map_pages.size();
     WordInfo word_info{cur_word, it.second.GetAllPages(), it.second.preview_position(),
         it.second.preview_page(), term_frequency};
+
+    // Create new entry in index map, or add word to list of conjunctions.
     index_map[base_form].push_back(word_info);
   }
 }
@@ -358,6 +368,7 @@ void Book::SafePages() {
   // Open file for writing and write number of pages as first value.
   nlohmann::json json_index_map;
   json_index_map["num_pages"] = num_pages_;
+  json_index_map["document_size"] = document_size_;
   json_index_map["base_forms"] = nlohmann::json::object();
 
   // Iterate over all base forms and create word-info-entries for it's conjunctions.
@@ -378,22 +389,18 @@ void Book::SafePages() {
     }
   }
 
-  // Write constructed json to disc.
-  std::ofstream write(path_ + "/intern/pages.txt");
-  write << json_index_map;
-  write.close();
+  // Store constructed json in database.
+  db_->AddIndex(key_, json_index_map.dump());
 }
 
 void Book::LoadPages() {
   std::cout << key_ << " Loading pages." << std::endl;
-  // Load json with index-map from disc.
-  nlohmann::json json_index_map;
-  std::ifstream read(path_ + "/intern/pages.txt");
-  read >> json_index_map;
-  read.close();
+  // Get json-string with index-map from database and parse as json.
+  nlohmann::json json_index_map = nlohmann::json::parse(db_->GetIndexMap(key_));
 
   // Extract number of pages.
   num_pages_ = json_index_map["num_pages"];
+  document_size_ = json_index_map["document_size"];
 
   // Iterate over all base forms and create word-info-entries for it's conjunctions.
   for (auto base_form = json_index_map["base_forms"].begin(); 
@@ -569,7 +576,8 @@ std::string Book::GetOnePreview(std::pair<std::string, short> matched_word, bool
     pos = word_info.preview_position_;
     locaction = word_info.preview_page_;
     // Load page on which preview was found from disc.
-    prev_str = func::LoadStringFromDisc(path_ + "/intern/page" + std::to_string(locaction) + ".txt");
+    // prev_str = func::LoadStringFromDisc(path_ + "/intern/page" + std::to_string(locaction) + ".txt");
+    prev_str = db_->GetPage(key_, locaction);
   }
   else {
     WordInfo word_info = words_in_tags_.at(word).front();

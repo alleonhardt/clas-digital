@@ -15,6 +15,7 @@
 #include <set>
 #include <vector>
 
+#include "book_manager/database.h"
 #include "searched_word_object.h"
 #include "search_object.h"
 #include "word_info.h"
@@ -63,6 +64,7 @@ public:
 
   // **** setter **** //
   static void set_dict(Dict* dict);
+  static void set_datebase(Database* database);
   static void set_metadata_tag_reference(std::map<short, std::pair<std::string, double>> ref);
   static void set_reverted_tag_reference(std::map<std::string, short> reverted_ref);
 
@@ -136,6 +138,7 @@ public:
 private:
 
   static Dict* dict_;
+  static Database* db_;
   static std::map<short, std::pair<std::string, double>> metadata_tag_reference_;
   static std::map<std::string, short> reverted_tag_reference_;
 

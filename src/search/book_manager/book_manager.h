@@ -18,6 +18,7 @@
 #include <vector>
 
 #include "book.h"
+#include "database.h"
 #include "func.hpp"
 #include "gramma.h"
 #include "result_object.h"
@@ -27,6 +28,7 @@
 class BookManager {
   private:
     Dict* full_dict_;
+    Database db_;
     const std::vector<std::string> upload_points_; ///< mount_points for book-locations.
     nlohmann::json search_config_;
     std::map<short, std::pair<std::string, double>> metadata_tags_;
@@ -51,7 +53,8 @@ class BookManager {
 
   public:
     ///< Constructor
-    BookManager(std::vector<std::string> paths_to_books, Dict* dict, const nlohmann::json& search_config);
+    BookManager(std::vector<std::string> paths_to_books, Dict* dict, const nlohmann::json& search_config, 
+        std::string search_data_location);
 
     // **** getter **** //
 
@@ -69,7 +72,7 @@ class BookManager {
      * @brief parse json of all items. If item exists, change metadata of item, create new book.
      * @param[in] j_items json with all items
      */
-    void CreateItemsFromMetadata(nlohmann::json j_Items);
+    void CreateItemsFromMetadata(nlohmann::json j_Items, bool reload_pages);
 
     /**
      * @brief add a book, or rather: add ocr to book

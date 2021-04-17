@@ -11,6 +11,7 @@
 #include <regex>
 #include <set>
 #include <codecvt>
+#include <limits>
 
 namespace func {
 
@@ -280,4 +281,11 @@ namespace func {
    * @return Return the human readable string representation of the current time.
    */
   std::string GetCurrentTime();
+
+  /** 
+   * Prints a message and continues afer enter is pressed.
+   * If no message is passed, will print: "Press enter to continue..."
+   * @param msg - message, to show.
+   */
+  void pause(std::string msg = "Press enter to continue... ");
 }

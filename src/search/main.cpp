@@ -289,12 +289,8 @@ int main(int argc, char *argv[]) {
   //Load and parse metadata 
   std::cout << "Loading metadata at " << config["zotero_metadata"] << std::endl;
   nlohmann::json metadata = func::LoadJsonFromDisc(config["zotero_metadata"]);
-  std::cout << "Parse config: " << config["parse_config"] << std::endl;
+  std::cout << "metadata loaded successfully." << std::endl;
 
-  std::cout << "Seachable: " << config["parse_config"]["searchableTags"] << std::endl;
-  std::cout << "replacements: " << config["parse_config"]["representations"] << std::endl;
-  std::cout << "Regex: " << config["parse_config"]["regex"] << std::endl;
-  
   // Load dictionary.
   std::cout << "Loading dictionary at " << config["dictionary"] << std::endl;
   Dict dict(config["dictionary"]);
@@ -308,10 +304,10 @@ int main(int argc, char *argv[]) {
 
   // Create book manager
   std::cout << "initializing bookmanager..." << std::endl;
-  BookManager manager(config["upload_points"], &dict, config["parse_config"]);
+  BookManager manager(config["upload_points"], &dict, config["parse_config"], "search_data/documents.db");
 
   // Create items form metadata-json.
-  manager.CreateItemsFromMetadata(metadata["items"]["data"]);
+  manager.CreateItemsFromMetadata(metadata["items"]["data"], reload_pages);
 
   // Initialize corpus data
   if (manager.Initialize(reload_pages))

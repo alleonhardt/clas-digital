@@ -662,4 +662,9 @@ std::string GetCurrentTime() {
   return ss.str();
 }
 
+void pause(std::string msg) {
+  std::cout << msg;
+  std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
+}
+
 } //Close namespace 
