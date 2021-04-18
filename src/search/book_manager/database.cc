@@ -1,12 +1,12 @@
 #include "database.h"
 #include "func.hpp"
+#include <cstddef>
+#include <cstring>
+#include <vector>
 
 Database::Database(std::string path_to_database) {
-  char* err_msg;
-  int rc;
-
   // Open database
-  rc = sqlite3_open(path_to_database.c_str(), &db_);
+  int rc = sqlite3_open(path_to_database.c_str(), &db_);
 
   if (rc) {
     std::cerr << "Can't open database: " << sqlite3_errmsg(db_) << std::endl;
@@ -17,37 +17,12 @@ Database::Database(std::string path_to_database) {
   }
 
   // Create table for documents and pages.
+  Query("CREATE TABLE IF NOT EXISTS DOCUMENTS (ID TEXT PRIMARY KEY NOT NULL, INDEXMAP TEXT);");
 
-  // Create sql statement.
-  const char* sql_documents = "CREATE TABLE IF NOT EXISTS DOCUMENTS (" \
-         "ID TEXT PRIMARY KEY NOT NULL, INDEXMAP TEXT);";
-
-  // Execute sql statement.
-  rc = sqlite3_exec(db_, sql_documents, callback, 0, &err_msg);
-
-  if( rc != SQLITE_OK ){
-    fprintf(stderr, "SQL error: %s\n", err_msg);
-    sqlite3_free(err_msg);
-  } 
-  else {
-    fprintf(stdout, "Table \"DOCUMENTS\" created successfully\n");
-  }
-
-      // Create sql statement.
-  const char* sql_pages = "CREATE TABLE IF NOT EXISTS PAGES (" \
+  // Create table for pages.
+  Query("CREATE TABLE IF NOT EXISTS PAGES (" \
          "DOCUMENT_KEY TEXT NOT NULL, PAGE_NUM INTEGER NOT NULL, PAGE TEXT," \
-         "PRIMARY KEY (DOCUMENT_KEY, PAGE_NUM));";
-
-  // Execute sql statement.
-  rc = sqlite3_exec(db_, sql_pages, callback, 0, &err_msg);
-
-  if( rc != SQLITE_OK ){
-    fprintf(stderr, "SQL error: %s\n", err_msg);
-    sqlite3_free(err_msg);
-  } 
-  else {
-    fprintf(stdout, "Table \"PAGES\" created successfully\n");
-  }
+         "PRIMARY KEY (DOCUMENT_KEY, PAGE_NUM));");
 }
 
 Database::~Database() {
@@ -56,32 +31,14 @@ Database::~Database() {
 }
 
 bool Database::ClearDatabase() {
-  char* err_msg;
-  int rc;
+  std::cout << "Database::ClearDatabase" << std::endl;
+  // Remove all documents.
+  if (!Query("DELETE FROM DOCUMENTS;"))
+    return false;
 
-  /* Create merged SQL statement */
-  const char* sql_delete_documents = "DELETE FROM DOCUMENTS;";
-  /* Execute SQL statement */
-  rc = sqlite3_exec(db_, sql_delete_documents, callback, 0, &err_msg);
-  if( rc != SQLITE_OK ) {
-     fprintf(stderr, "SQL error: %s\n", err_msg);
-     sqlite3_free(err_msg);
-     return false;
-  } else {
-     fprintf(stdout, "Emptied table \"DOCUMENTS\"\n");
-  }
-
-  /* Create merged SQL statement */
-  const char* sql_delete_pages = "DELETE FROM PAGES;";
-  /* Execute SQL statement */
-  rc = sqlite3_exec(db_, sql_delete_pages, callback, 0, &err_msg);
-  if( rc != SQLITE_OK ) {
-     fprintf(stderr, "SQL error: %s\n", err_msg);
-     sqlite3_free(err_msg);
-     return false;
-  } else {
-     fprintf(stdout, "Emptied table \"PAGES\"\n");
-  }
+  // Remove all pages.
+  if (!Query("DELETE FROM PAGES;"))
+    return false;
 
   return true;
 }
@@ -91,42 +48,19 @@ void Database::AddDocument(std::string document_key) {
   queued_documents_.push_back(document_key);
 }
 
-void Database::AddPage(std::pair<std::string, int> id, std::string page) {
+void Database::AddPage(std::pair<std::string, int> id, std::string page, size_t max_queue_size) {
   // Add new page to queued pages.
-  queued_pages_[id] =  page;
+  queued_pages_[id] = page;
   
   // If more than 10000 pages are queued, insert as batch insert.
-  if (queued_pages_.size() > 10000) {
+  if (queued_pages_.size() >= max_queue_size) {
     AddPages(); // queued_pages_ will be cleared here, when all successfull.
   }
 }
 
 bool Database::AddIndex(std::string document_key, std::string index_map) {
-  char* err_msg;
-  int rc;
-
   // Create sql statement.
-  std::string sql_add_index_map = "update DOCUMENTS set INDEXMAP=? where ID=?;";
-
-  sqlite3_stmt * stmt;
-  sqlite3_prepare_v2(db_, sql_add_index_map.c_str(), sql_add_index_map.length(), &stmt, nullptr);
-
-  sqlite3_bind_text(stmt, 1, index_map.c_str(), index_map.length(), SQLITE_STATIC);
-  sqlite3_bind_text(stmt, 2, document_key.c_str(), document_key.length(), SQLITE_STATIC);
-
-  // Execute statement.
-  int ret_code = 0;
-  while ((ret_code = sqlite3_step(stmt)) == SQLITE_ROW) {
-    std::cout << "Updated row." << std::endl;
-  };
-
-  if (ret_code != SQLITE_DONE) {
-    printf("ERROR: while performing sql (AddIndex): %s\n", sqlite3_errmsg(db_));
-    printf("ret_code = %d\n", ret_code);
-  }
-
-  sqlite3_finalize(stmt);
-  return true;
+  return Query("update DOCUMENTS set INDEXMAP=? where ID=?;", {index_map, document_key});
 }
 
 bool Database::AddDocuments() {
@@ -139,15 +73,16 @@ bool Database::AddDocuments() {
 
   sqlite3_exec(db_, "BEGIN TRANSACTION", NULL, NULL, &error_essage);
 
-  std::string sql = "INSERT OR IGNORE INTO DOCUMENTS (ID,INDEXMAP) VALUES (?,'');";
+  const char* sql = "INSERT OR IGNORE INTO DOCUMENTS (ID,INDEXMAP) VALUES (?,'');";
   sqlite3_stmt* stmt;
-  int rc = sqlite3_prepare(db_, sql.c_str(), sql.length(), &stmt, nullptr);
+  int rc = sqlite3_prepare(db_, sql, std::strlen(sql), &stmt, nullptr);
 
   if (rc == SQLITE_OK) {
     for (const auto& document_key : queued_documents_) {
-      // bind the value
+      // Bind value.
       sqlite3_bind_text(stmt, 1, document_key.c_str(), document_key.length(), SQLITE_STATIC);
       
+      // Check whether commit succeeded.
       int retVal = sqlite3_step(stmt);
       if (retVal != SQLITE_DONE) {
         printf("Commit Failed! %d: %s\n", retVal, document_key.c_str());
@@ -180,20 +115,21 @@ bool Database::AddPages() {
 
   sqlite3_exec(db_, "BEGIN TRANSACTION", NULL, NULL, &error_message);
 
-  std::string sql = "INSERT INTO PAGES (DOCUMENT_KEY,PAGE_NUM,PAGE) VALUES (?, ?, ?)";
+  // Create SQL statement.
+  const char* sql = "INSERT INTO PAGES (DOCUMENT_KEY,PAGE_NUM,PAGE) VALUES (?, ?, ?)";
   sqlite3_stmt* stmt;
-  int rc = sqlite3_prepare(db_, sql.c_str(), sql.length(), &stmt, nullptr);
+  int rc = sqlite3_prepare(db_, sql, std::strlen(sql), &stmt, nullptr);
 
   if (rc == SQLITE_OK) {
     for (const auto& it : queued_pages_) {
-      // bind the value
+      // Bind value.
       sqlite3_bind_text(stmt, 1, it.first.first.c_str(), it.first.first.length(), SQLITE_STATIC);
       sqlite3_bind_int(stmt, 2, it.first.second);
       sqlite3_bind_text(stmt, 3, it.second.c_str(), it.second.length(), SQLITE_STATIC);
       
-      int retVal = sqlite3_step(stmt);
-      if (retVal != SQLITE_DONE)
-        printf("Commit Failed! %d: %s, %d\n", retVal, it.first.first.c_str(), it.first.second);
+      // Check whether commit succeeded.
+      if (sqlite3_step(stmt) != SQLITE_DONE)
+        printf("Commit Failed: %s, %d\n", it.first.first.c_str(), it.first.second);
 
       sqlite3_reset(stmt);
     }
@@ -208,7 +144,6 @@ bool Database::AddPages() {
 
   sqlite3_mutex_leave(sqlite3_db_mutex(db_)); 
   std::cout << queued_pages_.size() << " pages inserted." << std::endl;
-  func::pause();
   queued_pages_.clear();
   return true;
 }
@@ -217,80 +152,84 @@ std::string Database::GetQueuedPage(std::pair<std::string, int> id) {
   // Check in queued pages.
   if (queued_pages_.count(id) > 0)
     return queued_pages_.at(id);
-  // If not found, page might already have been added to database, thus search
-  // in database.
+
+  // If not found, page might already have been added to database.
   return GetPage(id.first, id.second);
 }
 
 std::string Database::GetPage(std::string document_key, int page_num) {
-  char* err_msg;
-  int rc;
-
-  /* Create SQL statement */
-  std::string sql = "SELECT * FROM PAGES WHERE DOCUMENT_KEY = ? AND PAGE_NUM = ?;";
+  // Create SQL statement.
+  const char* sql = "SELECT PAGE FROM PAGES WHERE DOCUMENT_KEY = ? AND PAGE_NUM = ?;";
   sqlite3_stmt * stmt;
-  sqlite3_prepare_v2(db_, sql.c_str(), sql.length(), &stmt, nullptr);
+  sqlite3_prepare_v2(db_, sql, std::strlen(sql), &stmt, nullptr);
 
+  // Bind values.
   sqlite3_bind_text(stmt, 1, document_key.c_str(), document_key.length(), SQLITE_STATIC);
   sqlite3_bind_int(stmt, 2, page_num);
 
   // Execute SQL statement.
+  std::string page = "";
   int ret_code = 0;
   while ((ret_code = sqlite3_step(stmt)) == SQLITE_ROW) {
-    return std::string(reinterpret_cast<const char*>(
-      sqlite3_column_text(stmt, 2)
-    ));
+    page = std::string(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0)));
   }
   if (ret_code != SQLITE_DONE) {
     printf("ERROR: while performing sql (GetPage): %s\n", sqlite3_errmsg(db_));
-    printf("ret_code = %d\n", ret_code);
   }
 
-  std::cout << "SQL: Page not found" << std::endl;
-
-  //release resources
+  // Return page and release resources.
   sqlite3_finalize(stmt);
-  sqlite3_close(db_);
-  return "";
+  return page;
 }
 
 std::string Database::GetIndexMap(std::string document_key) {
-  char* err_msg;
-  int rc;
-
-  /* Create SQL statement */
-  std::string sql = "SELECT * FROM DOCUMENTS WHERE ID = ?;";
+  // Create SQL statement.
+  const char* sql = "SELECT INDEXMAP FROM DOCUMENTS WHERE ID = ?;";
   sqlite3_stmt * stmt;
-  sqlite3_prepare_v2(db_, sql.c_str(), sql.length(), &stmt, nullptr);
+  sqlite3_prepare_v2(db_, sql, std::strlen(sql), &stmt, nullptr);
 
+  // Bind values.
   sqlite3_bind_text(stmt, 1, document_key.c_str(), document_key.length(), SQLITE_STATIC);
 
   // Execute SQL statement.
+  std::string index_map = "";
   int ret_code = 0;
   while ((ret_code = sqlite3_step(stmt)) == SQLITE_ROW) {
-    return std::string(reinterpret_cast<const char*>(
-      sqlite3_column_text(stmt, 1)
-    ));
+    index_map = std::string(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0)));
   }
   if (ret_code != SQLITE_DONE) {
     printf("ERROR: while performing sql (GetIndexMap): %s\n", sqlite3_errmsg(db_));
-    printf("ret_code = %d\n", ret_code);
   }
 
-  printf("SQL: index map not found");
-
-  //release resources
+  // Return found index map and release resources.
   sqlite3_finalize(stmt);
-  sqlite3_close(db_);
-  return "";
+  return index_map;
 }
 
-int Database::callback(void *data, int argc, char **argv, char **azColName) {
-  int i;
-  for(i = 0; i<argc; i++) {
-     printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
-     data = argv[i];
+bool Database::Query(const char* query, const std::vector<std::string>& parameters) {
+  // Create SQL statement.
+  sqlite3_stmt * stmt;
+  sqlite3_prepare_v2(db_, query, std::strlen(query), &stmt, nullptr);
+
+  // Bind values.
+  for (size_t i=0; i<parameters.size(); i++) {
+    sqlite3_bind_text(stmt, i+1, parameters[i].c_str(), parameters[i].length(), SQLITE_STATIC);
   }
-  printf("\n");
-  return 0;
+  
+  // Execute SQL statement.
+  int ret_code = 0;
+  while ((ret_code = sqlite3_step(stmt)) == SQLITE_ROW) {
+    std::cout << "updated row" << std::endl;
+  };
+
+  // Print error message in case of failiure.
+  bool success = true;
+  if (ret_code != SQLITE_DONE) {
+    printf("ERROR: while executing sql-statement (%s): %s\n", query, sqlite3_errmsg(db_));
+    success = false;
+  }
+
+  // Return success and release resources.
+  sqlite3_finalize(stmt);
+  return success;
 }

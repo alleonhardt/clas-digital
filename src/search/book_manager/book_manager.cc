@@ -81,7 +81,7 @@ bool BookManager::Initialize(bool reload_pages) {
 }
 
 void BookManager::CreateItemsFromMetadata(nlohmann::json j_items, bool reload_pages) {
-
+  // Empty complete database, when reloading pages is set.
   if (reload_pages)
     db_.ClearDatabase();
 
