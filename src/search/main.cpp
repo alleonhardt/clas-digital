@@ -7,6 +7,7 @@
 #include <exception>
 #include <fstream>
 #include <iostream>
+#include <iterator>
 #include <ostream>
 #include <string>
 
@@ -126,21 +127,35 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
   else {
     std::cout << "Constructing response-object" << std::endl;
     size_t counter = 0;
-    for (auto result_obj: result_list) {
-      // Create entry for each book in result.
-      nlohmann::json entry;
-      entry["scanId"] = result_obj.book()->key();
-      entry["copyright"] = !result_obj.book()->IsPublic();
-      entry["hasocr"] = result_obj.book()->HasContent();
-      entry["description"] = result_obj.book()->GetFromMetadata("description");
-      entry["bibliography"] = result_obj.book()->GetFromMetadata("bibliography");
+    // Get iterator to the start of results.
+    auto it = result_list.begin();
 
-      std::string preview = result_obj.book()->GetPreview(
-        result_obj.matches_as_list(), 
+    // Check if result list, is longer then selected start-point. If so, advance
+    // iterator to desired start.
+    if (list_start < result_list.size())
+      std::advance(it, list_start);
+
+    // Iterate over selected area (start -> start+results per page) and create
+    // result entry.
+    for (; it!=result_list.end(); it++) {
+      // Add basic meta data.
+      nlohmann::json entry;
+      entry["scanId"] = it->book()->key();
+      entry["copyright"] = !it->book()->IsPublic();
+      entry["hasocr"] = it->book()->HasContent();
+      entry["description"] = it->book()->GetFromMetadata("description");
+      entry["bibliography"] = it->book()->GetFromMetadata("bibliography");
+
+      // Generate preview.
+      entry["preview"] = it->book()->GetPreview(
+        it->matches_as_list(), 
         search_object.search_options().fuzzy_search()
       );
-      entry["preview"] = preview;
+      
+      // Add created entry to response.
       search_response["books"].push_back(std::move(entry)); 
+
+      // Stop, if limit has been reached.
       if (++counter == resultsperpage)
         break;
     }
@@ -274,7 +289,6 @@ void Suggestions(const Request& req, Response& resp, BookManager& manager,
 }
 
 int main(int argc, char *argv[]) {
-
   // Parse command-line argument and check.
   std::string cmd_arg = (argc > 1) ? argv[1] : "";
   bool reload_pages = cmd_arg == "reload_pages";
