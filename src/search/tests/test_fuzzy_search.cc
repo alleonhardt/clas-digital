@@ -8,6 +8,7 @@
 TEST_CASE ("Test new fuzzy-search", "[test-fuzzysearch]") {
 
   std::vector<std::vector<std::string>> words = {
+    {"hunde", "hunde", "0"},
     {"hunde", "hande", "1"},
     {"hund", "jahrhundert", "2"},
     {"hund", "jagdhund", "1"},

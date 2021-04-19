@@ -68,11 +68,11 @@ namespace fuzzy
       }
       if (!found)
         continue;
-      // If word found at ending or beginning, return higher score.
-      else if (i==0 || i+len_input == len_given) 
-        return 1;
       else if (len_given == len_input)
         return 0;
+      // If word found at ending or beginning, return higher score.
+      else if (i == 0 || i+len_input == len_given) 
+        return 1;
       return 2;
     }
     return -1;
