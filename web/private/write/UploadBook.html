@@ -1,0 +1,170 @@
+<!doctype html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!--<link rel="stylesheet" href="style.css">-->
+    <title>Upload book - clas digital</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <link href="/topnav.css" rel="stylesheet" type="text/css">
+    <link href="UploadBook.css" rel="stylesheet">
+
+	<link rel="canonical" href="https://www.clas-digital.uni-frankfurt.de/private/write/UploadBook.html" />
+
+    <script src="/user.js"></script>
+    <script src="UploadBook.js"></script>
+</head>
+<body>
+    <!-- The navigation bar config -->
+    <nav id='tpnav' class="topnav">
+	<a  id='homelink' href='/information/'>Information</a>
+	<a  id='searchlink' href='/search'>Search</a>
+	<div class='dropdown'>
+		<a id='statisticslink'  href='/catalogue'>Catalogue</a>
+		<div class='dropdown-content'>
+			<a href="/catalogue/books">Books</a>
+			<a href="/catalogue/authors">Authors</a>
+			<a href="/catalogue/collections">Collections</a>
+			<a href="/catalogue/years">Years</a>
+		</div>
+	</div>
+	<a id='administrationlink' class='classifiedContent ' href='/private/admin/Administration.html' data-acc=4>Administration</a>
+	<a id='uploadbooklink' class='classifiedContent classifiedContent active' href='/private/write/UploadBook.html' data-acc=2>Upload Books</a>
+
+	<div class='topnav-right-in' id='loggedintopnav'>
+		<span id='LoggedInAs'>Logged in</span>
+		<input id="logoutBut" type='submit' value="Logout" class='loginbutton' onclick="DoLogout();return true;"/>
+	</div>
+	<div class='topnav-right-out' id='loggedouttopnav'>
+		<form id ="LoginForm" class='loginform'>
+			<input id="EmailType" class="emailinput" type="email" name="email" placeholder="Email" aria-label="Email" required>
+			<input id="PasswordType" class="passwordinput" type="password" name="password" placeholder="Password" aria-label="Password" required>
+			<input id="LoginButton" type='submit' value="Log In" class='loginbutton' onclick="ExecuteLogin();return true;"/>
+			<div id="LoaderButton" class='loader'></div>
+		</form>
+	</div>
+
+</nav>
+<footer style="position: fixed; bottom: 20px; right: 40px; color: grey; font-size:11px">
+    <dl>
+        <dt>Generated:</dt>
+        <dd itemprop="dataModified" content="2021-04-19T17:39:20Z">
+            <time datetime="2021-04-19T17:39:20Z">2021-04-19 17:39:20</time>
+        </dd>
+    </dl>
+</footer>
+
+ 
+	
+    <div class='biggerPageClass'>
+	<h3 id='status_banner'></h3>
+	<h1>Volltexte hochladen</h1>
+	<i> Click on the headlines to see additional information on how to upload.</i>
+	<br>
+	<input class="inputStyle" type="file" id="fileUpID" multiple/>
+    <br>
+
+    <button type="button" class="collapsible"><span>1.</span> Vorbereitung</button>
+    <div class="content">
+    <p>Was brauche ich, um ein Buch hochzuladen? Wenn Sie ein Buch hochladen wollen, sollten im Vorfeld folgende Dinge am besten auf Ihrem PC vorliegen: </p>
+    <p>1. Alle zu dem Buch vorhandenen Dateien (Scans der einzelnen Seiten und ggf. die OCR-Datei). </p>
+    <img src="/static/examples/buchDateien.png" alt="Beispiel Dateien" class="exampleImg"> 
+    <p>2. Das Buch muss bereits einen Eintrag in Zotero haben. Liegt ein Buch in Zotero vor, dann besitzt es einen sogenannten "Item-Key", der zum Hochladen des Buches auf dem clas-digital Server notwendig ist. Es reicht allerdings, wenn sie die URL des Buches kennen, die in ihrem Browserfenster angezeigt weird, wenn Sie in Zotero das entsprechende Buch ausgewählt haben. Der Uploader sucht sich den Item-Key selbstständig heraus. </p>
+    <img src="/static/examples/ItemKey.png" alt="Beispiel Item-Key" class="exampleImg"> 
+    <h4>Zum Format der Dateien</h4>
+	<p>Jede Bilddatei/ jeder Scan muss nach folgendem Format benannt sein: beliebiger_text[Seitennummer].jpg. "Seitennummer" bezieht sich hier auf die Seitennummer im Buch (das Deckblatt wäre z.B. mit page001.jpg benannt). Die OCRs müssen zur Seitentrennung folgendes Format verwenden ----- [Seitennummer] / [maximale Seitenzahl] -----. Es werden nur Dateien im JPG, PNG und TXT Format angenommen. (Falls das Buch von der BSB stammen sollte müssen Sie sich darum keine Sorgen machen, sie sollten bereits in genau diesem Format vorliegen.)</p>
+    </div>
+
+    <br><br>
+
+	<button type="button" class="collapsible"><span>2.</span> Auswählen der Dateien</button>
+    <div class="content">
+	<p>Es kann immer nur ein Buch hochgeladen werden. Ein "Buch" besteht aus Scans der einzelnen Seiten des Buches und ggf. einer .ocr Datei. Diese Datei sollten auf Ihrem PC vorliegen. Falls das hochzuladene Buch von der Staatsbibliothek kommt, laden Sie dieses also zunächst auf ihren PC (zu empfehlen: ein Ordner pro Buch, in dem sich alle Datei (Scans und ggf. ocr) befinden. Nutze sie dann das untenstehende Feld, um sie wieder auszuwählen. Die Dateien werden dann auf den Projekt-Server übertragen.</p>
+    </div>
+	<p><strong>Wichtig:</strong> Schließen Sie diesen Tab nicht, während der Upload läuft!</p>
+	<ul class="list-group" id="CurrentUploads">
+	</ul>
+	<ul id="FileDropList" class="filesList">
+	    <li onclick='document.getElementById("fileUpID").click()'>Hier klicken um eine Datei auszuwaehlen</li>
+	</ul>
+
+	<br>
+
+    <button type="button" class="collapsible"> <span>3.</span> Welches Werk ist das?</button>
+    <div class="content">
+	<p>Fügen Sie noch den Link zu Zotero ein (die URL die oben in ihrem Browserfenster angezeigt wird, wenn Sie in Zotero das entsprechende Buch ausgewählt haben), damit der Projektserver das Buch später immer korrekt zuordnen kann (dies ist der zuvor erwähnte "Item-Key"):</p>
+    <p> Nachdem sie den Item-Link (bzw. die URL) eingetragen haben, erscheinen zwei links. Der erste führt Sie zu einer Übersicht der bereits für dieses Buch existierenden Dateien auf dem Server. Der zweite Link führt Sie zu den Metadaten des Buches (so können Sie nochmlas sichergehen, ob Sie das richtige Buch ausgewählt haben.</p>
+    </div>
+	<input id="Permalink" class="description" type="text" placeholder="Item-Key hier einfügen" oninput="ShowBookContentLink();">
+	<div id="BookContentLink" style='display:inline-block;margin-left: 2rem;'></div>
+	</input>
+	<br>
+
+    <button type="button" class="collapsible"><span>4.</span> Option: Erstellen einer OCR</button>
+    <div class="content">
+	<p>Es ist möglich eine OCR vom Server erstellen zu lassen. Um diese Option zu benutzen setzten Sie bitte ein Häkchen in der Checkbox unten. <b>Dieser Vorgang dauert sehr lange benuzten Sie diese Funktion nur wenn sie wenige Dateien hochladen!</b></p>
+    </div>
+	<div>
+	    <span>Der Server soll eine computergenerierte OCR erstellen: </span>
+	    <input id='languageoptenabled' onclick='show_language(this);' type='checkbox'/>
+	    <select id='languageopt' style='display: none;margin-left: 2rem;'>
+		<option value='deu_frak' selected>Deutsch Fraktur</option>
+		<option value='deu'>Deutsch</option>
+		<option value='eng'>Englisch</option>
+	    </select>
+	</div>
+
+    <br>
+
+    <button type="button" class="noncollapsible"> <span>6.</span> Hochladen beginnen!</button>
+	<div class="saver" id="saver">
+	    <p>Speichere diesen Volltext auf dem Projektserver!</p>
+	    <button id="SaveNow" class="saveButton" onclick="UploadAll();return true;">Speichern!</button>
+	</div>
+
+    <br>
+
+    <button type="button" class="collapsible"> <span>6.</span> Etwas Schiefgelaufen? Keine Sorge!</button>
+    <div class="content">
+    <p>Ist etwas schief gelaufen? Machen sie sich keine Sorgen! Sollte die Internetverbindung abgebrochen sein, oder das Hochladen aus einem anderen Grund nicht funktioniert haben, ist das kein Grund zur Sorge! Alle Datein, die bis zum dem Abruch hochgeladen worden sind befinden sich sicher auf dem Server. Wiederholen Sie einfach den Vorgang, wählen Sie nochmals alle Dateien aus, die Sie hochladen wollten. Es wird Ihnen dann angezeigt, welche Dateien, bereist vorhanden sind. Sie können selbst auswählen, welche Dateien Sie hochladen wollen. Drücken Sie dafür auf "Compare Files", um die Dateien zu vergleichen und dann auszuwählen.</p>
+    <img src="/static/examples/überschreiben1.png" alt="Dateien Überschreiben1" class="exampleImg">
+    <p>Generell wird Ihnen immer angeziegt, wenn zu dem Buch, dass Sie hochladen wollen bereits Dateien auf dem Server existieren. Sie können stets auswählen, welche Dateien Sie überschreiben, oder vielleicht lieber doch nicht hinzufügen wollen.</p>
+    <img src="/static/examples/überschreiben2.png" alt="Dateien Überschreiben2" class="exampleImg">
+    <p>Sie müssen für jedes Buch einzelnd diese Wahl treffen. Es wird Ihnen angezeigt, welches Datein sie überschreiben und für welche Dateien Sie den Upload abgebrochen haben.</p>
+    <img src="/static/examples/überschreiben3.png" alt="Dateien Überschreiben3" class="exampleImg">
+    <p>Wenn Sie für alle Dateien eine Aswahl getroffen haben wird der Upload automatisch fertig gestellt. Es sollte eine grüne Bestätigungsnachricht erscheinen.</p>
+    </div>
+
+    </div> 
+
+    <div id="modal" style="display: none;position: fixed; top: 10vh;left: 10vw; width: 80vw; padding: 1rem; height: 80vh; z-index: 3;background:grey;">	<div style='display: grid; grid-template-columns: 48% 48%;grid-template-rows: 2.5rem calc(100% - 7.5rem) 2.5rem 2.5rem;height:100%;width:100%;grid-column-gap: 2%'>
+	    <p style="grid-column: 1 /span 1;grid-row: 1 /span 1;margin:auto;background:white;">Old File</p>
+	    <p style="grid-column: 2 /span 1;grid-row: 1 /span 1;margin:auto;background:white;">New File</p>
+	    <div id="oldfile" style="grid-column: 1 /span 1;grid-row: 2 /span 1;width: 100%;height:100%;margin:auto;overflow: auto;"></div>
+	    <div id="newfile" style="grid-column: 2 /span 1;grid-row: 2 /span 1;width: 100%;height:100%;margin:auto;overflow: auto;"></div>
+	    <button id="nobut" style="grid-column: 1 /span 1;grid-row: 3 /span 1;cursor:pointer;">Keep existing</button>
+	    <button id="yesbut" style="grid-column: 2 /span 1;grid-row: 3 /span 1;cursor:pointer;">Replace existing</button>
+	    <button id="noall" style="grid-column: 1 /span 1;grid-row: 4 /span 1;cursor:pointer;color: green;" onclick="onglobalno();return true;">Keep all existing files</button>
+	    <button id="yesall" style="grid-column: 2 /span 1;grid-row: 4 /span 1;cursor: pointer;color: red;" onclick="onglobalyes();return true;">Replace all existing</button>
+	</div>
+    </div>
+</body>
+
+<script>
+    var coll = document.getElementsByClassName("collapsible");
+    var i;
+    for (i = 0; i < coll.length; i++) {
+        console.log("adding click event");
+      coll[i].addEventListener("click", function() {
+        console.log("doing something");
+        this.classList.toggle("active");
+        var content = this.nextElementSibling;
+        if (content.style.display === "block") {
+          content.style.display = "none";
+        } else {
+          content.style.display = "block";
+        }
+      });
+    }
+</script>

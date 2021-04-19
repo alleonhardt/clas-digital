@@ -489,9 +489,6 @@ bool CorpusManager::CreateWebpage(IReference *item,clas_digital::IFileHandler *h
   std::string webpath = "/books/"+item->GetKey()+"/pages";
   std::error_code ec;
 
-  std::filesystem::create_directory("web/books/"+item->GetKey(), ec);
-  std::filesystem::create_directory("web/books/"+item->GetKey()+"/pages", ec);
-
   if(item->HasContent())
   {
     createPagesPage(item);
@@ -513,7 +510,7 @@ bool CorpusManager::UpdateZotero(clas_digital::IReferenceManager *manager, clas_
   auto res2 = manager->GetAllCollections(collection_references_);
   auto res = manager->GetAllItems(item_references_);
   res2 = manager->GetAllCollections(collection_references_);
-  //manager->SaveToFile();
+  manager->SaveToFile();
 
   createSearchPage(collection_references_);
   std::cout<<"After search"<<std::endl;
