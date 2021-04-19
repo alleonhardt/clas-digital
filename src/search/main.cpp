@@ -298,12 +298,10 @@ int main(int argc, char *argv[]) {
 
   // Load and parse config file.
   nlohmann::json config = func::LoadJsonFromDisc("server.config");
-  std::cout << 0 << std::endl;
 
   //Load and parse metadata 
   std::cout << "Loading metadata at " << config["zotero_metadata"] << std::endl;
   nlohmann::json metadata = func::LoadJsonFromDisc(config["zotero_metadata"]);
-  std::cout << "metadata loaded successfully." << std::endl;
 
   // Load dictionary.
   std::cout << "Loading dictionary at " << config["dictionary"] << std::endl;
@@ -318,7 +316,7 @@ int main(int argc, char *argv[]) {
 
   // Create book manager
   std::cout << "initializing bookmanager..." << std::endl;
-  BookManager manager(config["upload_points"], &dict, config["parse_config"], "search_data/documents.db");
+  BookManager manager(config["upload_points"], &dict, config["parse_config"], config["search_data"]);
 
   // Create items form metadata-json.
   manager.CreateItemsFromMetadata(metadata["items"]["data"], reload_pages);
