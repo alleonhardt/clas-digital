@@ -33,7 +33,8 @@ class SearchOptions {
         int year_to,
         int sort_results_by,
         std::string author,
-        std::vector<std::string> collections);
+        std::vector<std::string> collections
+      );
 
   /**
    * Constructor for the search-options, when searchin the pages of a book

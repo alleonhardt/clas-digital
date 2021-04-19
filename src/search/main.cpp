@@ -36,7 +36,7 @@ std::string GetReqParam(const Request&req, std::string key, std::string def="") 
  * @param[in, out] resp (respsonse)
  * @param[in] manager (book manager, to do search and get map of all books.)
  */
-void Search(const Request& req, Response& resp, const nlohmann::json& 
+void Search(const Request& req, Response& resp, const std::vector<std::string>& 
     zotero_pillars, BookManager& manager, Dict& dict) {
   
   // Get and process query (necessary value!):
@@ -59,17 +59,13 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
 
   // Get pillars:
   std::vector<std::string> pillars;
-  std::string str_pillars;
-  if (req.has_param("pillars")) {
-    str_pillars = req.get_param_value("pillars", 0);
-    for (auto it : func::Split2(str_pillars, ","))
-        pillars.push_back(it);
+  std::string str_pillars = GetReqParam(req, "pillars");
+  if (str_pillars != "") {
+    pillars = func::Split2(str_pillars, ",");
   }
   else {
-    for (auto& it : zotero_pillars) {
-      str_pillars += it["key"].get<std::string>() + ";";
-      pillars.push_back(it["key"]);
-    }
+    str_pillars = "using all pillars (default)";
+    pillars = zotero_pillars;
   }
 
   // Get published after/ published before:
@@ -297,26 +293,33 @@ int main(int argc, char *argv[]) {
   Server srv;
 
   // Load and parse config file.
-  nlohmann::json config = func::LoadJsonFromDisc("server.config");
+  std::cout << "Loading and parsing config..." << std::endl;
+  nlohmann::json config = func::LoadJsonFromDisc("search.config");
+  nlohmann::json parse_config = config["parse_config"];
+  std::string path_to_database = config["search_data"];
+  std::string path_to_metadata = config["metadata"];
+  std::string path_to_dictionary = config["dictionary"];
+  int start_port = config["port"].get<int>();
+
 
   //Load and parse metadata 
-  std::cout << "Loading metadata at " << config["zotero_metadata"] << std::endl;
-  nlohmann::json metadata = func::LoadJsonFromDisc(config["zotero_metadata"]);
+  std::cout << "Loading metadata at " << path_to_metadata << std::endl;
+  nlohmann::json metadata = func::LoadJsonFromDisc(path_to_metadata);
 
   // Load dictionary.
-  std::cout << "Loading dictionary at " << config["dictionary"] << std::endl;
-  Dict dict(config["dictionary"]);
+  std::cout << "Loading dictionary at " << path_to_dictionary << std::endl;
+  Dict dict(path_to_dictionary);
   Book::set_dict(&dict);
 
   // Load active pillars:
   std::cout << "Loading active collections...";
-  nlohmann::json zotero_pillars = nlohmann::json::array();
+  std::vector<std::string> zotero_pillars = nlohmann::json::array();
   for (auto it : metadata["collections"]["data"])
-    zotero_pillars.push_back(nlohmann::json({{"key", it["key"]}, {"name", it["data"]["name"]}}));
+    zotero_pillars.push_back(it["key"]);
 
   // Create book manager
   std::cout << "initializing bookmanager..." << std::endl;
-  BookManager manager(config["upload_points"], &dict, config["parse_config"], config["search_data"]);
+  BookManager manager(config["upload_points"], &dict, parse_config, path_to_database);
 
   // Create items form metadata-json.
   manager.CreateItemsFromMetadata(metadata["items"]["data"], reload_pages);
@@ -328,7 +331,6 @@ int main(int argc, char *argv[]) {
     std::cout << "Initialization failed!\n\n";
   
   // Specify port to run on.
-  int start_port = std::stoi("4848");
   std::cout << "Starting on port: " << start_port << std::endl;
 
   // Add specific handlers via server-frame 

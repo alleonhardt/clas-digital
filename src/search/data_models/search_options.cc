@@ -18,7 +18,7 @@ SearchOptions::SearchOptions(bool fuzzy_search) :
       only_metadata_(false),
       only_corpus_(false),
       year_from_(0),
-      year_to_(0),
+      year_to_(2050),
       sort_result_by_(0),
       author_(""),
       collections_({}) {}
