@@ -13,3 +13,15 @@ bin/*
 compile_commands.json
 server.config
 .clangd/*
+.cache/*
+src/search/tests/example_data/ocr_data/test_books/UEHEJINT/intern
+src/search/tests/example_data/wiki_data/test_books/*
+*intern
+
+search_data/*
+
+BSBDownLoadFertig_noOCR.txt
+gibtEsBeiBSB_OCR.txt
+gibtEsBeiBSB_noOCR.txt
+tierwissen_noOCR.txt
+untracked_books.txt
