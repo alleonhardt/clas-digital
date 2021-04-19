@@ -172,9 +172,9 @@ std::vector<std::map<std::string, std::string>> MetadataHandler::GetAuthorsKeys(
       author["fullname"] += ", " + firstname;
 
     //Generate key firstname-lastName
-    std::string key = func::returnToLower(firstname) 
+    std::string key = func::ReturnToLower(firstname) 
                       + "-"
-                      + func::returnToLower(lastName);
+                      + func::ReturnToLower(lastName);
     std::replace(key.begin(), key.end(), ' ', '-');
     std::replace(key.begin(), key.end(), '/', ',');
     author["key"] = key;
@@ -210,7 +210,7 @@ std::string MetadataHandler::GetTitle() {
   std::string title = GetMetadata("title", "data");
 
   //Escape html and return 
-  func::escapeHTML(title);
+  func::EscapeHTML(title);
   return title;
 }
 
@@ -270,7 +270,7 @@ std::string MetadataHandler::GetShow2(bool html) {
     result += ", ";
       
   //Add first [num] words of title
-  std::vector<std::string> words_in_title = func::split2(GetTitle(), " "); 
+  std::vector<std::string> words_in_title = func::Split2(GetTitle(), " "); 
   for (unsigned int i=0; i<10 && i<words_in_title.size(); i++)
     result += words_in_title[i] + " ";
 
