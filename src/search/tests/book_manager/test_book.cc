@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <vector>
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 #include <catch2/catch.hpp>
 #include <cstddef>
@@ -64,6 +65,10 @@ TEST_CASE( "The map of base-forms is created as expected", "[generate_base_forms
   tmp_index_map["hundes"] = create_word_info({{7,1},{8,2},{3,1},{5,2}}, 5, 8);
   tmp_index_map["Hündin"] = create_word_info({{1,1,},{2,2},{4,3},{5,2}}, 10, 4);
   tmp_index_map["Strassen"] = create_word_info({{7,1},{8,2},{3,1},{5,2}}, 5, 8);
+  tmp_index_map["top"] = create_word_info({{0,1}}, 5, 8);
+  tmp_index_map["tone"] = create_word_info({{0,1}}, 5, 8);
+  tmp_index_map["to"] = create_word_info({{0,1}}, 5, 8);
+  tmp_index_map["tom"] = create_word_info({{0,1}}, 5, 8);
   Book book;
   book.GenerateBaseFormMap(tmp_index_map, book.words_on_pages_);
 
@@ -73,4 +78,29 @@ TEST_CASE( "The map of base-forms is created as expected", "[generate_base_forms
   REQUIRE(book.words_on_pages().count("strasse") > 0);
   REQUIRE(book.words_on_pages()["strasse"].size() == 1);
   REQUIRE(book.words_on_pages()["strasse"].front().word_ == "strassen");
+  
+  std::cout << "All base forms: " << std::endl;
+  for (const auto& it : book.words_on_pages()) {
+    std::cout << it.first << ", ";
+  }
+  std::cout << "\nTop: " << std::endl;
+  if (book.words_on_pages().count("top") > 0) {
+    for (const auto& it : book.words_on_pages()["top"])
+      std::cout << it.word_ << ", ";
+  }
+  std::cout << "\ntone: " << std::endl;
+  if (book.words_on_pages().count("tone") > 0) {
+    for (const auto& it : book.words_on_pages()["tone"])
+      std::cout << it.word_ << ", ";
+  }
+  std::cout << "\ntom: " << std::endl;
+  if (book.words_on_pages().count("tom") > 0) {
+    for (const auto& it : book.words_on_pages()["tom"])
+      std::cout << it.word_ << ", ";
+  }
+  std::cout << "\nto: " << std::endl;
+  if (book.words_on_pages().count("to") > 0) {
+    for (const auto& it : book.words_on_pages()["to"])
+      std::cout << it.word_ << ", ";
+  }
 }

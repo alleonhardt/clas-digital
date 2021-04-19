@@ -38,7 +38,7 @@ namespace fuzzy
           d[col] = std::min(p[col-1], std::min(d[col-1], p[col])) + 1;
       }
 
-      //Swap 
+      // Swap 
       dtmp = p;
       p = d;
       d = dtmp;
@@ -71,17 +71,15 @@ namespace fuzzy
       // If word found at ending or beginning, return higher score.
       else if (i==0 || i+len_input == len_given) 
         return 1;
+      else if (len_given == len_input)
+        return 0;
       return 2;
     }
     return -1;
   }
 
   short cmp(std::string input, std::string given) {
-    // If strings match, return success right alway.
-    if (input == given)
-      return 0;
-    
-    // Calculate lengths
+    // Calculate lengths and c_str representations.
     short len_input = input.length();
     short len_given = given.length();
     const char* cinput = input.c_str();
@@ -99,7 +97,7 @@ namespace fuzzy
     if (std::abs(len_input-len_given) > threshold)
       return -1; 
     
-    //Calculate levenshtein distance, use the longer word a first word to reduce memory.
+    // Calculate levenshtein distance, use the longer word as first word to reduce memory.
     if (len_given > len_input) 
       return lshtein(cgiven, cinput, len_given, len_input, threshold);
     else 

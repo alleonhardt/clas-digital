@@ -18,7 +18,8 @@ TEST_CASE ("Test new fuzzy-search", "[test-fuzzysearch]") {
     {"hund", "jahrhundert", "2"},
     {"philosophie", "philosophies", "1"},
     {"philopophie", "philosophies", "2"},
-    {"philopophie", "dphilosophies", "-1"}
+    {"philopophie", "dphilosophies", "-1"},
+    {"tone", "top", "-1"}
   };
 
   for (const auto& it : words) {

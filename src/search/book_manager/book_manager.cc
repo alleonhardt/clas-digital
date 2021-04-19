@@ -331,7 +331,7 @@ void BookManager::CreateIndexMap() {
     for (auto& jt : it.second) {
       double tf = jt.second.relevance_; // term frequency.
       size_t len_document = documents_[jt.first]->document_size();
-      double okapi = idf + ((tf*(2.0+1.0))/(tf+2.0*(1-0.75+0.75*(len_document/avglength))));
+      double okapi = idf * ((tf*(2.0+1.0))/(tf+2.0*(1-0.75+0.75*(len_document/avglength))));
 
       // Decrease scope if document does not have a corpus & set relevance.
       if (!documents_[jt.first]->HasContent())

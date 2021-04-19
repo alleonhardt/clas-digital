@@ -122,6 +122,7 @@ SCENARIO ("Searching for wiki words with normal search", "[wiki_fuzzy]") {
 }
 
 
+/*
 SCENARIO ("Searching for wiki words - search options", "[wiki_fuzzy]") {
 
   GIVEN ("An existing index based on a wikipedia entries and fuzzy-search") {
@@ -161,3 +162,4 @@ SCENARIO ("Searching for wiki words - search options", "[wiki_fuzzy]") {
     }
   }
 }
+*/

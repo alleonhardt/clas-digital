@@ -12,27 +12,6 @@ def main():
 
     print(f"Got template: {template}")
 
-    # Load random names
-    first_names = []
-    sir_names = []
-    with open('random_names.txt') as names:
-        line = names.readline()
-        while line:
-            first_names.append(line.split(" ")[0])
-            sir_names.append(line.split(" ")[1])
-            line = names.readline()
-    print(f"Parsed {len(first_names)} first names and {len(sir_names)} sir names.\n")
-
-    # Load random cities.
-    cities = []
-    with open('random_cities.txt') as ran_cities:
-        line = ran_cities.readline()
-        while line:
-            cities.append(line)
-            line = ran_cities.readline()
-    print(f"Parsed {len(cities)} random cities.\n")
-
-
     # Load wiki-articles
     unprocessed_wiki_jsons = []
     cnt = 1
@@ -50,28 +29,21 @@ def main():
     proccessed_wikis = []
     for wiki_json in unprocessed_wiki_jsons:
         new_entry = copy.deepcopy(template)
-        new_entry["data"]["date"] = str(random.randint(1800,2020))
+        new_entry["data"]["date"] = "1999"
 
         ran_keys += 1
         new_entry["key"] = str(ran_keys)
         new_entry["data"]["key"] = new_entry["key"]
 
-        a_first_name = first_names[random.randint(0, len(first_names)-1)]
-        a_last_name = sir_names[random.randint(0, len(sir_names)-1)]
-        e_first_name = first_names[random.randint(0, len(first_names)-1)]
-        e_last_name = sir_names[random.randint(0, len(sir_names)-1)]
-        new_entry["data"]["creators"][0]["firstName"] = a_first_name
-        new_entry["data"]["creators"][0]["lastName"] = a_last_name
-        new_entry["data"]["creators"][1]["firstName"] = e_first_name
-        new_entry["data"]["creators"][1]["lastName"] = e_last_name
+        new_entry["data"]["creators"][0]["firstName"] = "ayyyy"
+        new_entry["data"]["creators"][0]["lastName"] = "axxxx"
+        new_entry["data"]["creators"][1]["firstName"] = "eyyyy"
+        new_entry["data"]["creators"][1]["lastName"] = "exxxx"
 
         new_entry["data"]["title"] = wiki_json["title"]
-        new_entry["data"]["place"] = cities[random.randint(0, len(cities)-1)]
+        new_entry["data"]["place"] = "pppp"
 
-        new_entry["bib"] = (f'{a_last_name}, {a_first_name}: '
-            + f'{new_entry["data"]["title"]}, {new_entry["data"]["place"]}, '
-            + f'{new_entry["data"]["date"]}.')
-        new_entry["citation"] = new_entry["bib"] 
+        new_entry["bib"] = wiki_json["title"]
         new_entry["rights"] = "CLASfrei"
         proccessed_wikis.append(new_entry)
 
