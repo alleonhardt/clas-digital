@@ -68,14 +68,27 @@ bool BookManager::Initialize(bool reload_pages) {
   //Create map of all words + and of all words in all titles
   std::cout << "BookManager: Creating map of books." << std::endl;
   CreateIndexMap();
-  std::cout << "Map words:   " << index_map_.size() << "\n";
+  std::cout << "Map words: " << index_map_.size() << "\n";
+
+  size_t words_with_base_form = 0;
+  size_t base_forms = 0;
+  int counter=0;
+  for (const auto& book : documents_) {
+    for (const auto& jt : documents_[book.first]->words_on_pages()) {
+      words_with_base_form += jt.second.size();
+      base_forms++;
+    }
+  }
+  std::cout << "Total baseforms: " << base_forms << std::endl;
+  std::cout << "Baseforms with conjunctions: " << words_with_base_form << std::endl;
 
   // Create type-ahead lists of sorted words and sorted authors.
   CreateListWords(list_words_, 0);
-  CreateListWords(list_authors_, reverted_tag_map_["authors"]);
+  nlohmann::json all_words = list_words_;
+  func::WriteContentToDisc("all_words.json", all_words);
+  std::cout << "List words: " << list_words_.size() << "\n";
 
-  std::string page = db_.GetPage("12000", 1);
-  std::cout << page << std::endl;
+  CreateListWords(list_authors_, reverted_tag_map_["authors"]);
 
   return true;
 }
@@ -409,7 +422,7 @@ std::list<std::string> BookManager::GetSuggestions(std::string word, sorted_list
   size_t counter = 0; 
   for (const auto& it : list_words) {
     // calculate levensthein.
-    double value = fuzzy::cmp(word, it.first); 
+    double value = fuzzy::contains(word.c_str(), it.first.c_str(), word.length(), it.first.length()); 
     
     // Only add if found (0: direct match, 1,2: fuzzy or contains match)
     if(value != -1) {

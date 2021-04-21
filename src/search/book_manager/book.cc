@@ -317,7 +317,7 @@ size_t Book::GetPreviewPosition(std::string word, size_t best_page) {
 
   // Stop indexing and exit programm, when preview could not be found.
   if (pos == std::string::npos) {
-    std::cout << "Preview not found! " << key_ << ", " << word << ", " << best_page << std::endl;
+    std::cout << "Preview not found! " << key_ << ", " << word << ", " << page << std::endl;
     std::exit(404);  
   }
   return pos;

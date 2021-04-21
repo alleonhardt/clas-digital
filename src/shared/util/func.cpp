@@ -278,6 +278,7 @@ std::map<std::string, int> extractWordsFromString(std::string& buffer) {
   return words;
 }
 
+// ----- 8 -----
 bool checkPage(std::string &buffer) {
   const char arr[] = "----- ";
   if (buffer.length()<6)
@@ -288,9 +289,15 @@ bool checkPage(std::string &buffer) {
       return false;
   }
 
+  auto found = buffer.rfind(" -----");
+  if(found < 7 || found == std::string::npos) {
+    return false;
+  }
+
   for (unsigned int i = 6; i < buffer.length(); i++) {
-    if (buffer[i] == ' ')
+    if (buffer[i] == ' ') {
       return true;
+    }
     else if (buffer[i] < 48 || buffer[i] > 57)
       return false;
   }

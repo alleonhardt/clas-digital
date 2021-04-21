@@ -51,6 +51,7 @@ set(SRC_FILES_SEARCH
   src/shared/metadata_handler.cc 
   src/shared/util/func.cpp 
   src/shared/util/fuzzy.cpp
+  src/shared/util/ubuntu20matherror.cpp
 )
 
 set(SRC_FILES_SEARCH_TEST 
@@ -70,6 +71,7 @@ set(SRC_FILES_SEARCH_TEST
   src/search/tests/test_func.cc
   src/search/tests/test_fuzzy_search.cc
   src/search/tests/util.cc
+  src/shared/util/ubuntu20matherror.cpp
 )
 
 set(SRC_FILES_SPEED_TEST 
@@ -79,6 +81,7 @@ set(SRC_FILES_SPEED_TEST
   src/search/data_models/tmp_word_info.cc 
   src/search/data_models/result_object.cc
   src/search/data_models/search_object.cc 
+  src/shared/util/ubuntu20matherror.cpp
   src/search/data_models/search_options.cc 
   src/shared/metadata_handler.cc 
   src/shared/util/func.cpp 

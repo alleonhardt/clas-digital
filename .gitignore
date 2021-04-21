@@ -12,6 +12,7 @@ web/catalogue/*
 bin/*
 compile_commands.json
 server.config
+search.config
 .clangd/*
 .cache/*
 src/search/tests/example_data/ocr_data/test_books/UEHEJINT/intern
