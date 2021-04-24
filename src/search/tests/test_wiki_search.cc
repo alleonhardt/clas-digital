@@ -122,7 +122,6 @@ SCENARIO ("Searching for wiki words with normal search", "[wiki_fuzzy]") {
 }
 
 
-/*
 SCENARIO ("Searching for wiki words - search options", "[wiki_fuzzy]") {
 
   GIVEN ("An existing index based on a wikipedia entries and fuzzy-search") {
@@ -130,19 +129,6 @@ SCENARIO ("Searching for wiki words - search options", "[wiki_fuzzy]") {
     BaseData* base_data = BaseData::wiki_instance("wiki_data");
 
     // Initialize basic search_options.
-
-    WHEN ("Searching for 'and' with specific author (first name)") {
-      SearchOptions search_options(true, true, true, 0, 2070, 0, "Kandis", {"XCFFDRQC"});
-      auto results = util::CheckResultsForQuery("and", search_options, base_data);
-      REQUIRE(util::CheckAuthors(results, search_options.author()));
-    }
-
-    WHEN ("Searching for 'and' with specific author (last name)" ) {
-      SearchOptions search_options(true, true, true, 0, 2070, 0, "Mclaughlin", {"XCFFDRQC"});
-      auto results = util::CheckResultsForQuery("and", search_options, base_data);
-      REQUIRE(util::CheckAuthors(results, search_options.author()));
-    }
-
     WHEN ("Searching for 'and' with specific sorting: relevance") {
       SearchOptions search_options(true, true, true, 0, 2070, 0, "", {"XCFFDRQC"});
       auto results = util::CheckResultsForQuery("and", search_options, base_data);
@@ -160,6 +146,19 @@ SCENARIO ("Searching for wiki words - search options", "[wiki_fuzzy]") {
       auto results = util::CheckResultsForQuery("and", search_options, base_data);
       REQUIRE(util::CheckSorting(results, search_options.sort_results_by()));
     }
+
+    WHEN ("Searching for books before 1999, zero results found") {
+      SearchOptions search_options(true, true, true, 0, 1998, 0, "", {"XCFFDRQC"});
+      SearchObject search_object = SearchObject("and", search_options, base_data->dict());
+      auto results = base_data->book_manager().Search(search_object);
+      REQUIRE(results.size() == 0);
+    }
+
+    WHEN ("Searching for books after 1999, zero results found") {
+      SearchOptions search_options(true, true, true, 2000, 2070, 0, "", {"XCFFDRQC"});
+      SearchObject search_object = SearchObject("and", search_options, base_data->dict());
+      auto results = base_data->book_manager().Search(search_object);
+      REQUIRE(results.size() == 0);
+    }
   }
 }
-*/

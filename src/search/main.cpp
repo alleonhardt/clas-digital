@@ -103,8 +103,10 @@ void Search(const Request& req, Response& resp, const std::vector<std::string>&
   int sort_result_by = 0;
   if (sort == "chronologically") sort_result_by = 1;
   if (sort == "alphabetically") sort_result_by = 2;
+  std::cout << "Constructing search options" << std::endl;
   SearchOptions search_options(fuzzyness, scope=="metadata", scope=="corpus", pubafter, pubbefore, 
       sort_result_by, author, pillars);
+  std::cout << "Constructing search object" << std::endl;
   SearchObject search_object = SearchObject(query, search_options, dict);
 
   // Start search.
@@ -158,7 +160,7 @@ void Search(const Request& req, Response& resp, const std::vector<std::string>&
 
     // Add number of results and elapsed time to response.
     search_response["max_results"] = result_list.size();
-    auto elapsed_seconds = std::chrono::system_clock::now() - time_start;
+    std::chrono::duration<double> elapsed_seconds = std::chrono::system_clock::now() - time_start;
     search_response["time"] = elapsed_seconds.count();
   }
   resp.set_content(search_response.dump(), "application/json");
@@ -299,7 +301,12 @@ int main(int argc, char *argv[]) {
   std::string path_to_database = config["search_data"];
   std::string path_to_metadata = config["metadata"];
   std::string path_to_dictionary = config["dictionary"];
+  std::vector<std::string> upload_points = config["upload_points"];
   int start_port = config["port"].get<int>();
+  std::cout << "Using " << path_to_database << " and following directories: " << std::endl;
+  for (const auto& it : upload_points) 
+    std::cout << "- " << it << std::endl;
+  std::cout << std::endl;
 
 
   //Load and parse metadata 
@@ -319,7 +326,7 @@ int main(int argc, char *argv[]) {
 
   // Create book manager
   std::cout << "initializing bookmanager..." << std::endl;
-  BookManager manager(config["upload_points"], &dict, parse_config, path_to_database);
+  BookManager manager(upload_points, &dict, parse_config, path_to_database);
 
   // Create items form metadata-json.
   manager.CreateItemsFromMetadata(metadata["items"]["data"], reload_pages);

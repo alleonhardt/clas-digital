@@ -129,6 +129,9 @@ void BookManager::AddBook(std::string path, std::string key, bool reload_pages) 
 }
 
 std::list<ResultObject> BookManager::Search(SearchObject& search_object) {
+  if (search_object.query() == "")
+    return {};
+
   // Get converted words.
   std::vector<std::string> words = search_object.converted_words();
   bool fuzzy_search = search_object.search_options().fuzzy_search();
@@ -237,19 +240,20 @@ void BookManager::FuzzySearch(std::string word, SearchOptions& search_options,
   for (const auto& it : index_list_) {
 
     // Calculate fuzzy score (occures in word, and levensthein-distance).
-    int score = fuzzy::cmp(word, it.first);
+    int score = fuzzy::cmp(word, it);
     if (score == -1) 
       continue;
 
     // Iterate over all found items:
-    for (auto item : it.second) {
+    auto matching_items = index_map_[it];
+    for (auto item : matching_items) {
       // Skip if item is in conflict with search-options. Only check 
       // search-options, if item is not already in results.
       if (results.count(item.first) == 0 && 
           !CheckSearchOptions(search_options, documents_[item.first])) 
         continue;
       // Add new information to result object.
-      results[item.first].NewResult(word, it.first, item.second.scope_, score, item.second.relevance_, it.second.size());
+      results[item.first].NewResult(word, it, item.second.scope_, score, item.second.relevance_, matching_items.size());
     }
   }
 }
@@ -298,7 +302,9 @@ void BookManager::SortByRelavance(sort_list& unordered) {
 void BookManager::SortChronologically(sort_list& unordered) {
   unordered.sort([&](const auto &a, const auto &b) {
         int date1 = documents_[a.second]->date();
+        if (date1 == -1) date1 = 2050;
         int date2 = documents_[b.second]->date();
+        if (date2 == -1) date2 = 2050;
         if (date1 == date2) 
           return a.first < b.first;
         return date1 < date2; 
@@ -307,8 +313,8 @@ void BookManager::SortChronologically(sort_list& unordered) {
 
 void BookManager::SortAlphabetically(sort_list& unordered) {
   unordered.sort([&](const auto &a,const auto &b) {
-        std::string author1 = *documents_[a.second]->authors().cbegin();
-        std::string author2 = *documents_[b.second]->authors().cbegin();
+        std::string author1 = documents_[a.second]->first_author_lower();
+        std::string author2 = documents_[b.second]->first_author_lower();
         if (author1 == author2) 
           return a.first < b.first;
         return author1 < author2 ; 
@@ -359,7 +365,7 @@ void BookManager::CreateIndexMap() {
 
   // Create index map as list:
   for (const auto& it : index_map_)
-    index_list_.push_back({it.first, it.second});
+    index_list_.push_back(it.first);
 }
 
 void BookManager::AddWordsFromItem(std::unordered_map<std::string, std::vector<WordInfo>> m, 
@@ -444,10 +450,19 @@ std::list<std::string> BookManager::GetSuggestions(std::string word, sorted_list
   std::list<std::string> sorted_search_results;
   counter=0;
   for (auto it : suggs) {
-    sorted_search_results.push_back(it.second); 
+    sorted_search_results.push_back(GetConjunction(it.second)); 
     if (++counter == 10) break;
   }
   return sorted_search_results;
+}
+
+std::string BookManager::GetConjunction(std::string suggestion) {
+  // Get First book to contain this word.
+  Book* book = documents_[index_map_[suggestion].begin()->first];
+  if (book->words_on_pages().count(suggestion) > 0)
+    return book->words_on_pages().at(suggestion).begin()->word_;
+  else
+   return book->words_in_tags().at(suggestion).begin()->word_;
 }
 
 std::vector<std::map<short, std::string>> BookManager::ConvertMetadata(const nlohmann::json &metadata_items) {

@@ -1,5 +1,6 @@
 #include "util.h"
 #include "catch2/catch.hpp"
+#include "func.hpp"
 #include "result_object.h"
 #include <iostream>
 
@@ -61,6 +62,7 @@ namespace util {
     }
     return true;
   }
+
   bool CheckSorting(std::list<ResultObject>& results, int sort_style) {
     double prev_score = 100000;
     int prev_date = 0;
@@ -73,14 +75,18 @@ namespace util {
         prev_name = it.score();
       }
       else if (sort_style == 1) {
-        if (it.book()->date() < prev_date) {
+        int date = it.book()->date();
+        if (date == -1) date = 2050;
+        if (date < prev_date) {
           return false;
         }
         prev_date = it.book()->date();
       }
       else if (sort_style == 2) {
-        std::string author = *it.book()->authors().cbegin();
+        std::string author = it.book()->GetFromMetadata("authors");
+        func::ConvertToLower(author);
         if (author < prev_name) {
+          std::cout << author << " < " << prev_name << std::endl;
           return false;
         }
         prev_name = it.book()->GetFromMetadata("authors");

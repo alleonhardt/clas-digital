@@ -176,7 +176,7 @@ namespace func {
    * @param pos position to center.
    * @param length length to trim string to
    */
-  void TrimStringToLength(std::string& str, int pos, int length);
+  int TrimStringToLength(std::string& str, int pos, int length);
 
   /**
    * Delete non-valid characters and escape html code.

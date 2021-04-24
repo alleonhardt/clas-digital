@@ -40,12 +40,13 @@ public:
   Book(std::map<short, std::string> metadata);
 
   // **** Getter **** //
-  const std::string& key();
-  const std::string& path();
+  std::string key();
+  std::string path();
   std::string ocr_path();
   bool has_ocr() const;
   bool has_images() const;
   int num_pages();
+  std::string first_author_lower() const;
   const std::set<std::string>& authors() const;
   const std::set<std::string>& collections() const;
   int date();
@@ -153,6 +154,7 @@ private:
   std::map<short, std::string> metadata_;
 
   // From json/ metadata-handler
+  std::string first_author_lower_;
   std::set<std::string> authors_;
   int date_;  ///< Date for fast access during search
   std::set<std::string> collections_; ///< Collections (fast access)

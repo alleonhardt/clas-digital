@@ -44,7 +44,7 @@ Book::Book(std::map<short, std::string> metadata) : metadata_(metadata) {
   
   // date:
   date_ = -1;
-  if (GetFromMetadata("date") != "") {
+  if (GetFromMetadata("date") != "undefined") {
     int date = -1; 
     try {
       date_ = stoi(GetFromMetadata("date"));
@@ -55,19 +55,21 @@ Book::Book(std::map<short, std::string> metadata) : metadata_(metadata) {
   }
 
   // Create set of authors.
-  for (auto author : func::Split2(GetFromMetadata("authors"), ", "))
+  first_author_lower_ = GetFromMetadata("authors");
+  for (auto author : func::Split2(first_author_lower_, ", "))
     authors_.insert(func::ReplaceMultiByteChars(func::ReturnToLower(author)));
+  func::ConvertToLower(first_author_lower_);
 
   CreateMetadataIndex();
 }
 
 // **** GETTER **** //
 
-const std::string& Book::key() { 
+std::string Book::key() { 
   return key_;
 }
 
-const std::string& Book::path() {
+std::string Book::path() {
   return path_;
 }
 
@@ -84,6 +86,10 @@ bool Book::has_images() const {
 
 int Book::num_pages() { 
   return num_pages_; 
+}
+
+std::string Book::first_author_lower() const {
+  return first_author_lower_;
 }
 
 const std::set<std::string>& Book::authors() const {
@@ -132,7 +138,7 @@ std::string Book::GetFromMetadata(std::string tag) const {
   if (reverted_tag_reference_.count(tag) == 0)
     return "undefined";
   std::string str = metadata_.at(reverted_tag_reference_.at(tag));
-  return str;
+  return (str == "") ? "undefined" : str;
 }
 
 // **** SETTER **** //
@@ -599,13 +605,14 @@ std::string Book::GetOnePreview(std::pair<std::string, short> matched_word, bool
   func::HighlightWordByPos(prev_str, pos, "<mark>", "</mark>");
 
   // Trim string (text, position to center, min threschold, result-length)
-  func::TrimStringToLength(prev_str, pos, 150);
+  int modifications = func::TrimStringToLength(prev_str, pos, 150);
 
   // Delete or escape invalid characters if needed.
   func::EscapeDeleteInvalidChars(prev_str);
 
-  // Append [...] front and back.
-  prev_str = "\u2026" + prev_str + "\u2026";
+  // Append [...] front and back if string was trimmed.
+  if (modifications > 0)
+    prev_str = "\u2026" + prev_str + "\u2026";
 
   // If found in corpus, append page number at the end of preview.
   if (scope & 1) 

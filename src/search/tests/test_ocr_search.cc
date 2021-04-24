@@ -283,3 +283,43 @@ SCENARIO("Test finding pages and matches in one book", "[search in book]") {
     }
   }
 }
+
+SCENARIO ("Searching for ocr words - search options", "[ocr_fuzzy]") {
+
+  GIVEN ("An existing index based on an ocr") {
+
+    BaseData* base_data = BaseData::wiki_instance("ocr_data");
+
+    // Initialize basic search_options.
+
+    WHEN ("Searching for 'hund' with specific author (first name)") {
+      SearchOptions search_options(true, true, true, 0, 2070, 0, "Roland", {"XCFFDRQC"});
+      auto results = util::CheckResultsForQuery("and", search_options, base_data);
+      REQUIRE(util::CheckAuthors(results, search_options.author()));
+    }
+
+    WHEN ("Searching for 'and' with specific author (last name)" ) {
+      SearchOptions search_options(true, true, true, 0, 2070, 0, "Borgards", {"XCFFDRQC"});
+      auto results = util::CheckResultsForQuery("and", search_options, base_data);
+      REQUIRE(util::CheckAuthors(results, search_options.author()));
+    }
+
+    WHEN ("Searching for 'and' with specific sorting: relevance") {
+      SearchOptions search_options(true, true, true, 0, 2070, 0, "", {"XCFFDRQC"});
+      auto results = util::CheckResultsForQuery("and", search_options, base_data);
+      REQUIRE(util::CheckSorting(results, search_options.sort_results_by()));
+    }
+
+    WHEN ("Searching for 'and' with specific sorting: chronologically") {
+      SearchOptions search_options(true, true, true, 0, 2070, 1, "", {"XCFFDRQC"});
+      auto results = util::CheckResultsForQuery("and", search_options, base_data);
+      REQUIRE(util::CheckSorting(results, search_options.sort_results_by()));
+    }
+
+    WHEN ("Searching for 'and' with specific sorting: alphabetically") {
+      SearchOptions search_options(true, true, true, 0, 2070, 2, "", {"XCFFDRQC"});
+      auto results = util::CheckResultsForQuery("and", search_options, base_data);
+      REQUIRE(util::CheckSorting(results, search_options.sort_results_by()));
+    }
+  }
+}

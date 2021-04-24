@@ -43,7 +43,8 @@ class BookManager {
     };
     typedef std::unordered_map<std::string, std::map<std::string, Match>> index_map_type;
     index_map_type index_map_;
-    std::vector<std::pair<std::string, std::map<std::string, Match>>> index_list_;
+    // std::vector<std::pair<std::string, std::map<std::string, Match>>> index_list_;
+    std::vector<std::string> index_list_;
 
     typedef std::vector<std::pair<std::string, size_t>> sorted_list_type;
     sorted_list_type list_words_; ///< Sorted list of all words by score (for typeahead).
@@ -169,6 +170,8 @@ class BookManager {
      * F.e. `[{1:"Picture of Dorian Gray", 2:"D7YH2W", 3:"Wilde, Oscar}, {...}, ...]`
      */
     std::vector<std::map<short, std::string>> ConvertMetadata(const nlohmann::json& metadata_items);
+
+    std::string GetConjunction(std::string);
 }; 
 
 #endif

@@ -325,24 +325,28 @@ void HighlightWordByPos(std::string& str, int pos, std::string left, std::string
   }
 }
 
-void TrimStringToLength(std::string& str, int pos, int length) {
+int TrimStringToLength(std::string& str, int pos, int length) {
   int before = pos-75;  
   int after = pos+75;
+  int modifications = 0;
 
   // Correct before if below zero and add negative numbers to after.
   if (before < 0) {
     after+=-1*before;
+    modifications += before;
     before = 0;
   }
 
   // Correct after and subtract exceeding numbers from before.
   if (after > str.length()) {
     before -= after - str.length();
+    modifications += after - str.length();
     // If now before is incorrect (below zero), set before to zero.
     if (before < 0) 
       before = 0;
   }
   str = str.substr(before, after-before);
+  return modifications;
 }
 
 void EscapeDeleteInvalidChars(std::string& str) {
