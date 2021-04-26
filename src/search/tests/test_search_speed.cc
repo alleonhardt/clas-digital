@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
   BaseData* base_data = BaseData::wiki_instance("wiki_data");
   
   // Initialize basic search_options.
-  SearchOptions search_options(fuzzy_search, true, true, 0, 2070, 0, "", {"XCFFDRQC"});
+  SearchOptions search_options(fuzzy_search, false, false, 0, 2070, 0, "", {"XCFFDRQC"});
 
   CheckResultsForQuery("Longacre", search_options, base_data);
 

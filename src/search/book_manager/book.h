@@ -54,7 +54,6 @@ public:
   index_map_type& words_on_pages();
   index_map_type& words_in_tags();
   size_t document_size() const;
-
     
   ///< Return whether book has images or ocr
   bool HasContent() const;

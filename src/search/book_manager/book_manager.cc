@@ -258,16 +258,25 @@ void BookManager::FuzzySearch(std::string word, SearchOptions& search_options,
   }
 }
 
-bool BookManager::CheckSearchOptions(SearchOptions& search_options, Book* book) {
+bool BookManager::CheckSearchOptions(SearchOptions& search_options, Book* document) {
+  
+  // If only metadata, but document has a corpus return false
+  if (search_options.only_metadata() && document->has_ocr())
+    return false;
+
+  // If only corpus, but document does not have a corpus, return false
+  if (search_options.only_corpus() && !document->has_ocr())
+    return false;
+  
   // If an author is given and in the string of authors, the auther is not
   // found, return false.
-  if(search_options.author().length() > 0) {
-    if (book->authors().count(search_options.author()) == 0)
+  if (search_options.author().length() > 0) {
+    if (document->authors().count(search_options.author()) == 0)
       return false;
   }
 
   // If date is specified (→ date is not -1) return false if date is outside of timerange.
-  int date = book->date();
+  int date = document->date();
   if (date != -1 && (date < search_options.year_from() || date > search_options.year_to()))
     return false;
        
@@ -275,7 +284,7 @@ bool BookManager::CheckSearchOptions(SearchOptions& search_options, Book* book) 
   if (search_options.collections().size() == 0)
     return true;
   for (const auto& collection : search_options.collections()) {
-    if (book->collections().count(collection) > 0)
+    if (document->collections().count(collection) > 0)
       return true;
   }
   return false;
