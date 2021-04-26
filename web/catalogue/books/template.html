@@ -15,8 +15,8 @@
     <link rel="shortcut icon" href="static/fav/hand-top-right-16+32+48.ico"/>
 
     <!-- Provide more sutable information show in google search -->
-    <title>Books - Cultural and Literary Animal Studies</title>
-    <meta name="description" lang="en" content="The CLAS Digital searchable book archive: index of all books."/>
+    <title>Documents - Cultural and Literary Animal Studies</title>
+    <meta name="description" lang="en" content="The CLAS Digital searchable document archive: index of all documents."/>
     <link href="/catalogue/catalogue.css" rel="stylesheet" type="text/css">
 
     <script src="/user.js"></script>
@@ -35,15 +35,15 @@
 	    </ol>
 	</nav>
 	<article class="main">
-	    <h1>Index of all Books</h1>
-	    <p>{{ length(books) }} books</p>
+	    <h1>Index of all Documents</h1>
+	    <p>{{ length(books) }} documents</p>
 	    {% include "../search_template.html" %}
 
 	    <ol>
 		{% for pg in books %}
 		{% if pg.has_ocr %}
 		<li class="searchable_item">
-            <a title="This book has an OCR, which means it contains a searchable approximation of the text inside the book and possibly some images"  data-key="{{ pg.key }}" href="/books/{{pg.key}}/pages">
+            <a title="This document has an OCR, which means it contains a searchable approximation of the text inside the document and possibly some images"  data-key="{{ pg.key }}" href="/books/{{pg.key}}/pages">
                 <span class='bookhasocr'>[OCR]</span>
             </a>
             <a href="/books/{{pg.key}}/">{{ pg.title }}</a>

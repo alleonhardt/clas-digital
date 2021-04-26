@@ -16,7 +16,7 @@
 
     <!-- Provide more sutable information show in google search -->
     <title>{{year}} - Cultural and Literary Animal Studies</title>
-    <meta name="description" lang="en" content="The CLAS Digital searchable book archive: index of all booky published in {{year}}"/>
+    <meta name="description" lang="en" content="The CLAS Digital searchable document archive: index of all documents published in {{year}}"/>
 
     <script src="/Search.js"></script>
     <script src="/user.js"></script>
@@ -38,8 +38,8 @@
 	</nav>
 
 	<article class="main">
-	    <h1>Book published in {{ year }}</h1>
-	    <p>Found {{ length(books) }} books from the year {{ year }}</p>
+	    <h1>Documents published in {{ year }}</h1>
+	    <p>Found {{ length(books) }} documents from the year {{ year }}</p>
 	    {% include "../search_template.html" %}
 
 	    <ol>
