@@ -283,6 +283,13 @@ void CLASServer::do_upload(const httplib::Request& req, httplib::Response &resp)
     resp.status = 403;
     return;
   }
+
+  if(!cfg_->enable_uploads_) {
+    resp.status = 403;
+    resp.set_content("The server does not allow uploads at all on this server instance","text/plain");
+    return;
+  }
+
   bool forcedWrite=false;
   std::string scanId = "";
   std::string fileName = "";

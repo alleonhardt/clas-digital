@@ -27,6 +27,7 @@ namespace clas_digital
 
 
     bool use_https_;
+    bool enable_uploads_;
     unsigned short server_port_;
     long long file_cache_size_;
     std::vector<std::filesystem::path> mount_points_;

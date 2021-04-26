@@ -95,6 +95,11 @@ function ShowSelectedValues(obj) {
   if(start+limit > json.max_results)
     to = json.max_results - start;
 
+  console.log(limit);
+  console.log(start);
+  console.log(to);
+  console.log(json.books.length);
+  console.log("END");
   //Iterate over books and add to page.
 	for (var i=0; i<to; i++) {
     let newList = document.createElement("li");
@@ -253,6 +258,9 @@ function sendToPage(name) {
 	  requ += "&publicatedafter="+document.getElementById("publicatedAfter").value;
 	if(document.getElementById("publicatedBefore").value != 2049)
 	  requ +=  "&publicatedbefore="+ document.getElementById("publicatedBefore").value;
+  if(document.getElementById("scope").value != "") {
+    requ+="&scope="+document.getElementById("scope").value;
+  }
 	if(document.getElementById("limit").value != 10)
 	  requ += "&limit="+document.getElementById("limit").value;
 	if(document.getElementById("collections").value != "all")
@@ -323,7 +331,7 @@ window.addEventListener("load", function() {
   AddListeners();
   ReflectUrlValues();
   GetSearchResultsFromServer();
-  ;} ,false);
+  } ,false);
 
 function AddListeners() {
 
@@ -436,6 +444,10 @@ function ReflectUrlValues() {
 	if(getParameterByName('author')!=null) 
     document.getElementById("author").value=getParameterByName('author');
 
+  if(getParameterByName("scope")!=null) {
+    document.getElementById("scope").value = getParameterByName("scope");
+  }
+
 	if(getParameterByName('publicatedafter')!=null) {
     document.getElementById("publicatedAfter").value = parseInt(getParameterByName
       ('publicatedafter'));
@@ -492,8 +504,7 @@ function GetSearchResultsFromServer() {
 
   let requ = "api/v2/search" + url.substr(pos, url.length)
   var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-
+  xhttp.onload = function() {
     if (this.status == 400) {
       if (this.responseText != "") {
         console.log(this.responseText);
@@ -506,6 +517,7 @@ function GetSearchResultsFromServer() {
     }
     else {
       //parse search results from respond
+      console.log(this.responseText);
       if (this.responseText == "")
         return;
       var search_results= JSON.parse(this.responseText);

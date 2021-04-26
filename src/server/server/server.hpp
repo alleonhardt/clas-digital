@@ -73,8 +73,19 @@ namespace clas_digital
 
 
 
+      /**
+       * Handles the upload of one file to the remote server. It will accept PDF, JPG and PNG at the moment.
+       */
       void do_upload(const httplib::Request& req, httplib::Response &resp);
+
+      /**
+       * Create the bibliography given a set of items in the request query.
+       */
       void do_create_bibliography(const httplib::Request &req,httplib::Response &resp);
+
+      /**
+       * Handle the login of a single user
+       */
       void HandleLogin(const httplib::Request& req, httplib::Response &resp);
       void SendUserList(const httplib::Request& req, httplib::Response &resp);
       void UpdateUserList(const httplib::Request& req, httplib::Response &resp);

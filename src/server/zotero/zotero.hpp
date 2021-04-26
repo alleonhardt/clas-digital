@@ -63,7 +63,7 @@ static std::string returnToLower(std::string &str)
     public:
       ZoteroReference(IFileHandler *handler, nlohmann::json js) {
         metadata_ = js; 
-        for(auto &vec: handler->GetUploadPoints()) {
+        for(auto &vec: handler->GetMountPoints()) {
           auto path = vec / "books" / GetKey();
           if(std::filesystem::exists(path)) 
             _path = path.string();
@@ -71,8 +71,8 @@ static std::string returnToLower(std::string &str)
 
         std::error_code ec;
         if(_path == "") {
-          std::filesystem::create_directory(handler->GetUploadPoints()[0]/GetKey(),ec);
-          _path = handler->GetUploadPoints()[0]/GetKey();
+          std::filesystem::create_directory(handler->GetMountPoints()[0]/GetKey(),ec);
+          _path = handler->GetMountPoints()[0]/GetKey();
         }
         std::filesystem::create_directory(_path+"/pages",ec);
       }
