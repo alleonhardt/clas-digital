@@ -22,6 +22,7 @@ Error<ServerConfigReturnCodes> ServerConfig::LoadFromString(std::string config)
   {
     config_ = nlohmann::json::parse(config);
 
+    enable_uploads_ = config_.value("enable_uploads",false);
     use_https_ = config_.value("enable_https",false);
 
     if(use_https_)
