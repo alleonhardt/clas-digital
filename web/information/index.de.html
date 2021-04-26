@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!--<link rel="stylesheet" href="style.css">-->
+    <title>Informationen zu CLAS digital</title>
+
+    <!-- Link favicon, so google can show in search results -->
+    <link rel="shortcut icon" href="/static/fav/hand-top-right-16+32+48.ico"/>
+
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <link rel="canonical" href="https://www.clas-digital.uni-frankfurt.de/information/" />
+    <link rel="alternate" href="https://www.clas-digital.uni-frankfurt.de/information/index.de.html" hreflang="de" />
+    <link rel="up top" href="https://www.clas-digital.uni-frankfurt.de/" />
+
+    <script src='../user.js'></script>
+<style>
+
+body {
+    /* background: linear-gradient(rgba(255,255,255,.1), rgba(255,255,255,.1)), url("/clasdigital.png"); 
+    background-repeat: no-repeat;
+    background-position: right;
+    */
+    
+}
+
+body {
+    margin:0;
+}
+
+html {
+    margin:0;
+}
+
+div.sideimage {
+    float: right;
+}
+div.sideimage img{
+    width: 20em;
+}
+div.sideimage img#clasdog {
+    transform: scaleX(-1);
+}
+
+.GeneralPageLayout {
+    margin-top: 4rem;
+    width: 100%;
+    margin-right: 2rem;
+    padding-left: 2rem;
+}
+
+.GeneralPageLayout p {
+    max-width: 60em;
+}
+
+.GeneralPageLayout p abbr {
+    cursor: auto;
+    text-decoration: auto;
+}
+
+</style>
+<link href="/topnav.css" rel="stylesheet" type="text/css">
+<script>
+window.addEventListener("load",function(){initialise("homelink");},false);
+</script>
+  </head>
+<body>
+   <nav id='tpnav' class="topnav">
+	<a class='dropdown-banner active' id='homelink' href='/information/'>Information</a>
+	<a  id='searchlink' href='/search'>Search</a>
+	<div class='dropdown'>
+		<a id='statisticslink'  href='/catalogue'>Catalogue</a>
+		<div class='dropdown-content'>
+			<a href="/catalogue/books">Books</a>
+			<a href="/catalogue/authors">Authors</a>
+			<a href="/catalogue/collections">Collections</a>
+			<a href="/catalogue/years">Years</a>
+		</div>
+	</div>
+	<a id='administrationlink' class='classifiedContent ' href='/private/admin/Administration.html' data-acc=4>Administration</a>
+	<a id='uploadbooklink' class='classifiedContent ' href='/private/write/UploadBook.html' data-acc=2>Upload Books</a>
+
+	<div class='topnav-right-in' id='loggedintopnav'>
+		<span id='LoggedInAs'>Logged in</span>
+		<input id="logoutBut" type='submit' value="Logout" class='loginbutton' onclick="DoLogout();return true;"/>
+	</div>
+	<div class='topnav-right-out' id='loggedouttopnav'>
+		<form id ="LoginForm" class='loginform'>
+			<input id="EmailType" class="emailinput" type="email" name="email" placeholder="Email" aria-label="Email" required>
+			<input id="PasswordType" class="passwordinput" type="password" name="password" placeholder="Password" aria-label="Password" required>
+			<input id="LoginButton" type='submit' value="Log In" class='loginbutton' onclick="ExecuteLogin();return true;"/>
+			<div id="LoaderButton" class='loader'></div>
+		</form>
+	</div>
+
+</nav>
+<footer style="position: fixed; bottom: 20px; right: 40px; color: grey; font-size:11px">
+    <dl>
+        <dt>Generated:</dt>
+        <dd itemprop="dataModified" content="2021-04-19T17:39:20Z">
+            <time datetime="2021-04-19T17:39:20Z">2021-04-19 17:39:20</time>
+        </dd>
+    </dl>
+</footer>
+
+ 
+
+ <div class="GeneralPageLayout">
+    <div class="sideimage" > <img id="clasdog" src="/clasdigital.png"/> </div>
+    <h1>Informationen zu CLAS digital</h1>
+     <p>
+   Die <span lang="en">Cultural and Literary Animal Studies</span> (<abbr lang="en" title="Cultural and Literary Animal Studies">CLAS</abbr>) widmen sich unter einer kultur-, literatur- und wissensgeschichtlichen Perspektive dem Fragefeld der Tiere.
+<abbr lang="en" title="Cultural and Literary Animal Studies">CLAS</abbr> digital bietet eine Forschungsbibliographie zu den <span lang="en">Cultural and Literary Animal Studies</span> sowie Volltexte aus der Geschichte des Tierwissens, mit Konzentration auf die Naturkunde/Zoologie zwischen 1750 und 1850.
+     </p>
+
+     <p>
+Die Forschungsbibliographie erschließt die geistes- und kulturwissenschaftliche Tierforschung in ihrer disziplinären Vielfalt, gleichwohl ist sie weder vollständig noch ausgewogen; vielmehr trägt sie deutlich die Spuren ihres Entstehungskontextes, d.h. der Neueren Deutschen Literaturgeschichte.  
+Die Forschungsbibliographie wird ständig erweitert. Hinweise nehmen wir sehr gerne auf, bitte per Mail an <a href='mailto:clas-digital@dlist.server.uni-frankfurt.de'>clas-digital@dlist.server.uni-frankfurt.de</a>.
+     </p>
+
+     <p>Die Texte aus der Geschichte des Tierwissens werden im Zusammenhang mit dem Projekt „Büchners Tiere“ (<a href="https://www.uni-frankfurt.de/69369128/FB_10___NDL___Lehrende___Prof__Dr__Roland_Borgards">Roland Borgards</a>) erschlossen; daraus erklärt sich die Beschränkung auf den Zeitraum zwischen 1750 und 1850 und die Konzentration auf deutschsprachige Texte. Das hier zugänglich gemachte Korpus kann für benachbarte Fragen (Schillers Tiere, Tiecks Tiere, die Tiere der Romantik, literarische Tiere im frühen 19. Jahrhundert, Tiere in Goethes Faust, usw.) ohne Einschränkung benutzt werden. Eine Erweiterung des Korpus ist geplant, zunächst bis 1900, dann bis 1950, dann um frühneuzeitliche, mittelalterliche und antike zoologische Texte.
+     </p>
+ </div>
+</body>
+</html>

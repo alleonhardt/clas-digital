@@ -39,9 +39,55 @@ configure_file("${CMAKE_SOURCE_DIR}/src/shared/version.hpp.in"
 
 
 
+set(SRC_FILES_SEARCH 
+  src/search/book_manager/book.cc 
+  src/search/book_manager/book_manager.cc 
+  src/search/book_manager/database.cc
+  src/search/data_models/tmp_word_info.cc 
+  src/search/data_models/result_object.cc
+  src/search/data_models/search_object.cc 
+  src/search/data_models/search_options.cc 
+  src/search/main.cpp 
+  src/shared/metadata_handler.cc 
+  src/shared/util/func.cpp 
+  src/shared/util/fuzzy.cpp
+  src/shared/util/ubuntu20matherror.cpp
+)
 
+set(SRC_FILES_SEARCH_TEST 
+  src/search/book_manager/book.cc 
+  src/search/book_manager/book_manager.cc 
+  src/search/book_manager/database.cc
+  src/search/data_models/tmp_word_info.cc 
+  src/search/data_models/result_object.cc
+  src/search/data_models/search_object.cc 
+  src/search/data_models/search_options.cc 
+  src/shared/metadata_handler.cc 
+  src/shared/util/func.cpp 
+  src/shared/util/fuzzy.cpp
+  src/search/tests/book_manager/test_book.cc
+  src/search/tests/test_ocr_search.cc
+  src/search/tests/test_wiki_search.cc
+  src/search/tests/test_func.cc
+  src/search/tests/test_fuzzy_search.cc
+  src/search/tests/util.cc
+  src/shared/util/ubuntu20matherror.cpp
+)
 
-set(SRC_FILES_SEARCH src/search/book_manager/book.cc src/search/book_manager/book_manager.cc src/search/book_manager/word_info.cc src/search/search/search.cc src/search/search/search_options.cc src/search/main.cpp src/shared/metadata_handler.cc src/shared/util/func.cpp src/shared/util/fuzzy.cpp)
+set(SRC_FILES_SPEED_TEST 
+  src/search/book_manager/book.cc 
+  src/search/book_manager/book_manager.cc 
+  src/search/book_manager/database.cc
+  src/search/data_models/tmp_word_info.cc 
+  src/search/data_models/result_object.cc
+  src/search/data_models/search_object.cc 
+  src/shared/util/ubuntu20matherror.cpp
+  src/search/data_models/search_options.cc 
+  src/shared/metadata_handler.cc 
+  src/shared/util/func.cpp 
+  src/shared/util/fuzzy.cpp
+  src/search/tests/test_search_speed.cc
+)
 
 add_library(clas_server_lib OBJECT src/shared/metadata_handler.cc
   src/shared/util/URLParser.cpp src/shared/util/ubuntu20matherror.cpp
@@ -80,15 +126,16 @@ add_executable(clas_digital_server_test.o $<TARGET_OBJECTS:clas_server_lib>
 
 set(CXX_STDLIB "")
 
-
 add_executable(clas_digital_search.o  ${SRC_FILES_SEARCH})
+add_executable(clas_digital_search_test.o  ${SRC_FILES_SEARCH_TEST})
+add_executable(clas_digital_speed_test.o  ${SRC_FILES_SPEED_TEST})
 
 if(MSVC)
   add_compile_options(/W4 /WX)
   #target_link_libraries(test_plugin ${CONAN_LIBS} ${CXX_STDLIB})
   #  target_link_libraries(clas_digital_plugin ${CONAN_LIBS} ${CXX_STDLIB})
 else()
-  add_compile_options(-Wall -Wextra -pedantic -Werror)
+  add_compile_options(-Wall -Wextra -pedantic -Werror -O3)
 
   set(CXX_STDLIB stdc++)
 endif()
@@ -131,11 +178,30 @@ target_include_directories(clas_digital_search.o PUBLIC
   "src/shared"
   "src/shared/util"
   "src/search"
+  "src/search/data_models"
+)
+
+target_include_directories(clas_digital_search_test.o PUBLIC
+  "src/shared"
+  "src/shared/util"
+  "src/search"
+  "src/search/data_models"
+  "src/search/tests"
+)
+
+target_include_directories(clas_digital_speed_test.o PUBLIC
+  "src/shared"
+  "src/shared/util"
+  "src/search"
+  "src/search/data_models"
+  "src/search/tests"
 )
 
 target_link_libraries(clas_digital_server.o ${CONAN_LIBS} ${CXX_STDLIB})
 target_link_libraries(clas_digital_server_test.o ${CONAN_LIBS} ${CXX_STDLIB})
 target_link_libraries(clas_digital_search.o ${CONAN_LIBS} ${CXX_STDLIB})
+target_link_libraries(clas_digital_search_test.o ${CONAN_LIBS} ${CXX_STDLIB})
+target_link_libraries(clas_digital_speed_test.o ${CONAN_LIBS} ${CXX_STDLIB})
 
 set(INSTALL_DIRS /etc/clas-digital-devel)
 set(SERVICE_TARGET clas-digital-devel)
@@ -146,6 +212,8 @@ install(FILES src/server/${SERVICE_TARGET}.service DESTINATION /etc/systemd/syst
 install(FILES src/default DESTINATION /etc/nginx/sites-available)
 install(PROGRAMS build/bin/clas_digital_server.o DESTINATION ${INSTALL_DIRS})
 install(PROGRAMS build/bin/clas_digital_search.o DESTINATION ${INSTALL_DIRS})
+install(PROGRAMS build/bin/clas_digital_search_test.o DESTINATION ${INSTALL_DIRS})
+install(PROGRAMS build/bin/clas_digital_speed_test.o DESTINATION ${INSTALL_DIRS})
 install(DIRECTORY web DESTINATION ${INSTALL_DIRS} PATTERN "web/books/*" EXCLUDE)
 install(DIRECTORY bin/trainingdata DESTINATION ${INSTALL_DIRS})
 install(CODE "MESSAGE(\"Installing files done. Restarting nginx and the service ${SERVICE_TARGET}\")")

@@ -1,353 +1,480 @@
 #include "book_manager.h"
 #include "book_manager/book.h"
-#include "search/search.h"
+#include "func.hpp"
+#include "gramma.h"
+#include "nlohmann/json.hpp"
+#include "result_object.h"
+#include "search_object.h"
+#include "search_options.h"
+#include <cmath>
+#include <cstddef>
+#include <exception>
+#include <iostream>
+#include <numeric>
 #include <ostream>
 #include <utility>
 #include <vector>
 
-BookManager::BookManager(std::vector<std::string> mount_points, std::string dictionary_low) 
-  : upload_points_(mount_points){
-  std::string sBuffer;
-  std::ifstream read(dictionary_low);
+BookManager::BookManager(std::vector<std::string> mount_points, Dict* dict, 
+    const nlohmann::json& search_config, std::string search_data_location) 
+  : db_(Database(search_data_location)),  upload_points_(mount_points){
+
+  // Load dictionary
+  full_dict_ = dict;
+
+  // Set search-config and created metadata tags (bit → {tag-name, relevance}).
+  search_config_ = search_config;
+  metadata_tags_ = func::CreateMetadataTags(search_config_);  
+
   
-  while(getline(read, sBuffer)) {
-    std::vector<std::string> vec = func::split2(sBuffer, ":");
-    std::vector<std::string> vec2 = func::split2(vec[1], ",");
-    for(size_t i=0; i<vec2.size(); i++) {
-      dict_[vec[0]].insert(vec2[i]);
-      dict_[vec2[i]].insert(vec[0]);
-    }
-  }
-  std::cout << "Created dictionary. Size: " << dict_.size() << "\n";
-}
-
-std::unordered_map<std::string, Book*>& BookManager::map_of_books() {
-  return map_books_;
-}
-
-BookManager::MAPWORDS& BookManager::map_of_authors() {
-  return map_words_authors_;
-}
-
-std::map<std::string, std::vector<std::string>>& BookManager::map_unique_authors() {
-  return map_unique_authors_;
-}
-
-void BookManager::WriteListofBooksWithBSB() {    
-  std::string untracked_books = "Currently untracked books:\n";
-  std::string inBSB_noOcr = "Buecher mit bsb-link, aber ohne OCR: \n";
-  std::string gibtEsBeiBSB_noOCR = "Buecher mit tag \"gibtEsBeiBSB\" aber ohne ocr: \n";
-  std::string gibtEsBeiBSB_OCR = "Buecher mit tag \"gibtEsBeiBSB\" aber mit ocr: \n";
-  std::string BSBDownLoadFertig_noOCR = "Buecher mit tag \"BSBDownLoadFertig\" aber ohne ocr: \n";
-  std::string tierwissen_noOCR = "Buecher in \"Geschichte des Tierwissens\" aber ohne ocr: \n";
-
-  for (auto it : map_books_) {
-    std::string info = it.second->key() + ": " + it.second->metadata().GetShow2() + "\n";
-    if (it.second->has_ocr() == false) {
-      //Check if book has a bsb-link (archiveLocation)
-      if (it.second->metadata().GetMetadata("archiveLocation", "data") != "")
-        inBSB_noOcr += info;
-      
-      //Check if book has tag: "GibtEsBeiBSB"
-      if (it.second->metadata().HasTag("GibtEsBeiBSB") == true)
-        gibtEsBeiBSB_noOCR += info;
-
-      //Check if book has tag: "BSBDownLoadFertig"
-      if (it.second->metadata().HasTag("BSBDownLoadFertig") == true)
-        BSBDownLoadFertig_noOCR += info;
-
-      //Check if book is in collection: "Geschichte des Tierwissens"
-      if (func::in("RFWJC42V", it.second->metadata().GetCollections()) == true)
-        tierwissen_noOCR += info;
-    }
-    else if (it.second->metadata().HasTag("GibtEsBeiBSB") == true)
-      gibtEsBeiBSB_OCR += info;
+  // Revert metadata_tags_ to easily find matching bit representation of string
+  // (tag-name → bit)
+  for (const auto& it : metadata_tags_) {
+    std::cout << it.first << ": " << it.second.first << ", " << it.second.second << std::endl;
+    reverted_tag_map_[it.second.first] = it.first;
   }
 
-  //Search for untracked books
-  std::vector<std::filesystem::path> vec;
-  for (const auto& entry : std::filesystem::directory_iterator("web/books")) {
-    std::string fileNameStr = entry.path().filename().string();
-    if (entry.is_directory() && map_books_.count(fileNameStr) == 0) {
-      std::ifstream readJson(entry.path().string() + "/info.json");
-      if (!readJson) 
-        continue;
-      nlohmann::json j;
-      readJson >> j;
-      if (j.count("data") == 0 || j["data"].count("creators") == 0 
-          || j["data"]["creators"][0].size() == 0) {
-        continue;
-      }
-      std::string sName = j["data"]["creators"][0].value("lastName", "unkown name");
-      std::string sTitle = j["data"].value("title", "unkown title");
-      untracked_books += fileNameStr + " - " + sName + ", \"" + sTitle + "\"\n";
-      readJson.close(); 
-      vec.push_back(entry); 
-    }
-  }
-
-  //Move old zotero files to archive: "zotero_old"
-  if (std::filesystem::exists("web/books/zotero_old") == false)
-    std::filesystem::create_directories("web/books/zotero_old");
-  for (const auto& it : vec) {
-    std::string path=it.string().substr(0, 9)+"/zotero_old"+it.string().substr(9);
-    try {
-      std::filesystem::rename(it, path);
-    }
-    catch (std::filesystem::filesystem_error& e) {
-      std::cout << e.what() << std::endl;
-    }
-  }
-
-  //Save books with bsb-link but o ocr
-  std::ofstream writeBSB_NoOCR("inBSB_noOcr.txt");
-  writeBSB_NoOCR << inBSB_noOcr;
-  writeBSB_NoOCR.close();
-
-  //Save books with tag GibtEsBeiBSB but without ocr
-  std::ofstream writeGIBT_NoOCR("gibtEsBeiBSB_noOCR.txt");
-  writeGIBT_NoOCR << gibtEsBeiBSB_noOCR;
-  writeGIBT_NoOCR.close();
-
-  //Save books with tag GibtEsBeiBSB but with ocr
-  std::ofstream writeGIBT_OCR("gibtEsBeiBSB_OCR.txt");
-  writeGIBT_OCR << gibtEsBeiBSB_OCR;
-  writeGIBT_OCR.close();
-
-  //Save books with tag BSBDownLoadFertig but with ocr
-  std::ofstream writeFERTIG_noOCR("BSBDownLoadFertig_noOCR.txt");
-  writeFERTIG_noOCR << BSBDownLoadFertig_noOCR;
-  writeFERTIG_noOCR.close();
-
-  //Save books in collection "Geschichte des Tierwissens": RFWJC42V, without ocr
-  std::ofstream writeTierwissen_noOCR("tierwissen_noOCR.txt");
-  writeTierwissen_noOCR << tierwissen_noOCR;
-  writeTierwissen_noOCR.close();
-
-  //Write all untracked books to seperate files
-  if(std::filesystem::exists("untracked_books.txt"))
-    std::filesystem::rename("untracked_books.txt", "web/books/zotero_old/untracked_books.txt");
-  if(vec.size() > 0) {
-    std::ofstream writeUntracked("untracked_books.txt");
-    writeUntracked << untracked_books;
-    writeUntracked.close();
-  }
+  // Set static variable for in books, to grant books acces to both
+  // metadata-tags and their revert accessing map.
+  Book::set_metadata_tag_reference(metadata_tags_);
+  Book::set_reverted_tag_reference(reverted_tag_map_);
+  Book::set_datebase(&db_);
 }
 
-bool BookManager::Initialize() {
-  std::cout << "BookManager: Starting initializing..." << std::endl;
+std::unordered_map<std::string, Book*>& BookManager::documents() {
+  return documents_;
+}
 
+const BookManager::index_map_type& BookManager::index_map() const {
+  return index_map_;
+}
+
+bool BookManager::Initialize(bool reload_pages) {
   std::cout << "BookManager: Extracting books." << std::endl;
-  //Go though all books and create book
+  
+  // Go though all and create item-index-map, only if book was created from metadata. 
   for (auto upload_point : upload_points_) {
     for (const auto& p : std::filesystem::directory_iterator(upload_point)) {
       std::string filename = p.path().stem().string();
-      if (map_books_.count(filename) > 0)
-        AddBook(p.path(), filename);
+      if (documents_.count(filename) > 0)
+        AddBook(p.path(), filename, reload_pages);
     }
   }
+
+  // Afer Initializing all books is done, the pages need to be transmitted to
+  // the database.
+  db_.AddPages();
 
   //Create map of all words + and of all words in all titles
   std::cout << "BookManager: Creating map of books." << std::endl;
-  CreateMapWords();
-  CreateMapWordsTitle();
-  CreateMapWordsAuthor();
-  std::cout << "Map words:   " << map_words_.size() << "\n";
-  std::cout << "Map title:   " << map_words_title_.size() << "\n";
-  std::cout << "Map authors: " << map_words_authors_.size() << "\n";
+  CreateIndexMap();
+  std::cout << "Map words: " << index_map_.size() << "\n";
 
-  // WriteListofBooksWithBSB();
+  size_t words_with_base_form = 0;
+  size_t base_forms = 0;
+  int counter=0;
+  for (const auto& book : documents_) {
+    for (const auto& jt : documents_[book.first]->words_on_pages()) {
+      words_with_base_form += jt.second.size();
+      base_forms++;
+    }
+  }
+  std::cout << "Total baseforms: " << base_forms << std::endl;
+  std::cout << "Baseforms with conjunctions: " << words_with_base_form << std::endl;
+
+  // Create type-ahead lists of sorted words and sorted authors.
+  CreateListWords(list_words_, 0);
+  nlohmann::json all_words = list_words_;
+  func::WriteContentToDisc("all_words.json", all_words);
+  std::cout << "List words: " << list_words_.size() << "\n";
+
+  CreateListWords(list_authors_, reverted_tag_map_["authors"]);
+
   return true;
 }
 
-void BookManager::UpdateZotero(nlohmann::json j_items) {
+void BookManager::CreateItemsFromMetadata(nlohmann::json j_items, bool reload_pages) {
+  // Empty complete database, when reloading pages is set.
+  if (reload_pages)
+    db_.ClearDatabase();
+
+  // Convert items according to search_config.
+  std::cout << "Converting items." << std::endl;
+  auto items = ConvertMetadata(j_items);
+
   //Iterate over all items in json
-  for (auto &it : j_items) {
+  for (auto &it : items) {
+    nlohmann::json json = it;
+    std::string key = it[reverted_tag_map_["key"]];
     // already exists: update metadata.
-    if (map_books_.count(it["key"]) > 0)
-      map_books_[it["key"]]->metadata().set_json(it);
+    if (documents_.count(key) > 0)
+      documents_[key]->UpdateMetadata(it);
 
     // does not exits: create new book and add to map of all books.
     else
-      map_books_[it["key"]] = new Book(it);
+      documents_[key] = new Book(it);
 
-    // If book's json does not contain the most relevant information, delete again
-    if(map_books_[it["key"]]->metadata().CheckJsonSet() == false) {
-      delete map_books_[it["key"]];
-      map_books_.erase(it["key"]);
-    }
+    // Add document to database (only queued).
+    db_.AddDocument(key);
   }
+
+  // Submit all queued documents.
+  db_.AddDocuments();
 }
 
-void BookManager::AddBook(std::string path, std::string sKey) {
+void BookManager::AddBook(std::string path, std::string key, bool reload_pages) {
   if(!std::filesystem::exists(path))
     return;
-  map_books_[sKey]->InitializeBook(path);
+  documents_[key]->InitializeBook(path, reload_pages);
 }
-    
 
-std::list<Book*> BookManager::DoSearch(SearchOptions* searchOpts) {
-    std::vector<std::string> sWords = func::split2(searchOpts->getSearchedWord(), "+");
-  //Start first search:
-  Search search(searchOpts, sWords[0]);
-  auto* results = search.search(map_words_, map_words_title_, map_words_authors_, 
-      map_books_, dict_);
+std::list<ResultObject> BookManager::Search(SearchObject& search_object) {
+  if (search_object.query() == "")
+    return {};
+
+  // Get converted words.
+  std::vector<std::string> words = search_object.converted_words();
+  bool fuzzy_search = search_object.search_options().fuzzy_search();
+  
+  // Caluculate start time.
+  auto start = std::chrono::system_clock::now();
+
+  // Start first search:
+  std::map<std::string, ResultObject> results;
+  DoSearch(results, words[0], search_object.search_options());
 
   // Do search for every other word.
-  for (size_t i=1; i<sWords.size(); i++) {
-    if(sWords[i].length() == 0)
-      continue;
+  for (size_t i=1; i<words.size(); i++) {
 
-    Search search2(searchOpts, sWords[i]);
-    auto* results2 = search2.search(map_words_, map_words_title_, 
-        map_words_authors_, map_books_, dict_);
-
-    for (auto it=results->begin(); it!=results->end();) {
-      if(results2->count(it->first) == 0)
-        it = results->erase(it);
-      else if(map_books_[it->first]->OnSamePage(sWords, searchOpts->getFuzzyness())==false)
-        it = results->erase(it);
-      else
+    // Start nth search:
+    std::map<std::string, ResultObject> results2;
+    DoSearch(results2, words[i], search_object.search_options());
+ 
+    // Erase all words from results which were not found in new results and join
+    // result-object-infos, of all others.
+    for (auto it=results.begin(); it!=results.end();) {
+      // Erase if not found.
+      if (results2.count(it->first) == 0)
+        it = results.erase(it);
+      // Join result-object (found scope, map of words, with scope)
+      else {
+        it->second.Join(results2[it->first]); 
         ++it;
+      }
+    }
+    if (results.size() == 0)
+      return {};
+  }
+  
+  // Simplyfy results (convert to map of book-keys and relevance. 
+  // Also add a pointer to the book for every result-object.
+  // If search query contained more than one word, also manipulate relevance of
+  // found match accoring to number of matches found on the same page.
+  std::list<std::pair<double, std::string>> simplyfied_results;
+  if (words.size() > 1) {
+    for (auto& [key, res_obj] : results) {
+      // Add book, and original words to result object and simplyfy result.
+      res_obj.set_book(documents_.at(key));
+      res_obj.set_original_words(search_object.converted_to_original());
+      simplyfied_results.push_back({res_obj.score(), key});
+
+      // Change score accoring to number of found words in one page.
+      res_obj.set_score(res_obj.score()*
+          res_obj.book()->WordsOnSamePage(res_obj.matches_as_list(), fuzzy_search));
     }
   }
-  //Sort results results and convert to list of books.
-  std::list<Book*> sorted_search_results;
-  for (auto it : SortMapByValue(results, searchOpts->getFilterResults()))
-    sorted_search_results.push_back(map_books_[it.first]); 
+  else {
+    for (auto& [key, res_obj] : results) {
+      // Add book, and original words to result object and simplyfy result.
+      res_obj.set_book(documents_.at(key));
+      res_obj.set_original_words(search_object.converted_to_original());
+      simplyfied_results.push_back({res_obj.score(), key});
+    }
+  }
+  auto end = std::chrono::system_clock::now();
+  std::chrono::duration<double> elapsed_seconds = end-start;
+  std::cout << "Completed search after " << elapsed_seconds.count() << " seconds." << std::endl;
+
+  // Sort results results and convert to list of books.
+  std::list<ResultObject> sorted_search_results;
+  SortMapByValue(simplyfied_results, search_object.search_options().sort_results_by());
+  for (auto it : simplyfied_results)
+    sorted_search_results.push_back(results[it.second]); 
+
+  end = std::chrono::system_clock::now();
+  elapsed_seconds = end-start;
+  std::cout << "Completed sorting after " << elapsed_seconds.count() << " seconds." << std::endl;
+
   return sorted_search_results;
 }
 
-BookManager::sorted_set BookManager::SortMapByValue(
-    std::map<std::string, double>* unordered_results, int sorting) {
-  if (unordered_results->size() == 0) 
-    return sorted_set();
-  else if (unordered_results->size() == 1)
-    return {std::make_pair(unordered_results->begin()->first, unordered_results->begin()->second)};
-
-	// Defining a lambda function to compare two pairs. It will compare two pairs using second field.
-	Comp compFunctor;
-  if (sorting == 0) {
-    compFunctor = [](const auto &a,const auto &b) {
-        if(a.second == b.second) 
-          return a.first > b.first;
-        return a.second > b.second; };
-  }
-  else if (sorting == 1) {
-    compFunctor = [this](const auto &elem1,const auto &elem2) {
-        int date1 = map_books_[elem1.first]->date();
-        int date2 = map_books_[elem2.first]->date();
-        if(date1==date2) 
-          return elem1.first < elem2.first;
-        return date1 < date2; };
-  }
-  else {
-    compFunctor = [this](const auto &elem1,const auto &elem2) {
-        auto &bk1 = map_books_[elem1.first];
-        auto &bk2 = map_books_[elem2.first];
-        std::string s1= bk1->author();
-        std::string s2= bk2->author();
-        if(s1==s2)
-          return elem1.first < elem2.first;
-        return s1 < s2; };
-  }
-
-  //Sort by defined sort logic
-	sorted_set sorted_results(unordered_results->begin(), unordered_results->end(), compFunctor);
-  return sorted_results;
+void BookManager::DoSearch(std::map<std::string, ResultObject> &results, std::string word, 
+    SearchOptions &search_options) {
+  if (search_options.fuzzy_search())
+    FuzzySearch(word, search_options, results);
+  else
+    NormalSearch(word, search_options, results);
 }
 
+void BookManager::NormalSearch(std::string word, SearchOptions& search_options, 
+    std::map<std::string, ResultObject>& results) {
+  // Get all books, which contain the searched word.
+  std::map<std::string, Match> tmp; 
+  try {
+    tmp = index_map_.at(word);
+  } catch(...) {
+    return;
+  }
 
-void BookManager::CreateMapWords() {
-  // Iterate over all books. Add words to list and book to list of books with this word.
-  for (auto it=map_books_.begin(); it!=map_books_.end(); it++) {
-    // Check whether book has ocr.
-    if(it->second->has_ocr() == false)
+  // For each found book, whether it matches with the search-options. If so, add
+  // new-search-result.
+  for (const auto& it : tmp) {
+    if (CheckSearchOptions(search_options, documents_[it.first]))
+      results[it.first].NewResult(word, word, it.second.scope_, 0, it.second.relevance_);
+  }
+}
+
+void BookManager::FuzzySearch(std::string word, SearchOptions& search_options, 
+    std::map<std::string, ResultObject>& results) {
+  // search in corpus: 
+  for (const auto& it : index_list_) {
+
+    // Calculate fuzzy score (occures in word, and levensthein-distance).
+    int score = fuzzy::cmp(word, it);
+    if (score == -1) 
       continue;
-    //Iterate over all words in book and add word to map and book to list with score.
-    for(auto yt : it->second->map_words_pages()) {
-      map_words_[yt.first][it->first] = static_cast<double>(it->second
-          ->map_words_pages()[yt.first].relevance())/it->second->num_pages();
-    }
-  }
 
-  CreateListWords(map_words_, list_words_);
-} 
-
-void BookManager::CreateMapWordsTitle() {
-  // Iterate over all books. Add words from title to map.
-  for (auto it=map_books_.begin(); it!=map_books_.end(); it++) {
-    // Get map of words of current book.
-    std::string sTitle = it->second->metadata().GetTitle();
-    sTitle = func::convertStr(sTitle);
-    std::map<std::string, int> mapWords = func::extractWordsFromString(sTitle);
-    
-    //Iterate over all words in this book. Check whether word already exists in list off all words.
-    for (auto yt=mapWords.begin(); yt!=mapWords.end(); yt++)
-      map_words_title_[yt->first][it->first] = 0.1;
-    // Add author names and year.
-    map_words_title_[std::to_string(it->second->date())][it->first] = 0.1;
-  }
-}
-
-void BookManager::CreateMapWordsAuthor() {
-  //Iterate over all books. Add words to list (if the word does not already exist 
-  // in map of all words) or add book to list of books (if word already exists).
-  for (auto it=map_books_.begin(); it!=map_books_.end(); it++) {
-    for (auto author : it->second->metadata().GetAuthorsKeys()) {
-      if (!it->second->metadata().IsAuthorEditor(author["creator_type"]))
+    // Iterate over all found items:
+    auto matching_items = index_map_[it];
+    for (auto item : matching_items) {
+      // Skip if item is in conflict with search-options. Only check 
+      // search-options, if item is not already in results.
+      if (results.count(item.first) == 0 && 
+          !CheckSearchOptions(search_options, documents_[item.first])) 
         continue;
-      map_words_authors_[func::returnToLower(author["lastname"])][it->first] = 0.1;
-      map_unique_authors_[author["key"]].push_back(it->first);
+      // Add new information to result object.
+      results[item.first].NewResult(word, it, item.second.scope_, score, item.second.relevance_, matching_items.size());
     }
   }
-  CreateListWords(map_words_authors_, list_authors_);
 }
 
-void BookManager::CreateListWords(MAPWORDS& mapWords, sortedList& listWords) {
-  std::map<std::string, size_t> mapRel;
-  for (auto it = mapWords.begin(); it!=mapWords.end(); it++) {
-    mapRel[it->first] = it->second.size();
+bool BookManager::CheckSearchOptions(SearchOptions& search_options, Book* book) {
+  // If an author is given and in the string of authors, the auther is not
+  // found, return false.
+  if(search_options.author().length() > 0) {
+    if (book->authors().count(search_options.author()) == 0)
+      return false;
   }
 
-  typedef std::function<bool(std::pair<std::string, double>, std::pair<std::string, double>)> Comp;
+  // If date is specified (→ date is not -1) return false if date is outside of timerange.
+  int date = book->date();
+  if (date != -1 && (date < search_options.year_from() || date > search_options.year_to()))
+    return false;
+       
+  // If no collections are specified in search options, return true
+  if (search_options.collections().size() == 0)
+    return true;
+  for (const auto& collection : search_options.collections()) {
+    if (book->collections().count(collection) > 0)
+      return true;
+  }
+  return false;
+}
 
-  Comp compFunctor = [](const auto &a, const auto &b) {
-      if (a.second == b.second) 
-        return a.first > b.first;
-      return a.second > b.second; };
+void BookManager::SortMapByValue(sort_list& unordered_results, int sorting) {
+  if (unordered_results.size() < 2) 
+    return;
 
-  std::set<std::pair<std::string, size_t>, Comp> sorted(mapRel.begin(), mapRel.end(), compFunctor);
+  // Call matching sorting algorythem.
+  if (sorting == 0) return SortByRelavance(unordered_results);
+  if (sorting == 1) return SortChronologically(unordered_results);
+  if (sorting == 2) return SortAlphabetically(unordered_results);
+}
+  
+void BookManager::SortByRelavance(sort_list& unordered) {
+  unordered.sort([](const auto &a, const auto &b) {
+        if (a.first == b.first) 
+          return a.second > b.second;
+        return a.first > b.first; 
+    });
+}
 
-  for (auto elem : sorted)
-    listWords.push_back({elem.first, elem.second});
+void BookManager::SortChronologically(sort_list& unordered) {
+  unordered.sort([&](const auto &a, const auto &b) {
+        int date1 = documents_[a.second]->date();
+        if (date1 == -1) date1 = 2050;
+        int date2 = documents_[b.second]->date();
+        if (date2 == -1) date2 = 2050;
+        if (date1 == date2) 
+          return a.first < b.first;
+        return date1 < date2; 
+    });
+}
+
+void BookManager::SortAlphabetically(sort_list& unordered) {
+  unordered.sort([&](const auto &a,const auto &b) {
+        std::string author1 = documents_[a.second]->first_author_lower();
+        std::string author2 = documents_[b.second]->first_author_lower();
+        if (author1 == author2) 
+          return a.first < b.first;
+        return author1 < author2 ; 
+    });
+}
+
+void BookManager::CreateIndexMap() {
+
+  int num_documents = documents().size();
+  double avglength = 0;
+  for (const auto& it : documents_)
+    avglength += it.second->document_size();
+  avglength /= num_documents;
+
+  std::cout << "Number of documents: " << num_documents << std::endl;
+  std::cout << "Average length of documents: " << avglength << std::endl;
+
+  // Create main-index map from all 
+  for (auto it : documents_) {
+    AddWordsFromItem(it.second->words_on_pages(), true, it.first);
+    AddWordsFromItem(it.second->words_in_tags(), false, it.first);
+  }
+
+  // Calculate Okapi
+  int counter=0;
+  for (auto& it : index_map_) {
+    
+    // Caluculate Inverse document frequency (idenical for each entry (word, document))
+    size_t n_q = it.second.size(); // number of documents containing current word.
+    double idf = std::log((num_documents-n_q+0.5)/(n_q+0.5)+1); 
+
+    // Caluculate document specific Part
+    for (auto& jt : it.second) {
+      double tf = jt.second.relevance_; // term frequency.
+      size_t len_document = documents_[jt.first]->document_size();
+      double okapi = idf * ((tf*(2.0+1.0))/(tf+2.0*(1-0.75+0.75*(len_document/avglength))));
+
+      // Decrease scope if document does not have a corpus & set relevance.
+      if (!documents_[jt.first]->HasContent())
+        jt.second.relevance_ = okapi / 2;
+      // Increase scope, if word was found in metadata & set relevance.
+      else if (jt.second.scope_>1)
+        jt.second.relevance_ = okapi * 2;
+      else
+        jt.second.relevance_ = okapi;
+    }
+  }
+
+  // Create index map as list:
+  for (const auto& it : index_map_)
+    index_list_.push_back(it.first);
+}
+
+void BookManager::AddWordsFromItem(std::unordered_map<std::string, std::vector<WordInfo>> m, 
+    bool corpus, std::string item_key) {
+  for (auto it : m) {
+    // Calculate total relevance
+    index_map_[it.first][item_key].relevance_ = std::accumulate(it.second.begin(), it.second.end(), 
+        0.0, [](const double& init, const auto& word_info) { 
+        return (init+word_info.term_frequency_); 
+      });
+
+    // If found in corpus, add corpus to scope. (corpus→1), metadata→get all different tags.
+    if (corpus)
+      index_map_[it.first][item_key].scope_ |= 1;
+    // If found in metadata, add all different metadata-tags (2,4,8, ...). 
+    else {
+      for (const auto& word_info : it.second) {
+        for (const auto& scope : word_info.pages_)
+          index_map_[it.first][item_key].scope_ |= scope;
+      }
+    }
+  }
+}
+
+void BookManager::CreateListWords(sorted_list_type& list_of_words, short scope) {
+  std::map<std::string, double> map_word_relevance;
+  // Transform into above map type.
+  for (auto it = index_map_.begin(); it!=index_map_.end(); it++) {
+    
+    // Get complete scope -> where does this word occure
+    short cur_scope = std::accumulate(it->second.begin(), it->second.end(), 0, 
+        [](const short& init, const auto& elem) { return init|elem.second.scope_; });
+
+    // Check wether scope matches given scope and insert. 
+    // RELEVANCE: number of documents containing this word.
+    if (scope == 0 || cur_scope&scope) 
+      map_word_relevance[it->first] = it->second.size();
+  }
+
+  for (auto elem : func::SortByRelavance(map_word_relevance))
+    list_of_words.push_back({elem.first, elem.second});
 }
 
 
 std::list<std::string> BookManager::GetSuggestions(std::string word, std::string scope) {
-  if(scope=="corpus") 
+  if (scope == "corpus") 
     return GetSuggestions(word, list_words_);
-  if(scope=="author") 
+  if (scope == "author") 
     return GetSuggestions(word, list_authors_);
   return std::list<std::string>();
 }
 
-std::list<std::string> BookManager::GetSuggestions(std::string word, sortedList& list_words) {
+std::list<std::string> BookManager::GetSuggestions(std::string word, sorted_list_type& list_words) {
   std::cout << "GetSuggestions" << std::endl;
-  func::convertToLower(word);
-  word = func::convertStr(word);
-  std::map<std::string, double>* suggs = new std::map<std::string, double>;
-  size_t counter=0;
-  for (auto it=list_words.begin(); it!=list_words.end() && counter < 10; it++) {
-    double value = fuzzy::fuzzy_cmp(it->first, word);
-    if(value > 0 && value <= 0.2) {
-      (*suggs)[it->first] = value*(-1);
-      counter++;
+  // Replace multiple byte characters and convert to lowercase.
+  word = func::ReplaceMultiByteChars(func::ReturnToLower(word));
+
+  // Create list of pairs, with the resulting relevance as first value (for sorting).
+  std::list<std::pair<double, std::string>> suggs;
+  size_t counter = 0; 
+  for (const auto& it : list_words) {
+    // calculate levensthein.
+    double value = fuzzy::contains(word.c_str(), it.first.c_str(), word.length(), it.first.length()); 
+    
+    // Only add if found (0: direct match, 1,2: fuzzy or contains match)
+    if(value != -1) {
+      suggs.push_back({(1.0/(1.0+value))*it.second, it.first});
+      
+      // If 50 rersults where found, stop searching. This usually only makes a
+      // difference for short, and unfinished words, the user won't feel a
+      // difference, but the search time is reduced to upto 10 times (for
+      // example when search for single letters.
+      if (++counter >= 50)
+        break;
     }
   }
+
+  // Sort list.
+  SortByRelavance(suggs);
+  
+  // Take the best 10 matches and return in expected list type.
   std::list<std::string> sorted_search_results;
-  for (auto it : SortMapByValue(suggs, 0)) 
-    sorted_search_results.push_back(it.first); 
-  delete suggs;
+  counter=0;
+  for (auto it : suggs) {
+    sorted_search_results.push_back(GetConjunction(it.second)); 
+    if (++counter == 10) break;
+  }
   return sorted_search_results;
+}
+
+std::string BookManager::GetConjunction(std::string suggestion) {
+  // Get First book to contain this word.
+  Book* book = documents_[index_map_[suggestion].begin()->first];
+  if (book->words_on_pages().count(suggestion) > 0)
+    return book->words_on_pages().at(suggestion).begin()->word_;
+  else
+   return book->words_in_tags().at(suggestion).begin()->word_;
+}
+
+std::vector<std::map<short, std::string>> BookManager::ConvertMetadata(const nlohmann::json &metadata_items) {
+  std::cout << "ConvertMetadata" << std::endl;
+  // Convert each item in metadata.
+  std::vector<std::map<short, std::string>> items;
+  for (auto item : metadata_items) {
+    std::map<short, std::string> key_converted;
+    // Convert key to bit-representation.
+    for (const auto& it : func::ConvertJson(item, search_config_))
+      key_converted[reverted_tag_map_[it.first]] = it.second; 
+    items.push_back(key_converted);
+  }
+  return items;
 }

@@ -5,18 +5,22 @@
 #include <chrono>
 #include <cstddef>
 #include <exception>
+#include <fstream>
 #include <iostream>
+#include <iterator>
 #include <ostream>
 #include <string>
 
 #include <httplib.h>
+#include <vector>
 
 #include "book_manager/book.h"
 #include "book_manager/book_manager.h"
 #include "func.hpp"
 #include "gramma.h"
 #include "nlohmann/json.hpp"
-#include "search/search_options.h"
+#include "search_object.h"
+#include "search_options.h"
 
 using namespace httplib;
 
@@ -32,7 +36,7 @@ std::string GetReqParam(const Request&req, std::string key, std::string def="") 
  * @param[in, out] resp (respsonse)
  * @param[in] manager (book manager, to do search and get map of all books.)
  */
-void Search(const Request& req, Response& resp, const nlohmann::json& 
+void Search(const Request& req, Response& resp, const std::vector<std::string>& 
     zotero_pillars, BookManager& manager, Dict& dict) {
   
   // Get and process query (necessary value!):
@@ -41,11 +45,8 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
     return;
   }
   std::string query = GetReqParam(req, "q");
-  query = func::convertStr(query); // replace some non-english characters.
-  func::transform(query); // remove leading and trailing non-characters.
-  std::replace(query.begin(), query.end(), ' ', '+');
 
-  // Get searcing for relevant neighbors:
+  // Get searching for relevant neighbors:
   bool relevant_neighbors = GetReqParam(req, "relevant_neighbors", "0") == "1";
   // Get fuzzyness:
   bool fuzzyness = GetReqParam(req, "fuzzyness", "0") == "1";
@@ -58,17 +59,13 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
 
   // Get pillars:
   std::vector<std::string> pillars;
-  std::string str_pillars;
-  if (req.has_param("pillars")) {
-    str_pillars = req.get_param_value("pillars", 0);
-    for (auto it : func::split2(str_pillars, ","))
-        pillars.push_back(it);
+  std::string str_pillars = GetReqParam(req, "pillars");
+  if (str_pillars != "") {
+    pillars = func::Split2(str_pillars, ",");
   }
   else {
-    for (auto& it : zotero_pillars) {
-      str_pillars += it["key"].get<std::string>() + ";";
-      pillars.push_back(it["key"]);
-    }
+    str_pillars = "using all pillars (default)";
+    pillars = zotero_pillars;
   }
 
   // Get published after/ published before:
@@ -91,7 +88,6 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
   } catch(...) {};
 
   // Debug printing.
-  std::cout << "Recieved search request!" << std::endl;
   std::cout << "Searching with query: " << query << 
     "; fuzzyness: " << fuzzyness <<
     "; scope: " << scope <<
@@ -104,15 +100,22 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
     << resultsperpage << std::endl;
 
   // Construct search-options.
-  SearchOptions options(query, fuzzyness, pillars, scope, author, pubafter,
-    pubbefore, true, sort);
+  int sort_result_by = 0;
+  if (sort == "chronologically") sort_result_by = 1;
+  if (sort == "alphabetically") sort_result_by = 2;
+  std::cout << "Constructing search options" << std::endl;
+  SearchOptions search_options(fuzzyness, scope=="metadata", scope=="corpus", pubafter, pubbefore, 
+      sort_result_by, author, pillars);
+  std::cout << "Constructing search object" << std::endl;
+  SearchObject search_object = SearchObject(query, search_options, dict);
 
   // Start search.
   auto time_start = std::chrono::system_clock::now();
-  auto result_list = manager.DoSearch(&options);
+  std::cout << "Start searching..." << std::endl;
+  auto result_list = manager.Search(search_object);
 
   // Construct response.
-  std::cout << "Constructing response json." << std::endl;
+  std::cout << "Results found: " << result_list.size() << std::endl;
   nlohmann::json search_response;
 
   if (result_list.size() == 0) {
@@ -120,33 +123,46 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
     search_response["time"] = 0;
   }
   else {
+    std::cout << "Constructing response-object" << std::endl;
     size_t counter = 0;
-    for (auto book : result_list) {
-      // Create entry for each book in result.
-      nlohmann::json entry;
-      entry["scanId"] = book->key();
-      entry["copyright"] = !book->metadata().GetPublic();
-      entry["hasocr"] = book->HasContent();
-      entry["description"] = book->GetAuthorDateScanned();
-      entry["bibliography"] = book->metadata().GetMetadata("bib");
+    // Get iterator to the start of results.
+    auto it = result_list.begin();
 
-      std::string preview = book->GetPreview(query);
-      if (relevant_neighbors == true) {
-        std::string str = book->GetMostRelevantNeighbors(query, dict);
-        if (str != "") preview += "<br>" + str;
-      }
-      entry["preview"] = preview;
+    // Check if result list, is longer then selected start-point. If so, advance
+    // iterator to desired start.
+    if (list_start < result_list.size())
+      std::advance(it, list_start);
+
+    // Iterate over selected area (start -> start+results per page) and create
+    // result entry.
+    for (; it!=result_list.end(); it++) {
+      // Add basic meta data.
+      nlohmann::json entry;
+      entry["scanId"] = it->book()->key();
+      entry["copyright"] = !it->book()->IsPublic();
+      entry["hasocr"] = it->book()->HasContent();
+      entry["description"] = it->book()->GetFromMetadata("description");
+      entry["bibliography"] = it->book()->GetFromMetadata("bibliography");
+
+      // Generate preview.
+      entry["preview"] = it->book()->GetPreview(
+        it->matches_as_list(), 
+        search_object.search_options().fuzzy_search()
+      );
+      
+      // Add created entry to response.
       search_response["books"].push_back(std::move(entry)); 
+
+      // Stop, if limit has been reached.
       if (++counter == resultsperpage)
         break;
     }
 
     // Add number of results and elapsed time to response.
     search_response["max_results"] = result_list.size();
-    auto elapsed_seconds = std::chrono::system_clock::now() - time_start;
+    std::chrono::duration<double> elapsed_seconds = std::chrono::system_clock::now() - time_start;
     search_response["time"] = elapsed_seconds.count();
   }
-  std::cout << "Finished constructing json response." << std::endl;
   resp.set_content(search_response.dump(), "application/json");
 }
 
@@ -156,7 +172,7 @@ void Search(const Request& req, Response& resp, const nlohmann::json&
  * @param[in, out] resp (respsonse)
  * @param[in] manager (book manager, to do get book which to search in.)
  */
-void Pages(const Request& req, Response& resp, BookManager& manager) {
+void Pages(const Request& req, Response& resp, BookManager& manager, Dict& dict) {
   if (!req.has_param("scanId") || !req.has_param("query") || !req.has_param("fuzzyness")) {
     std::cout << "Invalid or missing query-parameter in search_in_book: " << std::endl; 
     resp.status = 400;
@@ -166,15 +182,15 @@ void Pages(const Request& req, Response& resp, BookManager& manager) {
   // Retrieve necessary query and scan-/ book-id.
   std::string scan_id = req.get_param_value("scanId"); 
   std::string query = req.get_param_value("query"); 
-  func::convertToLower(query);
-  query = func::convertStr(query);
-  
   int fuzzyness=0;
   try {
     fuzzyness = stoi(req.get_param_value("fuzzyness"));
   } catch (std::exception& e) {
     std::cout << "Recieved fuzzyness with invalid value, using 0 instead.";
   }
+
+  SearchOptions search_options(fuzzyness!=0);
+  SearchObject search_object = SearchObject(query, search_options, dict);
   
   // Construct response.
   nlohmann::json json_response;
@@ -184,16 +200,17 @@ void Pages(const Request& req, Response& resp, BookManager& manager) {
     << " and fuzzyness: " << fuzzyness << std::endl;
     
   // Check if book exists.
-  if (manager.map_of_books().count(scan_id) == 0) {
+  if (manager.documents().count(scan_id) == 0) {
     std::cout << "Search in book: given book not found!" << std::endl;
     resp.status = 404;
+    return;
   }
 
   // Get pages.
-  auto book = manager.map_of_books()[scan_id];
-  auto pages = book->GetPages(query, fuzzyness!=0);
-  std::cout << "Got " << pages->size() << " pages for this book." << std::endl;
-  if (pages->size() == 0) {
+  auto book = manager.documents()[scan_id];
+  auto pages = book->GetPages(search_object);
+  std::cout << "Got " << pages.size() << " pages for this book." << std::endl;
+  if (pages.size() == 0) {
     resp.status = 200;
     resp.set_content(json_response.dump(), "application/json");
     return;
@@ -202,7 +219,7 @@ void Pages(const Request& req, Response& resp, BookManager& manager) {
   // Create hitlist of books.
   try {
     json_response["books"] = nlohmann::json::array();
-    for (auto const &it : *pages) {
+    for (auto const &it : pages) {
       nlohmann::json entry;
       entry["page"] = it.first;
       std::string matches_on_page = "";
@@ -234,6 +251,7 @@ void Pages(const Request& req, Response& resp, BookManager& manager) {
  */
 void Suggestions(const Request& req, Response& resp, BookManager& manager, 
     std::string type) {
+  auto start = std::chrono::system_clock::now();
   std::cout << "Suggestions: " << type << std::endl;
   // Retrieve suggestions from book manager.
   std::string query = GetReqParam(req, "q", "");
@@ -261,62 +279,72 @@ void Suggestions(const Request& req, Response& resp, BookManager& manager,
   // Send response.
   resp.set_content(json_response.dump(), "application/json");
   resp.status = 200;
+  
+  // Caluculate elapsed seconds.
+  auto end = std::chrono::system_clock::now();
+  std::chrono::duration<double> elapsed_seconds = end-start;
+  std::cout << "Elaped time: " << elapsed_seconds.count() << std::endl;
 }
 
-int main() {
-  std::cout << "Starting super fast, but partly sucking c++ search api...\n" << std::endl;
-  
+int main(int argc, char *argv[]) {
+  // Parse command-line argument and check.
+  std::string cmd_arg = (argc > 1) ? argv[1] : "";
+  bool reload_pages = cmd_arg == "reload_pages";
+
   // Create server.
   Server srv;
 
   // Load and parse config file.
-  nlohmann::json config;
-  std::ifstream read_config("server.config");
-  read_config >> config;
-  read_config.close();
+  std::cout << "Loading and parsing config..." << std::endl;
+  nlohmann::json config = func::LoadJsonFromDisc("search.config");
+  nlohmann::json parse_config = config["parse_config"];
+  std::string path_to_database = config["search_data"];
+  std::string path_to_metadata = config["metadata"];
+  std::string path_to_dictionary = config["dictionary"];
+  std::vector<std::string> upload_points = config["upload_points"];
+  int start_port = config["port"].get<int>();
+  std::cout << "Using " << path_to_database << " and following directories: " << std::endl;
+  for (const auto& it : upload_points) 
+    std::cout << "- " << it << std::endl;
+  std::cout << std::endl;
+
+
+  //Load and parse metadata 
+  std::cout << "Loading metadata at " << path_to_metadata << std::endl;
+  nlohmann::json metadata = func::LoadJsonFromDisc(path_to_metadata);
 
   // Load dictionary.
-  std::cout << "Loading dictionary at " << config["dictionary"] << std::endl;
-  Dict dict(config["dictionary"]);
-  std::cout << "done.\n\n";
-
-  // Load corpus metadata from disc.
-  std::cout << "Loading metadata at " << config["zotero_metadata"];
-  std::ifstream read(config["zotero_metadata"], std::ios::in);
-  // Check if metadata was found.
-  if(!read) {
-    std::cout << "]nNo metadata found! Server fails to load\n";
-    return 1;
-  }
-  nlohmann::json metadata;
-  read >> metadata;
-  std::cout << "done.\n\n";
+  std::cout << "Loading dictionary at " << path_to_dictionary << std::endl;
+  Dict dict(path_to_dictionary);
+  Book::set_dict(&dict);
 
   // Load active pillars:
   std::cout << "Loading active collections...";
-  nlohmann::json zotero_pillars = nlohmann::json::array();
+  std::vector<std::string> zotero_pillars = nlohmann::json::array();
   for (auto it : metadata["collections"]["data"])
-    zotero_pillars.push_back(nlohmann::json({{"key", it["key"]}, {"name", it["data"]["name"]}}));
-  std::cout << "done.\n\n";
+    zotero_pillars.push_back(it["key"]);
 
-  // Create book manager:
+  // Create book manager
   std::cout << "initializing bookmanager..." << std::endl;
-  BookManager manager(config["upload_points"], config["dictionary_old"]);
-  manager.UpdateZotero(metadata["items"]["data"]);
-  if (manager.Initialize())
+  BookManager manager(upload_points, &dict, parse_config, path_to_database);
+
+  // Create items form metadata-json.
+  manager.CreateItemsFromMetadata(metadata["items"]["data"], reload_pages);
+
+  // Initialize corpus data
+  if (manager.Initialize(reload_pages))
     std::cout << "Initialization successful!\n\n"; 
   else
     std::cout << "Initialization failed!\n\n";
   
   // Specify port to run on.
-  int start_port = std::stoi("4848");
   std::cout << "Starting on port: " << start_port << std::endl;
 
   // Add specific handlers via server-frame 
   srv.Get("/api/v2/search", [&](const Request& req, Response& resp) 
       { Search(req, resp, zotero_pillars, manager, dict); });
   srv.Get("/api/v2/search/pages", [&](const Request& req, Response& resp) 
-      { Pages(req, resp, manager); });
+      { Pages(req, resp, manager, dict); });
   srv.Get("/api/v2/search/suggestions/corpus", [&](const Request& req, Response& resp)
       { Suggestions(req, resp, manager, "corpus"); });
   srv.Get("/api/v2/search/suggestions/author", [&](const Request& req, Response& resp)

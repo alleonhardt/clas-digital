@@ -69,11 +69,12 @@ static std::string returnToLower(std::string &str)
             _path = path.string();
         }
 
+        std::error_code ec;
         if(_path == "") {
-          std::error_code ec;
           std::filesystem::create_directory(handler->GetUploadPoints()[0]/GetKey(),ec);
           _path = handler->GetUploadPoints()[0]/GetKey();
         }
+        std::filesystem::create_directory(_path+"/pages",ec);
       }
 
       ZoteroReference(std::string path, nlohmann::json js) {
@@ -175,6 +176,9 @@ static std::string returnToLower(std::string &str)
 
       virtual bool HasContent() override {
         int count = 0;
+        if(!std::filesystem::exists(std::filesystem::path(GetPath())/"pages")) {
+          return false;
+        }
         for(auto &it : std::filesystem::directory_iterator(std::filesystem::path(GetPath())/"pages")) {
           count++;
         }

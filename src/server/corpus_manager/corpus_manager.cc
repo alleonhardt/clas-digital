@@ -22,7 +22,7 @@ bool mySort(nlohmann::json i, nlohmann::json j) {
 
   std::string str1 = i[check];
   std::string str2 = j[check];
-  return func::returnToLower(str1)<func::returnToLower(str2);
+  return func::ReturnToLower(str1)<func::ReturnToLower(str2);
 }
 
 /**
@@ -460,7 +460,7 @@ void CreateCatalogueCollection(IReferenceManager::ptr_cont_t &items, IReferenceM
     for(auto &jt : *items) {
       std::vector<std::string> collections = jt.second->GetCollections();
 
-      if(collections.size() == 0 || func::in(key, collections) == false)
+      if(collections.size() == 0 || func::In(key, collections) == false)
         continue;
 
       vBooks.push_back({ 
@@ -489,9 +489,6 @@ bool CorpusManager::CreateWebpage(IReference *item,clas_digital::IFileHandler *h
   std::string webpath = "/books/"+item->GetKey()+"/pages";
   std::error_code ec;
 
-  std::filesystem::create_directory("web/books/"+item->GetKey(), ec);
-  std::filesystem::create_directory("web/books/"+item->GetKey()+"/pages", ec);
-
   if(item->HasContent())
   {
     createPagesPage(item);
@@ -513,7 +510,7 @@ bool CorpusManager::UpdateZotero(clas_digital::IReferenceManager *manager, clas_
   auto res2 = manager->GetAllCollections(collection_references_);
   auto res = manager->GetAllItems(item_references_);
   res2 = manager->GetAllCollections(collection_references_);
-  //manager->SaveToFile();
+  manager->SaveToFile();
 
   createSearchPage(collection_references_);
   std::cout<<"After search"<<std::endl;
