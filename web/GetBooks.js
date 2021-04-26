@@ -185,7 +185,9 @@ function loadOCRFile(ocrtxt) {
 let gTitle = document.title;
 
 function CreatePageLayout() {
-  if( gOcrSplittedFile != null && gOcrSplittedFile.length != 0) {
+  console.log("Create page layout now!");
+  console.log(gOcrSplittedFile);
+  if(gOcrSplittedFile != null && gOcrSplittedFile.arr.length != 0) {
     console.log(gOcrSplittedFile);
     for(let i = 0; i < gOcrSplittedFile.arr.length; i++) {
       let x = document.createElement("p");

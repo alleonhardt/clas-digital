@@ -1,0 +1,173 @@
+<!doctype html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="canonical" href="https://www.clas-digital.uni-frankfurt.de/search" />
+    <link rel="help" href="https://www.clas-digital.uni-frankfurt.de/information/help" />
+    <!--<link rel="stylesheet" href="style.css">-->
+
+    <link href="topnav.css" rel="stylesheet" type="text/css">
+    <link href="Search.css" rel="stylesheet">
+
+    <!-- Link favicon, so google can show in search results -->
+    <link rel="shortcut icon" href="static/fav/hand-top-right-16+32+48.ico"/>
+
+    <!-- Provide more sutable information show in google search -->
+    <title>Cultural and Literary Animal Studies: book search</title>
+    <meta name="description" lang="en" content="The CLAS Digital searchable book archive contains over 100,000 pages from historical books related the study of animals."/>
+
+    <script src="Search.js"></script>
+    <script src="user.js"></script>
+</head>
+
+
+
+<body>
+   <nav id='tpnav' class="topnav">
+	<a  id='homelink' href='/information/'>Information</a>
+	<a class='dropdown-banner active' id='searchlink' href='/search'>Search</a>
+	<div class='dropdown'>
+		<a id='statisticslink'  href='/catalogue'>Catalogue</a>
+		<div class='dropdown-content'>
+			<a href="/catalogue/books">Books</a>
+			<a href="/catalogue/authors">Authors</a>
+			<a href="/catalogue/collections">Collections</a>
+			<a href="/catalogue/years">Years</a>
+		</div>
+	</div>
+	<a id='administrationlink' class='classifiedContent ' href='/private/admin/Administration.html' data-acc=4>Administration</a>
+	<a id='uploadbooklink' class='classifiedContent ' href='/private/write/UploadBook.html' data-acc=2>Upload Books</a>
+
+	<div class='topnav-right-in' id='loggedintopnav'>
+		<span id='LoggedInAs'>Logged in</span>
+		<input id="logoutBut" type='submit' value="Logout" class='loginbutton' onclick="DoLogout();return true;"/>
+	</div>
+	<div class='topnav-right-out' id='loggedouttopnav'>
+		<form id ="LoginForm" class='loginform'>
+			<input id="EmailType" class="emailinput" type="email" name="email" placeholder="Email" aria-label="Email" required>
+			<input id="PasswordType" class="passwordinput" type="password" name="password" placeholder="Password" aria-label="Password" required>
+			<input id="LoginButton" type='submit' value="Log In" class='loginbutton' onclick="ExecuteLogin();return true;"/>
+			<div id="LoaderButton" class='loader'></div>
+		</form>
+	</div>
+
+</nav>
+<footer style="position: fixed; bottom: 20px; right: 40px; color: grey; font-size:11px">
+    <dl>
+        <dt>Generated:</dt>
+        <dd itemprop="dataModified" content="2021-04-26T14:45:52Z">
+            <time datetime="2021-04-26T14:45:52Z">2021-04-26 14:45:52</time>
+        </dd>
+    </dl>
+</footer>
+
+ 
+
+    <div id="searchboxid" class="button_box_top">
+        <div class="logo"> <img src="static/clas-logotype-frankfurt-00618f-blue-712x450.png" width="15%" height="12%" title="Cultural And Literary Animal Studies" alt="CLAS Logo"> </div>
+        
+        <address class="betaversion"> This is a Beta version. Report Bugs at <a href="https://github.com/ShadowItaly/clas-digital/issues">clas-digital/issues</a>. Or use E-Mail: <a href="mailto:clas-digital-technik@dlist.server.uni-frankfurt.de">clas-digital-technik@dlist.server.uni-frankfurt.de</a>. </address> 
+        <div style='position:relative'>
+
+            <input id="SpecialSID" class="srchbar" onblur='sugg_disapear("corpus");return true;' type="text" placeholder="Search here..." required>
+                <button id="srchButton" class='srchbtn' type="button" onclick="sendToPage('SpecialSID');return true;"><i class="fa fa-search"></i></button>
+            </input>
+            <a style="margin-left:2rem;" href="/information/help">help</a>
+
+            <div id="suggs_corpus" class="sugg" align="left"></div>
+            <div id="suggs_author" class="sugg" style="top:5.7rem;left:26%;" align="left"></div>
+        </div>
+        
+        <div id="ResultBanner" style="display:none; margin-top:2rem;" >
+            <span class='advanceoptsText' style="width:45px;">By:</span>
+            <input id='author' onblur='sugg_disapear("author");return true;' onchange="ResetFocus();return true;" class='advanceoptsInput' style="width:130px" type="text" value="" placeholder="All authors"/>
+            <div class='selectdiv' style="display:inline-block;">
+                <label>
+                <select id='collections' onchange='ResetFocus();return true;'>
+                    
+                    <option value="RFWJC42V">Geschichte des Tierwissens</option>
+                    
+                    <option value="XCFFDRQC">Forschung CLAS</option>
+                    
+                    <option value='all' selected>Search all Collections</option>
+                </select>
+                </label>
+            </div>
+            <div class='selectdiv' style="display:inline-block;">
+                <label>
+                <select id='year' onchange='SetAdvancedYear(this);return true;'>
+                    <option value='0'>Any Time</option>
+                    <option value='1700'>1700s</option>
+                    <option value='1800'>1800s</option>
+                    <option value='1900'>1900s</option>
+                    <option value='2000'>2000s</option>
+                    <option value= '1'>Custom</option>
+                </select>
+                </label>
+            </div>
+            <div class='selectdiv' style="display:inline-block;">
+                <label>
+                <select id='fuzzyness' onchange='ResetFocus();return true;'>
+                    <option value='0'>Exact matches</option>
+                    <option value='1'>Fuzzy matching</option>
+                </select>
+                </label>
+            </div>
+            <div id="CustomDateOpt" style="display:none;margin-top:2rem;">
+                <span class='advanceoptsText'> After:</span>
+                <input id='publicatedAfter' class='advanceoptsInput' size='5' type='number' step='50' min='0' value='1700'></input>
+                <span class='advanceoptsText'> Before:</span>
+                <input id='publicatedBefore' class='advanceoptsInput' size='5' type='number' step='50' min='0' value='2049'></input>
+                <button id='advancedApply' class='advanceopts' onclick='SetCustom();return true;'>Apply</button>
+            </div>
+
+
+            <div id="ResultBannerFooter" style="margin-top: 2rem; margin-bottom:0;">
+                <div class='selectdiv' style="display:inline-block;">
+                <label>
+                <select id='limit' onchange='OpenFilter(this);return true;' style='background:white;'>
+                   <option value='10'>Show 10 results per page</option>
+                   <option value='20'>Show 20 results per page</option>
+                   <option value='50'>Show 50 results per page</option>
+                   <option value='1000000'>Show all results</option>
+               </select>
+               <label>
+               </div>
+               <div class='selectdiv' style="display:inline-block;">
+               <label>
+               <select id='sorting' onchange='OpenFilter(this);return true;' onclick='return true;' style='background:white;'>
+                   <option value='relevance'>Sort by relevance</option>
+                   <option value='alphabetically'>Sort alphabetically</option>
+                   <option value='chronologically'>Sort chronologically</option>
+               </select>
+               </label>
+               </div>
+               <button class='advanceopts' onclick='CreateBibliography();return true;'>Create Bibliography</button>
+
+                
+               <hr style='padding: 0;'>
+               <span style='color: grey;font-size:13px;margin-left:20%;'><span id="maxResults"></span> results found in <span id="searchTime"></span> seconds</span>
+               <div id="selAll" class="selAll" >
+                   Select All <input type="checkbox" onchange="SelectAll(this.checked);return true;"></input>
+               </div>
+            </div>
+        </div>
+        <div>
+            <div ><ul id="hitList" class="searchResults"> </ul> </div>
+            <div><hr id="bottomBorder" style="padding:0;display:none;"></div>
+            <div class="linkcontainerDiv">
+              <a id="server_crash_warning" style="display:none;">Please try again later</a>
+              <ul id="linkcontainer" class="linkcontainer"></ul> 
+            </div>
+            <div id="next_last">
+                <a id="prev" class="prev_next">prev</a>
+                <a id="next" class="prev_next">next</a>
+            </div>
+        </div>
+        <div id="SearchHitList"></div>
+    </div> 
+</body>
