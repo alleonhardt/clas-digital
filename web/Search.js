@@ -95,6 +95,11 @@ function ShowSelectedValues(obj) {
   if(start+limit > json.max_results)
     to = json.max_results - start;
 
+  console.log(limit);
+  console.log(start);
+  console.log(to);
+  console.log(json.books.length);
+  console.log("END");
   //Iterate over books and add to page.
 	for (var i=0; i<to; i++) {
     let newList = document.createElement("li");
@@ -323,7 +328,7 @@ window.addEventListener("load", function() {
   AddListeners();
   ReflectUrlValues();
   GetSearchResultsFromServer();
-  ;} ,false);
+  } ,false);
 
 function AddListeners() {
 
@@ -492,8 +497,7 @@ function GetSearchResultsFromServer() {
 
   let requ = "api/v2/search" + url.substr(pos, url.length)
   var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-
+  xhttp.onload = function() {
     if (this.status == 400) {
       if (this.responseText != "") {
         console.log(this.responseText);
@@ -506,6 +510,7 @@ function GetSearchResultsFromServer() {
     }
     else {
       //parse search results from respond
+      console.log(this.responseText);
       if (this.responseText == "")
         return;
       var search_results= JSON.parse(this.responseText);
