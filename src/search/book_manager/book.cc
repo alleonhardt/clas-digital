@@ -196,9 +196,6 @@ void Book::InitializePreProcessing(bool reload_pages) {
 
 void Book::CreateCorpusIndex() {
   // Delete old index-directory and create new.
-  fs::remove_all(path_ + "/intern");
-  fs::create_directories(path_ + "/intern");
-
   std::map<std::string, TempWordInfo> temp_map_pages;
   SeperatePages(temp_map_pages);
   CreateMapPreview(temp_map_pages);
