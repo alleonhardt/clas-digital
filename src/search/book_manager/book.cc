@@ -361,7 +361,7 @@ void Book::GenerateBaseFormMap(temp_index_map& temp_map_pages,
       base_form = converted_word;
 
     // Create word info of current word:
-    double term_frequency = static_cast<double>(it.second.raw_count())/temp_map_pages.size();
+    double term_frequency = static_cast<double>(it.second.raw_count())/document_size_;
     WordInfo word_info{cur_word, it.second.GetAllPages(), it.second.preview_position(),
         it.second.preview_page(), term_frequency};
 

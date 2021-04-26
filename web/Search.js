@@ -258,6 +258,9 @@ function sendToPage(name) {
 	  requ += "&publicatedafter="+document.getElementById("publicatedAfter").value;
 	if(document.getElementById("publicatedBefore").value != 2049)
 	  requ +=  "&publicatedbefore="+ document.getElementById("publicatedBefore").value;
+  if(document.getElementById("scope").value != "") {
+    requ+="&scope="+document.getElementById("scope").value;
+  }
 	if(document.getElementById("limit").value != 10)
 	  requ += "&limit="+document.getElementById("limit").value;
 	if(document.getElementById("collections").value != "all")
@@ -440,6 +443,10 @@ function ReflectUrlValues() {
     document.getElementById("fuzzyness").value = 1;
 	if(getParameterByName('author')!=null) 
     document.getElementById("author").value=getParameterByName('author');
+
+  if(getParameterByName("scope")!=null) {
+    document.getElementById("scope").value = getParameterByName("scope");
+  }
 
 	if(getParameterByName('publicatedafter')!=null) {
     document.getElementById("publicatedAfter").value = parseInt(getParameterByName
