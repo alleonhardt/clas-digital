@@ -394,7 +394,7 @@ function loadPageLayoutFile(layout) {
   console.log("Hello World");
   console.log(gOcrSplittedFile);
   //OCR loaded and splitted yet? Then start building the page!
-  if(gOcrSplittedFile!=null || gOcrSplittedFile == undefined)
+  if(gOcrSplittedFile!=null || gOcrSplittedFile === undefined)
 	  CreatePageLayout();
 }
 
