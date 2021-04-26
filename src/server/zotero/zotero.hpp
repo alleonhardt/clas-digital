@@ -58,15 +58,22 @@ static std::string returnToLower(std::string &str)
   {
     private: 
       std::string _path;
+      std::string _datapath;
       nlohmann::json metadata_;
 
     public:
       ZoteroReference(IFileHandler *handler, nlohmann::json js) {
         metadata_ = js; 
         for(auto &vec: handler->GetMountPoints()) {
-          auto path = vec / "books" / GetKey();
+          auto path = vec / GetKey();
           if(std::filesystem::exists(path)) 
             _path = path.string();
+        }
+
+        for(auto &vec: handler->GetUploadPoints()) {
+          auto path = vec / GetKey();
+          if(std::filesystem::exists(path)) 
+            _datapath = path.string();
         }
 
         std::error_code ec;
@@ -75,6 +82,7 @@ static std::string returnToLower(std::string &str)
           _path = handler->GetMountPoints()[0]/GetKey();
         }
         std::filesystem::create_directory(_path+"/pages",ec);
+
       }
 
       ZoteroReference(std::string path, nlohmann::json js) {
@@ -186,7 +194,7 @@ static std::string returnToLower(std::string &str)
       }
 
       virtual bool HasOcr() override {
-        return std::filesystem::exists(std::filesystem::path(GetPath())/"ocr.txt");
+        return std::filesystem::exists(std::filesystem::path(_datapath)/"ocr.txt");
       }
 
       std::string GetShow2() override {
