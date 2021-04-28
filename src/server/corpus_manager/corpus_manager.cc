@@ -522,6 +522,7 @@ bool CorpusManager::UpdateZotero(clas_digital::IReferenceManager *manager, clas_
   std::cout<<"After Upload"<<std::endl;
 
   std::cout<<"Value of pointer: "<<item_references_.get()<<std::endl;
+  std::cout<<"Length of items: "<<item_references_->size()<<std::endl;
   std::cout<<"Value of pointer: "<<collection_references_.get()<<std::endl;
 
   for(auto &i : *item_references_) {
