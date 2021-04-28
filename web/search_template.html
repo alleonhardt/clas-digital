@@ -68,6 +68,15 @@
             </div>
             <div class='selectdiv' style="display:inline-block;">
                 <label>
+                <select id='scope' onchange='return true;'>
+                    <option value=''>All</option>
+                    <option value='corpus'>Only with corpus</option>
+                    <option value='metadata'>Only in metadata</option>
+                </select>
+                </label>
+            </div>
+            <div class='selectdiv' style="display:inline-block;">
+                <label>
                 <select id='fuzzyness' onchange='ResetFocus();return true;'>
                     <option value='0'>Exact matches</option>
                     <option value='1'>Fuzzy matching</option>

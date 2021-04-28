@@ -575,7 +575,7 @@ IReferenceManager::Error ZoteroReferenceManager::GetAllItems(ZoteroReferenceMana
     cmdMatrix.push_back("/items?format=json&include=data,bib,citation&style="+citationStyle_+"&limit=100");
   else
     std::for_each(trackedCollections_.begin(),trackedCollections_.end(),[&cmdMatrix,this](std::string &coll)
-        {cmdMatrix.push_back("/collections/"+coll+"/items?format=json&include=data,bib,citation&style="+this->citationStyle_+"&limit=100");});
+        {cmdMatrix.push_back("/collections/"+coll+"/items/top?format=json&include=data,bib,citation&style="+this->citationStyle_+"&limit=100");});
 
   auto ret = __performRequestsAndUpdateCache(itemReferences_,cmdMatrix);
 

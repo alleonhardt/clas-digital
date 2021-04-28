@@ -44,9 +44,12 @@ namespace fuzzy
       d = dtmp;
     }
 
-    if (p[len_s2] >= MAX)
+    int res = p[len_s2];
+    delete p;
+    delete d;
+    if (res >= MAX)
       return -1;
-    return p[len_s2];
+    return res;
   }
 
   short contains(const char* input, const char* given, size_t len_input, size_t len_given) {
