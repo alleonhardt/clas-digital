@@ -6,6 +6,7 @@
 #include "result_object.h"
 #include "search_object.h"
 #include "search_options.h"
+#include <array>
 #include <cmath>
 #include <cstddef>
 #include <exception>
@@ -237,23 +238,24 @@ void BookManager::NormalSearch(std::string word, SearchOptions& search_options,
 void BookManager::FuzzySearch(std::string word, SearchOptions& search_options, 
     std::map<std::string, ResultObject>& results) {
   // search in corpus: 
-  for (const auto& it : index_list_) {
-
-    // Calculate fuzzy score (occures in word, and levensthein-distance).
-    int score = fuzzy::cmp(word, it);
-    if (score == -1) 
-      continue;
-
-    // Iterate over all found items:
-    auto matching_items = index_map_[it];
-    for (auto item : matching_items) {
-      // Skip if item is in conflict with search-options. Only check 
-      // search-options, if item is not already in results.
-      if (results.count(item.first) == 0 && 
-          !CheckSearchOptions(search_options, documents_[item.first])) 
+  for (const auto& array : index_list_) {
+    for (const auto& it : array) {
+      // Calculate fuzzy score (occures in word, and levensthein-distance).
+      int score = fuzzy::cmp(word, it);
+      if (score == -1) 
         continue;
-      // Add new information to result object.
-      results[item.first].NewResult(word, it, item.second.scope_, score, item.second.relevance_, matching_items.size());
+
+      // Iterate over all found items:
+      auto matching_items = index_map_[it];
+      for (auto item : matching_items) {
+        // Skip if item is in conflict with search-options. Only check 
+        // search-options, if item is not already in results.
+        if (results.count(item.first) == 0 && 
+            !CheckSearchOptions(search_options, documents_[item.first])) 
+          continue;
+        // Add new information to result object.
+        results[item.first].NewResult(word, it, item.second.scope_, score, item.second.relevance_, matching_items.size());
+      }
     }
   }
 }
@@ -373,8 +375,15 @@ void BookManager::CreateIndexMap() {
   }
 
   // Create index map as list:
-  for (const auto& it : index_map_)
-    index_list_.push_back(it.first);
+  int word_count = 0;
+  std::array<std::string, 100000> tmp;
+  for (const auto& it : index_map_) {
+      tmp[word_count] = it.first;
+    if (++word_count > 99999) {
+      word_count=0;
+      index_list_.push_back(tmp);
+    }
+  }
 }
 
 void BookManager::AddWordsFromItem(std::unordered_map<std::string, std::vector<WordInfo>> m, 

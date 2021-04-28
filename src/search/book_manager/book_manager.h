@@ -6,6 +6,8 @@
 #define CLASDIGITAL_SRC_SEARCH_BOOKMANAGER_H_
 
 #include <algorithm> 
+#include <array>
+#include <cstddef>
 #include <filesystem>
 #include <functional> 
 #include <fstream>
@@ -43,8 +45,7 @@ class BookManager {
     };
     typedef std::unordered_map<std::string, std::map<std::string, Match>> index_map_type;
     index_map_type index_map_;
-    // std::vector<std::pair<std::string, std::map<std::string, Match>>> index_list_;
-    std::vector<std::string> index_list_;
+    std::vector<std::array<std::string, 100000>> index_list_;
 
     typedef std::vector<std::pair<std::string, size_t>> sorted_list_type;
     sorted_list_type list_words_; ///< Sorted list of all words by score (for typeahead).
