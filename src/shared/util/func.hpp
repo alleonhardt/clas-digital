@@ -102,6 +102,7 @@ namespace func {
   /**
    * Replaces all non-english (or rather non-utf-8 characters) with the most
    * similar utf-8 character). F.e. 'ä' is converted to 'a'.
+   * NOTE: This function also removes all "-" characters!!!
    * @param[in] str - string to convert.
    * @return converted string.
    */
@@ -121,6 +122,13 @@ namespace func {
    * @return boolean for word/ no word
    */
   bool IsWord(const char* word);
+
+  /**
+   * Checks if a string is build from only digits.
+   * @param[in] str
+   * @return true if only digits, false otherwise.
+   */
+  bool IsNumber(std::string& str);
 
   /**
    * Split string at given delimitter and fill given array with splitted strings.

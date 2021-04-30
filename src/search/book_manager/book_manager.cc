@@ -239,6 +239,7 @@ void BookManager::FuzzySearch(std::string word, SearchOptions& search_options,
     std::map<std::string, ResultObject>& results) {
   // search in corpus: 
   for (const auto& array : index_list_) {
+    std::cout << "array size: " << array.size() << std::endl;
     for (const auto& it : array) {
       // Calculate fuzzy score (occures in word, and levensthein-distance).
       int score = fuzzy::cmp(word, it);
@@ -378,12 +379,16 @@ void BookManager::CreateIndexMap() {
   int word_count = 0;
   std::array<std::string, 100000> tmp;
   for (const auto& it : index_map_) {
-      tmp[word_count] = it.first;
-    if (++word_count > 99999) {
-      word_count=0;
+    tmp[word_count] = it.first;
+    if (++word_count > 99998) {
+      word_count = 0;
       index_list_.push_back(tmp);
+      std::cout << "Added: " << tmp.empty() << std::endl;
     }
   }
+  index_list_.push_back(tmp);
+
+  std::cout << "List words: " << index_list_.size() << std::endl;
 }
 
 void BookManager::AddWordsFromItem(std::unordered_map<std::string, std::vector<WordInfo>> m, 
