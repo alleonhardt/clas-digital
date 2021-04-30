@@ -12,7 +12,6 @@ namespace fuzzy
 
     // Fill initial values.
     int MAX = threshold + 1;
-    // int MAX = 214748364;
     int n=0;
     for (; n<std::min(len_s2+1, threshold+1); ++n)
       p[n] = n;
@@ -45,8 +44,8 @@ namespace fuzzy
     }
 
     int res = p[len_s2];
-    delete p;
-    delete d;
+    delete[] p;
+    delete[] d;
     if (res >= MAX)
       return -1;
     return res;

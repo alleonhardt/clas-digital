@@ -137,6 +137,10 @@ std::vector<std::string> Split2(std::string str, std::string delimiter) {
 }
 
 std::string ReplaceMultiByteChars(std::string str) {
+
+  // Erase all - 
+  // str.erase(std::remove(str.begin(), str.end(), '-'), str.end());
+
   std::map<wchar_t, wchar_t> rep = {{L'ä','a'},{L'ö','o'},{L'ü','u'},{L'ö','o'},
     {L'ß','s'},{L'é','e'},{L'è','e'},{L'á','a'},{L'ê','e'},{L'â','a'}, {L'ſ','s'}};
   
@@ -183,12 +187,12 @@ void TrimNonLetterChars(std::string& str) {
 
     if (len == 0) break;
     // Erase from front in nonsense.
-    if (!std::isalnum(wide.front(), loc)) 
+    if (!std::isalpha(wide.front(), loc)) 
       wide.erase(0,1);
 
     // Erase from back if nonsense.
     if (wide.length() == 0) break;
-    if (!std::isalnum(wide.back(), loc))
+    if (!std::isalpha(wide.back(), loc))
       wide.pop_back();
     
     // if the length did not change, stop trimming string.
@@ -223,7 +227,7 @@ bool IsWord(const char* word) {
       break;
     
     // Check, whether string is character or digit, if not increase error-count.
-    if (!isalnum(dest, loc))
+    if (!std::isalpha(dest, loc))
       count_err++;
    
     // We're counting the actual length as strlen(word) returns 2 for non-utf8
@@ -237,6 +241,18 @@ bool IsWord(const char* word) {
 
   // Calculate whether more the 30% of characters are non-letters (return false).
   return static_cast<double>(count_err)/static_cast<double>(count_len) <= 0.3;
+}
+
+bool IsNumber(std::string& word) {
+  //Set locale
+  std::locale loc("de_DE.utf8");
+  std::setlocale(LC_ALL, "de_DE.utf8");
+
+  for (size_t i=0; i<word.length(); i++) {
+    if (!std::isdigit(word[i]))
+      return false;
+  }
+  return true;
 }
 
 void add_spaces_after(std::string& str, std::vector<char> chars) {
@@ -257,17 +273,27 @@ std::map<std::string, int> extractWordsFromString(std::string& buffer) {
   std::vector<std::string> possible_words = Split2(buffer, " ");
   std::map<std::string, int> words;
 
-  // Iterate over all possible words and only add, if they fulfill certain
-  // criteria (min, max length, min number of actual characters). Also
-  // "transform" word (cut nonsense characters from beginning and end).
+  /* 
+   * Iterate over all possible words and only add, if they fulfill certain
+   * criteria (min, max length, min number of actual characters). Also
+   * "transform" word (cut nonsense characters from beginning and end).
+   */
   for (unsigned int i=0; i<possible_words.size();i++) {
     // Only check if length is below minimum, as word length might be reduced
     // after next step.
     if (possible_words[i].length() < 2)
       continue;
 
-    // Get current word and erase non-chars or digits at the beginning and ending.
+    // Get current word.
     std::string cur_word = possible_words[i];
+
+    // If year, add word 
+    if (cur_word.length() == 4 && IsNumber(cur_word)) {
+      words[cur_word] += 1; // Increase word-count on this page.
+      continue;
+    }
+
+    // Erase non-chars or digits at the beginning and ending.
     TrimNonLetterChars(cur_word);
 
     // Only add if word-length criteria or met. Only add if word actually is a word.
