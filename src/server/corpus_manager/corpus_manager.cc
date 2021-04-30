@@ -489,6 +489,14 @@ bool CorpusManager::CreateWebpage(IReference *item,clas_digital::IFileHandler *h
   std::string webpath = "/books/"+item->GetKey()+"/pages";
   std::error_code ec;
 
+  std::filesystem::create_directory(item->GetPath(),ec);
+  if(ec) {
+    std::cout<<"Got error "<<ec.message()<<std::endl;
+  }
+  std::filesystem::create_directory(item->GetPath()+"/pages",ec);
+  if(ec) {
+    std::cout<<"Got error "<<ec.message()<<std::endl;
+  }
   if(item->HasContent())
   {
     createPagesPage(item);
