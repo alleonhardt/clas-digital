@@ -513,7 +513,7 @@ std::list<std::string> BookManager::GetSuggestions(std::string word, sorted_list
   std::list<std::string> sorted_search_results;
   counter=0;
   for (auto it : suggs) {
-    sorted_search_results.push_back(GetConjunction(it.second)); 
+    sorted_search_results.push_back(it.second); 
     if (++counter == 10) break;
   }
   return sorted_search_results;

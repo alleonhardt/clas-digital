@@ -79,5 +79,15 @@ void FileHandler::ServeFile(const httplib::Request &req, httplib::Response &resp
             ServeFile(req,resp,true);
           }
         }
+
+        for(auto &it : upload_points_)
+        {
+          std::filesystem::path pt = it.string()+req.path;
+          if(std::filesystem::exists(pt))
+          {
+            cache_.insert(req.path,std::make_unique<UnmutableCacheableFile>(pt));
+            ServeFile(req,resp,true);
+          }
+        }
       });
 }

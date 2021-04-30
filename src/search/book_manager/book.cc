@@ -609,7 +609,7 @@ std::string Book::GetOnePreview(std::pair<std::string, short> matched_word, bool
 
   // Append [...] front and back if string was trimmed.
   if (modifications > 0)
-    prev_str = "\u2026" + prev_str + "\u2026";
+    prev_str = "\u2026" + prev_str + "\u2026.";
 
   // If found in corpus, append page number at the end of preview.
   if (scope & 1) 

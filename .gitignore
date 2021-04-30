@@ -20,7 +20,7 @@ src/search/tests/example_data/wiki_data/test_books/*
 *intern
 
 search_data/*
-
+mount_point/*
 BSBDownLoadFertig_noOCR.txt
 gibtEsBeiBSB_OCR.txt
 gibtEsBeiBSB_noOCR.txt

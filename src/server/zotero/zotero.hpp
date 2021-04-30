@@ -65,29 +65,31 @@ static std::string returnToLower(std::string &str)
       ZoteroReference(IFileHandler *handler, nlohmann::json js) {
         metadata_ = js; 
         for(auto &vec: handler->GetMountPoints()) {
-          auto path = vec / GetKey();
-          if(std::filesystem::exists(path)) 
+          auto path = vec /"books"/GetKey();
+          if(std::filesystem::exists(path)) {
             _path = path.string();
+            break;
+          }
         }
 
         for(auto &vec: handler->GetUploadPoints()) {
           auto path = vec / GetKey();
-          if(std::filesystem::exists(path)) 
-            _datapath = path.string();
+          _datapath = path.string();
         }
 
         std::error_code ec;
         if(_path == "") {
-          std::filesystem::create_directory(handler->GetMountPoints()[0]/GetKey(),ec);
-          _path = handler->GetMountPoints()[0]/GetKey();
+          std::filesystem::create_directory(handler->GetMountPoints()[0]/"books"/GetKey(),ec);
+          _path = handler->GetMountPoints()[0]/"books"/GetKey();
         }
         std::filesystem::create_directory(_path+"/pages",ec);
 
       }
 
-      ZoteroReference(std::string path, nlohmann::json js) {
+      ZoteroReference(std::string path,std::string datapath, nlohmann::json js) {
         metadata_ = js;
         _path = path;
+        _datapath = datapath;
         if(!std::filesystem::exists(_path)) {
           std::cout<<"Zotero path does not exist "<<_path<<std::endl;
           std::exit(-1);
@@ -184,6 +186,8 @@ static std::string returnToLower(std::string &str)
 
       virtual bool HasContent() override {
         int count = 0;
+        if(HasOcr())
+          return true;
         if(!std::filesystem::exists(std::filesystem::path(GetPath())/"pages")) {
           return false;
         }
@@ -352,7 +356,7 @@ static std::string returnToLower(std::string &str)
 
       IReference *Copy() override
       {
-        auto ref = new ZoteroReference(_path, json());
+        auto ref = new ZoteroReference(_path,_datapath, json());
         return ref;
       }
 
