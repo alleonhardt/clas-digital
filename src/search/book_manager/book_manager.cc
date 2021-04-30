@@ -13,6 +13,7 @@
 #include <iostream>
 #include <numeric>
 #include <ostream>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -129,27 +130,59 @@ void BookManager::AddBook(std::string path, std::string key, bool reload_pages) 
   documents_[key]->InitializeBook(path, reload_pages);
 }
 
-std::list<ResultObject> BookManager::Search(SearchObject& search_object) {
+std::list<ResultObject> BookManager::Search(SearchObject& search_object, int limit) {
   if (search_object.query() == "")
     return {};
 
+  // Get all words containing all entered terms.
+  auto start = std::chrono::system_clock::now();
+  std::map<std::string, ResultObject> results;
+  SearchNWords(results, search_object, limit);
+  
+  // Print time needed for searching and preparing results.
+  auto end = std::chrono::system_clock::now();
+  std::chrono::duration<double> elapsed_seconds = end-start;
+  std::cout << "Completed search after " << elapsed_seconds.count() << " seconds." << std::endl;
+
+  // Simplyfy results (convert to map of book-keys and relevance. 
+  // Also add a pointer to the book for every result-object.
+  // If search query contained more than one word, also manipulate relevance of
+  // found match accoring to number of matches found on the same page.
+  prepared_results_type prepared_results;
+  PrepareResults(prepared_results, results, search_object);
+  
+  // Print time needed for searching and preparing results.
+  end = std::chrono::system_clock::now();
+  elapsed_seconds = end-start;
+  std::cout << "Completed preparing after " << elapsed_seconds.count() << " seconds." << std::endl;
+
+  // Sort results results and convert to list of books.
+  std::list<ResultObject> sorted_search_results;
+  SortMapByValue(prepared_results, search_object.search_options().sort_results_by());
+  for (auto it : prepared_results)
+    sorted_search_results.push_back(results[it.second]); 
+
+  // Print time needed for searching, preparing and sorting.
+  end = std::chrono::system_clock::now();
+  elapsed_seconds = end-start;
+  std::cout << "Completed sorting after " << elapsed_seconds.count() << " seconds." << std::endl;
+
+  return sorted_search_results;
+}
+
+void BookManager::SearchNWords(std::map<std::string, ResultObject> &results, SearchObject &search_object,
+    int limit) {
   // Get converted words.
   std::vector<std::string> words = search_object.converted_words();
-  bool fuzzy_search = search_object.search_options().fuzzy_search();
-  
-  // Caluculate start time.
-  auto start = std::chrono::system_clock::now();
 
-  // Start first search:
-  std::map<std::string, ResultObject> results;
-  DoSearch(results, words[0], search_object.search_options());
+  // Search for first word.
+  SearchOneWord(results, words[0], search_object.search_options(), limit);
 
   // Do search for every other word.
   for (size_t i=1; i<words.size(); i++) {
-
     // Start nth search:
     std::map<std::string, ResultObject> results2;
-    DoSearch(results2, words[i], search_object.search_options());
+    SearchOneWord(results2, words[i], search_object.search_options(), limit);
  
     // Erase all words from results which were not found in new results and join
     // result-object-infos, of all others.
@@ -164,55 +197,20 @@ std::list<ResultObject> BookManager::Search(SearchObject& search_object) {
       }
     }
     if (results.size() == 0)
-      return {};
+      return;
   }
-  
-  // Simplyfy results (convert to map of book-keys and relevance. 
-  // Also add a pointer to the book for every result-object.
-  // If search query contained more than one word, also manipulate relevance of
-  // found match accoring to number of matches found on the same page.
-  std::list<std::pair<double, std::string>> simplyfied_results;
-  if (words.size() > 1) {
-    for (auto& [key, res_obj] : results) {
-      // Add book, and original words to result object and simplyfy result.
-      res_obj.set_book(documents_.at(key));
-      res_obj.set_original_words(search_object.converted_to_original());
-      simplyfied_results.push_back({res_obj.score(), key});
-
-      // Change score accoring to number of found words in one page.
-      res_obj.set_score(res_obj.score()*
-          res_obj.book()->WordsOnSamePage(res_obj.matches_as_list(), fuzzy_search));
-    }
-  }
-  else {
-    for (auto& [key, res_obj] : results) {
-      // Add book, and original words to result object and simplyfy result.
-      res_obj.set_book(documents_.at(key));
-      res_obj.set_original_words(search_object.converted_to_original());
-      simplyfied_results.push_back({res_obj.score(), key});
-    }
-  }
-  auto end = std::chrono::system_clock::now();
-  std::chrono::duration<double> elapsed_seconds = end-start;
-  std::cout << "Completed search after " << elapsed_seconds.count() << " seconds." << std::endl;
-
-  // Sort results results and convert to list of books.
-  std::list<ResultObject> sorted_search_results;
-  SortMapByValue(simplyfied_results, search_object.search_options().sort_results_by());
-  for (auto it : simplyfied_results)
-    sorted_search_results.push_back(results[it.second]); 
-
-  end = std::chrono::system_clock::now();
-  elapsed_seconds = end-start;
-  std::cout << "Completed sorting after " << elapsed_seconds.count() << " seconds." << std::endl;
-
-  return sorted_search_results;
 }
 
-void BookManager::DoSearch(std::map<std::string, ResultObject> &results, std::string word, 
-    SearchOptions &search_options) {
-  if (search_options.fuzzy_search())
-    FuzzySearch(word, search_options, results);
+void BookManager::SearchOneWord(std::map<std::string, ResultObject> &results, std::string word, 
+    SearchOptions &search_options, int limit) {
+  if (search_options.fuzzy_search()) {
+    FuzzySearch(word, search_options, results, index_list_);
+    std::cout << "Results: " << results.size();
+    if (results.size() < limit) {
+      FuzzySearch(word, search_options, results, index_list_b_);
+      std::cout << "Results: " << results.size();
+    }
+  }
   else
     NormalSearch(word, search_options, results);
 }
@@ -236,10 +234,9 @@ void BookManager::NormalSearch(std::string word, SearchOptions& search_options,
 }
 
 void BookManager::FuzzySearch(std::string word, SearchOptions& search_options, 
-    std::map<std::string, ResultObject>& results) {
+    std::map<std::string, ResultObject>& results, index_list_type& index_list) {
   // search in corpus: 
-  for (const auto& array : index_list_) {
-    std::cout << "array size: " << array.size() << std::endl;
+  for (const auto& array : index_list) {
     for (const auto& it : array) {
       // Calculate fuzzy score (occures in word, and levensthein-distance).
       int score = fuzzy::cmp(word, it);
@@ -251,11 +248,11 @@ void BookManager::FuzzySearch(std::string word, SearchOptions& search_options,
       for (auto item : matching_items) {
         // Skip if item is in conflict with search-options. Only check 
         // search-options, if item is not already in results.
-        if (results.count(item.first) == 0 && 
-            !CheckSearchOptions(search_options, documents_[item.first])) 
+        if (results.count(item.first) == 0 && !CheckSearchOptions(search_options, documents_[item.first])) 
           continue;
         // Add new information to result object.
-        results[item.first].NewResult(word, it, item.second.scope_, score, item.second.relevance_, matching_items.size());
+        results[item.first].NewResult(word, it, item.second.scope_, score, 
+            item.second.relevance_, matching_items.size());
       }
     }
   }
@@ -293,7 +290,39 @@ bool BookManager::CheckSearchOptions(SearchOptions& search_options, Book* docume
   return false;
 }
 
-void BookManager::SortMapByValue(sort_list& unordered_results, int sorting) {
+void BookManager::PrepareResults(prepared_results_type &prepared_results, std::map<std::string, ResultObject> &results,
+    SearchObject& search_object) {
+
+  auto converted_to_original = search_object.converted_to_original();
+  bool fuzzy = search_object.search_options().fuzzy_search();
+
+  // Simplyfy results (convert to map of book-keys and relevance. 
+  // Also add a pointer to the book for every result-object.
+  // If search query contained more than one word, also manipulate relevance of
+  // found match accoring to number of matches found on the same page.
+  if (search_object.converted_words().size() > 1) {
+    for (auto& [key, res_obj] : results) {
+      // Add book, and original words to result object and simplyfy result.
+      res_obj.set_book(documents_.at(key));
+      res_obj.set_original_words(converted_to_original);
+      prepared_results.push_back({res_obj.score(), key});
+
+      // Change score accoring to number of found words in one page.
+      res_obj.set_score(res_obj.score()*
+          res_obj.book()->WordsOnSamePage(res_obj.matches_as_list(), fuzzy));
+    }
+  }
+  else {
+    for (auto& [key, res_obj] : results) {
+      // Add book, and original words to result object and simplyfy result.
+      res_obj.set_book(documents_.at(key));
+      res_obj.set_original_words(converted_to_original);
+      prepared_results.push_back({res_obj.score(), key});
+    }
+  }
+}
+
+void BookManager::SortMapByValue(prepared_results_type& unordered_results, int sorting) {
   if (unordered_results.size() < 2) 
     return;
 
@@ -303,7 +332,7 @@ void BookManager::SortMapByValue(sort_list& unordered_results, int sorting) {
   if (sorting == 2) return SortAlphabetically(unordered_results);
 }
   
-void BookManager::SortByRelavance(sort_list& unordered) {
+void BookManager::SortByRelavance(prepared_results_type& unordered) {
   unordered.sort([](const auto &a, const auto &b) {
         if (a.first == b.first) 
           return a.second > b.second;
@@ -311,7 +340,7 @@ void BookManager::SortByRelavance(sort_list& unordered) {
     });
 }
 
-void BookManager::SortChronologically(sort_list& unordered) {
+void BookManager::SortChronologically(prepared_results_type& unordered) {
   unordered.sort([&](const auto &a, const auto &b) {
         int date1 = documents_[a.second]->date();
         if (date1 == -1) date1 = 2050;
@@ -323,7 +352,7 @@ void BookManager::SortChronologically(sort_list& unordered) {
     });
 }
 
-void BookManager::SortAlphabetically(sort_list& unordered) {
+void BookManager::SortAlphabetically(prepared_results_type& unordered) {
   unordered.sort([&](const auto &a,const auto &b) {
         std::string author1 = documents_[a.second]->first_author_lower();
         std::string author2 = documents_[b.second]->first_author_lower();
@@ -376,19 +405,30 @@ void BookManager::CreateIndexMap() {
   }
 
   // Create index map as list:
+  CreateIndexList(index_list_, 5, true);  // primary list with all words occuring in more than 5 documents.
+  CreateIndexList(index_list_b_, 5, false);  // secondary list with all words with low occurance.
+
+  std::cout << "List words: " << index_list_.size() << std::endl;
+  std::cout << "List words: " << index_list_b_.size() << std::endl;
+}
+
+void BookManager::CreateIndexList(index_list_type& index_list, int occurance, bool primary) {
+  // Create index map as list:
   int word_count = 0;
-  std::array<std::string, 100000> tmp;
+  std::array<std::string, 100000> tmp; // temporary array.
   for (const auto& it : index_map_) {
-    tmp[word_count] = it.first;
-    if (++word_count > 99998) {
+    // If primary add only words occuring > occurance times, other wise less that
+    if ((primary && it.second.size() >= occurance) || (!primary && it.second.size() < occurance))
+      tmp[word_count++] = it.first;
+
+    // If array-size is reached add array to index-list, empty array and reset counter.
+    if (word_count > 99998) {
       word_count = 0;
-      index_list_.push_back(tmp);
+      index_list.push_back(tmp);
       std::cout << "Added: " << tmp.empty() << std::endl;
     }
   }
-  index_list_.push_back(tmp);
-
-  std::cout << "List words: " << index_list_.size() << std::endl;
+  index_list.push_back(tmp);
 }
 
 void BookManager::AddWordsFromItem(std::unordered_map<std::string, std::vector<WordInfo>> m, 

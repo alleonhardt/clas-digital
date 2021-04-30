@@ -45,7 +45,9 @@ class BookManager {
     };
     typedef std::unordered_map<std::string, std::map<std::string, Match>> index_map_type;
     index_map_type index_map_;
-    std::vector<std::array<std::string, 100000>> index_list_;
+    typedef std::vector<std::array<std::string, 100000>> index_list_type;
+    index_list_type index_list_;
+    index_list_type index_list_b_;
 
     typedef std::vector<std::pair<std::string, size_t>> sorted_list_type;
     sorted_list_type list_words_; ///< Sorted list of all words by score (for typeahead).
@@ -91,7 +93,14 @@ class BookManager {
      * @return list of all found books as result-object storing additional
      * information.
      */
-    std::list<ResultObject> Search(SearchObject& search_object);
+    std::list<ResultObject> Search(SearchObject& search_object, int limit);
+
+    /**
+     * Searches for n words. Returns only documents containing all n words.
+     * @param[out] results
+     * @param search_object with search querys and search-options.
+     */
+    void SearchNWords(std::map<std::string, ResultObject>& results, SearchObject& search_object, int limit);
 
     /**
      * Takes search-options and one searched word and calls mathcing
@@ -101,16 +110,44 @@ class BookManager {
      * @param[in] word which was searched.
      * @param[in] search_options 
      */
-    void DoSearch(std::map<std::string, ResultObject>& results, std::string word, 
-        SearchOptions& search_options);
+    void SearchOneWord(std::map<std::string, ResultObject>& results, std::string word, SearchOptions& search_options,
+        int limit);
 
-    void NormalSearch(std::string word, SearchOptions& search_options, 
-        std::map<std::string, ResultObject>& results);
-    void FuzzySearch(std::string word, SearchOptions& search_options, 
-        std::map<std::string, ResultObject>& results);
-    bool CheckSearchOptions(SearchOptions& search_options, Book* book);
+    /**
+     * Searches withough fuzzy or contains matching.
+     * @param[in] search_options
+     * @param[out] results
+     */
+    void NormalSearch(std::string word, SearchOptions& search_options, std::map<std::string, ResultObject>& results);
 
-    typedef std::list<std::pair<double, std::string>> sort_list;
+    /**
+     * Searches with fuzzy or contains matching.
+     * @param[in] search_options
+     * @param[out] results
+     */
+    void FuzzySearch(std::string word, SearchOptions& search_options, std::map<std::string, ResultObject>& results,
+        index_list_type& index_list);
+
+    /** Checks if a word matches with given search-options.
+     * @param[in] search_options
+     * @param[in] documents
+     * @return true if matching, false otherwise.
+     */
+    bool CheckSearchOptions(SearchOptions& search_options, Book* document);
+
+    typedef std::list<std::pair<double, std::string>> prepared_results_type;
+    
+    /** Prepare sorting
+     * - convert result-map to list in correct format (relevance, document-key)
+     * - For multiple term search: increase relevance if words are found on the
+     *   same page.
+     * @param[out] prepared_results
+     * @param[in] results
+     * @param[in] search_object
+     */ 
+    void PrepareResults(prepared_results_type& prepared_results, std::map<std::string, ResultObject>& results,
+        SearchObject& search_object);
+
     /**
      * @brief sort a map by it's value and return as set.
      * @param[in] unordered_results of books that have been found to contains the searched word
@@ -133,6 +170,18 @@ class BookManager {
      * of the tag "authors".
      */
     void CreateIndexMap();
+
+    /**
+     * Create index list for fuzzy-search. 
+     * As fuzzy-search works with iteration, a more efficient data-structue ist
+     * used. Here we create the index-list as a vector of arrays (arrays have a
+     * fixed size, thus but perform ~2 times faster, that a vector without using
+     * optimisation. 
+     * Also two index-lists are created (index_list_ and index_list_b_). The
+     * first index list contains all words with an occurance greated 5, the
+     * second all other words.
+     */
+    void CreateIndexList(index_list_type& index_list, int occurance, bool primary);
 
     void AddWordsFromItem(std::unordered_map<std::string, std::vector<WordInfo>> m, 
         bool corpus, std::string item_key);

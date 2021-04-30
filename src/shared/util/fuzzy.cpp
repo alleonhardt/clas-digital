@@ -105,5 +105,4 @@ namespace fuzzy
     else 
       return lshtein(cinput, cgiven, len_input, len_given, threshold);
   }
-
 } //Close namespace

@@ -12,7 +12,7 @@ namespace util {
     // Create search-object from given parameters and do search.
     auto start = std::chrono::system_clock::now();
     SearchObject search_object = SearchObject(query, search_options, base_data->dict());
-    auto results = base_data->book_manager().Search(search_object);
+    auto results = base_data->book_manager().Search(search_object, 10000);
     
     std::cout << "When search for " << query << " initialy found " << results.size() << " results." << std::endl;
 

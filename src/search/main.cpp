@@ -112,7 +112,7 @@ void Search(const Request& req, Response& resp, const std::vector<std::string>&
   // Start search.
   auto time_start = std::chrono::system_clock::now();
   std::cout << "Start searching..." << std::endl;
-  auto result_list = manager.Search(search_object);
+  auto result_list = manager.Search(search_object, resultsperpage+list_start);
 
   // Construct response.
   std::cout << "Results found: " << result_list.size() << std::endl;
