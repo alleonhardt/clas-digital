@@ -150,14 +150,16 @@ SCENARIO ("Searching for wiki words - search options", "[wiki_fuzzy]") {
     WHEN ("Searching for books before 1999, zero results found") {
       SearchOptions search_options(true, false, false, 0, 1998, 0, "", {"XCFFDRQC"});
       SearchObject search_object = SearchObject("and", search_options, base_data->dict());
-      auto results = base_data->book_manager().Search(search_object, 10000);
+      bool all_lists_used = false;
+      auto results = base_data->book_manager().Search(search_object, 10000, all_lists_used);
       REQUIRE(results.size() == 0);
     }
 
     WHEN ("Searching for books after 1999, zero results found") {
       SearchOptions search_options(true, false, false, 2000, 2070, 0, "", {"XCFFDRQC"});
       SearchObject search_object = SearchObject("and", search_options, base_data->dict());
-      auto results = base_data->book_manager().Search(search_object, 10000);
+      bool all_lists_used = false;
+      auto results = base_data->book_manager().Search(search_object, 10000, all_lists_used);
       REQUIRE(results.size() == 0);
     }
   }

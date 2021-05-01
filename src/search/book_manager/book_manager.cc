@@ -130,14 +130,16 @@ void BookManager::AddBook(std::string path, std::string key, bool reload_pages) 
   documents_[key]->InitializeBook(path, reload_pages);
 }
 
-std::list<ResultObject> BookManager::Search(SearchObject& search_object, int limit) {
+std::list<ResultObject> BookManager::Search(SearchObject& search_object, int limit, bool& all_lists_used) {
   if (search_object.query() == "")
     return {};
 
   // Get all words containing all entered terms.
   auto start = std::chrono::system_clock::now();
   std::map<std::string, ResultObject> results;
-  SearchNWords(results, search_object, limit);
+  SearchNWords(results, search_object, limit, all_lists_used);
+  if (search_object.search_options().fuzzy_search() && !all_lists_used && results.size() <= limit)
+    SearchNWords(results, search_object, 100000, all_lists_used);
   
   // Print time needed for searching and preparing results.
   auto end = std::chrono::system_clock::now();
@@ -171,18 +173,18 @@ std::list<ResultObject> BookManager::Search(SearchObject& search_object, int lim
 }
 
 void BookManager::SearchNWords(std::map<std::string, ResultObject> &results, SearchObject &search_object,
-    int limit) {
+    int limit, bool& all_lists_used) {
   // Get converted words.
   std::vector<std::string> words = search_object.converted_words();
 
   // Search for first word.
-  SearchOneWord(results, words[0], search_object.search_options(), limit);
+  SearchOneWord(results, words[0], search_object.search_options(), limit, all_lists_used);
 
   // Do search for every other word.
   for (size_t i=1; i<words.size(); i++) {
     // Start nth search:
     std::map<std::string, ResultObject> results2;
-    SearchOneWord(results2, words[i], search_object.search_options(), limit);
+    SearchOneWord(results2, words[i], search_object.search_options(), limit, all_lists_used);
  
     // Erase all words from results which were not found in new results and join
     // result-object-infos, of all others.
@@ -202,14 +204,17 @@ void BookManager::SearchNWords(std::map<std::string, ResultObject> &results, Sea
 }
 
 void BookManager::SearchOneWord(std::map<std::string, ResultObject> &results, std::string word, 
-    SearchOptions &search_options, int limit) {
+    SearchOptions &search_options, int limit, bool& all_lists_used) {
   if (search_options.fuzzy_search()) {
     FuzzySearch(word, search_options, results, index_list_);
-    std::cout << "Results: " << results.size();
-    if (results.size() < limit) {
+    std::cout << "Results primary: " << results.size() << std::endl;
+    if (results.size() <= limit) {
       FuzzySearch(word, search_options, results, index_list_b_);
-      std::cout << "Results: " << results.size();
+      all_lists_used = true;
+      std::cout << "Results secondary: " << results.size() << std::endl;
     }
+    else
+      all_lists_used = false;
   }
   else
     NormalSearch(word, search_options, results);
@@ -418,7 +423,7 @@ void BookManager::CreateIndexList(index_list_type& index_list, int occurance, bo
   std::array<std::string, 100000> tmp; // temporary array.
   for (const auto& it : index_map_) {
     // If primary add only words occuring > occurance times, other wise less that
-    if ((primary && it.second.size() >= occurance) || (!primary && it.second.size() < occurance))
+    if ((primary && it.second.size() > occurance) || (!primary && it.second.size() <= occurance))
       tmp[word_count++] = it.first;
 
     // If array-size is reached add array to index-list, empty array and reset counter.

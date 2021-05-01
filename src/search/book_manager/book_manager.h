@@ -93,14 +93,14 @@ class BookManager {
      * @return list of all found books as result-object storing additional
      * information.
      */
-    std::list<ResultObject> Search(SearchObject& search_object, int limit);
+    std::list<ResultObject> Search(SearchObject& search_object, int limit, bool& all_lists_used);
 
     /**
      * Searches for n words. Returns only documents containing all n words.
      * @param[out] results
      * @param search_object with search querys and search-options.
      */
-    void SearchNWords(std::map<std::string, ResultObject>& results, SearchObject& search_object, int limit);
+    void SearchNWords(std::map<std::string, ResultObject>& results, SearchObject& search_object, int limit, bool& all_lists_used);
 
     /**
      * Takes search-options and one searched word and calls mathcing
@@ -111,7 +111,7 @@ class BookManager {
      * @param[in] search_options 
      */
     void SearchOneWord(std::map<std::string, ResultObject>& results, std::string word, SearchOptions& search_options,
-        int limit);
+        int limit, bool& all_lists_used);
 
     /**
      * Searches withough fuzzy or contains matching.

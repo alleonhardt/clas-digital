@@ -139,7 +139,7 @@ std::vector<std::string> Split2(std::string str, std::string delimiter) {
 std::string ReplaceMultiByteChars(std::string str) {
 
   // Erase all - 
-  // str.erase(std::remove(str.begin(), str.end(), '-'), str.end());
+  str.erase(std::remove(str.begin(), str.end(), '-'), str.end());
 
   std::map<wchar_t, wchar_t> rep = {{L'ä','a'},{L'ö','o'},{L'ü','u'},{L'ö','o'},
     {L'ß','s'},{L'é','e'},{L'è','e'},{L'á','a'},{L'ê','e'},{L'â','a'}, {L'ſ','s'}};

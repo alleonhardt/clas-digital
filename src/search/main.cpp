@@ -112,7 +112,8 @@ void Search(const Request& req, Response& resp, const std::vector<std::string>&
   // Start search.
   auto time_start = std::chrono::system_clock::now();
   std::cout << "Start searching..." << std::endl;
-  auto result_list = manager.Search(search_object, resultsperpage+list_start);
+  bool all_lists_used = false;
+  auto result_list = manager.Search(search_object, resultsperpage+list_start, all_lists_used);
 
   // Construct response.
   std::cout << "Results found: " << result_list.size() << std::endl;
@@ -163,6 +164,7 @@ void Search(const Request& req, Response& resp, const std::vector<std::string>&
     std::chrono::duration<double> elapsed_seconds = std::chrono::system_clock::now() - time_start;
     search_response["time"] = elapsed_seconds.count();
   }
+  search_response["all_results"] = all_lists_used;
   resp.set_content(search_response.dump(), "application/json");
 }
 
