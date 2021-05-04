@@ -112,7 +112,7 @@ void Search(const Request& req, Response& resp, const std::vector<std::string>&
   // Start search.
   auto time_start = std::chrono::system_clock::now();
   std::cout << "Start searching..." << std::endl;
-  bool all_lists_used = false;
+  bool all_lists_used = (fuzzyness) ? false : true;
   auto result_list = manager.Search(search_object, resultsperpage+list_start, all_lists_used);
 
   // Construct response.

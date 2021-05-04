@@ -400,7 +400,7 @@ void BookManager::CreateIndexMap() {
 
       // Decrease scope if document does not have a corpus & set relevance.
       if (!documents_[jt.first]->has_ocr())
-        jt.second.relevance_ = okapi / 4;
+        jt.second.relevance_ = okapi / 2;
       // Increase scope, if word was found in metadata & set relevance.
       else if (jt.second.scope_>1)
         jt.second.relevance_ = okapi * 2;
