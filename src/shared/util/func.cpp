@@ -698,6 +698,17 @@ std::string GetCurrentTime() {
   return ss.str();
 }
 
+std::string GetCurrentDate() {
+  auto timestamp = std::chrono::system_clock::now();
+
+  std::time_t now_tt = std::chrono::system_clock::to_time_t(timestamp);
+  std::tm tm = *std::localtime(&now_tt);
+
+  std::stringstream ss;
+  ss << std::put_time(&tm, "%Y-%m-%d");
+  return ss.str();
+}
+
 void pause(std::string msg) {
   std::cout << msg;
   std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');

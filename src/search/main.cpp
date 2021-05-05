@@ -21,6 +21,7 @@
 #include "nlohmann/json.hpp"
 #include "search_object.h"
 #include "search_options.h"
+#include "statistics/statistics.h"
 
 using namespace httplib;
 
@@ -37,7 +38,7 @@ std::string GetReqParam(const Request&req, std::string key, std::string def="") 
  * @param[in] manager (book manager, to do search and get map of all books.)
  */
 void Search(const Request& req, Response& resp, const std::vector<std::string>& 
-    zotero_pillars, BookManager& manager, Dict& dict) {
+    zotero_pillars, BookManager& manager, Dict& dict, SearchStatistic& stats) {
   
   // Get and process query (necessary value!):
   if (!req.has_param("q")) {
@@ -164,6 +165,11 @@ void Search(const Request& req, Response& resp, const std::vector<std::string>&
     std::chrono::duration<double> elapsed_seconds = std::chrono::system_clock::now() - time_start;
     search_response["time"] = elapsed_seconds.count();
   }
+
+  // Add entry to stats.
+  std::chrono::duration<double> elapsed_seconds = std::chrono::system_clock::now() - time_start;
+  stats.AddEntry(query, fuzzyness, all_lists_used, elapsed_seconds.count()); 
+
   search_response["all_results"] = all_lists_used;
   resp.set_content(search_response.dump(), "application/json");
 }
@@ -338,19 +344,27 @@ int main(int argc, char *argv[]) {
     std::cout << "Initialization successful!\n\n"; 
   else
     std::cout << "Initialization failed!\n\n";
+
+  // Statistics 
+  SearchStatistic stats;
+  stats.SetManagerStats(manager.documents().size(), manager.index_map().size());
   
   // Specify port to run on.
   std::cout << "Starting on port: " << start_port << std::endl;
 
   // Add specific handlers via server-frame 
   srv.Get("/api/v2/search", [&](const Request& req, Response& resp) 
-      { Search(req, resp, zotero_pillars, manager, dict); });
+      { Search(req, resp, zotero_pillars, manager, dict, stats); });
   srv.Get("/api/v2/search/pages", [&](const Request& req, Response& resp) 
       { Pages(req, resp, manager, dict); });
   srv.Get("/api/v2/search/suggestions/corpus", [&](const Request& req, Response& resp)
       { Suggestions(req, resp, manager, "corpus"); });
   srv.Get("/api/v2/search/suggestions/author", [&](const Request& req, Response& resp)
       { Suggestions(req, resp, manager, "author"); });
+  srv.Get("/api/v2/search/statistics", [&](const Request& req, Response& resp)
+      { resp.set_content(stats.GetAllStats().dump(), "application/json"); });
+  srv.Post("/api/v2/search/statistics/save", [&](const Request& req, Response& resp)
+      { stats.SafeStats(); });
 
   std::cout << "C++ Api server startup successfull!" << std::endl;
   srv.listen("0.0.0.0", start_port);

@@ -290,6 +290,12 @@ namespace func {
    */
   std::string GetCurrentTime();
 
+  /**
+   * Get current date as string.
+   * @return Return the human readable string representation of the current date.
+   */
+  std::string GetCurrentDate();
+
   /** 
    * Prints a message and continues afer enter is pressed.
    * If no message is passed, will print: "Press enter to continue..."
