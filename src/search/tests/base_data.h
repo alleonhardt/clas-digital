@@ -13,15 +13,15 @@ class BaseData {
   public:
 
     // getter:
-    static BaseData *ocr_instance(std::string path_to_example_data) {
+    static BaseData *ocr_instance(std::string path_to_example_data, bool reload_pages=true) {
       if (!ocr_instance_)
-        ocr_instance_ = new BaseData(path_to_example_data);
+        ocr_instance_ = new BaseData(path_to_example_data, reload_pages);
       return ocr_instance_; 
     }
 
-    static BaseData *wiki_instance(std::string path_to_example_data) {
+    static BaseData *wiki_instance(std::string path_to_example_data, bool reload_pages=true) {
       if (!wiki_instance_)
-        wiki_instance_ = new BaseData(path_to_example_data);
+        wiki_instance_ = new BaseData(path_to_example_data, reload_pages);
       return wiki_instance_; 
     }
 
@@ -65,7 +65,7 @@ class BaseData {
     std::string run_id_;
     nlohmann::json statistics_;
 
-    BaseData(std::string example_data_name)
+    BaseData(std::string example_data_name, bool reload_pages)
         : dict_("web/dict.json"), 
         base_path_("src/search/tests/example_data/"),
         book_manager_(
@@ -83,9 +83,9 @@ class BaseData {
       std::cout << "Loading metadata." << std::endl;
       nlohmann::json j_metadata = 
         func::LoadJsonFromDisc(base_path_ + example_data_name + "/metadata.json");
-      book_manager_.CreateItemsFromMetadata(j_metadata["items"]["data"], true);
+      book_manager_.CreateItemsFromMetadata(j_metadata["items"]["data"], reload_pages);
       std::cout << "Initializing books." << std::endl;
-      book_manager_.Initialize(true);
+      book_manager_.Initialize(reload_pages);
       
       // Get current time in human redable format
       std::cout << "Initializing new statistics entry." << std::endl;

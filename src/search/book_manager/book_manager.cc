@@ -6,6 +6,7 @@
 #include "result_object.h"
 #include "search_object.h"
 #include "search_options.h"
+#include "search_tree.h"
 #include <array>
 #include <cmath>
 #include <cstddef>
@@ -241,6 +242,7 @@ void BookManager::NormalSearch(std::string word, SearchOptions& search_options,
 void BookManager::FuzzySearch(std::string word, SearchOptions& search_options, 
     std::map<std::string, ResultObject>& results, index_list_type& index_list) {
   // search in corpus: 
+  /*
   for (const auto& array : index_list) {
     for (const auto& it : array) {
       // Calculate fuzzy score (occures in word, and levensthein-distance).
@@ -259,6 +261,23 @@ void BookManager::FuzzySearch(std::string word, SearchOptions& search_options,
         results[item.first].NewResult(word, it, item.second.scope_, score, 
             item.second.relevance_, matching_items.size());
       }
+    }
+  }
+  */
+
+  size_t threshold = (word.length() >= 8) ? 2 : 1;
+  auto matched_words = search_tree_->SearchIterative(word, threshold);
+  for (const auto& it : matched_words) {
+    // Iterate over all found items:
+    auto matching_items = index_map_[it];
+    for (auto item : matching_items) {
+      // Skip if item is in conflict with search-options. Only check 
+      // search-options, if item is not already in results.
+      if (results.count(item.first) == 0 && !CheckSearchOptions(search_options, documents_[item.first])) 
+        continue;
+      // Add new information to result object.
+      results[item.first].NewResult(word, it, item.second.scope_, 1, 
+          item.second.relevance_, matching_items.size());
     }
   }
 }
@@ -415,6 +434,9 @@ void BookManager::CreateIndexMap() {
 
   std::cout << "List words: " << index_list_.size() << std::endl;
   std::cout << "List words: " << index_list_b_.size() << std::endl;
+  search_tree_ = new SearchTree("xxxxx");
+  for (const auto& it : index_map_) 
+    search_tree_->Insert(it.first);
 }
 
 void BookManager::CreateIndexList(index_list_type& index_list, int occurance, bool primary) {
@@ -496,7 +518,7 @@ std::list<std::string> BookManager::GetSuggestions(std::string word, sorted_list
   size_t counter = 0; 
   for (const auto& it : list_words) {
     // calculate levensthein.
-    double value = fuzzy::contains(word.c_str(), it.first.c_str(), word.length(), it.first.length()); 
+    double value = fuzzy::Contains(word.c_str(), it.first.c_str(), word.length(), it.first.length()); 
     
     // Only add if found (0: direct match, 1,2: fuzzy or contains match)
     if(value != -1) {

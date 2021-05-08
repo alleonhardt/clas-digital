@@ -42,7 +42,7 @@ int main(int argc, char* argv[]) {
   std::string cmd_arg = (argc > 1) ? argv[1] : "";
   bool fuzzy_search = (cmd_arg == "fuzzy") ? true : false;
 
-  BaseData* base_data = BaseData::wiki_instance("wiki_data");
+  BaseData* base_data = BaseData::wiki_instance("wiki_data", false);
   
   // Initialize basic search_options.
   SearchOptions search_options(fuzzy_search, false, false, 0, 2070, 0, "", {"XCFFDRQC"});

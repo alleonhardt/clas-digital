@@ -13,14 +13,19 @@
 namespace fuzzy
 {
     /**
-    * Levenshtein distance algorithm as a iterative function
+    * Levenshtein distance algorithm as a iterative function, sensitiv to given
+    * threshold.
     * @parameter const char* (searched word)
     * @parameter const char* (target word)
     * @return int (levenshtein distance)
     **/
     short lshtein(const char* chS, const char* chT, size_t len_s1, size_t len_s2, size_t max_score);
+
+    short lshteinNoStop(const char* chS, const char* chT, size_t len_s1, size_t len_s2, size_t max_score);
+
+    size_t LevenshteinDistance(const char* chS, const char* chT);
             
-    short contains(const char* input, const char* given, size_t len_input, size_t len_given);
+    short Contains(const char* input, const char* given, size_t len_input, size_t len_given);
 
     /**
     * @brief compare to words with fuzzy search and case insensetive, AND modify id

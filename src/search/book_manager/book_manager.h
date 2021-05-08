@@ -26,6 +26,7 @@
 #include "result_object.h"
 #include "search_object.h"
 #include "search_options.h"
+#include "search_tree.h"
 
 class BookManager {
   private:
@@ -48,6 +49,8 @@ class BookManager {
     typedef std::vector<std::array<std::string, 100000>> index_list_type;
     index_list_type index_list_;
     index_list_type index_list_b_;
+
+    SearchTree* search_tree_;
 
     typedef std::vector<std::pair<std::string, size_t>> sorted_list_type;
     sorted_list_type list_words_; ///< Sorted list of all words by score (for typeahead).
