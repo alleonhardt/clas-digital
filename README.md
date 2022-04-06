@@ -39,6 +39,34 @@ cmake --build .
 cmake . --target install
 ```
 
+__Possible errors:__
+In case of a glibc link-error during the conan install process, which might look something like this: 
+```
+usr/bin/ld: /home/<user>/.conan/data/openjpeg/2.4.0///package/dfbe50feef7f3c6223a476cd5aeadb687084a646/lib/libopenjp2.a(tcd.c.o): in function `opj_tcd_rateallocate':
+tcd.c:(.text+0x39d5): undefined reference to `__exp_finite'
+/usr/bin/ld: /home/<user>/.conan/data/openjpeg/2.4.0///package/dfbe50feef7f3c6223a476cd5aeadb687084a646/lib/libopenjp2.a(tcd.c.o): in function `opj_tcd_init_tile':
+tcd.c:(.text+0x4a95): undefined reference to `__exp2_finite'
+```
+
+You should build the package in question (rather than using prebuild binary from
+conan.io). Here: openjpeg:
+Create a conanfile.txt:
+```
+[requires]
+openjpeg/2.4.0
+
+[generators]
+cmake
+```
+
+Then install openjpeg and build package
+```
+`conan install conanfile.txt --build=openjpeg`
+```
+
+When this is done, restart the installation as described above.
+
+
 <br/>
 <br/>
 
