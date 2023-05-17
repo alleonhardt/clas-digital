@@ -47,7 +47,7 @@ bool PdfExtractor::FindPdf() {
   //iterate over given directory and find pdf
   for (const auto& p : fs::directory_iterator(cur_path_)) {
     if (p.path().extension() == ".pdf") {
-      cur_path_to_pdf_ = p.path();
+      cur_path_to_pdf_ = "'" + p.path().string() + "'";
       return true;
     }
   }
@@ -62,7 +62,7 @@ bool PdfExtractor::FindPdf() {
 */
 bool PdfExtractor::ConvertToText() {
 
-  //Convert one page after the oter. Authomatically breaky, when page to high.
+  //Convert one page after the other. Authomatically breaky, when page to high.
   for (size_t i=1; i<1000000; i++) {
 
     //Construct comand to extract nth page.

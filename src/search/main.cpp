@@ -67,6 +67,7 @@ void Search(const Request& req, Response& resp, const std::vector<std::string>&
   else {
     str_pillars = "using all pillars (default)";
     pillars = zotero_pillars;
+    pillars.push_back("undefined");
   }
 
   // Get published after/ published before:
@@ -329,8 +330,10 @@ int main(int argc, char *argv[]) {
   // Load active pillars:
   std::cout << "Loading active collections...";
   std::vector<std::string> zotero_pillars = nlohmann::json::array();
-  for (auto it : metadata["collections"]["data"])
+  for (auto it : metadata["collections"]["data"]) {
+    std::cout << "Added pillar: " << it["key"] << std::endl;
     zotero_pillars.push_back(it["key"]);
+  }
 
   // Create book manager
   std::cout << "initializing bookmanager..." << std::endl;

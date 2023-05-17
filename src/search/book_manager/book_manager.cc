@@ -229,6 +229,10 @@ void BookManager::NormalSearch(std::string word, SearchOptions& search_options,
   } catch(...) {
     return;
   }
+  std::cout << "Results before checking search-options: " << tmp.size() << std::endl;
+  for (const auto& it : tmp) {
+    std::cout << "- " << it.first << std::endl;
+  }
 
   // For each found book, whether it matches with the search-options. If so, add
   // new-search-result.
@@ -236,6 +240,7 @@ void BookManager::NormalSearch(std::string word, SearchOptions& search_options,
     if (CheckSearchOptions(search_options, documents_[it.first]))
       results[it.first].NewResult(word, word, it.second.scope_, 0, it.second.relevance_);
   }
+  std::cout << "Results before checking search-options: " << results.size() << std::endl;
 }
 
 void BookManager::FuzzySearch(std::string word, SearchOptions& search_options, 
@@ -266,32 +271,47 @@ void BookManager::FuzzySearch(std::string word, SearchOptions& search_options,
 bool BookManager::CheckSearchOptions(SearchOptions& search_options, Book* document) {
   
   // If only metadata, but document has a corpus return false
-  if (search_options.only_metadata() && document->has_ocr())
+  if (search_options.only_metadata() && document->has_ocr()) {
+    std::cout << "Searching only metadata, but has ocr" << std::endl;
     return false;
+  }
 
   // If only corpus, but document does not have a corpus, return false
-  if (search_options.only_corpus() && !document->has_ocr())
+  if (search_options.only_corpus() && !document->has_ocr()) {
+    std::cout << "Searching only corpus, but does not have ocr" << std::endl;
     return false;
+  }
   
   // If an author is given and in the string of authors, the auther is not
   // found, return false.
   if (search_options.author().length() > 0) {
-    if (document->authors().count(search_options.author()) == 0)
+    if (document->authors().count(search_options.author()) == 0) {
+      std::cout << "Searching author )" << search_options.author() << "), but book not from this author" << std::endl;
       return false;
+    }
   }
 
   // If date is specified (→ date is not -1) return false if date is outside of timerange.
   int date = document->date();
-  if (date != -1 && (date < search_options.year_from() || date > search_options.year_to()))
+  if (date != -1 && (date < search_options.year_from() || date > search_options.year_to())) {
+    std::cout << "Wrong date: " << date << std::endl;
     return false;
+  }
        
   // If no collections are specified in search options, return true
   if (search_options.collections().size() == 0)
     return true;
+  std::cout << "Book collections: " << std::endl;
+  for (const auto& it : document->collections()) {
+    std::cout << "- " << it << std::endl;
+  }
+  std::cout << "Checking collections: " << std::endl;
   for (const auto& collection : search_options.collections()) {
+    std::cout << "- " << collection << std::endl;
     if (document->collections().count(collection) > 0)
       return true;
   }
+  std::cout << "Wrong collection: " << std::endl;
   return false;
 }
 

@@ -4,7 +4,7 @@ inja/3.0.0
 cpp-httplib/0.7.5
 nlohmann_json/3.9.1 
 stb/20200203 
-catch2/2.13.0
+catch2/2.13.8
 termcolor/1.0.1
 openssl/1.1.1g
 libcurl/7.72.0

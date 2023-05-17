@@ -38,14 +38,14 @@ server {
 	#
 	# include snippets/snakeoil.conf;
 
-	server_name _;
+	server_name localhost:1440;
   error_log  /var/www/clas-digital/nginx_error.log  warn;
 	
 	location /api/v2/search {
-        	proxy_pass http://localhost:4848;
+      proxy_pass http://localhost:4848;
 	}
 	location /search {
-        	proxy_pass http://localhost:1440;
+      proxy_pass http://localhost:1440;
 	}
 
 	location / {

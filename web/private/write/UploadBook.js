@@ -245,7 +245,7 @@ function ShowImageSlide(fl,key)
 function ShowBookContentLink()
 {
     let lnk = ExtractKey();
-    document.getElementById("BookContentLink").innerHTML = "<a href='/ShowMetadata.html?scanId="+lnk+"' target='_blank'> Book Metadata</a>";
+    document.getElementById("BookContentLink").innerHTML = "<a href='/books/"+lnk+"'> Book Metadata</a>";
 }
 
 let gBaseTitle = null;
